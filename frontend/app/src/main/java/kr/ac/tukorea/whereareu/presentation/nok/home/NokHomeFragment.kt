@@ -2,7 +2,6 @@ package kr.ac.tukorea.whereareu.presentation.nok.home
 
 import android.content.Context
 import android.content.Context.MODE_PRIVATE
-import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.PointF
 import android.util.Log
@@ -10,8 +9,8 @@ import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -23,7 +22,6 @@ import com.naver.maps.map.NaverMap
 import com.naver.maps.map.OnMapReadyCallback
 import com.naver.maps.map.overlay.OverlayImage
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
 import kr.ac.tukorea.whereareu.R
 import kr.ac.tukorea.whereareu.data.model.home.GetLocationInfoResponse
 import kr.ac.tukorea.whereareu.databinding.IconLocationOverlayLayoutBinding
@@ -48,6 +46,17 @@ class NokHomeFragment : BaseFragment<kr.ac.tukorea.whereareu.databinding.Fragmen
     private lateinit var behavior: BottomSheetBehavior<ConstraintLayout>
 
     override fun initObserver() {
+        repeatOnStarted {
+            viewModel.isPredicted.collect{ isPredicted ->
+                binding.homeGroup.isVisible = !isPredicted
+                binding.bottomSheet.isVisible = isPredicted
+                binding.predictLayout.isVisible = isPredicted
+                if(isPredicted) {
+                    initBottomSheet()
+                    initMeaningfulListRVA()
+                }
+            }
+        }
     }
 
     private fun updateDementiaMovementStatus(status: Int): String{
@@ -124,21 +133,27 @@ class NokHomeFragment : BaseFragment<kr.ac.tukorea.whereareu.databinding.Fragmen
     }
 
     override fun initView() {
+        binding.view = this
+        binding.viewModel = viewModel
         checkLocationPermission()
         updateDementiaName()
         initMap()
-        goToPredictLocationFragment()
     }
 
-    private fun goToPredictLocationFragment(){
-        binding.predictTv.setOnClickListener {
+    fun predict(){
             viewModel.setIsPredicted(true)
-            binding.homeGroup.visibility = View.GONE
+            /*binding.homeGroup.visibility = View.GONE
             binding.bottomSheet.visibility = View.VISIBLE
-            initBottomSheet()
-            initMeaningfulListRVA()
+            binding.predictLayout.visibility = View.VISIBLE*/
+            //binding.predictGroup.visibility = View.VISIBLE
+            /*initBottomSheet()
+            initMeaningfulListRVA()*/
             //navigator.navigate(R.id.action_nokHomeFragment_to_predictLocationFragment)
-        }
+
+    }
+
+    fun stopPredict(){
+        viewModel.setIsPredicted(false)
     }
 
     private fun initMeaningfulListRVA(){
