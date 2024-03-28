@@ -2,6 +2,10 @@ from pyclustering.cluster.gmeans import gmeans
 from collections import Counter
 import numpy as np
 import pandas as pd
+import warnings
+
+warnings.simplefilter(action='ignore', category=FutureWarning) # FutureWarning 제거
+pd.set_option('mode.chained_assignment', None)
 
 class LocationAnalyzer:
     def __init__(self, filename):
@@ -22,16 +26,16 @@ class LocationAnalyzer:
 
         # 데이터에 불필요한 부분 제거
         # 추후 데이터 형식에 따라 수정 필요 *
-        data = data.split('\n')[:-1]
-        # data = data.split('\n')[6:-1]
+        # data = data.split('\n')[:-1]
+        data = data.split('\n')[6:-1]
         for i in range(len(data)):
             line = data[i].split(',')
             latitude.append(line[0])    # 위도
             longitude.append(line[1])   # 경도
-            date.append(line[2])        # 날짜
-            time.append(line[3])        # 시간
-            # date.append(line[5])
-            # time.append(line[6])
+            #date.append(line[2])        # 날짜
+            #time.append(line[3])        # 시간
+            date.append(line[5])
+            time.append(line[6])
         df = pd.DataFrame({"latitude":latitude, "longitude":longitude, "date":date, "time":time})
 
     
@@ -111,9 +115,13 @@ if __name__ == '__main__':
 
     data = la.gmeansFunc()
     
-    print(data)
-    print(type(data))
-
-
     
-    
+    print(data[1])
+    print(data[1][0])
+    print(data[1][0][0]) # latitude
+    print(data[1][0][1]) # longitude
+    print(data[1][2]) # time
+    print(data[1][3]) # w
+
+    print(type(data[1][2]))
+    print(type(data[1][3]))
