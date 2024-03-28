@@ -23,13 +23,15 @@ class LocationAnalyzer:
         # 데이터에 불필요한 부분 제거
         # 추후 데이터 형식에 따라 수정 필요 *
         data = data.split('\n')[:-1]
+        # data = data.split('\n')[6:-1]
         for i in range(len(data)):
             line = data[i].split(',')
             latitude.append(line[0])    # 위도
             longitude.append(line[1])   # 경도
             date.append(line[2])        # 날짜
             time.append(line[3])        # 시간
-
+            # date.append(line[5])
+            # time.append(line[6])
         df = pd.DataFrame({"latitude":latitude, "longitude":longitude, "date":date, "time":time})
 
     
@@ -97,19 +99,21 @@ class LocationAnalyzer:
             data_df['hour_block'].iloc[i] = most_hour_value
             data_df['day_of_week'].iloc[i] = most_day_value
 
-
-        return data_df
+        data_list = data_df.values.tolist()
+        return data_list
     
 
 
 if __name__ == '__main__':
     # 파일 경로 가져오기
-    filePath = r"C:\Users\sk002\OneDrive\문서\카카오톡 받은 파일\location_data_for_dementia_key_253050_2024-03-19.txt"
+    filePath = r"C:\Users\sk002\OneDrive\바탕 화면\학교\Yoodori\Geolife Trajectories 1.3\Data\003\Trajectory\20081202160051.txt"
     la = LocationAnalyzer(filePath)
 
     data = la.gmeansFunc()
     
     print(data)
+    print(type(data))
+
 
     
     
