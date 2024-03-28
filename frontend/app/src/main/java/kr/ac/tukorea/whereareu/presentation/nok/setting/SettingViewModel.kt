@@ -27,21 +27,16 @@ class SettingViewModel @Inject constructor(
     private val _updateOtherUserInfo = MutableSharedFlow<ModifyUserInfoResponse>()
     val updateOtherUserInfo = _updateOtherUserInfo.asSharedFlow()
 
-    fun setUpdateUserInfo(request: ModifyUserInfoRequest) {
+    fun sendUpdateUserInfo(request: ModifyUserInfoRequest) {
         viewModelScope.launch(Dispatchers.IO) {
-            repository.sendModifyUserInfo(request).onSuccess {
+            repository.sendModifyUserInfo(request).onSuccess {response ->
                 Log.d("UpdateUserInfo", "UserInfoChanged")
-                _updateOtherUserInfo.emit(ModifyUserInfoResponse(it.message, it.status))
-//                Log.d("UpdateUserInfo", "UserInfoChanged")
-//                response?.let {
-//                    _updateOtherUserInfo.emit(ModifyUserInfoResponse(it.message, it.status))
-//                } ?: run {
-//                    Log.e("UpdateUserInfo", "ModirfyUserInfoResponse is null")
+                _updateOtherUserInfo.emit(response)
             }
         }
     }
 
-    fun setUpdateOtherUserInfo(request: ModifyUserInfoRequest) {
+    fun sendUpdateOtherUserInfo(request: ModifyUserInfoRequest) {
         viewModelScope.launch(Dispatchers.IO) {
             repository.sendModifyUserInfo(request).onSuccess {
                 Log.d("UpdateOtherUserInfo", "OtherUserInfoChanged")

@@ -2,6 +2,7 @@ package kr.ac.tukorea.whereareu.presentation
 
 import android.content.Context.MODE_PRIVATE
 import android.telephony.PhoneNumberFormattingTextWatcher
+import android.util.Log
 import android.view.inputmethod.EditorInfo
 import android.widget.Toast
 import androidx.core.content.ContentProviderCompat.requireContext
@@ -31,37 +32,19 @@ class ModifyUserInfoFragment :
 
     override fun initObserver() {
         binding.viewModel = viewModel
-//        repeatOnStarted {
-//            viewModel.updateUserInfo.collect{userInfo ->
-//                userInfo?.let {
-//                    // 수정한 정보 저장
-//                    val nokSpf = requireActivity().getSharedPreferences("User", MODE_PRIVATE)
-//                    nokSpf.edit {
-//                        putString("name", binding.userNameEt.text.toString())
-//                        putString("phone", binding.userPhoneEt.text.toString())
-//                        commit()
-//                    }
-//                }
-//            }
-//        }
-        viewModel?.let { // viewModel이 null이 아닌 경우에만 실행
-            repeatOnStarted {
-                it.updateUserInfo?.collect { userInfo ->
-                    userInfo?.let { // userInfo가 null이 아닌 경우에만 실행
-                        // 수정한 정보 저장
-                        val nokSpf = requireActivity().getSharedPreferences("User", MODE_PRIVATE)
-                        nokSpf.edit {
-                            putString("name", binding.userNameEt.text.toString())
-                            putString("phone", binding.userPhoneEt.text.toString())
-                            commit()
-                        }
+        repeatOnStarted {
+            viewModel.updateUserInfo.collect { userInfo ->
+                userInfo.let {
+                    // 수정한 정보 저장
+                    val nokSpf = requireActivity().getSharedPreferences("User", MODE_PRIVATE)
+                    nokSpf.edit {
+                        putString("name", binding.userNameEt.text.toString())
+                        putString("phone", binding.userPhoneEt.text.toString())
+                        commit()
                     }
+                    Log.d("updateUserInfo", userInfo.message)
                 }
             }
-        } ?: run {
-            // viewModel이 null인 경우 처리할 로직 작성
-            // 예를 들어, Toast 메시지를 표시하거나 로그를 출력할 수 있습니다.
-            Toast.makeText(requireContext(), "ViewModel이 null입니다.", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -86,18 +69,20 @@ class ModifyUserInfoFragment :
                     userPhoneEt.error = "전화번호 형식이 다릅니다.\n입력 예시) 010-1234-5678"
                 }
             }
-            binding.finishBtn.setOnClickListener {
-                binding.userNameEt.error = if (!validUserName()) "최소 2자의 한글을 입력해주세요" else null
-                binding.userPhoneEt.error =
-                    if (!validUserPhone()) "전화번호 형식이 다릅니다.\n예시) 010-1234-5678" else null
+        }
+        binding.finishBtn.setOnClickListener {
+            binding.userNameEt.error = if (!validUserName()) "최소 2자의 한글을 입력해주세요" else null
+            binding.userPhoneEt.error =
+                if (!validUserPhone()) "전화번호 형식이 다릅니다.\n예시) 010-1234-5678" else null
 
-                val spf = requireActivity().getSharedPreferences("User", MODE_PRIVATE)
-                val key = spf.getString("key", "")
+            val spf = requireActivity().getSharedPreferences("User", MODE_PRIVATE)
+            val key = spf.getString("key", "")
 
-                viewModel.setUpdateUserInfo(ModifyUserInfoRequest(0, key, binding.userNameEt.text.toString().trim(), binding.userPhoneEt.text.toString().trim()))
-            }
+            viewModel.sendUpdateUserInfo(ModifyUserInfoRequest(0, key ?: "", binding.userNameEt.text.toString().trim()!!, binding.userPhoneEt.text.toString().trim()!!))
+            Toast.LENGTH_SHORT
         }
     }
+
     fun onClickBackBtn() {
 //        navigator.popBackStack()
         requireActivity().supportFragmentManager.popBackStack()
