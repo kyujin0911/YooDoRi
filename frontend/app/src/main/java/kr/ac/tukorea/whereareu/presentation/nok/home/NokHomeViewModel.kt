@@ -28,6 +28,9 @@ class NokHomeViewModel @Inject constructor(
     private val _dementiaLocation = MutableSharedFlow<LocationInfoResponse>(replay = 1)
     val dementiaLocation = _dementiaLocation.asSharedFlow()
 
+    val isInternetOn = MutableStateFlow(true)
+    val isGpsOn = MutableStateFlow(true)
+
     private val _updateDuration = MutableStateFlow<Long>(300000 * 1000)
     val updateDuration = _updateDuration.asStateFlow()
 
@@ -72,6 +75,8 @@ class NokHomeViewModel @Inject constructor(
         viewModelScope.launch {
             repository.getDementiaLocationInfo(_dementiaKey.value).onSuccess {
                 _dementiaLocation.emit(it)
+                isInternetOn.value = it.isInternetOn
+                isGpsOn.value = it.isGpsOn
             }.onError {
                 Log.d("error", it.toString())
             }.onException {

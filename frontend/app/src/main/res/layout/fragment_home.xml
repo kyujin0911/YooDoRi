@@ -123,7 +123,7 @@
                         android:layout_height="25dp"
                         android:layout_marginStart="20dp"
                         android:layout_marginTop="5dp"
-                        android:src="@drawable/ic_wifi_on"
+                        android:src="@{viewModel.isInternetOn ? @drawable/ic_wifi_on : @drawable/ic_wifi_off}"
                         app:layout_constraintStart_toEndOf="@+id/oval_v"
                         app:layout_constraintTop_toBottomOf="@+id/line_v" />
 
@@ -132,7 +132,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="5dp"
-                        android:text="on"
+                        android:text='@{viewModel.isInternetOn ? "on" : "off"}'
                         android:textAppearance="@style/TextAppearance.App.16sp.SemiBold"
                         app:layout_constraintBottom_toBottomOf="@+id/wifi_iv"
                         app:layout_constraintStart_toEndOf="@+id/wifi_iv"
@@ -143,7 +143,7 @@
                         android:layout_width="25dp"
                         android:layout_height="25dp"
                         android:layout_marginStart="15dp"
-                        android:src="@drawable/ic_gps_on_24"
+                        android:src="@{viewModel.isGpsOn ? @drawable/ic_gps_on : @drawable/ic_gps_off}"
                         app:layout_constraintBottom_toBottomOf="@+id/wifi_iv"
                         app:layout_constraintStart_toEndOf="@+id/internet_status_tv" />
 
@@ -152,7 +152,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="5dp"
-                        android:text="on"
+                        android:text='@{viewModel.isGpsOn ? "on" : "off"}'
                         android:textAppearance="@style/TextAppearance.App.16sp.SemiBold"
                         app:layout_constraintBottom_toBottomOf="@+id/wifi_iv"
                         app:layout_constraintStart_toEndOf="@+id/gps_iv"
@@ -396,6 +396,7 @@
             android:elevation="10dp"
             android:padding="16dp"
             android:visibility="@{viewModel.isPredicted ? View.VISIBLE : View.GONE}"
+            tools:visibility="gone"
             app:behavior_hideable="false"
             app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
 

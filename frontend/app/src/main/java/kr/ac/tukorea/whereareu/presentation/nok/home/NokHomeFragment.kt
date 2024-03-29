@@ -10,7 +10,6 @@ import android.view.ViewTreeObserver.OnGlobalLayoutListener
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -29,7 +28,6 @@ import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kr.ac.tukorea.whereareu.R
-import kr.ac.tukorea.whereareu.data.model.dementia.home.PostLocationInfoResponse
 import kr.ac.tukorea.whereareu.data.model.nok.home.LocationInfoResponse
 import kr.ac.tukorea.whereareu.databinding.IconLocationOverlayLayoutBinding
 import kr.ac.tukorea.whereareu.domain.home.MeaningfulPlace
@@ -66,6 +64,23 @@ class NokHomeFragment : BaseFragment<kr.ac.tukorea.whereareu.databinding.Fragmen
                 }
             }
         }
+
+        repeatOnStarted {
+            viewModel.predictEvent.collect{ predictEvent ->
+                handlePredictEvent(predictEvent)
+            }
+        }
+    }
+
+    private fun handlePredictEvent(event: NokHomeViewModel.PredictEvent){
+        when(event){
+            is NokHomeViewModel.PredictEvent.DementiaLastInfoEvent -> {
+
+            }
+            is NokHomeViewModel.PredictEvent.MeaningFulPlaceEvent -> {
+
+            }
+        }
     }
 
     private fun updateDementiaMovementStatus(status: Int): String{
@@ -82,21 +97,6 @@ class NokHomeFragment : BaseFragment<kr.ac.tukorea.whereareu.databinding.Fragmen
         with(binding){
             stateTv.text = updateDementiaMovementStatus(dementiaStatus.userStatus)
             batteryTv.text = "${dementiaStatus.battery}%"
-            if (dementiaStatus.isInternetOn){
-                internetStatusTv.text = "on"
-                wifiIv.setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.ic_wifi_on))
-            } else {
-                internetStatusTv.text = "off"
-                wifiIv.setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.ic_wifi_off))
-            }
-
-            if (dementiaStatus.isGpsOn){
-                gpsStatusTv.text = "on"
-                gpsIv.setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.ic_gps_on_24))
-            } else {
-                gpsStatusTv.text = "off"
-                gpsIv.setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.ic_gps_off_24))
-            }
 
             when(dementiaStatus.isRingstoneOn){
                 0 -> {
@@ -124,17 +124,19 @@ class NokHomeFragment : BaseFragment<kr.ac.tukorea.whereareu.databinding.Fragmen
     private fun trackingDementiaLocation(coord: LatLng, bearing: Float, name: String, speed: Float){
         naverMap?.let {
             val locationOverlay = it.locationOverlay
-            locationOverlay.isVisible = true
             val iconBinding = IconLocationOverlayLayoutBinding.inflate(layoutInflater)
-            iconBinding.nameTv.text = name
+            val icon = iconBinding.layout
 
-            // m/s to km/h
-            iconBinding.speedTv.text = (speed * 3.6).roundToInt().toString()
-            val speedTv = iconBinding.layout
-            locationOverlay.icon = OverlayImage.fromView(speedTv)
-            locationOverlay.circleRadius = 0
-            locationOverlay.position = coord
-            locationOverlay.anchor = PointF(0.5f, 1f)
+            with(locationOverlay){
+                isVisible = true
+                // m/s to km/h
+                iconBinding.speedTv.text = (speed * 3.6).roundToInt().toString()
+                iconBinding.nameTv.text = name
+                locationOverlay.icon = OverlayImage.fromView(icon)
+                locationOverlay.circleRadius = 0
+                locationOverlay.position = coord
+                locationOverlay.anchor = PointF(0.5f, 1f)
+            }
 
             it.moveCamera(CameraUpdate.scrollTo(coord))
         }
@@ -157,13 +159,14 @@ class NokHomeFragment : BaseFragment<kr.ac.tukorea.whereareu.databinding.Fragmen
     }
 
     private fun initMeaningfulListRVA(){
-        binding.rv.adapter = meaningfulListRVA
-        binding.rv.addItemDecoration(
+        binding.rv.apply {
+            adapter = meaningfulListRVA
+            addItemDecoration(
             DividerItemDecoration(
                 requireContext(),
                 LinearLayoutManager.VERTICAL
             )
-        )
+        )}
         val list = listOf<MeaningfulPlace>(
             MeaningfulPlace("한국공학대학교", "시흥시 뭐시기"),
             MeaningfulPlace("한국공학대학교", "시흥시 뭐시기"),
