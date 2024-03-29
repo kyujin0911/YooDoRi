@@ -65,14 +65,14 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
             repeatOnStarted {
                 viewModel.updateDuration.collect { duration ->
                     Log.d("duration", duration.toString())
-                    if (updateLocationJob == null) {
-                        updateLocationJob = makeUpdateLocationJob(duration)
+                    updateLocationJob = if (updateLocationJob == null) {
+                        makeUpdateLocationJob(duration)
                     }
 
                     // 실행중인 coroutine이 있으면 job을 취소하고 duration에 맞게 재시작
                     else {
                         updateLocationJob?.cancelAndJoin()
-                        updateLocationJob = makeUpdateLocationJob(duration)
+                        makeUpdateLocationJob(duration)
                     }
                 }
             }

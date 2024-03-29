@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kr.ac.tukorea.whereareu.data.model.DementiaKeyRequest
 import kr.ac.tukorea.whereareu.data.model.login.request.CheckInterConnectRequest
 import kr.ac.tukorea.whereareu.domain.login.NokInfo
 import kr.ac.tukorea.whereareu.data.model.login.request.DementiaIdentityRequest
@@ -70,7 +71,7 @@ class LoginViewModel @Inject constructor(
         }
     }
 
-    fun checkConnected(request: CheckInterConnectRequest) {
+    fun checkConnected(request: DementiaKeyRequest) {
         viewModelScope.launch(Dispatchers.IO) {
             repository.checkInterConnected(request).onSuccess {
                 _navigateToDementiaMainEvent.emit(NokInfo(it.nokInfoRecord.nokKey, it.nokInfoRecord.nokName, it.nokInfoRecord.nokPhoneNumber))

@@ -3,6 +3,7 @@ package kr.ac.tukorea.whereareu.data.repository.login
 import kr.ac.tukorea.whereareu.data.model.login.request.NokIdentityRequest
 import kr.ac.tukorea.whereareu.data.model.login.response.NokIdentityResponse
 import kr.ac.tukorea.whereareu.data.api.LoginService
+import kr.ac.tukorea.whereareu.data.model.DementiaKeyRequest
 import kr.ac.tukorea.whereareu.data.model.login.request.CheckInterConnectRequest
 import kr.ac.tukorea.whereareu.data.model.login.response.CheckInterConnectResponse
 import kr.ac.tukorea.whereareu.data.model.login.request.DementiaIdentityRequest
@@ -23,7 +24,7 @@ class LoginRepositoryImpl @Inject constructor(
         return handleApi({api.postDementiaIdentity(request)}) { response: ResponseBody<DementiaIdentityResponse> -> response.result }
     }
 
-    override suspend fun checkInterConnected(request: CheckInterConnectRequest): NetworkResult<CheckInterConnectResponse> {
+    override suspend fun checkInterConnected(request: DementiaKeyRequest): NetworkResult<CheckInterConnectResponse> {
         return handleApi({api.postIsConnected(request)}) { response: ResponseBody<CheckInterConnectResponse> -> response.result}
     }
 

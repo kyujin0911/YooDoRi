@@ -9,6 +9,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import dagger.hilt.android.AndroidEntryPoint
 import kr.ac.tukorea.whereareu.R
+import kr.ac.tukorea.whereareu.data.model.DementiaKeyRequest
 import kr.ac.tukorea.whereareu.data.model.login.request.CheckInterConnectRequest
 import kr.ac.tukorea.whereareu.databinding.FragmentPatientOtpBinding
 import kr.ac.tukorea.whereareu.databinding.ToastLayoutBinding
@@ -81,6 +82,6 @@ class PatientOtpFragment : BaseFragment<FragmentPatientOtpBinding>(R.layout.frag
     }
 
     fun onClickInputDone() {
-        viewModel.checkConnected(CheckInterConnectRequest(binding.displayOtpTv.text.toString()))
+        viewModel.checkConnected(DementiaKeyRequest(binding.displayOtpTv.text.toString()))
     }
 }

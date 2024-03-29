@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kr.ac.tukorea.whereareu.data.model.DementiaKeyRequest
 import kr.ac.tukorea.whereareu.data.model.nok.home.LocationInfoResponse
 import kr.ac.tukorea.whereareu.data.repository.nok.home.NokHomeRepositoryImpl
 import kr.ac.tukorea.whereareu.util.network.onError
@@ -45,7 +46,6 @@ class NokHomeViewModel @Inject constructor(
 
     fun setUpdateDuration(duration: Long) {
         viewModelScope.launch {
-            //Log.d("duration", duration.toString())
             _updateDuration.emit(duration * 60 * 1000)
         }
     }
@@ -64,10 +64,19 @@ class NokHomeViewModel @Inject constructor(
         }
     }
 
-    fun getMeaningfulPlace(){
+    private fun getMeaningfulPlace(){
         viewModelScope.launch {
             repository.getMeaningfulPlace("253050").onSuccess {
                 Log.d("meaningful", it.toString())
+            }
+        }
+    }
+
+    fun getDementiaLastInfo(){
+        viewModelScope.launch {
+            repository.getDementiaLastInfo(DementiaKeyRequest("253050")).onSuccess {
+                Log.d("last info", it.toString())
+                getMeaningfulPlace()
             }
         }
     }

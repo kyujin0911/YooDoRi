@@ -61,7 +61,7 @@ class NokHomeFragment : BaseFragment<kr.ac.tukorea.whereareu.databinding.Fragmen
                 binding.predictLayout.isVisible = isPredicted
                 if(isPredicted) {
                     startCountDown()
-                    viewModel.getMeaningfulPlace()
+                    viewModel.getDementiaLastInfo()
                     initBottomSheet()
                     initMeaningfulListRVA()
                 } else {
