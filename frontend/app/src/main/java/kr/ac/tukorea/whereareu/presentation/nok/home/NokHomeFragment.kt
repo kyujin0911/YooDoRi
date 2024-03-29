@@ -61,7 +61,7 @@ class NokHomeFragment : BaseFragment<kr.ac.tukorea.whereareu.databinding.Fragmen
                 binding.predictLayout.isVisible = isPredicted
                 if(isPredicted) {
                     startCountDown()
-                    viewModel.getMeaningfulPlace("253050")
+                    viewModel.getMeaningfulPlace()
                     initBottomSheet()
                     initMeaningfulListRVA()
                 } else {
@@ -137,7 +137,6 @@ class NokHomeFragment : BaseFragment<kr.ac.tukorea.whereareu.databinding.Fragmen
             locationOverlay.icon = OverlayImage.fromView(speedTv)
             locationOverlay.circleRadius = 0
             locationOverlay.position = coord
-            //locationOverlay.bearing = bearing
             locationOverlay.anchor = PointF(0.5f, 1f)
 
             it.moveCamera(CameraUpdate.scrollTo(coord))
@@ -239,7 +238,6 @@ class NokHomeFragment : BaseFragment<kr.ac.tukorea.whereareu.databinding.Fragmen
                     minute += 1
                     second = 0
                 }
-                Log.d("time", "$minute $second")
                 binding.countDownT.text = String.format("%02d:%02d",minute, second)
                 delay(1000L)
             }

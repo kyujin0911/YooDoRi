@@ -31,6 +31,12 @@ class NokHomeViewModel @Inject constructor(
     private val _isPredicted = MutableStateFlow(false)
     val isPredicted = _isPredicted.asStateFlow()
 
+    private val _dementiaKey = MutableStateFlow("")
+
+    fun saveDementiaKey(dementiaKey: String){
+        _dementiaKey.value = dementiaKey
+    }
+
     fun setIsPredicted(boolean: Boolean) {
         viewModelScope.launch {
             _isPredicted.emit(boolean)
@@ -44,9 +50,9 @@ class NokHomeViewModel @Inject constructor(
         }
     }
 
-    fun getDementiaLocation(dementiaKey: String) {
+    fun getDementiaLocation() {
         viewModelScope.launch {
-            repository.getDementiaLocationInfo(dementiaKey).onSuccess {
+            repository.getDementiaLocationInfo(_dementiaKey.value).onSuccess {
                 _dementiaLocation.emit(it)
             }.onError {
                 Log.d("error", it.toString())
@@ -58,9 +64,9 @@ class NokHomeViewModel @Inject constructor(
         }
     }
 
-    fun getMeaningfulPlace(dementiaKey: String){
+    fun getMeaningfulPlace(){
         viewModelScope.launch {
-            repository.getMeaningfulPlace(dementiaKey).onSuccess {
+            repository.getMeaningfulPlace(_dementiaKey.value).onSuccess {
                 Log.d("meaningful", it.toString())
             }
         }

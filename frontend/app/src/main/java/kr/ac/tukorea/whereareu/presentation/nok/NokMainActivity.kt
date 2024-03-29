@@ -59,22 +59,28 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
         val spf = getSharedPreferences("OtherUser", MODE_PRIVATE)
         val dementiaKey = spf.getString("key", "")
         if (!dementiaKey.isNullOrEmpty()) {
+            viewModel.saveDementiaKey(dementiaKey)
+
+            // 실행중인 coroutine이 없으면 새로운 job을 생성해서 실행
             repeatOnStarted {
                 viewModel.updateDuration.collect { duration ->
                     Log.d("duration", duration.toString())
                     if (updateLocationJob == null) {
                         updateLocationJob = lifecycleScope.launch {
                             while (true) {
-                                viewModel.getDementiaLocation(dementiaKey)
+                                viewModel.getDementiaLocation()
                                 Log.d("duration null test", duration.toString())
                                 delay(duration)
                             }
                         }
-                    } else {
+                    }
+
+                    // 실행중인 coroutine이 있으면 job을 취소하고 duration에 맞게 재시작
+                    else {
                         updateLocationJob?.cancelAndJoin()
                         updateLocationJob = lifecycleScope.launch {
                             while (true) {
-                                viewModel.getDementiaLocation(dementiaKey)
+                                viewModel.getDementiaLocation()
                                 Log.d("duration not null test", duration.toString())
                                 delay(duration)
                             }
@@ -84,6 +90,14 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
             }
         }
     }
+
+    /*fun makeUpdateLocationJob(duration: Long): Job{
+        return lifecycleScope.launch {
+            while (true){
+                viewModel.getDementiaLocation()
+            }
+        }
+    }*/
 
     private fun stopGetDementiaLocation() {
         lifecycleScope.launch {
