@@ -53,9 +53,6 @@ class NokHomeFragment : BaseFragment<kr.ac.tukorea.whereareu.databinding.Fragmen
     }
     private lateinit var behavior: BottomSheetBehavior<ConstraintLayout>
     private var countDownJob: Job? = null
-    private var dementiaLocationInfo: LocationInfoResponse? = null
-    private var isNaverMapReady = false
-
     override fun initObserver() {
         repeatOnStarted {
             viewModel.isPredicted.collect{ isPredicted ->
@@ -300,12 +297,9 @@ class NokHomeFragment : BaseFragment<kr.ac.tukorea.whereareu.databinding.Fragmen
     override fun onResume() {
         super.onResume()
         Log.d("resume", "resume")
-        Log.d("ready", naverMap?.isDestroyed.toString())
         repeatOnStarted {
             delay(500)
             viewModel.dementiaLocation.collect{ response ->
-                Log.d("ready", naverMap?.isDestroyed.toString())
-                dementiaLocationInfo = response
                 Log.d("response", response.toString())
                 updateDementiaStatus(response)
                 val coord = LatLng(response.latitude, response.longitude)

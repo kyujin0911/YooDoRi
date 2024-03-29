@@ -66,7 +66,7 @@ class NokHomeViewModel @Inject constructor(
 
     fun getMeaningfulPlace(){
         viewModelScope.launch {
-            repository.getMeaningfulPlace(_dementiaKey.value).onSuccess {
+            repository.getMeaningfulPlace("253050").onSuccess {
                 Log.d("meaningful", it.toString())
             }
         }
