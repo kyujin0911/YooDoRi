@@ -1,10 +1,8 @@
 package kr.ac.tukorea.whereareu.presentation.nok.home
 
-import android.content.Context
 import android.content.Context.MODE_PRIVATE
 import android.content.pm.PackageManager
 import android.graphics.PointF
-import android.opengl.ETC1.getHeight
 import android.util.Log
 import android.view.View
 import android.view.ViewTreeObserver
@@ -31,7 +29,7 @@ import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kr.ac.tukorea.whereareu.R
-import kr.ac.tukorea.whereareu.data.model.home.GetLocationInfoResponse
+import kr.ac.tukorea.whereareu.data.model.nok.home.LocationInfoResponse
 import kr.ac.tukorea.whereareu.databinding.IconLocationOverlayLayoutBinding
 import kr.ac.tukorea.whereareu.domain.home.MeaningfulPlace
 import kr.ac.tukorea.whereareu.presentation.base.BaseFragment
@@ -81,7 +79,7 @@ class NokHomeFragment : BaseFragment<kr.ac.tukorea.whereareu.databinding.Fragmen
         }
     }
 
-    private fun updateDementiaStatus(dementiaStatus: GetLocationInfoResponse){
+    private fun updateDementiaStatus(dementiaStatus: LocationInfoResponse){
         with(binding){
             stateTv.text = updateDementiaMovementStatus(dementiaStatus.userStatus)
             batteryTv.text = "${dementiaStatus.battery}%"

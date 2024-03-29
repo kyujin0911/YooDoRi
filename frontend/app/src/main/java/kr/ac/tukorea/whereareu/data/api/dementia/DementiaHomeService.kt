@@ -1,8 +1,7 @@
 package kr.ac.tukorea.whereareu.data.api.dementia
 
-import kr.ac.tukorea.whereareu.data.model.ResponseBody
-import kr.ac.tukorea.whereareu.data.model.home.LocationInfo
-import kr.ac.tukorea.whereareu.data.model.home.PostLocationInfoResponse
+import kr.ac.tukorea.whereareu.data.model.dementia.home.LocationInfo
+import kr.ac.tukorea.whereareu.data.model.dementia.home.LocationInfoResponse
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.POST
@@ -11,6 +10,6 @@ interface DementiaHomeService {
     @POST("receive-location-info")
     suspend fun postLocationInfo(
         @Body request: LocationInfo
-    ): Response<PostLocationInfoResponse>
+    ): Response<LocationInfoResponse>
 
 }

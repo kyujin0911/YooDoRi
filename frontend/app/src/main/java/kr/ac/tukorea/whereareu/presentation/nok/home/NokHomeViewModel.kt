@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import kr.ac.tukorea.whereareu.data.model.home.GetLocationInfoResponse
+import kr.ac.tukorea.whereareu.data.model.nok.home.LocationInfoResponse
 import kr.ac.tukorea.whereareu.data.repository.nok.home.NokHomeRepositoryImpl
 import kr.ac.tukorea.whereareu.util.network.onError
 import kr.ac.tukorea.whereareu.util.network.onException
@@ -22,7 +22,7 @@ class NokHomeViewModel @Inject constructor(
     val repository: NokHomeRepositoryImpl
 ) : ViewModel() {
 
-    private val _dementiaLocation = MutableSharedFlow<GetLocationInfoResponse>(replay = 1)
+    private val _dementiaLocation = MutableSharedFlow<LocationInfoResponse>(replay = 1)
     val dementiaLocation = _dementiaLocation.asSharedFlow()
 
     private val _updateDuration = MutableStateFlow<Long>(300000 * 1000)

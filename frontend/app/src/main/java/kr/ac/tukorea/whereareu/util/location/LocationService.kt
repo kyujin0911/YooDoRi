@@ -24,7 +24,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kr.ac.tukorea.whereareu.R
-import kr.ac.tukorea.whereareu.data.model.home.LocationInfo
+import kr.ac.tukorea.whereareu.data.model.dementia.home.LocationInfo
 import kr.ac.tukorea.whereareu.data.repository.dementia.home.DementiaHomeRepositoryImpl
 import kr.ac.tukorea.whereareu.util.network.onException
 import kr.ac.tukorea.whereareu.util.network.onSuccess

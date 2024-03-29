@@ -11,7 +11,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import dagger.hilt.android.AndroidEntryPoint
 //import kotlinx.coroutines.flow.EmptyFlow.collect
 import kr.ac.tukorea.whereareu.R
-import kr.ac.tukorea.whereareu.data.model.home.LocationInfo
+import kr.ac.tukorea.whereareu.data.model.dementia.home.LocationInfo
 import kr.ac.tukorea.whereareu.databinding.FragmentDementiaSettingBinding
 import kr.ac.tukorea.whereareu.presentation.base.BaseFragment
 import kr.ac.tukorea.whereareu.util.location.LocationService
