@@ -57,4 +57,12 @@ class NokHomeViewModel @Inject constructor(
             }
         }
     }
+
+    fun getMeaningfulPlace(dementiaKey: String){
+        viewModelScope.launch {
+            repository.getMeaningfulPlace(dementiaKey).onSuccess {
+                Log.d("meaningful", it.toString())
+            }
+        }
+    }
 }

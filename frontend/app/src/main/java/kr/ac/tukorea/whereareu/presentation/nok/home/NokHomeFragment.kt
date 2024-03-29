@@ -60,6 +60,8 @@ class NokHomeFragment : BaseFragment<kr.ac.tukorea.whereareu.databinding.Fragmen
                 binding.bottomSheet.isVisible = isPredicted
                 binding.predictLayout.isVisible = isPredicted
                 if(isPredicted) {
+                    startCountDown()
+                    viewModel.getMeaningfulPlace("253050")
                     initBottomSheet()
                     initMeaningfulListRVA()
                 } else {
@@ -152,7 +154,6 @@ class NokHomeFragment : BaseFragment<kr.ac.tukorea.whereareu.databinding.Fragmen
 
     fun predict(){
         viewModel.setIsPredicted(true)
-        startCountDown()
     }
 
     fun stopPredict(){

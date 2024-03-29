@@ -65,29 +65,7 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideTestApi(retrofit: Retrofit): LoginService {
-        return retrofit.buildService()
-    }
-
-    @Provides
-    @Singleton
-    fun provideDementiaHomeApi(retrofit: Retrofit): DementiaHomeService {
-        return retrofit.buildService()
-    }
-
-    @Provides
-    @Singleton
-    fun provideNokHomeApi(retrofit: Retrofit): NokHomeService {
-        return retrofit.buildService()
-    }
-
-    @Provides
-    @Singleton
     fun provideLocationService(): LocationService{
         return LocationService()
-    }
-
-    private inline fun <reified T> Retrofit.buildService(): T {
-        return this.create(T::class.java)
     }
 }
