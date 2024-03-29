@@ -4,13 +4,17 @@ import android.content.Context
 import android.content.Context.MODE_PRIVATE
 import android.content.pm.PackageManager
 import android.graphics.PointF
+import android.opengl.ETC1.getHeight
 import android.util.Log
 import android.view.View
+import android.view.ViewTreeObserver
+import android.view.ViewTreeObserver.OnGlobalLayoutListener
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -22,6 +26,10 @@ import com.naver.maps.map.NaverMap
 import com.naver.maps.map.OnMapReadyCallback
 import com.naver.maps.map.overlay.OverlayImage
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancelAndJoin
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kr.ac.tukorea.whereareu.R
 import kr.ac.tukorea.whereareu.data.model.home.GetLocationInfoResponse
 import kr.ac.tukorea.whereareu.databinding.IconLocationOverlayLayoutBinding
@@ -29,6 +37,7 @@ import kr.ac.tukorea.whereareu.domain.home.MeaningfulPlace
 import kr.ac.tukorea.whereareu.presentation.base.BaseFragment
 import kr.ac.tukorea.whereareu.util.extension.repeatOnStarted
 import kotlin.math.roundToInt
+
 
 @AndroidEntryPoint
 class NokHomeFragment : BaseFragment<kr.ac.tukorea.whereareu.databinding.FragmentHomeBinding>(R.layout.fragment_home),
@@ -44,6 +53,7 @@ class NokHomeFragment : BaseFragment<kr.ac.tukorea.whereareu.databinding.Fragmen
         MeaningfulListRVA()
     }
     private lateinit var behavior: BottomSheetBehavior<ConstraintLayout>
+    private var countDownJob: Job? = null
 
     override fun initObserver() {
         repeatOnStarted {
@@ -54,6 +64,8 @@ class NokHomeFragment : BaseFragment<kr.ac.tukorea.whereareu.databinding.Fragmen
                 if(isPredicted) {
                     initBottomSheet()
                     initMeaningfulListRVA()
+                } else {
+                    countDownJob?.cancelAndJoin()
                 }
             }
         }
@@ -141,15 +153,8 @@ class NokHomeFragment : BaseFragment<kr.ac.tukorea.whereareu.databinding.Fragmen
     }
 
     fun predict(){
-            viewModel.setIsPredicted(true)
-            /*binding.homeGroup.visibility = View.GONE
-            binding.bottomSheet.visibility = View.VISIBLE
-            binding.predictLayout.visibility = View.VISIBLE*/
-            //binding.predictGroup.visibility = View.VISIBLE
-            /*initBottomSheet()
-            initMeaningfulListRVA()*/
-            //navigator.navigate(R.id.action_nokHomeFragment_to_predictLocationFragment)
-
+        viewModel.setIsPredicted(true)
+        startCountDown()
     }
 
     fun stopPredict(){
@@ -191,31 +196,55 @@ class NokHomeFragment : BaseFragment<kr.ac.tukorea.whereareu.databinding.Fragmen
         behavior.state = BottomSheetBehavior.STATE_COLLAPSED
         behavior.peekHeight = 20
         behavior.isFitToContents = false
-        behavior.halfExpandedRatio = 0.4f
-        behavior.expandedOffset = 100
+        behavior.halfExpandedRatio = 0.3f
 
+        //bottom sheet predict layout과 높이 맞추기
+        val viewTreeObserver: ViewTreeObserver = binding.predictLayout.viewTreeObserver
+        viewTreeObserver.addOnGlobalLayoutListener(object : OnGlobalLayoutListener {
+            override fun onGlobalLayout() {
+                behavior.expandedOffset = binding.predictLayout.height + 35
+                binding.predictLayout.viewTreeObserver.removeOnGlobalLayoutListener(this)
+            }
+        })
 
         // half expanded state일 때 접기 제어
         behavior.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback(){
             var isHalfExpanded = false
             override fun onStateChanged(bottomSheet: View, newState: Int) {
-                when(newState){
+                /*when(newState){
                     BottomSheetBehavior.STATE_HALF_EXPANDED -> {
                         isHalfExpanded = true
                     }
                     BottomSheetBehavior.STATE_COLLAPSED and BottomSheetBehavior.STATE_HALF_EXPANDED-> {
                         isHalfExpanded = false
                     }
-                }
+                }*/
             }
 
             override fun onSlide(bottomSheet: View, slideOffset: Float) {
-                if(isHalfExpanded && slideOffset < 0.351f){
+                /*if(isHalfExpanded && slideOffset < 0.351f){
                     behavior.state = BottomSheetBehavior.STATE_COLLAPSED
-                }
+                }*/
             }
 
         })
+    }
+
+    private fun startCountDown(){
+        countDownJob = lifecycleScope.launch {
+            var second = 0
+            var minute = 0
+            while (true) {
+                second+=1
+                if(second % 60 == 0){
+                    minute += 1
+                    second = 0
+                }
+                Log.d("time", "$minute $second")
+                binding.countDownT.text = String.format("%02d:%02d",minute, second)
+                delay(1000L)
+            }
+        }
     }
 
     private fun updateDementiaName(){
@@ -225,27 +254,6 @@ class NokHomeFragment : BaseFragment<kr.ac.tukorea.whereareu.databinding.Fragmen
             binding.dementiaNameTv.text = dementiaName
         }
     }
-
-    fun getStatusBarHeight(context: Context): Int {
-        val resourceId = context.resources.getIdentifier("status_bar_height", "dimen", "android")
-
-        return if (resourceId > 0) {
-            context.resources.getDimensionPixelSize(resourceId)
-        } else {
-            0
-        }
-    }
-
-    fun getNaviBarHeight(context: Context): Int {
-        val resourceId: Int =
-            context.resources.getIdentifier("navigation_bar_height", "dimen", "android")
-        return if (resourceId > 0) {
-            context.resources.getDimensionPixelSize(resourceId)
-        } else {
-            0
-        }
-    }
-
     private fun initMap() {
         val fm = childFragmentManager
         val mapFragment = fm.findFragmentById(R.id.map_fragment) as MapFragment?

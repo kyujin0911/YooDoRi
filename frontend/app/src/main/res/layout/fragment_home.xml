@@ -210,7 +210,6 @@
                 android:orientation="horizontal"
                 android:paddingHorizontal="24dp"
                 android:paddingVertical="12dp"
-                android:visibility="gone"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
@@ -221,8 +220,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:text="예측 중지"
                     android:onClick="@{()->view.stopPredict()}"
+                    android:text="예측 중지"
                     android:textAppearance="@style/TextAppearance.App.16sp.ExtraBold"
                     android:textColor="@color/red"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -238,20 +237,29 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
-                <TextView
+                <LinearLayout
                     android:id="@+id/count_down_tv"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:orientation="horizontal"
+                    android:gravity="center"
                     android:layout_marginTop="8dp"
-                    android:background="@drawable/rectangle_corner_10_stroke_yellow"
-                    android:paddingHorizontal="10dp"
-                    android:paddingVertical="27dp"
-                    android:text="00:00"
-                    android:textAppearance="@style/TextAppearance.App.16sp.jalnan2"
-                    android:textSize="20sp"
+                    android:background="@drawable/oval_corner_10_stroke_yellow"
                     app:layout_constraintEnd_toEndOf="@id/count_down_title_tv"
                     app:layout_constraintStart_toStartOf="@id/count_down_title_tv"
-                    app:layout_constraintTop_toBottomOf="@id/count_down_title_tv" />
+                    app:layout_constraintTop_toBottomOf="@id/count_down_title_tv">
+
+                    <TextView
+                        android:id="@+id/count_down_t"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="00:00"
+                        android:textAppearance="@style/TextAppearance.App.16sp.jalnan2"
+                        android:textSize="20sp"
+                        app:layout_constraintEnd_toEndOf="@id/count_down_title_tv"
+                        app:layout_constraintStart_toStartOf="@id/count_down_title_tv"
+                        app:layout_constraintTop_toBottomOf="@id/count_down_title_tv" />
+                </LinearLayout>
 
                 <TextView
                     android:id="@+id/dementia_name_title_tv"
@@ -352,9 +360,9 @@
                 android:elevation="8dp"
                 android:fontFamily="@font/suite_extrabold"
                 android:gravity="center"
+                android:onClick="@{()->view.predict()}"
                 android:text="위치\n예측"
                 android:textSize="16sp"
-                android:onClick="@{()->view.predict()}"
                 app:layout_constraintBottom_toTopOf="@id/emergency_tv"
                 app:layout_constraintEnd_toEndOf="parent" />
 
@@ -387,6 +395,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@drawable/rectangle_top_corner_20"
+            android:elevation="10dp"
             android:padding="16dp"
             android:visibility="gone"
             app:behavior_hideable="false"
