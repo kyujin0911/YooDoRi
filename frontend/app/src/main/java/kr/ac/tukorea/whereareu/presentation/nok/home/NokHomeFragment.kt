@@ -29,6 +29,7 @@ import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kr.ac.tukorea.whereareu.R
+import kr.ac.tukorea.whereareu.data.model.dementia.home.PostLocationInfoResponse
 import kr.ac.tukorea.whereareu.data.model.nok.home.LocationInfoResponse
 import kr.ac.tukorea.whereareu.databinding.IconLocationOverlayLayoutBinding
 import kr.ac.tukorea.whereareu.domain.home.MeaningfulPlace
@@ -52,6 +53,8 @@ class NokHomeFragment : BaseFragment<kr.ac.tukorea.whereareu.databinding.Fragmen
     }
     private lateinit var behavior: BottomSheetBehavior<ConstraintLayout>
     private var countDownJob: Job? = null
+    private var dementiaLocationInfo: LocationInfoResponse? = null
+    private var isNaverMapReady = false
 
     override fun initObserver() {
         repeatOnStarted {
@@ -297,17 +300,20 @@ class NokHomeFragment : BaseFragment<kr.ac.tukorea.whereareu.databinding.Fragmen
     override fun onResume() {
         super.onResume()
         Log.d("resume", "resume")
+        Log.d("ready", naverMap?.isDestroyed.toString())
         repeatOnStarted {
+            delay(500)
             viewModel.dementiaLocation.collect{ response ->
+                Log.d("ready", naverMap?.isDestroyed.toString())
+                dementiaLocationInfo = response
                 Log.d("response", response.toString())
                 updateDementiaStatus(response)
                 val coord = LatLng(response.latitude, response.longitude)
-                trackingDementiaLocation(coord, response.bearing, dementiaName?:"", response.currentSpeed)
+                trackingDementiaLocation(coord, response.bearing, dementiaName ?: "", response.currentSpeed)
             }
         }
     }
 
     override fun onMapReady(p0: NaverMap) {
-
     }
 }

@@ -66,38 +66,27 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                 viewModel.updateDuration.collect { duration ->
                     Log.d("duration", duration.toString())
                     if (updateLocationJob == null) {
-                        updateLocationJob = lifecycleScope.launch {
-                            while (true) {
-                                viewModel.getDementiaLocation()
-                                Log.d("duration null test", duration.toString())
-                                delay(duration)
-                            }
-                        }
+                        updateLocationJob = makeUpdateLocationJob(duration)
                     }
 
                     // 실행중인 coroutine이 있으면 job을 취소하고 duration에 맞게 재시작
                     else {
                         updateLocationJob?.cancelAndJoin()
-                        updateLocationJob = lifecycleScope.launch {
-                            while (true) {
-                                viewModel.getDementiaLocation()
-                                Log.d("duration not null test", duration.toString())
-                                delay(duration)
-                            }
-                        }
+                        updateLocationJob = makeUpdateLocationJob(duration)
                     }
                 }
             }
         }
     }
 
-    /*fun makeUpdateLocationJob(duration: Long): Job{
+    fun makeUpdateLocationJob(duration: Long): Job{
         return lifecycleScope.launch {
             while (true){
                 viewModel.getDementiaLocation()
+                delay(duration)
             }
         }
-    }*/
+    }
 
     private fun stopGetDementiaLocation() {
         lifecycleScope.launch {
