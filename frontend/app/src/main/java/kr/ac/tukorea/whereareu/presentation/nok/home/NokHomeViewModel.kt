@@ -10,7 +10,9 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kr.ac.tukorea.whereareu.data.model.DementiaKeyRequest
+import kr.ac.tukorea.whereareu.data.model.nok.home.DementiaLastInfoResponse
 import kr.ac.tukorea.whereareu.data.model.nok.home.LocationInfoResponse
+import kr.ac.tukorea.whereareu.data.model.nok.home.MeaningfulPlaceResponse
 import kr.ac.tukorea.whereareu.data.repository.nok.home.NokHomeRepositoryImpl
 import kr.ac.tukorea.whereareu.util.network.onError
 import kr.ac.tukorea.whereareu.util.network.onException
@@ -33,6 +35,22 @@ class NokHomeViewModel @Inject constructor(
     val isPredicted = _isPredicted.asStateFlow()
 
     private val _dementiaKey = MutableStateFlow("")
+
+    private val _meaningfulPlace = MutableSharedFlow<MeaningfulPlaceResponse>()
+    val meaningfulPlace = _meaningfulPlace.asSharedFlow()
+
+    private val _predictEvent = MutableSharedFlow<PredictEvent>()
+    val predictEvent = _predictEvent.asSharedFlow()
+    sealed class PredictEvent{
+        data class MeaningFulPlaceEvent(val meaningfulPlace: MeaningfulPlaceResponse): PredictEvent()
+        data class DementiaLastInfoEvent(val dementiaLastInfo: DementiaLastInfoResponse): PredictEvent()
+    }
+
+    fun eventPredict(event: PredictEvent){
+        viewModelScope.launch {
+            _predictEvent.emit(event)
+        }
+    }
 
     fun saveDementiaKey(dementiaKey: String){
         _dementiaKey.value = dementiaKey

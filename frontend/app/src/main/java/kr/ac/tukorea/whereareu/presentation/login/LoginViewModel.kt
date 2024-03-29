@@ -11,7 +11,6 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kr.ac.tukorea.whereareu.data.model.DementiaKeyRequest
-import kr.ac.tukorea.whereareu.data.model.login.request.CheckInterConnectRequest
 import kr.ac.tukorea.whereareu.domain.login.NokInfo
 import kr.ac.tukorea.whereareu.data.model.login.request.DementiaIdentityRequest
 import kr.ac.tukorea.whereareu.data.model.login.request.NokIdentityRequest

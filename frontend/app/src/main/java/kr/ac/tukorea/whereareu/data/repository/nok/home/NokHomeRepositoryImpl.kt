@@ -3,7 +3,7 @@ package kr.ac.tukorea.whereareu.data.repository.nok.home
 import kr.ac.tukorea.whereareu.data.api.nok.NokHomeService
 import kr.ac.tukorea.whereareu.data.model.DementiaKeyRequest
 import kr.ac.tukorea.whereareu.data.model.ResponseBody
-import kr.ac.tukorea.whereareu.data.model.nok.home.DementiaAverageSpeedResponse
+import kr.ac.tukorea.whereareu.data.model.nok.home.DementiaLastInfoResponse
 import kr.ac.tukorea.whereareu.data.model.nok.home.LocationInfoResponse
 import kr.ac.tukorea.whereareu.data.model.nok.home.MeaningfulPlaceResponse
 import kr.ac.tukorea.whereareu.util.network.NetworkResult
@@ -21,8 +21,8 @@ class NokHomeRepositoryImpl @Inject constructor(
         return handleApi({api.getMeaningfulPlace(dementiaKey)}) {response: ResponseBody<MeaningfulPlaceResponse> -> response.result}
     }
 
-    override suspend fun getDementiaLastInfo(request: DementiaKeyRequest): NetworkResult<DementiaAverageSpeedResponse> {
-        return handleApi({api.getDementiaLastInfo(request)}) { response: ResponseBody<DementiaAverageSpeedResponse> -> response.result}
+    override suspend fun getDementiaLastInfo(request: DementiaKeyRequest): NetworkResult<DementiaLastInfoResponse> {
+        return handleApi({api.getDementiaLastInfo(request)}) { response: ResponseBody<DementiaLastInfoResponse> -> response.result}
     }
 
 }

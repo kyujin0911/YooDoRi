@@ -46,6 +46,7 @@
                 android:elevation="10dp"
                 android:orientation="horizontal"
                 android:padding="4dp"
+                android:visibility="@{viewModel.isPredicted ? View.GONE : View.VISIBLE}"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
@@ -210,6 +211,7 @@
                 android:orientation="horizontal"
                 android:paddingHorizontal="24dp"
                 android:paddingVertical="12dp"
+                android:visibility="@{viewModel.isPredicted ? View.VISIBLE : View.GONE}"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
@@ -363,6 +365,7 @@
                 android:onClick="@{()->view.predict()}"
                 android:text="위치\n예측"
                 android:textSize="16sp"
+                android:visibility="@{viewModel.isPredicted ? View.GONE : View.VISIBLE}"
                 app:layout_constraintBottom_toTopOf="@id/emergency_tv"
                 app:layout_constraintEnd_toEndOf="parent" />
 
@@ -379,14 +382,9 @@
                 android:gravity="center"
                 android:text="긴급\n도움"
                 android:textSize="16sp"
+                android:visibility="@{viewModel.isPredicted ? View.GONE : View.VISIBLE}"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent" />
-
-            <androidx.constraintlayout.widget.Group
-                android:id="@+id/home_group"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:constraint_referenced_ids="user_info_layout, predict_tv, emergency_tv" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -397,7 +395,7 @@
             android:background="@drawable/rectangle_top_corner_20"
             android:elevation="10dp"
             android:padding="16dp"
-            android:visibility="gone"
+            android:visibility="@{viewModel.isPredicted ? View.VISIBLE : View.GONE}"
             app:behavior_hideable="false"
             app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
 

@@ -56,9 +56,6 @@ class NokHomeFragment : BaseFragment<kr.ac.tukorea.whereareu.databinding.Fragmen
     override fun initObserver() {
         repeatOnStarted {
             viewModel.isPredicted.collect{ isPredicted ->
-                binding.homeGroup.isVisible = !isPredicted
-                binding.bottomSheet.isVisible = isPredicted
-                binding.predictLayout.isVisible = isPredicted
                 if(isPredicted) {
                     startCountDown()
                     viewModel.getDementiaLastInfo()
