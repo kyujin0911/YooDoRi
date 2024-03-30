@@ -10,8 +10,11 @@ import androidx.core.content.edit
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kr.ac.tukorea.whereareu.R
 import kr.ac.tukorea.whereareu.data.model.setting.ModifyUserInfoRequest
 import kr.ac.tukorea.whereareu.databinding.FragmentModifyUserInfoBinding
@@ -21,6 +24,7 @@ import kr.ac.tukorea.whereareu.util.extension.EditTextUtil.hideKeyboard
 import kr.ac.tukorea.whereareu.util.extension.EditTextUtil.setOnEditorActionListener
 import kr.ac.tukorea.whereareu.util.extension.EditTextUtil.showKeyboard
 import kr.ac.tukorea.whereareu.util.extension.repeatOnStarted
+import kr.ac.tukorea.whereareu.util.extension.showToastOnView
 
 @AndroidEntryPoint
 class ModifyUserInfoFragment :
@@ -44,6 +48,14 @@ class ModifyUserInfoFragment :
                     }
                     Log.d("updateUserInfo", userInfo.message)
                 }
+            }
+        }
+        repeatOnStarted {
+            viewModel.toastEvent.collect{
+                if (navigator.currentDestination?.id == R.id.modifyUserInfoFragment) {
+                    navigator.popBackStack()
+                }
+                requireActivity().showToastOnView(requireContext(), it, binding.finishBtn.bottom)
             }
         }
     }
@@ -79,13 +91,14 @@ class ModifyUserInfoFragment :
             val key = spf.getString("key", "")
 
             viewModel.sendUpdateUserInfo(ModifyUserInfoRequest(0, key ?: "", binding.userNameEt.text.toString().trim()!!, binding.userPhoneEt.text.toString().trim()!!))
-            Toast.LENGTH_SHORT
+
+//            navigator.popBackStack()
         }
     }
 
     fun onClickBackBtn() {
-//        navigator.popBackStack()
-        requireActivity().supportFragmentManager.popBackStack()
+        navigator.popBackStack()
+//        requireActivity().supportFragmentManager.popBackStack()
     }
 
     private fun validUserName() = binding.userNameEt.text.isNullOrBlank()

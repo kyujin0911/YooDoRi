@@ -14,6 +14,10 @@
     <fragment
         android:id="@+id/modifyUserInfoFragment"
         android:name="kr.ac.tukorea.whereareu.presentation.ModifyUserInfoFragment"
-        android:label="ModifyUserInfoFragment"/>
+        android:label="ModifyUserInfoFragment">
+        <action
+            android:id="@+id/action_modifyUserInfoFragment_to_nokSettingFragment2"
+            app:destination="@id/nokSettingFragment" />
+    </fragment>
 
 </navigation>

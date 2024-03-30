@@ -89,7 +89,6 @@
 
         </com.google.android.material.textfield.TextInputLayout>
 
-
         <Button
             android:id="@+id/finish_btn"
             style="@style/Widget.App.Button"

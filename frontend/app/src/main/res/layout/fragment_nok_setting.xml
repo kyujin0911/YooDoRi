@@ -59,13 +59,13 @@
             app:layout_constraintStart_toEndOf="@+id/profile_iv"
             tools:text="010-0000-0000" />
 
-        <View
-            android:id="@+id/profile_v"
-            android:layout_width="match_parent"
-            android:layout_height="5dp"
-            android:layout_marginTop="10dp"
-            android:background="#D9D9D9"
-            app:layout_constraintTop_toBottomOf="@+id/profile_iv" />
+<!--        <View-->
+<!--            android:id="@+id/profile_v"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="5dp"-->
+<!--            android:layout_marginTop="10dp"-->
+<!--            android:background="#D9D9D9"-->
+<!--            app:layout_constraintTop_toBottomOf="@+id/profile_iv" />-->
 
         <TextView
             android:id="@+id/other_user_type_tv"
@@ -76,7 +76,7 @@
             android:text="보호대상자"
             android:textAppearance="@style/TextAppearance.App.16sp.ExtraBold"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/profile_v" />
+            app:layout_constraintTop_toBottomOf="@+id/user_phone_number_tv" />
 
         <TextView
             android:id="@+id/other_name_tv"
@@ -106,7 +106,7 @@
             android:layout_height="10dp"
             android:layout_marginTop="10dp"
             android:background="#D9D9D9"
-            app:layout_constraintTop_toBottomOf="@+id/other_phone_tv" />
+            app:layout_constraintTop_toBottomOf="@+id/user_phone_number_tv" />
 
         <TextView
             android:id="@+id/update_user_info_tv"

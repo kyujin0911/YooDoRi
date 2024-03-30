@@ -88,16 +88,6 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/name_input" />
 
-        <!--        <EditText-->
-        <!--            android:id="@+id/user_phone_et"-->
-        <!--            android:layout_width="match_parent"-->
-        <!--            android:layout_height="wrap_content"-->
-        <!--            android:layout_marginTop="10dp"-->
-        <!--            android:hint=""-->
-        <!--            android:textAppearance="@style/TextAppearance.App.20sp.Bold"-->
-        <!--            app:layout_constraintTop_toBottomOf="@+id/user_phone_tv"-->
-        <!--            tools:text="현재 전화번호" />-->
-
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/phone_input"
             style="@style/Widget.App.TextInputLayout.corner10"

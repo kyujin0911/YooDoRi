@@ -27,11 +27,15 @@ class SettingViewModel @Inject constructor(
     private val _updateOtherUserInfo = MutableSharedFlow<ModifyUserInfoResponse>()
     val updateOtherUserInfo = _updateOtherUserInfo.asSharedFlow()
 
+    private val _toastEvent = MutableSharedFlow<String>()
+    val toastEvent = _toastEvent.asSharedFlow()
+
     fun sendUpdateUserInfo(request: ModifyUserInfoRequest) {
         viewModelScope.launch(Dispatchers.IO) {
             repository.sendModifyUserInfo(request).onSuccess {response ->
                 Log.d("UpdateUserInfo", "UserInfoChanged")
                 _updateOtherUserInfo.emit(response)
+                _toastEvent.emit("정보가 변경되었습니다.")
             }
         }
     }

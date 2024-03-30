@@ -48,19 +48,7 @@ class NokSettingFragment: BaseFragment<FragmentNokSettingBinding>(R.layout.fragm
         }
 
         binding.userInfoBtn.setOnClickListener {
-            val modifyUserInfoFragment = ModifyUserInfoFragment()
-
-            val fragmentManager: FragmentManager = requireActivity().supportFragmentManager
-            val fragmentTransaction: FragmentTransaction = fragmentManager.beginTransaction()
-
-            // Replace 명령을 사용하여 현재 프래그먼트를 ModifyUserInfoFragment로 교체
-            fragmentTransaction.replace(R.id.fragmentContainer, modifyUserInfoFragment)
-
-            // 백스택에 이전 프래그먼트를 추가하여 뒤로 가기를 지원합니다.
-            fragmentTransaction.addToBackStack(null)
-
-            // 트랜잭션을 커밋합니다.
-            fragmentTransaction.commit()
+            findNavController().navigate(R.id.action_nokSettingFragment_to_modifyUserInfoFragment2)
         }
     }
 }
