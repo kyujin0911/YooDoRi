@@ -47,8 +47,11 @@ class NokSettingFragment: BaseFragment<FragmentNokSettingBinding>(R.layout.fragm
             dialog.show(childFragmentManager, dialog.tag)
         }
 
-        binding.userInfoBtn.setOnClickListener {
-            findNavController().navigate(R.id.action_nokSettingFragment_to_modifyUserInfoFragment2)
-        }
+//        binding.userInfoBtn.setOnClickListener {
+//            findNavController().navigate(R.id.action_nokSettingFragment_to_modifyUserInfoFragment2)
+//        }
+    }
+    fun onClickUpdateUserInfo(){
+        findNavController().navigate(R.id.action_nokSettingFragment_to_modifyUserInfoFragment2)
     }
 }
