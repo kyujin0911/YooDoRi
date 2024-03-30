@@ -20,6 +20,7 @@ import kr.ac.tukorea.whereareu.presentation.nok.home.NokHomeViewModel
 @AndroidEntryPoint
 class NokSettingFragment: BaseFragment<FragmentNokSettingBinding>(R.layout.fragment_nok_setting) {
     private val viewModel: NokHomeViewModel by activityViewModels()
+
     override fun initObserver() {
     }
     override fun initView() {
@@ -39,19 +40,21 @@ class NokSettingFragment: BaseFragment<FragmentNokSettingBinding>(R.layout.fragm
             viewModel.setUpdateDuration(duration * 10000)
         }*/
 
-        binding.updateTimeBtn.setOnClickListener {
-            val dialog = SetUpdateTimeDialogFragment{time ->
-                viewModel.setUpdateDuration(time.toLong())
-                binding.updateTimeTv.text = time
-            }
-            dialog.show(childFragmentManager, dialog.tag)
-        }
-
-//        binding.userInfoBtn.setOnClickListener {
-//            findNavController().navigate(R.id.action_nokSettingFragment_to_modifyUserInfoFragment2)
+//        binding.updateTimeBtn.setOnClickListener {
+//            val dialog = SetUpdateTimeDialogFragment{time ->
+//                viewModel.setUpdateDuration(time.toLong())
+//                binding.updateTimeTv.text = time
+//            }
+//            dialog.show(childFragmentManager, dialog.tag)
 //        }
+
+        binding.updateUserInfoBtn.setOnClickListener{
+            onClickUpdateUserInfo()
+            Log.d("UpdateUserInfoBtn","Clicked")
+        }
     }
     fun onClickUpdateUserInfo(){
+        Log.d("UpdateUserInfoBtn","Clicked")
         findNavController().navigate(R.id.action_nokSettingFragment_to_modifyUserInfoFragment2)
     }
 }
