@@ -489,8 +489,13 @@ def caculate_dementia_average_walking_speed():
             for loc_info in location_info_list:  # 루프 변수의 이름을 loc_info로 변경
                 total_speed += loc_info.current_speed
             average_speed = round(total_speed / len(location_info_list),2)
+            result = {
+                'averageSpeed' : average_speed,
+                'lastLatitude' : location_info_list[-1].latitude,
+                'lastLongitude' : location_info_list[-1].longitude
+            }
             print('[system] {} dementia average walking speed : {}'.format(_dementia_key, average_speed))
-            response_data = {'status': 'success', 'message': 'Average walking speed calculated successfully', 'averageSpeed': average_speed}
+            response_data = {'status': 'success', 'message': 'Average walking speed calculated successfully', 'result': result}
 
             return jsonify(response_data), SUCCESS, {'Content-Type': 'application/json; charset = utf-8' }
         else:
@@ -578,7 +583,8 @@ def send_meaningful_location_info():
         response_data = {'status': 'error', 'message': str(e)}
         return jsonify(response_data), UNDEFERR, {'Content-Type': 'application/json; charset = utf-8' }
 
-
+# 스케줄러 비활성화
+''' 
 @scheduler.task('cron', id='analyze_meaningful_location', hour=17, minute=14, second=0, timezone='Asia/Seoul', misfire_grace_time=120)
 def analyze_meaningful_location():
     try:
@@ -639,3 +645,4 @@ def analyze_meaningful_location():
     except Exception as e:
         print(e)
         return str(e)
+'''
