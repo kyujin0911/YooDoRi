@@ -143,6 +143,18 @@
             />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
+    <!--         -&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;-->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/updateTimelayout"
+        app:layout_constraintStart_toStartOf="@+id/user_info_layout"
+        app:layout_constraintTop_toBottomOf="@+id/other_user_info_layout"
+        android:padding="24dp"
+        android:elevation="8dp"
+        >
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
 

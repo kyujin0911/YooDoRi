@@ -138,6 +138,47 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/updateTimelayout"
+            app:layout_constraintStart_toStartOf="@+id/user_info_layout"
+            app:layout_constraintTop_toBottomOf="@+id/other_user_info_layout"
+            android:background="@drawable/rectangle_corner_10_white"
+            android:padding="18dp"
+            android:elevation="8dp"
+            android:layout_marginTop="20dp"
+            >
+            <Button
+                android:id="@+id/update_time_btn"
+                style="@style/Widget.App.WhiteButton"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/rectangle_corner_10_white"
+                android:text="위치 정보 주기 변경"
+                android:textAppearance="@style/TextAppearance.App.14sp.ExtraBold" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/update_time_tv"
+                app:layout_constraintStart_toStartOf="@+id/update_time_btn"
+                app:layout_constraintEnd_toEndOf="@+id/update_time_btn"
+                app:layout_constraintTop_toBottomOf="@+id/update_time_btn"
+                android:textAppearance="@style/TextAppearance.App.14sp.SemiBold"
+                android:text="1"
+                />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="분"
+                android:layout_marginStart="3dp"
+                app:layout_constraintBaseline_toBaselineOf="@+id/update_time_tv"
+                app:layout_constraintStart_toEndOf="@+id/update_time_tv"
+                android:textAppearance="@style/TextAppearance.App.14sp.SemiBold"
+                />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </layout>
