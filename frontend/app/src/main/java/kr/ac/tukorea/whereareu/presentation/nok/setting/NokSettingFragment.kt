@@ -1,19 +1,12 @@
 package kr.ac.tukorea.whereareu.presentation.nok.setting
 
-import android.content.Context
 import android.content.Context.MODE_PRIVATE
 import android.util.Log
-import android.view.LayoutInflater
-import androidx.appcompat.app.AlertDialog
-import androidx.fragment.app.FragmentManager
-import androidx.fragment.app.FragmentTransaction
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import dagger.hilt.android.AndroidEntryPoint
 import kr.ac.tukorea.whereareu.R
-import kr.ac.tukorea.whereareu.databinding.DialogSettingUpdateTimeBinding
 import kr.ac.tukorea.whereareu.databinding.FragmentNokSettingBinding
-import kr.ac.tukorea.whereareu.presentation.ModifyUserInfoFragment
 import kr.ac.tukorea.whereareu.presentation.base.BaseFragment
 import kr.ac.tukorea.whereareu.presentation.nok.home.NokHomeViewModel
 

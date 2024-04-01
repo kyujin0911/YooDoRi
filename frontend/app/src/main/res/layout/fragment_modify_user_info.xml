@@ -2,13 +2,13 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".presentation.ModifyUserInfoFragment">
+    tools:context=".presentation.nok.setting.ModifyUserInfoFragment">
 
     <data>
 
         <variable
             name="view"
-            type="kr.ac.tukorea.whereareu.presentation.ModifyUserInfoFragment" />
+            type="kr.ac.tukorea.whereareu.presentation.nok.setting.ModifyUserInfoFragment" />
         <variable
             name="viewModel"
             type="kr.ac.tukorea.whereareu.presentation.nok.setting.SettingViewModel" />

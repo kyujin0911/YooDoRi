@@ -1,28 +1,19 @@
-package kr.ac.tukorea.whereareu.presentation
+package kr.ac.tukorea.whereareu.presentation.nok.setting
 
 import android.content.Context.MODE_PRIVATE
 import android.telephony.PhoneNumberFormattingTextWatcher
 import android.util.Log
 import android.view.inputmethod.EditorInfo
-import android.widget.Toast
-import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.core.content.edit
-import androidx.core.widget.addTextChangedListener
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import kr.ac.tukorea.whereareu.R
 import kr.ac.tukorea.whereareu.data.model.setting.ModifyUserInfoRequest
 import kr.ac.tukorea.whereareu.databinding.FragmentModifyUserInfoBinding
 import kr.ac.tukorea.whereareu.presentation.base.BaseFragment
-import kr.ac.tukorea.whereareu.presentation.nok.setting.SettingViewModel
 import kr.ac.tukorea.whereareu.util.extension.EditTextUtil.hideKeyboard
 import kr.ac.tukorea.whereareu.util.extension.EditTextUtil.setOnEditorActionListener
-import kr.ac.tukorea.whereareu.util.extension.EditTextUtil.showKeyboard
 import kr.ac.tukorea.whereareu.util.extension.repeatOnStarted
 import kr.ac.tukorea.whereareu.util.extension.showToastOnView
 
@@ -96,7 +87,6 @@ class ModifyUserInfoFragment :
 
     fun onClickBackBtn() {
         navigator.popBackStack()
-//        requireActivity().supportFragmentManager.popBackStack()
     }
 
     private fun validUserName() = binding.userNameEt.text.isNullOrBlank()
