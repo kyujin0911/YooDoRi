@@ -23,6 +23,7 @@ caculate_dementia_avarage_walking_speed_routes = Blueprint('caculate_dementia_av
 get_user_info_routes = Blueprint('get_user_info', __name__)
 update_rate_routes = Blueprint('update_rate', __name__)
 send_meaningful_location_info_routes = Blueprint('send-meaningful-location-info', __name__)
+send_location_history_rotues = Blueprint('send-location-history', __name__)
 
 # 상태코드 정의
 SUCCESS = 200
@@ -582,6 +583,43 @@ def send_meaningful_location_info():
     except Exception as e:
         response_data = {'status': 'error', 'message': str(e)}
         return jsonify(response_data), UNDEFERR, {'Content-Type': 'application/json; charset = utf-8' }
+    
+@send_location_history_rotues.route('/send-location-history', methods=['GET'])
+def send_location_history():
+    try:
+        dementia_key = request.args.get('dementiaKey')
+        date = request.args.get('date')
+
+        location_list = location_info.query.filter(and_(location_info.dementia_key == dementia_key, location_info.date == date)).all()
+
+        if location_list:
+            result = []
+            for location in location_list:
+                result.append({
+                    'latitude': location.latitude,
+                    'longitude': location.longitude,
+                    'time': location.time
+                })
+            response_data = {'status': 'success', 'message': 'Location history data sent successfully', 'result': result}
+
+            json_response = jsonify(response_data)
+            json_response.headers['Content-Length'] = len(json_response.get_data(as_text=True))
+
+            return json_response, SUCCESS, {'Content-Type': 'application/json; charset = utf-8' }
+        # 해당 날짜에 데이터가 없는경우
+        elif not location_list:
+            response_data = {'status': 'error', 'message': 'Location data not found'}
+
+            json_response = jsonify(response_data)
+            json_response.headers['Content-Length'] = len(json_response.get_data(as_text=True))
+
+            return json_response, LOCDATANOTFOUND, {'Content-Type': 'application/json; charset = utf-8' }
+
+
+    except Exception as e:
+        response_data = {'status': 'error', 'message': str(e)}
+        return jsonify(response_data), UNDEFERR, {'Content-Type': 'application/json; charset = utf-8' }
+
 
 # 스케줄러 비활성화
 ''' 
