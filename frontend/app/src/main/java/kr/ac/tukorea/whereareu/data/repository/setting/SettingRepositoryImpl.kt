@@ -11,13 +11,9 @@ import kr.ac.tukorea.whereareu.util.network.handleApi
 import javax.inject.Inject
 
 class SettingRepositoryImpl @Inject constructor(
-    private val api: ModifyUserInfoService,
-    private val api2: UserInfoService
+    private val api: ModifyUserInfoService
 ) : SettingRepository{
     override suspend fun sendModifyUserInfo(request: ModifyUserInfoRequest): NetworkResult<ModifyUserInfoResponse> {
         return handleApi({ api.postModifyUserInfo(request) }) { response: ResponseBody<ModifyUserInfoResponse> -> response.result }
-    }
-    override suspend fun getUserInfo(dementiaKey: String): NetworkResult<GetUserInfoResponse> {
-        return handleApi({api2.getUserInfo(dementiaKey)}) {response: ResponseBody<GetUserInfoResponse> -> response.result}
     }
 }

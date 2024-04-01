@@ -9,10 +9,12 @@ import kr.ac.tukorea.whereareu.R
 import kr.ac.tukorea.whereareu.databinding.FragmentNokSettingBinding
 import kr.ac.tukorea.whereareu.presentation.base.BaseFragment
 import kr.ac.tukorea.whereareu.presentation.nok.home.NokHomeViewModel
+import kr.ac.tukorea.whereareu.util.extension.repeatOnStarted
 
 @AndroidEntryPoint
 class NokSettingFragment: BaseFragment<FragmentNokSettingBinding>(R.layout.fragment_nok_setting) {
     private val viewModel: NokHomeViewModel by activityViewModels()
+    private val settingViewModel: SettingViewModel by activityViewModels()
 
     override fun initObserver() {
     }
@@ -50,6 +52,17 @@ class NokSettingFragment: BaseFragment<FragmentNokSettingBinding>(R.layout.fragm
         super.onResume()
         Log.d("settingFragment", "onResume")
 
+        repeatOnStarted {
+            settingViewModel.userInfo.collect{
+                Log.d("Nok_Setting_Fragment", "get User Info API")
+                val nokName = it.result.nokInfoRecord.nokName
+                val nokPhone = it.result.nokInfoRecord.nokPhoneNumber
+                val dementiaName = it.result.dementiaInfoRecord.dementiaName
+                val dementiaPhone = it.result.dementiaInfoRecord.dementiaPhoneNumber
+                Log.d("Nok_Setting_Fragment", "$nokName, $nokPhone, $dementiaName,$dementiaPhone")
+            }
+        }
+
         val spf = requireActivity().getSharedPreferences("User", MODE_PRIVATE)
         val otherSpf = requireActivity().getSharedPreferences("OtherUser", MODE_PRIVATE)
 
@@ -57,16 +70,8 @@ class NokSettingFragment: BaseFragment<FragmentNokSettingBinding>(R.layout.fragm
         binding.userPhoneNumberTv.text = spf.getString("phone", "")
         binding.otherNameTv.text = otherSpf.getString("name", "")
         binding.otherPhoneTv.text = otherSpf.getString("phone", "")
-
-        val userName = spf.getString("name", "")
-        val userPhone = spf.getString("phone", "")
-        Log.d("SharedPreferences", "User Name: $userName, User Phone: $userPhone")
-        val otherName = otherSpf.getString("name", "")
-        val otherPhone = otherSpf.getString("phone", "")
-        Log.d("SharedPreferences", "Other User Name: $otherName, Other User Phone: $otherPhone")
     }
     fun onClickUpdateUserInfo(){
-        Log.d("UpdateUserInfoBtn","Clicked")
         findNavController().navigate(R.id.action_nokSettingFragment_to_modifyUserInfoFragment2)
     }
 }
