@@ -39,13 +39,6 @@ class ModifyUserInfoFragment :
         repeatOnStarted {
             viewModel.updateUserInfo.collect { userInfo ->
                 userInfo.let {
-                    // 수정한 정보 저장
-                    val nokSpf = requireActivity().getSharedPreferences("User", MODE_PRIVATE)
-                    nokSpf.edit {
-                        putString("name", binding.userNameEt.text.toString())
-                        putString("phone", binding.userPhoneEt.text.toString())
-                        commit()
-                    }
                     Log.d("updateUserInfo", userInfo.message)
                 }
             }
@@ -87,12 +80,17 @@ class ModifyUserInfoFragment :
             binding.userPhoneEt.error =
                 if (!validUserPhone()) "전화번호 형식이 다릅니다.\n예시) 010-1234-5678" else null
 
+            // 수정한 정보 저장
+            val nokSpf = requireActivity().getSharedPreferences("User", MODE_PRIVATE)
+            nokSpf.edit {
+                putString("name", binding.userNameEt.text.toString())
+                putString("phone", binding.userPhoneEt.text.toString())
+                apply()
+            }
             val spf = requireActivity().getSharedPreferences("User", MODE_PRIVATE)
             val key = spf.getString("key", "")
 
             viewModel.sendUpdateUserInfo(ModifyUserInfoRequest(0, key ?: "", binding.userNameEt.text.toString().trim()!!, binding.userPhoneEt.text.toString().trim()!!))
-
-//            navigator.popBackStack()
         }
     }
 
