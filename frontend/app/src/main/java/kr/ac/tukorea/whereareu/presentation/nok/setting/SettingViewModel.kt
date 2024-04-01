@@ -28,9 +28,6 @@ class SettingViewModel @Inject constructor(
     private val _updateOtherUserInfo = MutableSharedFlow<ModifyUserInfoResponse>()
     val updateOtherUserInfo = _updateOtherUserInfo.asSharedFlow()
 
-    private val _userInfo = MutableSharedFlow<GetUserInfoResponse>()
-    val userInfo =  _userInfo.asSharedFlow()
-
     private val _toastEvent = MutableSharedFlow<String>()
     val toastEvent = _toastEvent.asSharedFlow()
 
@@ -49,14 +46,6 @@ class SettingViewModel @Inject constructor(
             repository.sendModifyUserInfo(request).onSuccess {
                 Log.d("UpdateOtherUserInfo", "OtherUserInfoChanged")
                 _updateOtherUserInfo.emit(ModifyUserInfoResponse(it.message, it.status))
-            }
-        }
-    }
-    fun getUserInfo(dementiaKey: String){
-        viewModelScope.launch{
-            repository.getUserInfo(dementiaKey).onSuccess {
-                _userInfo.emit(it)
-                Log.d("SettingViewModel", "getUserInfo Success")
             }
         }
     }
