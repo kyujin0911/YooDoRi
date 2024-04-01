@@ -10,6 +10,7 @@ import kr.ac.tukorea.whereareu.WhereAreUApplication
 import kr.ac.tukorea.whereareu.data.api.dementia.DementiaHomeService
 import kr.ac.tukorea.whereareu.data.api.LoginService
 import kr.ac.tukorea.whereareu.data.api.ModifyUserInfoService
+import kr.ac.tukorea.whereareu.data.api.UserInfoService
 import kr.ac.tukorea.whereareu.data.api.nok.NokHomeService
 import kr.ac.tukorea.whereareu.di.NetworkModule.buildService
 import kr.ac.tukorea.whereareu.util.location.LocationService
@@ -92,6 +93,11 @@ object NetworkModule {
     @Provides
     @Singleton
     fun provideModifyUserInfoApi(retrofit: Retrofit): ModifyUserInfoService{
+        return retrofit.buildService()
+    }
+    @Provides
+    @Singleton
+    fun provideUserInfoAPI(retrofit: Retrofit): UserInfoService{
         return retrofit.buildService()
     }
 
