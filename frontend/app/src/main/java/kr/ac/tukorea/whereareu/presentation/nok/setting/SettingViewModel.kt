@@ -15,6 +15,10 @@ import kr.ac.tukorea.whereareu.data.model.setting.GetUserInfoResponse
 import kr.ac.tukorea.whereareu.data.model.setting.ModifyUserInfoRequest
 import kr.ac.tukorea.whereareu.data.model.setting.ModifyUserInfoResponse
 import kr.ac.tukorea.whereareu.data.repository.setting.SettingRepositoryImpl
+import kr.ac.tukorea.whereareu.domain.login.userinfo.GetUserInfoResult
+import kr.ac.tukorea.whereareu.util.network.onError
+import kr.ac.tukorea.whereareu.util.network.onException
+import kr.ac.tukorea.whereareu.util.network.onFail
 import kr.ac.tukorea.whereareu.util.network.onSuccess
 import javax.inject.Inject
 
@@ -27,6 +31,9 @@ class SettingViewModel @Inject constructor(
 
     private val _updateOtherUserInfo = MutableSharedFlow<ModifyUserInfoResponse>()
     val updateOtherUserInfo = _updateOtherUserInfo.asSharedFlow()
+
+    private val _userInfo = MutableSharedFlow<GetUserInfoResult>(replay = 1)
+    val userInfo =  _userInfo.asSharedFlow()
 
     private val _toastEvent = MutableSharedFlow<String>()
     val toastEvent = _toastEvent.asSharedFlow()
@@ -46,6 +53,20 @@ class SettingViewModel @Inject constructor(
             repository.sendModifyUserInfo(request).onSuccess {
                 Log.d("UpdateOtherUserInfo", "OtherUserInfoChanged")
                 _updateOtherUserInfo.emit(ModifyUserInfoResponse(it.message, it.status))
+            }
+        }
+    }
+    fun getUserInfo(dementiaKey: String){
+        viewModelScope.launch{
+            repository.getUserInfo(dementiaKey).onSuccess {
+                _userInfo.emit(it)
+                Log.d("SettingViewModel", "getUserInfo Success")
+            }.onError {
+                Log.d("error in UserInfoViewModel", it.toString())
+            }.onException {
+                Log.d("exception in UserInfoViewModel", it.toString())
+            }.onFail {
+                Log.d("fail in UserInfoViewModel", it.toString())
             }
         }
     }

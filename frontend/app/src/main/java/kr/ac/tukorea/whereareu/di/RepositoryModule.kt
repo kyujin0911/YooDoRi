@@ -8,15 +8,12 @@ import dagger.hilt.android.scopes.ViewModelScoped
 import kr.ac.tukorea.whereareu.data.api.dementia.DementiaHomeService
 import kr.ac.tukorea.whereareu.data.api.LoginService
 import kr.ac.tukorea.whereareu.data.api.SettingService
-import kr.ac.tukorea.whereareu.data.api.UserInfoService
 import kr.ac.tukorea.whereareu.data.repository.dementia.home.DementiaHomeRepository
 import kr.ac.tukorea.whereareu.data.repository.dementia.home.DementiaHomeRepositoryImpl
 import kr.ac.tukorea.whereareu.data.repository.login.LoginRepository
 import kr.ac.tukorea.whereareu.data.repository.login.LoginRepositoryImpl
 import kr.ac.tukorea.whereareu.data.repository.setting.SettingRepository
 import kr.ac.tukorea.whereareu.data.repository.setting.SettingRepositoryImpl
-import kr.ac.tukorea.whereareu.data.repository.userInfo.UserInfoRepository
-import kr.ac.tukorea.whereareu.data.repository.userInfo.UserInfoRepositoryImpl
 
 @Module
 @InstallIn(ViewModelComponent::class)
