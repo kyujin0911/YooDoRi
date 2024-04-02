@@ -56,6 +56,8 @@ async def receive_nok_info(request: Request):
                 'nokKey': _key
             }
 
+            print(f"[INFO] NOK information received from {existing_dementia.dementia_name}({existing_dementia.dementia_key})")
+
             response = {
                 'status': 'success',
                 'status_code': SUCCESS,
@@ -63,6 +65,9 @@ async def receive_nok_info(request: Request):
             }
             
         else: # 보호 대상자 인증번호가 등록되어 있지 않은 경우
+
+            print(f"[ERROR] Dementia key({_key_from_dementia}) not found")
+
             response = {
                 'status': 'error',
                 'status_code': KEYNOTFOUND,   
@@ -70,6 +75,7 @@ async def receive_nok_info(request: Request):
             }
 
         return response
+    
     finally:
         session.close()
 
@@ -108,6 +114,8 @@ async def receive_dementia_info(request: Request):
             'result': result
         }
 
+        print(f"[INFO] Dementia information received from {_dementia_name}({_key})")
+
         return response
     
     finally:
@@ -134,8 +142,12 @@ async def is_connected(request: Request):
                 'status_code': SUCCESS,
                 'result': result
             }
+
+            print(f"[INFO] Connection check from {existing_dementia.dementia_name}({existing_dementia.dementia_key})")
         
         else:
+            print (f"[ERROR] Connection denied from Dementia key({_dementia_key})")
+
             response = {
                 'status': 'error',
                 'status_code': KEYNOTFOUND,
@@ -162,12 +174,14 @@ async def receive_user_login(request: Request):
                     'status': 'success',
                     'status_code': LOGINSUCCESS
                 }
+                print(f"[INFO] User login from {existing_nok.nok_name}({existing_nok.nok_key})")
 
             else:
                 response = {
                     'status': 'error',
                     'status_code': LOGINFAILED
                 }
+                print(f"[ERROR] User login failed from NOK key({_key})")
 
         elif _isdementia == 1: # 보호 대상자인 경우
             existing_dementia = session.query(models.dementia_info).filter_by(dementia_key = _key).first()
@@ -177,12 +191,14 @@ async def receive_user_login(request: Request):
                     'status': 'success',
                     'status_code': LOGINSUCCESS
                 }
+                print(f"[INFO] User login from {existing_dementia.dementia_name}({existing_dementia.dementia_key})")
 
             else:
                 response = {
                     'status': 'error',
                     'status_code': LOGINFAILED
                 }
+                print(f"[ERROR] User login failed from Dementia key({_key})")
 
         return response
             
@@ -249,6 +265,7 @@ async def receive_location_info(request: Request):
                 'status_code': KEYNOTFOUND,
                 'error': 'Dementia key not found'
             }
+            print(f"[ERROR] Dementia key({_dementia_key}) not found(receive location info)")
 
         return response
         
@@ -279,6 +296,7 @@ async def send_live_location_info(request: Request):
                 'status_code': SUCCESS,
                 'result': result
             }
+            print(f"[INFO] Live location data sent to {latest_location.dementia_key}")
 
         else:
             response = {
@@ -286,6 +304,7 @@ async def send_live_location_info(request: Request):
                 'status_code': LOCDATANOTFOUND,
                 'error': 'Location data not found'
             }
+            print(f"[ERROR] Location data not found for Dementia key({_dementia_key})")
 
         return response
     
@@ -365,7 +384,155 @@ async def modify_user_info(request: Request):
     finally:
         session.close()
 
+@router.post("/update-rate")
+async def modify_updatint_rate(request: Request):
+    data = await request.json()
 
+    _is_dementia = data.get("isDementia")
+    _key = data.get("key")
+    _update_rate = data.get("updateRate")
 
+    #보호자와 보호대상자 모두 업데이트
+    try:
+        if _is_dementia == 0: #보호자
+            existing_nok = session.query(models.nok_info).filter_by(nok_key = _key).first()
 
+            if existing_nok:
+                connected_dementia = session.query(models.dementia_info).filter_by(dementia_key = existing_nok.dementia_info_key).first()
+                existing_nok.update_rate = _update_rate
+                connected_dementia.update_rate = _update_rate
 
+                print(f"[INFO] Update rate modified by {existing_nok.nok_name}, {connected_dementia.dementia_name}")
+
+                response = {
+                    'status': 'success',
+                    'status_code': SUCCESS
+                }
+            else:
+                print(f"[ERROR] NOK key not found(update rate)")
+
+                response = {
+                    'status': 'error',
+                    'status_code': KEYNOTFOUND,
+                    'error': 'User key not found'
+                }
+        elif _is_dementia == 1:
+            existing_dementia = session.query(models.dementia_info).filter_by(dementia_key = _key).first()
+
+            if existing_dementia:
+                connected_nok = session.query(models.nok_info).filter_by(dementia_info_key = existing_dementia.dementia_key).first()
+                existing_dementia.update_rate = _update_rate
+                connected_nok.update_rate = _update_rate
+
+                print(f"[INFO] Update rate modified by {existing_dementia.dementia_name}, {connected_nok.nok_name}")
+
+                response = {
+                    'status': 'success',
+                    'status_code': SUCCESS
+                }
+            else:
+                print(f"[ERROR] Dementia key not found(update rate)")
+
+                response = {
+                    'status': 'error',
+                    'status_code': KEYNOTFOUND,
+                    'error': 'User key not found'
+                }
+        
+        session.commit()
+    
+        return response
+    
+    finally:
+        session.close()
+
+@router.post("/caculate-dementia-avarage-walking-speed")
+async def caculate_dementia_average_walking_speed(requset: Request):
+    data = await requset.json()
+
+    _dementia_key = data.get("dementiaKey")
+
+    if _dementia_key is None:
+        print(f"[ERROR] Dementia key not found(calculate dementia average walking speed)")
+        response = {
+            'status': 'error',
+            'status_code': KEYNOTFOUND,
+            'error': 'Dementia key not found'
+        }
+        return response
+    
+    try:
+        #최근 10개의 정보를 가져와 평균 속도 계산(임시)
+        location_info_list = session.query(models.location_info).filter_by(dementia_key = _dementia_key).order_by(models.location_info.num.desc()).limit(10).all()
+        
+        if location_info_list:
+            sum_speed = 0
+            for location_info in location_info_list:
+                sum_speed += float(location_info.current_speed)
+            
+            average_speed = round(sum_speed / len(location_info_list), 2)
+
+            response = {
+                'status': 'success',
+                'status_code': SUCCESS,
+                'result': {
+                    'averageSpeed': average_speed,
+                    'lastLatitude': location_info_list[0].latitude,
+                    'lastLongitude': location_info_list[0].longitude
+                }
+            }
+            print(f"[INFO] Dementia average walking speed calculated for {location_info_list[0].dementia_key}")
+
+        else:
+            response = {
+                'status': 'error',
+                'status_code': LOCDATANOTENOUGH,
+                'error': 'Not enough location data'
+            }
+            print(f"[ERROR] Not enough location data for Dementia key({_dementia_key})")
+
+        return response
+    
+    finally:
+        session.close()
+
+@router.get("/get-user-info")
+async def get_user_info(request: Request):
+    _dementia_key = request.query_params.get("dementiaKey")
+
+    try:
+        dementia_info_record = session.query(models.dementia_info).filter_by(dementia_key = _dementia_key).first()
+        nok_info_record = session.query(models.nok_info).filter_by(dementia_info_key = _dementia_key).first()
+
+        if dementia_info_record and nok_info_record:
+            result = {
+                'dementiaInfoRecord': {
+                    'dementiaKey': dementia_info_record.dementia_key,
+                    'dementiaName': dementia_info_record.dementia_name,
+                    'dementiaPhoneNumber': dementia_info_record.dementia_phonenumber
+                },
+                'nokInfoRecord': {
+                    'nokKey': nok_info_record.nok_key,
+                    'nokName': nok_info_record.nok_name,
+                    'nokPhoneNumber': nok_info_record.nok_phonenumber
+                }
+            }
+
+            response = {
+                'status': 'success',
+                'status_code': SUCCESS,
+                'result': result
+            }
+            print(f"[INFO] User information sent to {dementia_info_record.dementia_name}({dementia_info_record.dementia_key})")
+        else:
+            response = {
+                'status': 'error',
+                'status_code': KEYNOTFOUND,
+                'error': 'User information not found'
+            }
+            print(f"[ERROR] User information not found for Dementia key({_dementia_key})")
+
+        return response
+    
+    finally:
+        session.close()
