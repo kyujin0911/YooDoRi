@@ -10,6 +10,7 @@ import kotlinx.coroutines.launch
 import kr.ac.tukorea.whereareu.data.model.setting.GetUserInfoResponse
 import kr.ac.tukorea.whereareu.data.repository.userInfo.UserInfoRepository
 import kr.ac.tukorea.whereareu.data.repository.userInfo.UserInfoRepositoryImpl
+import kr.ac.tukorea.whereareu.domain.login.userinfo.GetUserInfoResult
 import kr.ac.tukorea.whereareu.util.network.onError
 import kr.ac.tukorea.whereareu.util.network.onException
 import kr.ac.tukorea.whereareu.util.network.onFail
@@ -21,7 +22,7 @@ class UserInfoViewModel @Inject constructor(
     val repository: UserInfoRepositoryImpl
 ): ViewModel() {
 
-    private val _userInfo = MutableSharedFlow<GetUserInfoResponse>(replay = 1)
+    private val _userInfo = MutableSharedFlow<GetUserInfoResult>(replay = 1)
     val userInfo =  _userInfo.asSharedFlow()
 
     fun getUserInfo(dementiaKey: String){

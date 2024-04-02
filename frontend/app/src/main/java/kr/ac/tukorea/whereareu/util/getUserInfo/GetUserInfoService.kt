@@ -25,7 +25,7 @@ class GetUserInfoService: Service()  {
     }
 
     private fun postUserInfo(dementiaKey: String){
-        
+
     }
 
     private fun getDementiaKey(): String?{

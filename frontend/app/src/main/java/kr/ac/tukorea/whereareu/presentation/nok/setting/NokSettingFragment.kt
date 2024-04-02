@@ -54,18 +54,18 @@ class NokSettingFragment: BaseFragment<FragmentNokSettingBinding>(R.layout.fragm
         Log.d("settingFragment", "onResume")
         val spf = requireActivity().getSharedPreferences("User", MODE_PRIVATE)
         val otherSpf = requireActivity().getSharedPreferences("OtherUser", MODE_PRIVATE)
-        val key: String = spf.getString("key", null) as String
+        val key: String = otherSpf.getString("key", null) as String
+        userInfoViewModel.getUserInfo(key)
 
         repeatOnStarted {
             Log.d("Nok Setting Fragment", "repeatOnStarted")
-            userInfoViewModel.getUserInfo(key)
             userInfoViewModel.userInfo.collect{
                 Log.d("Nok_Setting_Fragment", "get User Info API")
 
-                val nokName = it.result.nokInfoRecord.nokName
-                val nokPhone = it.result.nokInfoRecord.nokPhoneNumber
-                val dementiaName = it.result.dementiaInfoRecord.dementiaName
-                val dementiaPhone = it.result.dementiaInfoRecord.dementiaPhoneNumber
+                val nokName = it.nokInfoRecord.nokName
+                val nokPhone = it.nokInfoRecord.nokPhoneNumber
+                val dementiaName = it.dementiaInfoRecord.dementiaName
+                val dementiaPhone = it.dementiaInfoRecord.dementiaPhoneNumber
                 Log.d("Nok_Setting_Fragment", "$nokName, $nokPhone, $dementiaName,$dementiaPhone")
             }
         }

@@ -10,7 +10,7 @@ import androidx.navigation.fragment.findNavController
 import dagger.hilt.android.AndroidEntryPoint
 import kr.ac.tukorea.whereareu.R
 import kr.ac.tukorea.whereareu.data.model.setting.ModifyUserInfoRequest
-import kr.ac.tukorea.whereareu.databinding.FragmentModifyUserInfoBinding
+import kr.ac.tukorea.whereareu.databinding.FragmentNokModifyUserInfoBinding
 import kr.ac.tukorea.whereareu.presentation.base.BaseFragment
 import kr.ac.tukorea.whereareu.util.extension.EditTextUtil.hideKeyboard
 import kr.ac.tukorea.whereareu.util.extension.EditTextUtil.setOnEditorActionListener
@@ -19,7 +19,7 @@ import kr.ac.tukorea.whereareu.util.extension.showToastOnView
 
 @AndroidEntryPoint
 class ModifyUserInfoFragment :
-    BaseFragment<FragmentModifyUserInfoBinding>(R.layout.fragment_modify_user_info) {
+    BaseFragment<FragmentNokModifyUserInfoBinding>(R.layout.fragment_nok_modify_user_info) {
     private val viewModel: SettingViewModel by activityViewModels()
     private val navigator by lazy {
         findNavController()
