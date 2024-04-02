@@ -13,5 +13,6 @@ session = engine.get_session()
 def create_app():
     from . import routes
     app.include_router(routes.router)
+    routes.sched.start()
 
     return app
