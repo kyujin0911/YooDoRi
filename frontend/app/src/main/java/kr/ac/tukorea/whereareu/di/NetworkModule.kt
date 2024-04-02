@@ -97,8 +97,8 @@ object NetworkModule {
     }
     @Provides
     @Singleton
-    fun provideUserInfoAPI(retrofit: Retrofit): UserInfoService{
-        return retrofit.buildService()
+    fun provideUserInfoAPI(): GetUserInfoService{
+        return GetUserInfoSerivce()
     }
 
     private inline fun <reified T> Retrofit.buildService(): T {
