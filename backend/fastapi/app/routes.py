@@ -62,15 +62,14 @@ async def receive_nok_info(request: Request):
                 'result': result
             }
             
-            return response
         else: # 보호 대상자 인증번호가 등록되어 있지 않은 경우
             response = {
-                'status': 'fail',
+                'status': 'error',
                 'status_code': KEYNOTFOUND,   
                 'error': 'Dementia information not found'
             }
 
-            return response
+        return response
     finally:
         session.close()
 
@@ -135,17 +134,15 @@ async def is_connected(request: Request):
                 'status_code': SUCCESS,
                 'result': result
             }
-
-            return response
         
         else:
             response = {
-                'status': 'fail',
+                'status': 'error',
                 'status_code': KEYNOTFOUND,
                 'error': 'Dementia information not found'
             }
 
-            return response
+        return response
     finally:
         session.close()
 
@@ -166,14 +163,12 @@ async def receive_user_login(request: Request):
                     'status_code': LOGINSUCCESS
                 }
 
-                return response
             else:
                 response = {
-                    'status': 'fail',
+                    'status': 'error',
                     'status_code': LOGINFAILED
                 }
 
-                return response
         elif _isdementia == 1: # 보호 대상자인 경우
             existing_dementia = session.query(models.dementia_info).filter_by(dementia_key = _key).first()
 
@@ -183,14 +178,13 @@ async def receive_user_login(request: Request):
                     'status_code': LOGINSUCCESS
                 }
 
-                return response
             else:
                 response = {
-                    'status': 'fail',
+                    'status': 'error',
                     'status_code': LOGINFAILED
                 }
 
-                return response
+        return response
             
     finally:
         session.close()
@@ -248,6 +242,7 @@ async def receive_location_info(request: Request):
                 'status': 'success',
                 'status_code': SUCCESS
             }
+
         else:
             response = {
                 'status': 'fail',
@@ -255,9 +250,122 @@ async def receive_location_info(request: Request):
                 'error': 'Dementia key not found'
             }
 
-            return response
+        return response
         
     finally:
         session.close()
+
+@router.get("/send-live-location-info")
+async def send_live_location_info(request: Request):
+    _dementia_key = request.query_params.get("dementiaKey")
+
+    try:
+        latest_location = session.query(models.location_info).filter_by(dementia_key = _dementia_key).order_by(models.location_info.num.desc()).first()
+
+        if latest_location:
+            result = {
+                'latitude': latest_location.latitude,
+                'longitude': latest_location.longitude,
+                'bearing': latest_location.bearing,
+                'currentSpeed': latest_location.current_speed,
+                'userStatus': latest_location.user_status, # 1: 정지, 2: 도보, 3: 차량, 4: 지하철
+                'battery': latest_location.battery,
+                'isInternetOn': latest_location.isInternetOn,
+                'isGpsOn': latest_location.isGpsOn,
+                'isRingstoneOn': latest_location.isRingstoneOn # 0 : 무음, 1 : 진동, 2 : 벨소리
+            }
+            response = {
+                'status': 'success',
+                'status_code': SUCCESS,
+                'result': result
+            }
+
+        else:
+            response = {
+                'status': 'error',
+                'status_code': LOCDATANOTFOUND,
+                'error': 'Location data not found'
+            }
+
+        return response
+    
+    finally:
+        session.close()
+
+@router.post("/modify-user-info")
+async def modify_user_info(request: Request):
+    data = await request.json()
+
+    _is_dementia = data.get("isDementia")
+    _before_name = data.get("name")
+    _before_phonenumber = data.get("phoneNumber")
+
+    try:
+        if _is_dementia == 0: #보호자
+            existing_nok = session.query(models.nok_info).filter_by(nok_key = data.get("key")).first()
+
+            if existing_nok:
+                # 수정된 정보를 제외한 나머지 정보들은 기존의 값을 그대로 수신받음
+
+                if not existing_nok.nok_name == _before_name:
+                    existing_nok.nok_name = data.get("name")
+                
+                if not existing_nok.nok_phonenumber == _before_phonenumber:
+                    existing_nok.nok_phonenumber = data.get("phoneNumber")
+                
+                session.commit()
+
+                print(f"[INFO] User information modified by {existing_nok.nok_name}({existing_nok.nok_key})")
+
+                response = {
+                    'status': 'success',
+                    'status_code': SUCCESS
+                }
+            else:
+                print(f"[ERROR] NOK key not found")
+
+                response = {
+                    'status': 'error',
+                    'status_code': KEYNOTFOUND,
+                    'error': 'User key not found'
+                }
+
+        elif _is_dementia == 1: #보호대상자
+            existing_dementia = session.query(models.dementia_info).filter_by(dementia_key = data.get("key")).first()
+
+            if existing_dementia:
+                # 수정된 정보를 제외한 나머지 정보들은 기존의 값을 그대로 수신받음
+
+                if not existing_dementia.dementia_name == _before_name:
+                    existing_dementia.dementia_name = data.get("name")
+                
+                if not existing_dementia.dementia_phonenumber == _before_phonenumber:
+                    existing_dementia.dementia_phonenumber = data.get("phoneNumber")
+                
+                session.commit()
+
+                print(f"[INFO] User information modified by {existing_dementia.dementia_name}({existing_dementia.dementia_key})")
+
+                response = {
+                    'status': 'success',
+                    'status_code': SUCCESS
+                }
+
+            else:
+                print(f"[ERROR] Dementia key not found")
+
+                response = {
+                    'status': 'error',
+                    'status_code': KEYNOTFOUND,
+                    'error': 'User key not found'
+                }
+
+        return response
+    
+    finally:
+        session.close()
+
+
+
 
 
