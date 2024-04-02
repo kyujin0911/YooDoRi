@@ -1,10 +1,14 @@
 from fastapi import APIRouter, Request, HTTPException
 from . import models
 from .random_generator import RandomNumberGenerator
+from .update_user_status import UpdateUserStatus
 from .database import Database
+
+import json
 
 router = APIRouter()
 db = Database()
+session = next(db.get_session())
 
 SUCCESS = 200
 WRONG_REQUEST = 400
@@ -23,7 +27,6 @@ async def receive_nok_info(request: Request):
     _key_from_dementia = data.get("keyFromDementia")
     rng = RandomNumberGenerator()
 
-    session = next(db.get_session())
     try:
         existing_dementia = session.query(models.dementia_info).filter(models.dementia_info.dementia_key == _key_from_dementia).first()
         if existing_dementia:
@@ -77,8 +80,6 @@ async def receive_dementia_info(request: Request):
 
     rng = RandomNumberGenerator()
 
-    session = next(db.get_session())
-
     try:
         _dementia_name = data.get("name")
         _dementia_phonenumber = data.get("phoneNumber")
@@ -112,3 +113,151 @@ async def receive_dementia_info(request: Request):
     
     finally:
         session.close()
+
+@router.post("/is-connected")
+async def is_connected(request: Request):
+    data = await request.json()
+    _dementia_key = data.get("dementiaKey")
+
+    session = next(db.get_session())
+    try:
+        existing_dementia = session.query(models.nok_info).filter_by(dementia_info_key = _dementia_key).first()
+        if existing_dementia:
+            result = {
+                'nokInfoRecord':{
+                    'nokKey': existing_dementia.nok_key,
+                    'nokName': existing_dementia.nok_name,
+                    'nokPhoneNumber': existing_dementia.nok_phonenumber
+                }
+            }
+            response = {
+                'status': 'success',
+                'status_code': SUCCESS,
+                'result': result
+            }
+
+            return response
+        
+        else:
+            response = {
+                'status': 'fail',
+                'status_code': KEYNOTFOUND,
+                'error': 'Dementia information not found'
+            }
+
+            return response
+    finally:
+        session.close()
+
+@router.post("/receive-user-login")
+async def receive_user_login(request: Request):
+    data = await request.json()
+
+    _key = data.get("key")
+    _isdementia = data.get("isDementia")
+
+    try:
+        if _isdementia == 0: # 보호자인 경우
+            existing_nok = session.query(models.nok_info).filter_by(nok_key = _key).first()
+
+            if existing_nok:
+                response = {
+                    'status': 'success',
+                    'status_code': LOGINSUCCESS
+                }
+
+                return response
+            else:
+                response = {
+                    'status': 'fail',
+                    'status_code': LOGINFAILED
+                }
+
+                return response
+        elif _isdementia == 1: # 보호 대상자인 경우
+            existing_dementia = session.query(models.dementia_info).filter_by(dementia_key = _key).first()
+
+            if existing_dementia:
+                response = {
+                    'status': 'success',
+                    'status_code': LOGINSUCCESS
+                }
+
+                return response
+            else:
+                response = {
+                    'status': 'fail',
+                    'status_code': LOGINFAILED
+                }
+
+                return response
+            
+    finally:
+        session.close()
+
+@router.post("/receive-location-info")
+async def receive_location_info(request: Request):
+    data = await request.json()
+
+    json_data = json.dumps(data)
+
+    _dementia_key = data.get("dementiaKey")
+
+    try:
+        existing_dementia = session.query(models.dementia_info).filter_by(dementia_key = _dementia_key).first()
+
+        if existing_dementia:
+
+            user_status_updater = UpdateUserStatus()
+
+            lightsensor = data.get("lightsensor")
+
+            prediction = user_status_updater.predict(json_data)
+
+            new_location = models.location_info(
+                dementia_key = data.get("dementiaKey"),
+                date = data.get("date"),
+                time = data.get("time"),
+                latitude = data.get("latitude"),
+                longitude = data.get("longitude"),
+                bearing = data.get("bearing"),
+                user_status = int(prediction[0]),
+                accelerationsensor_x = data.get("accelerationsensor")[0],
+                accelerationsensor_y = data.get("accelerationsensor")[1],
+                accelerationsensor_z = data.get("accelerationsensor")[2],
+                directionsensor_x = data.get("directionsensor")[0],
+                directionsensor_y = data.get("directionsensor")[1],
+                directionsensor_z = data.get("directionsensor")[2],
+                gyrosensor_x = data.get("gyrosensor")[0],
+                gyrosensor_y = data.get("gyrosensor")[1],
+                gyrosensor_z = data.get("gyrosensor")[2],
+                lightsensor = lightsensor[0],
+                battery = data.get("battery"),
+                isInternetOn = data.get("isInternetOn"),
+                isRingstoneOn = data.get("isRingstoneOn"),
+                isGpsOn = data.get("isGpsOn"),
+                current_speed = data.get("currentSpeed")
+            )
+
+            session.add(new_location)
+            session.commit()
+
+            print(f"[INFO] Location data received from {existing_dementia.dementia_name}({existing_dementia.dementia_key})")
+
+            response = {
+                'status': 'success',
+                'status_code': SUCCESS
+            }
+        else:
+            response = {
+                'status': 'fail',
+                'status_code': KEYNOTFOUND,
+                'error': 'Dementia key not found'
+            }
+
+            return response
+        
+    finally:
+        session.close()
+
+
