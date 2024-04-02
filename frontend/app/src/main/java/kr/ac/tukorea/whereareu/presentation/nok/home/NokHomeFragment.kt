@@ -38,7 +38,6 @@ class NokHomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home
             else -> "알수없음"
         }
     }
-
     private fun updateDementiaStatus(dementiaStatus: GetLocationInfoResponse){
         with(binding){
             stateTv.text = updateDementiaMovementStatus(dementiaStatus.userStatus)

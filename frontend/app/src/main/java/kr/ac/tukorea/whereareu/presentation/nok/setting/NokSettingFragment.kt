@@ -52,10 +52,17 @@ class NokSettingFragment: BaseFragment<FragmentNokSettingBinding>(R.layout.fragm
     override fun onResume() {
         super.onResume()
         Log.d("settingFragment", "onResume")
+        val spf = requireActivity().getSharedPreferences("User", MODE_PRIVATE)
+        val otherSpf = requireActivity().getSharedPreferences("OtherUser", MODE_PRIVATE)
+//        val key = spf.getString("key", "")
+        val key: String = spf.getString("key", null) as String
 
         repeatOnStarted {
+            Log.d("Nok Setting Fragment", "repeatOnStarted")
+            userInfoViewModel.getUserInfo(key)
             userInfoViewModel.userInfo.collect{
                 Log.d("Nok_Setting_Fragment", "get User Info API")
+
                 val nokName = it.result.nokInfoRecord.nokName
                 val nokPhone = it.result.nokInfoRecord.nokPhoneNumber
                 val dementiaName = it.result.dementiaInfoRecord.dementiaName
@@ -64,9 +71,6 @@ class NokSettingFragment: BaseFragment<FragmentNokSettingBinding>(R.layout.fragm
             }
         }
 
-        val spf = requireActivity().getSharedPreferences("User", MODE_PRIVATE)
-        val otherSpf = requireActivity().getSharedPreferences("OtherUser", MODE_PRIVATE)
-
         binding.userNameTv.text = spf.getString("name", "")
         binding.userPhoneNumberTv.text = spf.getString("phone", "")
         binding.otherNameTv.text = otherSpf.getString("name", "")
@@ -74,5 +78,9 @@ class NokSettingFragment: BaseFragment<FragmentNokSettingBinding>(R.layout.fragm
     }
     fun onClickUpdateUserInfo(){
         findNavController().navigate(R.id.action_nokSettingFragment_to_modifyUserInfoFragment2)
+    }
+
+    fun getUserInfo(){
+
     }
 }
