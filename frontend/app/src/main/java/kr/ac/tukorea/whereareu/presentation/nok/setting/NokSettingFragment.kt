@@ -54,7 +54,6 @@ class NokSettingFragment: BaseFragment<FragmentNokSettingBinding>(R.layout.fragm
         Log.d("settingFragment", "onResume")
         val spf = requireActivity().getSharedPreferences("User", MODE_PRIVATE)
         val otherSpf = requireActivity().getSharedPreferences("OtherUser", MODE_PRIVATE)
-//        val key = spf.getString("key", "")
         val key: String = spf.getString("key", null) as String
 
         repeatOnStarted {
