@@ -523,6 +523,7 @@ async def get_user_info(request: Request):
                 'status_code': SUCCESS,
                 'result': result
             }
+
             print(f"[INFO] User information sent to {dementia_info_record.dementia_name}({dementia_info_record.dementia_key})")
         else:
             response = {
@@ -530,7 +531,86 @@ async def get_user_info(request: Request):
                 'status_code': KEYNOTFOUND,
                 'error': 'User information not found'
             }
+
             print(f"[ERROR] User information not found for Dementia key({_dementia_key})")
+
+        return response
+    
+    finally:
+        session.close()
+
+@router.get("/send-meaningful-location-info")
+async def send_meaningful_location_info(request: Request):
+    _key = request.query_params.get("dementiaKey")
+
+    try:
+        meaningful_location_list = session.query(models.meaningful_location_info).filter_by(dementia_key = _key).all()
+
+        if meaningful_location_list:
+            result = []
+            for location in meaningful_location_list:
+                result.append({
+                    'date': location.day_of_the_week,
+                    'time': location.time,
+                    'latitude': location.latitude,
+                    'longitude': location.longitude
+                })
+            response = {
+                'status': 'success',
+                'status_code': SUCCESS,
+                'result': result
+            }
+
+            print(f"[INFO] Meaningful location data sent to {_key}")
+
+        else:
+            response = {
+                'status': 'error',
+                'status_code': LOCDATANOTFOUND,
+                'error': 'Meaningful location data not found'
+            }
+
+            print(f"[ERROR] Meaningful location data not found for {_key}")
+        
+        return response
+    
+    finally:
+        session.close()
+
+@router.get("/send-location-history")
+async def send_location_history(request: Request):
+    _key = request.query_params.get("dementiaKey")
+    date = request.query_params.get("date")
+
+    try:
+        location_list = session.query(models.location_info).filter_by(dementia_key = _key, date = date).all()
+
+        if location_list:
+            result = []
+
+            for location in location_list:
+                result.append({
+                    'latitude': location.latitude,
+                    'longitude': location.longitude,
+                    'time': location.time
+                })
+
+            response = {
+                'status': 'success',
+                'status_code': SUCCESS,
+                'result': result
+            }
+
+            print(f"[INFO] Location history data sent to {_key}")
+
+        else:
+            response = {
+                'status': 'error',
+                'status_code': LOCDATANOTFOUND,
+                'error': 'Location history data not found'
+            }
+
+            print(f"[ERROR] Location history data not found for {_key}")
 
         return response
     
