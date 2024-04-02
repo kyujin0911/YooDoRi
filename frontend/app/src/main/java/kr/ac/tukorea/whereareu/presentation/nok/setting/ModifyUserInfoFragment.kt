@@ -81,7 +81,14 @@ class ModifyUserInfoFragment :
             val spf = requireActivity().getSharedPreferences("User", MODE_PRIVATE)
             val key = spf.getString("key", "")
 
-            viewModel.sendUpdateUserInfo(ModifyUserInfoRequest(0, key ?: "", binding.userNameEt.text.toString().trim()!!, binding.userPhoneEt.text.toString().trim()!!))
+            viewModel.sendUpdateUserInfo(
+                ModifyUserInfoRequest(
+                    0,
+                    key ?: "",
+                    binding.userNameEt.text.toString().trim()!!,
+                    binding.userPhoneEt.text.toString().trim()!!
+                )
+            )
         }
     }
 

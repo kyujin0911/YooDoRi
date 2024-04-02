@@ -37,9 +37,4 @@ object RepositoryModule {
         settingService: SettingService
     ): SettingRepository = SettingRepositoryImpl(settingService)
 
-    @ViewModelScoped
-    @Provides
-    fun providesUserInfoRepository(
-        userInfoService: UserInfoService
-    ): UserInfoRepository = UserInfoRepositoryImpl(userInfoService)
 }

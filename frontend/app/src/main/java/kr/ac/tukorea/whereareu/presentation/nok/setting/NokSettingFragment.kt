@@ -14,7 +14,7 @@ import kr.ac.tukorea.whereareu.util.extension.repeatOnStarted
 @AndroidEntryPoint
 class NokSettingFragment: BaseFragment<FragmentNokSettingBinding>(R.layout.fragment_nok_setting) {
     private val viewModel: NokHomeViewModel by activityViewModels()
-    private val userInfoViewModel: UserInfoViewModel by activityViewModels()
+    private val settingViewModel: SettingViewModel by activityViewModels()
 
     override fun initObserver() {
     }
@@ -54,11 +54,11 @@ class NokSettingFragment: BaseFragment<FragmentNokSettingBinding>(R.layout.fragm
         val spf = requireActivity().getSharedPreferences("User", MODE_PRIVATE)
         val otherSpf = requireActivity().getSharedPreferences("OtherUser", MODE_PRIVATE)
         val key: String = otherSpf.getString("key", null) as String
-        userInfoViewModel.getUserInfo(key)
+        settingViewModel.getUserInfo(key)
 
         repeatOnStarted {
             Log.d("Nok Setting Fragment", "repeatOnStarted")
-            userInfoViewModel.userInfo.collect{
+            settingViewModel.userInfo.collect{
                 Log.d("Nok_Setting_Fragment", "get User Info API")
 
                 val nokName = it.nokInfoRecord.nokName
