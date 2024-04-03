@@ -93,6 +93,7 @@ object NetworkModule {
     fun provideSettingAPI(retrofit: Retrofit): SettingService{
         return retrofit.buildService()
     }
+    
     private inline fun <reified T> Retrofit.buildService(): T {
         return this.create(T::class.java)
     }
