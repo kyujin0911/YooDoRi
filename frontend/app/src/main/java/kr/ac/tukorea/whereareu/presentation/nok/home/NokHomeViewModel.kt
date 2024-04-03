@@ -31,7 +31,7 @@ class NokHomeViewModel @Inject constructor(
     val isInternetOn = MutableStateFlow(true)
     val isGpsOn = MutableStateFlow(true)
 
-    private val _updateDuration = MutableStateFlow<Long>(300000 * 1000)
+    private val _updateDuration = MutableStateFlow<Long>(10 * 1000)
     val updateDuration = _updateDuration.asStateFlow()
 
     private val _isPredicted = MutableStateFlow(false)
@@ -49,7 +49,7 @@ class NokHomeViewModel @Inject constructor(
         data class DementiaLastInfoEvent(val dementiaLastInfo: DementiaLastInfoResponse): PredictEvent()
     }
 
-    fun eventPredict(event: PredictEvent){
+    private fun eventPredict(event: PredictEvent){
         viewModelScope.launch {
             _predictEvent.emit(event)
         }
@@ -91,6 +91,7 @@ class NokHomeViewModel @Inject constructor(
         viewModelScope.launch {
             repository.getMeaningfulPlace("253050").onSuccess {
                 Log.d("meaningful", it.toString())
+                eventPredict(PredictEvent.MeaningFulPlaceEvent(it))
             }
         }
     }
@@ -99,6 +100,7 @@ class NokHomeViewModel @Inject constructor(
         viewModelScope.launch {
             repository.getDementiaLastInfo(DementiaKeyRequest("253050")).onSuccess {
                 Log.d("last info", it.toString())
+                eventPredict(PredictEvent.DementiaLastInfoEvent(it))
                 getMeaningfulPlace()
             }
         }

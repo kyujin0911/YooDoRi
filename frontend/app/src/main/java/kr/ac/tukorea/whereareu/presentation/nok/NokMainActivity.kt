@@ -79,7 +79,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
         }
     }
 
-    fun makeUpdateLocationJob(duration: Long): Job{
+    private fun makeUpdateLocationJob(duration: Long): Job{
         return lifecycleScope.launch {
             while (true){
                 viewModel.getDementiaLocation()
@@ -102,6 +102,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
         repeatOnStarted {
             viewModel.isPredicted.collect { isPredicted ->
                 if (!isPredicted) {
+                    Log.d("NokMainActivity", isPredicted.toString())
                     getDementiaLocation()
                     binding.bottomNav.visibility = View.VISIBLE
                 } else {

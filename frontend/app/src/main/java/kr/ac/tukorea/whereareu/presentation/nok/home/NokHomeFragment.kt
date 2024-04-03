@@ -75,6 +75,8 @@ class NokHomeFragment : BaseFragment<kr.ac.tukorea.whereareu.databinding.Fragmen
     private fun handlePredictEvent(event: NokHomeViewModel.PredictEvent){
         when(event){
             is NokHomeViewModel.PredictEvent.DementiaLastInfoEvent -> {
+                binding.averageMovementSpeedTv.text = String.format("%.2fkm", event.dementiaLastInfo.averageSpeed)
+                naverMap?.locationOverlay?.isVisible = false
 
             }
             is NokHomeViewModel.PredictEvent.MeaningFulPlaceEvent -> {
