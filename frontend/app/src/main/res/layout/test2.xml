@@ -20,9 +20,11 @@
             android:layout_height="wrap_content"
             android:id="@+id/user_type_tv"
             android:text="보호자"
-            android:textAppearance="@style/TextAppearance.App.24sp.ExtraBold"
-            app:layout_constraintStart_toStartOf="parent"
+            android:textAppearance="@style/TextAppearance.App.18sp.ExtraBold"
             app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/user_name_tv"
+            app:layout_constraintBaseline_toBaselineOf="@+id/user_name_tv"
+            android:layout_marginEnd="10dp"
             />
 
         <androidx.cardview.widget.CardView
@@ -55,18 +57,6 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/nok_cardView"
             android:layout_marginTop="20dp"
-            />
-
-        <ImageView
-            android:id="@+id/update_user_info_btn"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:src="@drawable/ic_arrow_back_24"
-            android:scaleX="-1"
-            app:layout_constraintStart_toEndOf="@+id/user_name_tv"
-            app:layout_constraintTop_toTopOf="@+id/user_name_tv"
-            app:layout_constraintBottom_toBottomOf="@+id/user_name_tv"
-            android:layout_marginStart="10dp"
             />
 
         <TextView
@@ -172,11 +162,66 @@
             android:background="@drawable/rectangle_corner_10_white"
             android:elevation="4dp"
             >
+<!--            <Button-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:id="@+id/update_user_info_btn"-->
+<!--                style="@style/Widget.App.WhiteButton"-->
+<!--                android:text="사용자 정보 수정"-->
+<!--                android:textAppearance="@style/TextAppearance.App.14sp.ExtraBold"-->
+<!--                app:layout_constraintStart_toStartOf="parent"-->
+<!--                app:layout_constraintTop_toTopOf="parent"-->
+<!--                />-->
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+
+                >
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="0.5dp"
+                android:layout_marginTop="10dp"
+                android:background="@color/gray60"
+                app:layout_constraintBottom_toTopOf="@+id/update_user_info_tv"
+                android:layout_marginBottom="20dp"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/update_user_info_tv"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                android:text="사용자 정보 변경"
+                android:layout_marginTop="10dp"
+                android:textAppearance="@style/TextAppearance.App.14sp.ExtraBold"
+                />
+            <ImageView
+                android:id="@+id/back_btn"
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:src="@drawable/ic_arrow_back_24"
+                app:layout_constraintStart_toEndOf="@id/update_user_info_tv"
+                app:layout_constraintTop_toTopOf="parent"
+                android:layout_marginTop="10dp"
+                android:scaleX="-1"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginStart="200dp"/>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="0.5dp"
+                android:layout_marginTop="20dp"
+                android:background="@color/gray60"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/update_user_info_tv" />
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/update_time_title"
-                android:text="위지 정보 업데이트 주기"
+                android:text="위치 정보 업데이트 주기"
                 android:textAppearance="@style/TextAppearance.App.14sp.ExtraBold"
                 app:layout_constraintTop_toTopOf="@id/update_time_btn"
                 app:layout_constraintBottom_toBottomOf="@id/update_time_btn"
@@ -190,9 +235,10 @@
                 android:background="@drawable/rectangle_corner_10"
                 android:id="@id/update_time_btn"
                 android:text="변경"
+                android:layout_marginTop="30dp"
                 android:textAppearance="@style/TextAppearance.App.14sp.Regular"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/update_user_info_tv"
                 />
             <TextView
                 android:layout_width="wrap_content"
