@@ -16,6 +16,7 @@ import kr.ac.tukorea.whereareu.data.model.nok.home.MeaningfulPlaceResponse
 import kr.ac.tukorea.whereareu.data.repository.naver.NaverRepository
 import kr.ac.tukorea.whereareu.data.repository.naver.NaverRepositoryImpl
 import kr.ac.tukorea.whereareu.data.repository.nok.home.NokHomeRepositoryImpl
+import kr.ac.tukorea.whereareu.domain.home.LastAddress
 import kr.ac.tukorea.whereareu.util.network.onError
 import kr.ac.tukorea.whereareu.util.network.onException
 import kr.ac.tukorea.whereareu.util.network.onFail
@@ -50,6 +51,8 @@ class NokHomeViewModel @Inject constructor(
     sealed class PredictEvent{
         data class MeaningFulPlaceEvent(val meaningfulPlace: MeaningfulPlaceResponse): PredictEvent()
         data class DementiaLastInfoEvent(val dementiaLastInfo: DementiaLastInfoResponse): PredictEvent()
+
+        data class ReverseGeocodingEvent(val lastAddress: LastAddress): PredictEvent()
     }
 
     private fun eventPredict(event: PredictEvent){
@@ -104,16 +107,27 @@ class NokHomeViewModel @Inject constructor(
             nokHomeRepository.getDementiaLastInfo(DementiaKeyRequest("253050")).onSuccess {
                 Log.d("last info", it.toString())
                 eventPredict(PredictEvent.DementiaLastInfoEvent(it))
-                //getMeaningfulPlace()
-                getReverseGeocoding("${it.lastLongitude},${it.lastLatitude}", "legalcode", "json")
+                getReverseGeocoding("${it.lastLongitude},${it.lastLatitude}", it.lastLatitude, it.lastLongitude)
             }
         }
     }
 
-    private fun getReverseGeocoding(coords: String, orders: String, output: String){
+    private fun getReverseGeocoding(coords: String, latitude: Double, longitude: Double){
         viewModelScope.launch {
-            naverRepository.getReverseGeocodingInfo(coords, orders, output).onSuccess {
+            naverRepository.getReverseGeocodingInfo(coords, "roadaddr", "json").onSuccess {
                 Log.d("reverse Geocoding", it.toString())
+                val region = it.results[0].region
+                val land = it.results[0].land
+                val address = "${region.area1.name} ${region.area2.name} " +
+                        "${region.area3.name} ${land.name} ${land.number1} " +
+                        if (land.number2.isNullOrEmpty()) {
+                            "${land.addition0.value}"
+                        } else "-${land.number2} ${land.addition0.value}"
+                Log.d("address result", address)
+                eventPredict(PredictEvent.ReverseGeocodingEvent(LastAddress(latitude, longitude, address)))
+                getMeaningfulPlace()
+            }.onException {
+                Log.d("error", it.toString())
             }
         }
     }

@@ -21,6 +21,7 @@ import com.naver.maps.map.CameraUpdate
 import com.naver.maps.map.MapFragment
 import com.naver.maps.map.NaverMap
 import com.naver.maps.map.OnMapReadyCallback
+import com.naver.maps.map.overlay.Marker
 import com.naver.maps.map.overlay.OverlayImage
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Job
@@ -81,6 +82,19 @@ class NokHomeFragment : BaseFragment<kr.ac.tukorea.whereareu.databinding.Fragmen
             }
             is NokHomeViewModel.PredictEvent.MeaningFulPlaceEvent -> {
 
+            }
+
+            is NokHomeViewModel.PredictEvent.ReverseGeocodingEvent -> {
+                val latitude = event.lastAddress.latitude
+                val longitude = event.lastAddress.longitude
+                naverMap?.moveCamera(CameraUpdate.scrollTo(LatLng(latitude, longitude)))
+                val marker = Marker()
+                with(marker){
+                    position = LatLng(latitude, longitude)
+                    captionText = event.lastAddress.address
+                    captionRequestedWidth = 400
+                    map = naverMap
+                }
             }
         }
     }
