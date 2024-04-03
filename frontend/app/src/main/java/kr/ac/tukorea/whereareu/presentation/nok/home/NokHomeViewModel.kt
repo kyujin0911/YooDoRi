@@ -13,6 +13,8 @@ import kr.ac.tukorea.whereareu.data.model.DementiaKeyRequest
 import kr.ac.tukorea.whereareu.data.model.nok.home.DementiaLastInfoResponse
 import kr.ac.tukorea.whereareu.data.model.nok.home.LocationInfoResponse
 import kr.ac.tukorea.whereareu.data.model.nok.home.MeaningfulPlaceResponse
+import kr.ac.tukorea.whereareu.data.repository.naver.NaverRepository
+import kr.ac.tukorea.whereareu.data.repository.naver.NaverRepositoryImpl
 import kr.ac.tukorea.whereareu.data.repository.nok.home.NokHomeRepositoryImpl
 import kr.ac.tukorea.whereareu.util.network.onError
 import kr.ac.tukorea.whereareu.util.network.onException
@@ -22,7 +24,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class NokHomeViewModel @Inject constructor(
-    val repository: NokHomeRepositoryImpl
+    private val nokHomeRepository: NokHomeRepositoryImpl,
+    private val naverRepository: NaverRepositoryImpl
 ) : ViewModel() {
 
     private val _dementiaLocation = MutableSharedFlow<LocationInfoResponse>(replay = 1)
@@ -73,7 +76,7 @@ class NokHomeViewModel @Inject constructor(
 
     fun getDementiaLocation() {
         viewModelScope.launch {
-            repository.getDementiaLocationInfo(_dementiaKey.value).onSuccess {
+            nokHomeRepository.getDementiaLocationInfo(_dementiaKey.value).onSuccess {
                 _dementiaLocation.emit(it)
                 isInternetOn.value = it.isInternetOn
                 isGpsOn.value = it.isGpsOn
@@ -89,7 +92,7 @@ class NokHomeViewModel @Inject constructor(
 
     private fun getMeaningfulPlace(){
         viewModelScope.launch {
-            repository.getMeaningfulPlace("253050").onSuccess {
+            nokHomeRepository.getMeaningfulPlace("253050").onSuccess {
                 Log.d("meaningful", it.toString())
                 eventPredict(PredictEvent.MeaningFulPlaceEvent(it))
             }
@@ -98,10 +101,19 @@ class NokHomeViewModel @Inject constructor(
 
     fun getDementiaLastInfo(){
         viewModelScope.launch {
-            repository.getDementiaLastInfo(DementiaKeyRequest("253050")).onSuccess {
+            nokHomeRepository.getDementiaLastInfo(DementiaKeyRequest("253050")).onSuccess {
                 Log.d("last info", it.toString())
                 eventPredict(PredictEvent.DementiaLastInfoEvent(it))
-                getMeaningfulPlace()
+                //getMeaningfulPlace()
+                getReverseGeocoding("${it.lastLongitude},${it.lastLatitude}", "legalcode", "json")
+            }
+        }
+    }
+
+    private fun getReverseGeocoding(coords: String, orders: String, output: String){
+        viewModelScope.launch {
+            naverRepository.getReverseGeocodingInfo(coords, orders, output).onSuccess {
+                Log.d("reverse Geocoding", it.toString())
             }
         }
     }

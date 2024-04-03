@@ -5,6 +5,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import kr.ac.tukorea.whereareu.data.api.LoginService
+import kr.ac.tukorea.whereareu.data.api.NaverService
 import kr.ac.tukorea.whereareu.data.api.dementia.DementiaHomeService
 import kr.ac.tukorea.whereareu.data.api.nok.NokHomeService
 import retrofit2.Retrofit
@@ -19,19 +20,25 @@ object ServiceModule {
 
     @Provides
     @Singleton
-    fun provideLoginApi(retrofit: Retrofit): LoginService {
+    fun provideLoginApi(@NetworkModule.BaseRetrofit retrofit: Retrofit): LoginService {
         return retrofit.buildService()
     }
 
     @Provides
     @Singleton
-    fun provideDementiaHomeApi(retrofit: Retrofit): DementiaHomeService {
+    fun provideDementiaHomeApi(@NetworkModule.BaseRetrofit retrofit: Retrofit): DementiaHomeService {
         return retrofit.buildService()
     }
 
     @Provides
     @Singleton
-    fun provideNokHomeApi(retrofit: Retrofit): NokHomeService {
+    fun provideNokHomeApi(@NetworkModule.BaseRetrofit retrofit: Retrofit): NokHomeService {
+        return retrofit.buildService()
+    }
+
+    @Provides
+    @Singleton
+    fun provideNaverApi(@NetworkModule.NaverRetrofit retrofit: Retrofit): NaverService {
         return retrofit.buildService()
     }
 }
