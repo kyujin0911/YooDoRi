@@ -47,7 +47,7 @@ class LocationAnalyzer:
         # 시간대와 요일 추가
         # 시간대 형식 : f00t04 f20t24
         # 4시간 단위로 분리
-        df['hour_block'] = 'f' + ((df['datetime'].dt.hour) // 4 * 4).astype(str).str.zfill(2) + 't' + ((df['datetime'].dt.hour + 4) // 4 * 4).astype(str).str.zfill(2)
+        df['hour_block'] = ((df['datetime'].dt.hour) // 4 * 4).astype(str).str.zfill(2) + ((df['datetime'].dt.hour + 4) // 4 * 4).astype(str).str.zfill(2)
         df['day_of_week'] = df['datetime'].dt.day_name()
         df = df.drop(['date', 'time'], axis=1)
         df = df.drop_duplicates(['datetime'], ignore_index=True)
