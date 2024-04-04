@@ -36,7 +36,7 @@ class NokSettingFragment : BaseFragment<FragmentNokSettingBinding>(R.layout.frag
             viewModel.setUpdateDuration(duration * 10000)
         }*/
 
-        binding.updateTimeBtn.setOnClickListener {
+        binding.updateTimeLayout.setOnClickListener {
             val dialog = SetUpdateTimeDialogFragment { time ->
                 viewModel.setUpdateDuration(time.toLong())
                 binding.updateTimeTv.text = time
