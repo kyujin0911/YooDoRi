@@ -1,161 +1,82 @@
-<?xml version="1.0" encoding="utf-8"?>
-<layout
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
     <data>
         <variable
             name="view"
-            type="kr.ac.tukorea.whereareu.presentation.nok.setting.NokSettingFragment"
-            />
+            type="kr.ac.tukorea.whereareu.presentation.nok.setting.SettingUpdateTimeFragment" />
     </data>
 
-<androidx.constraintlayout.widget.ConstraintLayout
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
-
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/user_info_layout"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="100dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:background="@drawable/rectangle_corner_10_white"
-        android:elevation="8dp"
         android:padding="24dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        >
 
         <ImageView
-            android:id="@+id/user_profile_iv"
+            android:id="@+id/back_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_profile"
+            android:onClick="@{() -> view.onClickBackBtn()}"
+            android:src="@drawable/ic_arrow_back_24"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
+        <ImageView
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:id="@+id/update_time_iv"
+            android:src="@drawable/ic_time"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/guide_tv"
+            android:layout_marginTop="40dp"
+            />
+
         <TextView
-            android:id="@+id/user_type_tv"
+            android:id="@+id/guide_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:text="보호대상자 위치 업데이트 주기를 설정해주세요."
+            android:textAppearance="@style/TextAppearance.App.18sp.ExtraBold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/back_btn"
+            android:layout_marginTop="30dp"/>
+
+        <NumberPicker
+            android:id="@+id/number_picker"
+            android:layout_width="120dp"
+            android:layout_height="200dp"
+            android:layout_marginTop="70dp"
+            android:switchTextAppearance="@style/TextAppearance.App.14sp.SemiBold"
+            android:orientation="horizontal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/guide_tv" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="분"
             android:layout_marginStart="10dp"
-            android:text="보호자"
-            android:textAppearance="@style/TextAppearance.App.24sp.ExtraBold"
+            android:textAppearance="@style/TextAppearance.App.18sp.ExtraBold"
+            app:layout_constraintBottom_toBottomOf="@id/number_picker"
+            app:layout_constraintStart_toEndOf="@id/number_picker"
+            app:layout_constraintTop_toTopOf="@id/number_picker" />
 
-            app:layout_constraintStart_toEndOf="@+id/user_profile_iv"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <TextView
-            android:id="@+id/user_name_tv"
-            android:layout_width="wrap_content"
+        <Button
+            android:id="@+id/finish_btn"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
-            android:text=""
-            android:textAppearance="@style/TextAppearance.App.20sp.ExtraBold"
-            app:layout_constraintStart_toStartOf="@+id/user_type_tv"
-            app:layout_constraintTop_toBottomOf="@+id/user_type_tv"
-            tools:text="박승호" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
-            android:text=""
-            android:textAppearance="@style/TextAppearance.App.16sp.SemiBold"
-            app:layout_constraintStart_toStartOf="@+id/user_type_tv"
-            app:layout_constraintTop_toBottomOf="@+id/user_name_tv"
-            tools:text="000-0000-0000" />
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
-<!-- -&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;-->
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/other_user_info_layout"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:background="@drawable/rectangle_corner_10_white"
-        android:elevation="8dp"
-        android:padding="20dp"
-        app:layout_constraintStart_toStartOf="@id/user_info_layout"
-
-        app:layout_constraintTop_toBottomOf="@id/user_info_layout">
-
-        <TextView
-            android:id="@+id/other_user_type_tv"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="보호대상자"
-            android:textAppearance="@style/TextAppearance.App.14sp.ExtraBold"
+            style="@style/Widget.App.DialogButton"
+            android:textSize="14sp"
+            android:text="변경"
+            android:layout_marginBottom="32dp"
+            android:background="@drawable/rectangle_corner_10"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <TextView
-            android:id="@+id/other_name_tv"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="5dp"
-            android:layout_marginTop="5dp"
-            android:text=""
-            android:textAppearance="@style/TextAppearance.App.14sp.ExtraBold"
-            app:layout_constraintBaseline_toBaselineOf="@+id/other_user_type_tv"
-            app:layout_constraintStart_toEndOf="@+id/other_user_type_tv"
-            tools:text="황순권" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/other_phone_tv"
-            android:layout_marginTop="5dp"
-            android:textAppearance="@style/TextAppearance.App.14sp.SemiBold"
-            android:text=""
-            tools:text="010-0000-0000"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/other_name_tv"
-            />
-
+            app:layout_constraintBottom_toBottomOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
-    <!-- -&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;-->
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="wrap_content"
-        android:layout_height="80dp"
-        android:id="@+id/update_user_info_layout"
-        android:background="@drawable/rectangle_corner_10_white"
-        android:layout_marginTop="20dp"
-        android:layout_marginStart="10dp"
-        app:layout_constraintTop_toBottomOf="@+id/user_info_layout"
-        app:layout_constraintStart_toEndOf="@+id/other_user_info_layout"
-        app:layout_constraintEnd_toEndOf="@+id/user_info_layout"
-        android:padding="20dp"
-        android:elevation="8dp"
-        android:clickable="true"
-        android:focusable="true"
-        android:onClick="@{() -> view.onClickUpdateUserInfo()}"
-        >
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/update_user_info_tv"
-            android:text="사용자 정보 수정"
-            android:textAppearance="@style/TextAppearance.App.14sp.ExtraBold"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            />
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
-    <!--         -&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;-->
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/updateTimelayout"
-        app:layout_constraintStart_toStartOf="@+id/user_info_layout"
-        app:layout_constraintTop_toBottomOf="@+id/other_user_info_layout"
-        android:padding="24dp"
-        android:elevation="8dp"
-        >
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-</androidx.constraintlayout.widget.ConstraintLayout>
-
 </layout>

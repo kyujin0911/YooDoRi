@@ -10,6 +10,10 @@
         <action
             android:id="@+id/action_nokSettingFragment_to_modifyUserInfoFragment"
             app:destination="@+id/modifyUserInfoFragment"/>
+        <action
+            android:id="@+id/action_nokSettingFragment_to_SettingUpdateTimeFragment"
+            app:destination="@id/SettingUpdateTimeFragment" />
+
     </fragment>
     <fragment
         android:id="@+id/modifyUserInfoFragment"
@@ -17,6 +21,14 @@
         android:label="ModifyUserInfoFragment">
         <action
             android:id="@+id/action_modifyUserInfoFragment_to_nokSettingFragment2"
+            app:destination="@id/nokSettingFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/SettingUpdateTimeFragment"
+        android:name="kr.ac.tukorea.whereareu.presentation.nok.setting.SettingUpdateTimeFragment"
+        android:label="SettingUpdateTimeFragment">
+        <action
+            android:id="@+id/action_SettingUpdateTimeFragment_to_nokSettingFragment"
             app:destination="@id/nokSettingFragment" />
     </fragment>
 

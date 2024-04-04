@@ -1,12 +1,11 @@
 package kr.ac.tukorea.whereareu.presentation.nok.setting
 
-import android.content.Context
-import android.util.Log
+import androidx.navigation.fragment.findNavController
 import kr.ac.tukorea.whereareu.R
-import kr.ac.tukorea.whereareu.databinding.DialogSettingUpdateTimeBinding
+import kr.ac.tukorea.whereareu.databinding.FragmentSettingUpdateTimeBinding
 import kr.ac.tukorea.whereareu.presentation.base.BaseDialogFragment
 
-class SetUpdateTimeDialogFragment(val setUpdateTime: (String) -> Unit): BaseDialogFragment<DialogSettingUpdateTimeBinding>(R.layout.dialog_setting_update_time) {
+class SettingUpdateTimeFragment(val setUpdateTime: (String) -> Unit): BaseDialogFragment<FragmentSettingUpdateTimeBinding>(R.layout.fragment_setting_update_time) {
     //private lateinit var setUpdateTimeListener: SetUpdateTimeListener
     override fun initObserver() {
 
@@ -35,5 +34,8 @@ class SetUpdateTimeDialogFragment(val setUpdateTime: (String) -> Unit): BaseDial
     }
     interface SetUpdateTimeListener{
         fun setUpdateTime(time: String)
+    }
+    fun onClickBackBtn() {
+        findNavController().popBackStack()
     }
 }

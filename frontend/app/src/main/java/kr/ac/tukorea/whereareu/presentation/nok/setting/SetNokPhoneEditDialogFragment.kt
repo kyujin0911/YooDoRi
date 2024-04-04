@@ -9,7 +9,7 @@ import android.view.inputmethod.EditorInfo
 import androidx.core.content.edit
 import kr.ac.tukorea.whereareu.R
 import kr.ac.tukorea.whereareu.databinding.DialogSetNokPhoneEditBinding
-import kr.ac.tukorea.whereareu.databinding.DialogSettingUpdateTimeBinding
+import kr.ac.tukorea.whereareu.databinding.FragmentSettingUpdateTimeBinding
 import kr.ac.tukorea.whereareu.presentation.base.BaseDialogFragment
 import kr.ac.tukorea.whereareu.util.extension.EditTextUtil.hideKeyboard
 import kr.ac.tukorea.whereareu.util.extension.EditTextUtil.setOnEditorActionListener

@@ -2,7 +2,6 @@ package kr.ac.tukorea.whereareu.presentation.nok.setting
 
 import android.content.Context.MODE_PRIVATE
 import android.util.Log
-import android.view.View
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import dagger.hilt.android.AndroidEntryPoint
@@ -37,7 +36,7 @@ class NokSettingFragment : BaseFragment<FragmentNokSettingBinding>(R.layout.frag
         }*/
 
         binding.updateTimeLayout.setOnClickListener {
-            val dialog = SetUpdateTimeDialogFragment { time ->
+            val dialog = SettingUpdateTimeFragment { time ->
                 viewModel.setUpdateDuration(time.toLong())
                 binding.updateTimeTv.text = time
             }
