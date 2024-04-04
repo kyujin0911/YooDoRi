@@ -32,7 +32,7 @@ class SettingViewModel @Inject constructor(
     private val _updateOtherUserInfo = MutableSharedFlow<ModifyUserInfoResponse>()
     val updateOtherUserInfo = _updateOtherUserInfo.asSharedFlow()
 
-    private val _userInfo = MutableSharedFlow<GetUserInfoResult>(replay = 1)
+    private val _userInfo = MutableSharedFlow<GetUserInfoResult>()
     val userInfo =  _userInfo.asSharedFlow()
 
     private val _toastEvent = MutableSharedFlow<String>()
@@ -56,17 +56,17 @@ class SettingViewModel @Inject constructor(
             }
         }
     }
-    fun getUserInfo(dementiaKey: String){
+    fun getUserInfo(nokKey: String){
         viewModelScope.launch{
-            repository.getUserInfo(dementiaKey).onSuccess {
+            repository.getUserInfo(nokKey).onSuccess {
                 _userInfo.emit(it)
                 Log.d("SettingViewModel", "getUserInfo Success")
             }.onError {
-                Log.d("error in UserInfoViewModel", it.toString())
+                Log.d("error in SettingVIewModel", it.toString())
             }.onException {
-                Log.d("exception in UserInfoViewModel", it.toString())
+                Log.d("exception in SettingVIewModel", it.toString())
             }.onFail {
-                Log.d("fail in UserInfoViewModel", it.toString())
+                Log.d("fail in SettingVIewModel", it.toString())
             }
         }
     }

@@ -9,5 +9,5 @@ import kr.ac.tukorea.whereareu.util.network.NetworkResult
 interface SettingRepository {
     suspend fun sendModifyUserInfo(request:ModifyUserInfoRequest): NetworkResult<ModifyUserInfoResponse>
 
-    suspend fun getUserInfo(dementiaKey: String): NetworkResult<GetUserInfoResult>
+    suspend fun getUserInfo(nokKey: String): NetworkResult<GetUserInfoResult>
 }

@@ -16,7 +16,7 @@ class SettingRepositoryImpl @Inject constructor(
         return handleApi({ api.postModifyUserInfo(request) }) { response: ResponseBody<ModifyUserInfoResponse> -> response.result }
     }
 
-    override suspend fun getUserInfo(dementiaKey: String): NetworkResult<GetUserInfoResult> {
-        return handleApi({api.getUserInfo(dementiaKey)}) {response: ResponseBody<GetUserInfoResult> -> response.result}
+    override suspend fun getUserInfo(nokKey: String): NetworkResult<GetUserInfoResult> {
+        return handleApi({api.getUserInfo(nokKey)}) {response: ResponseBody<GetUserInfoResult> -> response.result}
     }
 }

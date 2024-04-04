@@ -15,5 +15,5 @@ interface SettingService {
     suspend fun postModifyUserInfo(@Body request : ModifyUserInfoRequest): Response<ResponseBody<ModifyUserInfoResponse>>
 
     @GET("get-user-info")
-    suspend fun getUserInfo(@Query("dementiaKey") dementiaKey: String): Response<ResponseBody<GetUserInfoResult>>
+    suspend fun getUserInfo(@Query("nokKey") nokKey: String): Response<ResponseBody<GetUserInfoResult>>
 }

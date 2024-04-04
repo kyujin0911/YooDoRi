@@ -2,6 +2,7 @@ package kr.ac.tukorea.whereareu.presentation.nok.setting
 
 import android.content.Context.MODE_PRIVATE
 import android.util.Log
+import android.view.View
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import dagger.hilt.android.AndroidEntryPoint
@@ -43,9 +44,8 @@ class NokSettingFragment : BaseFragment<FragmentNokSettingBinding>(R.layout.frag
             dialog.show(childFragmentManager, dialog.tag)
         }
 
-        binding.updateUserInfoBtn.setOnClickListener {
-            onClickUpdateUserInfo()
-            Log.d("UpdateUserInfoBtn", "Clicked")
+        binding.updateUserInfoLayout.setOnClickListener {
+            onUpdateUserInfoLayoutClicked()
         }
     }
 
@@ -81,6 +81,10 @@ class NokSettingFragment : BaseFragment<FragmentNokSettingBinding>(R.layout.frag
     }
 
     fun onClickUpdateUserInfo() {
+        findNavController().navigate(R.id.action_nokSettingFragment_to_modifyUserInfoFragment2)
+    }
+
+    fun onUpdateUserInfoLayoutClicked() {
         findNavController().navigate(R.id.action_nokSettingFragment_to_modifyUserInfoFragment2)
     }
 }

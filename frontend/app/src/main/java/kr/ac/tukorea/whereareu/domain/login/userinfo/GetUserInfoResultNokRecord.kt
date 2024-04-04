@@ -4,5 +4,5 @@ data class GetUserInfoResultNokRecord(
     val nokKey : String,
     val nokName : String,
     val nokPhoneNumber : String,
-    val updateRate : Boolean,
+    val updateRate : Int,
 )
