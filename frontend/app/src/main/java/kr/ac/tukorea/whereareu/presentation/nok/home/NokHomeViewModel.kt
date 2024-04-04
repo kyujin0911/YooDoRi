@@ -4,19 +4,23 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.async
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kr.ac.tukorea.whereareu.data.model.DementiaKeyRequest
+import kr.ac.tukorea.whereareu.data.model.naver.ReverseGeocodingResponse
 import kr.ac.tukorea.whereareu.data.model.nok.home.DementiaLastInfoResponse
 import kr.ac.tukorea.whereareu.data.model.nok.home.LocationInfoResponse
 import kr.ac.tukorea.whereareu.data.model.nok.home.MeaningfulPlaceResponse
-import kr.ac.tukorea.whereareu.data.repository.naver.NaverRepository
 import kr.ac.tukorea.whereareu.data.repository.naver.NaverRepositoryImpl
 import kr.ac.tukorea.whereareu.data.repository.nok.home.NokHomeRepositoryImpl
 import kr.ac.tukorea.whereareu.domain.home.LastAddress
+import kr.ac.tukorea.whereareu.domain.home.MeaningfulPlace
 import kr.ac.tukorea.whereareu.util.network.onError
 import kr.ac.tukorea.whereareu.util.network.onException
 import kr.ac.tukorea.whereareu.util.network.onFail
@@ -35,7 +39,7 @@ class NokHomeViewModel @Inject constructor(
     val isInternetOn = MutableStateFlow(true)
     val isGpsOn = MutableStateFlow(true)
 
-    private val _updateDuration = MutableStateFlow<Long>(10 * 1000)
+    private val _updateDuration = MutableStateFlow<Long>(300000 * 1000)
     val updateDuration = _updateDuration.asStateFlow()
 
     private val _isPredicted = MutableStateFlow(false)
@@ -48,20 +52,24 @@ class NokHomeViewModel @Inject constructor(
 
     private val _predictEvent = MutableSharedFlow<PredictEvent>()
     val predictEvent = _predictEvent.asSharedFlow()
-    sealed class PredictEvent{
-        data class MeaningFulPlaceEvent(val meaningfulPlace: MeaningfulPlaceResponse): PredictEvent()
-        data class DementiaLastInfoEvent(val dementiaLastInfo: DementiaLastInfoResponse): PredictEvent()
 
-        data class ReverseGeocodingEvent(val lastAddress: LastAddress): PredictEvent()
+    private val addressList = mutableListOf<String>()
+
+    sealed class PredictEvent {
+        data class MeaningFulPlaceEvent(val meaningfulPlace: List<MeaningfulPlace>) : PredictEvent()
+        data class DementiaLastInfoEvent(val dementiaLastInfo: DementiaLastInfoResponse) :
+            PredictEvent()
+
+        data class LastLocationEvent(val lastAddress: LastAddress) : PredictEvent()
     }
 
-    private fun eventPredict(event: PredictEvent){
+    private fun eventPredict(event: PredictEvent) {
         viewModelScope.launch {
             _predictEvent.emit(event)
         }
     }
 
-    fun saveDementiaKey(dementiaKey: String){
+    fun saveDementiaKey(dementiaKey: String) {
         _dementiaKey.value = dementiaKey
     }
 
@@ -93,42 +101,94 @@ class NokHomeViewModel @Inject constructor(
         }
     }
 
-    private fun getMeaningfulPlace(){
+    private fun getMeaningfulPlace() {
         viewModelScope.launch {
-            nokHomeRepository.getMeaningfulPlace("253050").onSuccess {
-                Log.d("meaningful", it.toString())
-                eventPredict(PredictEvent.MeaningFulPlaceEvent(it))
-            }
-        }
-    }
+            nokHomeRepository.getMeaningfulPlace("253050").onSuccess { response ->
+                Log.d("meaningful response", response.toString())
+                response.meaningfulLocations.forEach { meaningfulPlace ->
+                    getReverseGeocoding(
+                            "${meaningfulPlace.longitude},${meaningfulPlace.latitude}",
+                            meaningfulPlace.latitude, meaningfulPlace.longitude
+                        )
+                    delay(500)
+                }
+                Log.d("meaningful address", addressList.toString())
 
-    fun getDementiaLastInfo(){
-        viewModelScope.launch {
-            nokHomeRepository.getDementiaLastInfo(DementiaKeyRequest("253050")).onSuccess {
-                Log.d("last info", it.toString())
-                eventPredict(PredictEvent.DementiaLastInfoEvent(it))
-                getReverseGeocoding("${it.lastLongitude},${it.lastLatitude}", it.lastLatitude, it.lastLongitude)
-            }
-        }
-    }
+                val dateList = response.meaningfulLocations.map { it.date }
+                val timeList = response.meaningfulLocations.map { it.time }
+                val meaningfulPlaceList = mutableListOf<MeaningfulPlace>()
+                for (i in response.meaningfulLocations.indices){
+                    meaningfulPlaceList.add(MeaningfulPlace(dateList[i], timeList[i], addressList[i]))
+                }
 
-    private fun getReverseGeocoding(coords: String, latitude: Double, longitude: Double){
-        viewModelScope.launch {
-            naverRepository.getReverseGeocodingInfo(coords, "roadaddr", "json").onSuccess {
-                Log.d("reverse Geocoding", it.toString())
-                val region = it.results[0].region
-                val land = it.results[0].land
-                val address = "${region.area1.name} ${region.area2.name} " +
-                        "${region.area3.name} ${land.name} ${land.number1} " +
-                        if (land.number2.isNullOrEmpty()) {
-                            "${land.addition0.value}"
-                        } else "-${land.number2} ${land.addition0.value}"
-                Log.d("address result", address)
-                eventPredict(PredictEvent.ReverseGeocodingEvent(LastAddress(latitude, longitude, address)))
-                getMeaningfulPlace()
+                Log.d("meaningful place", meaningfulPlaceList.toString())
+
+                eventPredict(PredictEvent.MeaningFulPlaceEvent(meaningfulPlaceList))
             }.onException {
                 Log.d("error", it.toString())
             }
         }
+    }
+
+    fun getDementiaLastInfo() {
+        viewModelScope.launch {
+            nokHomeRepository.getDementiaLastInfo(DementiaKeyRequest("253050"))
+                .onSuccess { response ->
+                    Log.d("last info", response.toString())
+                    eventPredict(PredictEvent.DementiaLastInfoEvent(response))
+                    getLastLocationAddress(
+                        "${response.lastLongitude},${response.lastLatitude}",
+                        response.lastLatitude,
+                        response.lastLongitude
+                    )
+                }.onException {
+                    Log.d("error", it.toString())
+                }
+        }
+    }
+
+    private fun getReverseGeocoding(coords: String, latitude: Double, longitude: Double) {
+        viewModelScope.launch {
+            naverRepository.getReverseGeocodingInfo(coords, "addr", "json")
+                .onSuccess { response ->
+                    Log.d("reverse Geocoding", response.toString())
+                    addressList.add(setAddress(response))
+                }.onException {
+                    Log.d("error", it.toString())
+                }
+        }
+    }
+
+    private fun getLastLocationAddress(coords: String, latitude: Double, longitude: Double) {
+        viewModelScope.launch {
+            naverRepository.getReverseGeocodingInfo(coords, "addr", "json")
+                .onSuccess { response ->
+                    Log.d("reverse Geocoding", response.toString())
+                    val address = setAddress(response)
+                    Log.d("address result", address)
+                    eventPredict(
+                        PredictEvent.LastLocationEvent(
+                            LastAddress(
+                                latitude,
+                                longitude,
+                                address
+                            )
+                        )
+                    )
+                    getMeaningfulPlace()
+                }.onException {
+                    Log.d("error", it.toString())
+                }
+        }
+    }
+
+    private fun setAddress(response: ReverseGeocodingResponse): String {
+        val region = response.results[0].region
+        val land = response.results[0].land
+        return "${region.area1.name} ${region.area2.name} " +
+                "${region.area3.name} ${land.number1}" +
+                if (land.number2.isNullOrEmpty()) {
+                    ""
+                } else "-${land.number2}"
     }
 }

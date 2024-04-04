@@ -1,5 +1,6 @@
 package kr.ac.tukorea.whereareu.presentation.nok.home
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
@@ -22,8 +23,11 @@ class MeaningfulListRVA: ListAdapter<MeaningfulPlace, MeaningfulListRVA.Meaningf
 
     inner class MeaningfulListViewHolder(private val binding: ItemMeaningfulListBinding): RecyclerView.ViewHolder(binding.root){
         fun bind(meaningfulPlace: MeaningfulPlace){
-            binding.addressTv.text = meaningfulPlace.address
-            binding.placeNameTv.text = meaningfulPlace.name
+            with(binding) {
+                addressTv.text = meaningfulPlace.address
+                dateTv.text = convertDayOfWeekInKorean(meaningfulPlace.date)
+                timeTv.text = "${meaningfulPlace.time.substring(0 until 2)}시~${meaningfulPlace.time.substring(2 until 4)}시"
+            }
         }
     }
 
@@ -38,4 +42,18 @@ class MeaningfulListRVA: ListAdapter<MeaningfulPlace, MeaningfulListRVA.Meaningf
     override fun onBindViewHolder(holder: MeaningfulListViewHolder, position: Int) {
         holder.bind(currentList[position])
     }
+
+    private fun convertDayOfWeekInKorean(day: String): String{
+        return when(day){
+            "Monday" -> "월요일"
+            "Tuesday" -> "화요일"
+            "Wednesday" -> "수요일"
+            "Thursday" -> "목요일"
+            "Friday" -> "금요일"
+            "Saturday" -> "토요일"
+            "Sunday" -> "일요일"
+            else-> "알 수 없음"
+        }
+    }
+
 }

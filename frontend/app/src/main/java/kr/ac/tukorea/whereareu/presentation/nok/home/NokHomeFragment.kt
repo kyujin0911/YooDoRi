@@ -3,6 +3,7 @@ package kr.ac.tukorea.whereareu.presentation.nok.home
 import android.content.Context.MODE_PRIVATE
 import android.content.pm.PackageManager
 import android.graphics.PointF
+import android.os.Build.VERSION_CODES.M
 import android.util.Log
 import android.view.View
 import android.view.ViewTreeObserver
@@ -12,7 +13,6 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -21,8 +21,10 @@ import com.naver.maps.map.CameraUpdate
 import com.naver.maps.map.MapFragment
 import com.naver.maps.map.NaverMap
 import com.naver.maps.map.OnMapReadyCallback
+import com.naver.maps.map.overlay.InfoWindow
 import com.naver.maps.map.overlay.Marker
 import com.naver.maps.map.overlay.OverlayImage
+import com.naver.maps.map.util.MarkerIcons
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancelAndJoin
@@ -34,6 +36,7 @@ import kr.ac.tukorea.whereareu.databinding.IconLocationOverlayLayoutBinding
 import kr.ac.tukorea.whereareu.domain.home.MeaningfulPlace
 import kr.ac.tukorea.whereareu.presentation.base.BaseFragment
 import kr.ac.tukorea.whereareu.util.extension.repeatOnStarted
+import java.time.DayOfWeek
 import kotlin.math.roundToInt
 
 
@@ -44,9 +47,7 @@ class NokHomeFragment : BaseFragment<kr.ac.tukorea.whereareu.databinding.Fragmen
     private val LOCATION_PERMISSION_REQUEST_CODE = 1001
     private var naverMap: NaverMap? = null
     private var dementiaName: String? = null
-    private val navigator by lazy {
-        findNavController()
-    }
+    private val lastLocationMarker = Marker()
     private val meaningfulListRVA by lazy {
         MeaningfulListRVA()
     }
@@ -62,6 +63,7 @@ class NokHomeFragment : BaseFragment<kr.ac.tukorea.whereareu.databinding.Fragmen
                     initMeaningfulListRVA()
                 } else {
                     countDownJob?.cancelAndJoin()
+                    lastLocationMarker.map = null
                 }
             }
         }
@@ -81,20 +83,28 @@ class NokHomeFragment : BaseFragment<kr.ac.tukorea.whereareu.databinding.Fragmen
 
             }
             is NokHomeViewModel.PredictEvent.MeaningFulPlaceEvent -> {
-
+                meaningfulListRVA.submitList(event.meaningfulPlace)
             }
 
-            is NokHomeViewModel.PredictEvent.ReverseGeocodingEvent -> {
+            is NokHomeViewModel.PredictEvent.LastLocationEvent -> {
                 val latitude = event.lastAddress.latitude
                 val longitude = event.lastAddress.longitude
                 naverMap?.moveCamera(CameraUpdate.scrollTo(LatLng(latitude, longitude)))
-                val marker = Marker()
-                with(marker){
+                with(lastLocationMarker){
                     position = LatLng(latitude, longitude)
+                    icon = MarkerIcons.RED
                     captionText = event.lastAddress.address
                     captionRequestedWidth = 400
                     map = naverMap
                 }
+
+                val infoWindow = InfoWindow()
+                infoWindow.adapter = object : InfoWindow.DefaultTextAdapter(requireContext()) {
+                    override fun getText(infoWindow: InfoWindow): CharSequence {
+                        return "실종 직전 위치"
+                    }
+                }
+                infoWindow.open(lastLocationMarker)
             }
         }
     }
@@ -149,9 +159,9 @@ class NokHomeFragment : BaseFragment<kr.ac.tukorea.whereareu.databinding.Fragmen
                 iconBinding.speedTv.text = (speed * 3.6).roundToInt().toString()
                 iconBinding.nameTv.text = name
                 locationOverlay.icon = OverlayImage.fromView(icon)
-                locationOverlay.circleRadius = 0
-                locationOverlay.position = coord
-                locationOverlay.anchor = PointF(0.5f, 1f)
+                circleRadius = 0
+                position = coord
+                anchor = PointF(0.5f, 1f)
             }
 
             it.moveCamera(CameraUpdate.scrollTo(coord))
@@ -183,26 +193,22 @@ class NokHomeFragment : BaseFragment<kr.ac.tukorea.whereareu.databinding.Fragmen
                 LinearLayoutManager.VERTICAL
             )
         )}
-        val list = listOf<MeaningfulPlace>(
-            MeaningfulPlace("한국공학대학교", "시흥시 뭐시기"),
-            MeaningfulPlace("한국공학대학교", "시흥시 뭐시기"),
-            MeaningfulPlace("한국공학대학교", "시흥시 뭐시기"),
-            MeaningfulPlace("한국공학대학교", "시흥시 뭐시기"),
-            MeaningfulPlace("한국공학대학교", "시흥시 뭐시기"),
-            MeaningfulPlace("한국공학대학교", "시흥시 뭐시기"),
-            MeaningfulPlace("한국공학대학교", "시흥시 뭐시기"),
-            MeaningfulPlace("한국공학대학교", "시흥시 뭐시기"),
-            MeaningfulPlace("한국공학대학교", "시흥시 뭐시기"),
-            MeaningfulPlace("한국공학대학교", "시흥시 뭐시기"),
-            MeaningfulPlace("한국공학대학교", "시흥시 뭐시기"),
-            MeaningfulPlace("한국공학대학교", "시흥시 뭐시기"),
-            MeaningfulPlace("한국공학대학교", "시흥시 뭐시기"),
-            MeaningfulPlace("한국공학대학교", "시흥시 뭐시기"),
-            MeaningfulPlace("한국공학대학교", "시흥시 뭐시기"),
-            MeaningfulPlace("한국공학대학교", "시흥시 뭐시기"),
-            MeaningfulPlace("한국공학대학교", "시흥시 뭐시기"),
+        /*val list = listOf<MeaningfulPlace>(
+            MeaningfulPlace("화", "0408", "시흥시"),
+            MeaningfulPlace("화", "0408", "시흥시"),
+            MeaningfulPlace("화", "0408", "시흥시"),
+            MeaningfulPlace("화", "0408", "시흥시"),
+            MeaningfulPlace("화", "0408", "시흥시"),
+            MeaningfulPlace("화", "0408", "시흥시"),
+            MeaningfulPlace("화", "0408", "시흥시"),
+            MeaningfulPlace("화", "0408", "시흥시"),
+            MeaningfulPlace("화", "0408", "시흥시"),
+            MeaningfulPlace("화", "0408", "시흥시"),
+            MeaningfulPlace("화", "0408", "시흥시"),
+            MeaningfulPlace("화", "0408", "시흥시"),
+            MeaningfulPlace("화", "0408", "시흥시"),
         )
-        meaningfulListRVA.submitList(list)
+        meaningfulListRVA.submitList(list)*/
     }
 
     private fun initBottomSheet(){
@@ -213,13 +219,13 @@ class NokHomeFragment : BaseFragment<kr.ac.tukorea.whereareu.databinding.Fragmen
         behavior.halfExpandedRatio = 0.3f
 
         //bottom sheet predict layout과 높이 맞추기
-        val viewTreeObserver: ViewTreeObserver = binding.predictLayout.viewTreeObserver
+        /*val viewTreeObserver: ViewTreeObserver = binding.predictLayout.viewTreeObserver
         viewTreeObserver.addOnGlobalLayoutListener(object : OnGlobalLayoutListener {
             override fun onGlobalLayout() {
                 behavior.expandedOffset = binding.predictLayout.height + 35
                 binding.predictLayout.viewTreeObserver.removeOnGlobalLayoutListener(this)
             }
-        })
+        })*/
 
         // half expanded state일 때 접기 제어
         behavior.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback(){
