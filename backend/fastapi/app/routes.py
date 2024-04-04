@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Request, HTTPException
+from fastapi import APIRouter, Request, HTTPException, status
 from . import models
 from .random_generator import RandomNumberGenerator
 from .update_user_status import UpdateUserStatus
@@ -63,7 +63,7 @@ async def receive_nok_info(request: Request):
 
             response = {
                 'status': 'success',
-                'statusCode': SUCCESS,
+                'message': 'NOK information received',
                 'result': result
             }
             
@@ -73,7 +73,6 @@ async def receive_nok_info(request: Request):
 
             response = {
                 'status': 'error',
-                'statusCode': KEYNOTFOUND,   
                 'message': 'Dementia information not found'
             }
 
@@ -113,7 +112,7 @@ async def receive_dementia_info(request: Request):
 
         response = {
             'status': 'success',
-            'statusCode' : SUCCESS,
+            'message' : 'Dementia information received',
             'result': result
         }
 
@@ -142,7 +141,7 @@ async def is_connected(request: Request):
             }
             response = {
                 'status': 'success',
-                'statusCode': SUCCESS,
+                'message': 'Connection check',
                 'result': result
             }
 
@@ -153,7 +152,6 @@ async def is_connected(request: Request):
 
             response = {
                 'status': 'error',
-                'statusCode': KEYNOTFOUND,
                 'message': 'Dementia information not found'
             }
 
@@ -175,14 +173,14 @@ async def receive_user_login(request: Request):
             if existing_nok:
                 response = {
                     'status': 'success',
-                    'statusCode': LOGINSUCCESS
+                    'message': 'User login success',
                 }
                 print(f"[INFO] User login from {existing_nok.nok_name}({existing_nok.nok_key})")
 
             else:
                 response = {
                     'status': 'error',
-                    'statusCode': LOGINFAILED
+                    'message': 'User login failed'
                 }
                 print(f"[ERROR] User login failed from NOK key({_key})")
 
@@ -192,14 +190,14 @@ async def receive_user_login(request: Request):
             if existing_dementia:
                 response = {
                     'status': 'success',
-                    'statusCode': LOGINSUCCESS
+                    'message': 'User login success',
                 }
                 print(f"[INFO] User login from {existing_dementia.dementia_name}({existing_dementia.dementia_key})")
 
             else:
                 response = {
                     'status': 'error',
-                    'statusCode': LOGINFAILED
+                    'message': 'User login failed'
                 }
                 print(f"[ERROR] User login failed from Dementia key({_key})")
 
@@ -259,13 +257,12 @@ async def receive_location_info(request: Request):
 
             response = {
                 'status': 'success',
-                'statusCode': SUCCESS
+                'message': 'Location data received'
             }
 
         else:
             response = {
                 'status': 'error',
-                'statusCode': KEYNOTFOUND,
                 'message': 'Dementia key not found'
             }
             print(f"[ERROR] Dementia key({_dementia_key}) not found(receive location info)")
@@ -296,7 +293,7 @@ async def send_live_location_info(request: Request):
             }
             response = {
                 'status': 'success',
-                'statusCode': SUCCESS,
+                'message': 'Live location data sent',
                 'result': result
             }
             print(f"[INFO] Live location data sent to {latest_location.dementia_key}")
@@ -304,7 +301,6 @@ async def send_live_location_info(request: Request):
         else:
             response = {
                 'status': 'error',
-                'statusCode': LOCDATANOTFOUND,
                 'message': 'Location data not found'
             }
             print(f"[ERROR] Location data not found for Dementia key({_dementia_key})")
@@ -341,14 +337,13 @@ async def modify_user_info(request: Request):
 
                 response = {
                     'status': 'success',
-                    'statusCode': SUCCESS
+                    'message': 'User information modified'
                 }
             else:
                 print(f"[ERROR] NOK key not found")
 
                 response = {
                     'status': 'error',
-                    'statusCode': KEYNOTFOUND,
                     'message': 'User key not found'
                 }
 
@@ -370,7 +365,7 @@ async def modify_user_info(request: Request):
 
                 response = {
                     'status': 'success',
-                    'statusCode': SUCCESS
+                    'message': 'User information modified'
                 }
 
             else:
@@ -378,7 +373,6 @@ async def modify_user_info(request: Request):
 
                 response = {
                     'status': 'error',
-                    'statusCode': KEYNOTFOUND,
                     'message': 'User key not found'
                 }
 
@@ -409,14 +403,13 @@ async def modify_updatint_rate(request: Request):
 
                 response = {
                     'status': 'success',
-                    'statusCode': SUCCESS
+                    'message': 'User update rate modified'
                 }
             else:
                 print(f"[ERROR] NOK key not found(update rate)")
 
                 response = {
                     'status': 'error',
-                    'statusCode': KEYNOTFOUND,
                     'message': 'User key not found'
                 }
         elif _is_dementia == 1:
@@ -431,14 +424,13 @@ async def modify_updatint_rate(request: Request):
 
                 response = {
                     'status': 'success',
-                    'statusCode': SUCCESS
+                    'message': 'User update rate modified'
                 }
             else:
                 print(f"[ERROR] Dementia key not found(update rate)")
 
                 response = {
                     'status': 'error',
-                    'statusCode': KEYNOTFOUND,
                     'message': 'User key not found'
                 }
         
@@ -459,7 +451,6 @@ async def caculate_dementia_average_walking_speed(requset: Request):
         print(f"[ERROR] Dementia key not found(calculate dementia average walking speed)")
         response = {
             'status': 'error',
-            'statusCode': KEYNOTFOUND,
             'message': 'Dementia key not found'
         }
         return response
@@ -477,7 +468,7 @@ async def caculate_dementia_average_walking_speed(requset: Request):
 
             response = {
                 'status': 'success',
-                'statusCode': SUCCESS,
+                'message': 'Dementia average walking speed calculated',
                 'result': {
                     'averageSpeed': average_speed,
                     'lastLatitude': location_info_list[0].latitude,
@@ -489,7 +480,6 @@ async def caculate_dementia_average_walking_speed(requset: Request):
         else:
             response = {
                 'status': 'error',
-                'statusCode': LOCDATANOTENOUGH,
                 'message': 'Not enough location data'
             }
             print(f"[ERROR] Not enough location data for Dementia key({_dementia_key})")
@@ -512,7 +502,6 @@ async def get_user_info(request: Request):
             if not dementia_info_record:
                 response = {
                     'status': 'error',
-                    'statusCode': KEYNOTFOUND,
                     'message': 'Dementia information not found'
                 }
 
@@ -535,7 +524,7 @@ async def get_user_info(request: Request):
 
             response = {
                 'status': 'success',
-                'statusCode': SUCCESS,
+                'message': 'User information sent',
                 'result': result
             }
 
@@ -543,7 +532,6 @@ async def get_user_info(request: Request):
         else:
             response = {
                 'status': 'error',
-                'statusCode': KEYNOTFOUND,
                 'message': 'User information not found'
             }
 
@@ -562,17 +550,23 @@ async def send_meaningful_location_info(request: Request):
         meaningful_location_list = session.query(models.meaningful_location_info).filter_by(dementia_key = _key).all()
 
         if meaningful_location_list:
-            result = []
+            meaningful_locations = []
+
             for location in meaningful_location_list:
-                result.append({
+                meaningful_locations.append({
                     'date': location.day_of_the_week,
                     'time': location.time,
                     'latitude': location.latitude,
                     'longitude': location.longitude
                 })
+            
+            result = {
+                'meaningfulLocations': meaningful_locations
+            }
+            
             response = {
                 'status': 'success',
-                'statusCode': SUCCESS,
+                'message': 'Meaningful location data sent',
                 'result': result
             }
 
@@ -581,7 +575,6 @@ async def send_meaningful_location_info(request: Request):
         else:
             response = {
                 'status': 'error',
-                'statusCode': LOCDATANOTFOUND,
                 'message': 'Meaningful location data not found'
             }
 
@@ -612,7 +605,7 @@ async def send_location_history(request: Request):
 
             response = {
                 'status': 'success',
-                'statusCode': SUCCESS,
+                'message': 'Location history data sent',
                 'result': result
             }
 
@@ -621,7 +614,6 @@ async def send_location_history(request: Request):
         else:
             response = {
                 'status': 'error',
-                'statusCode': LOCDATANOTFOUND,
                 'message': 'Location history data not found'
             }
 
@@ -633,8 +625,8 @@ async def send_location_history(request: Request):
         session.close()
 
 
-""" 스케줄러 비활성화
-@sched.scheduled_job('cron', hour=0, minute=0, id = 'analyze_location_data')
+#스케줄러 비활성화
+"""@sched.scheduled_job('cron', hour=0, minute=18, id = 'analyze_location_data')
 def analyze_location_data():
     today = datetime.datetime.now()
     today = today - datetime.timedelta(days=1) # 어제 날짜의 위치 정보를 분석
@@ -690,7 +682,4 @@ def analyze_location_data():
         print(f"[INFO] Location data analysis completed at {today}")
 
     finally:
-        session.close()
-
-
-"""
+        session.close()"""
