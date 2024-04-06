@@ -241,49 +241,6 @@
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
-<!--            <TextView-->
-<!--                android:id="@+id/update_time_title2"-->
-<!--                android:layout_width="wrap_content"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:layout_marginTop="200dp"-->
-<!--                android:text="위치 정보 업데이트 주기"-->
-<!--                android:textAppearance="@style/TextAppearance.App.14sp.ExtraBold"-->
-<!--                app:layout_constraintStart_toStartOf="parent"-->
-<!--                app:layout_constraintTop_toBottomOf="@+id/update_user_info_v" />-->
-
-<!--            <ImageView-->
-<!--                android:id="@+id/update_time_btn"-->
-<!--                android:layout_width="18dp"-->
-<!--                android:layout_height="18dp"-->
-<!--                android:scaleX="-1"-->
-<!--                android:src="@drawable/ic_arrow_back_24"-->
-<!--                app:layout_constraintBottom_toBottomOf="@+id/update_time_tv"-->
-<!--                app:layout_constraintEnd_toEndOf="parent"-->
-
-
-<!--                app:layout_constraintTop_toTopOf="@+id/update_time_tv" />-->
-
-<!--            <TextView-->
-<!--                android:id="@+id/update_time_tv"-->
-<!--                android:layout_width="wrap_content"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:layout_marginStart="10dp"-->
-<!--                android:text="1"-->
-<!--                android:textAppearance="@style/TextAppearance.App.14sp.SemiBold"-->
-<!--                app:layout_constraintBaseline_toBaselineOf="@+id/update_time_title"-->
-<!--                app:layout_constraintStart_toEndOf="@id/update_time_title"-->
-<!--                app:layout_constraintTop_toTopOf="parent" />-->
-
-<!--            <TextView-->
-<!--                android:layout_width="wrap_content"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:layout_marginStart="2dp"-->
-<!--                android:text="분"-->
-<!--                android:textAppearance="@style/TextAppearance.App.14sp.SemiBold"-->
-<!--                app:layout_constraintBaseline_toBaselineOf="@+id/update_time_title"-->
-<!--                app:layout_constraintStart_toEndOf="@+id/update_time_tv"-->
-<!--                app:layout_constraintTop_toTopOf="parent" />-->
-
             <View
                 android:layout_width="match_parent"
                 android:layout_height="0.5dp"
