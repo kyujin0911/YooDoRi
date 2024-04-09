@@ -594,14 +594,18 @@ async def send_location_history(request: Request):
         location_list = session.query(models.location_info).filter_by(dementia_key = _key, date = date).all()
 
         if location_list:
-            result = []
+            locHistory = []
 
             for location in location_list:
-                result.append({
+                locHistory.append({
                     'latitude': location.latitude,
                     'longitude': location.longitude,
                     'time': location.time
                 })
+
+            result = {
+                'locationHistory': locHistory,
+            }
 
             response = {
                 'status': 'success',
