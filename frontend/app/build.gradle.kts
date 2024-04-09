@@ -113,6 +113,8 @@ dependencies {
     implementation("com.naver.maps:map-sdk:3.17.0")
 
     implementation("com.google.android.gms:play-services-location:21.2.0")
+
+    implementation ("com.airbnb.android:lottie:5.0.2")
 }
 kapt {
     correctErrorTypes = true

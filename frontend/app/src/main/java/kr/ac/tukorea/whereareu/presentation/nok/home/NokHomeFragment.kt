@@ -57,10 +57,10 @@ class NokHomeFragment : BaseFragment<kr.ac.tukorea.whereareu.databinding.Fragmen
         repeatOnStarted {
             viewModel.isPredicted.collect{ isPredicted ->
                 if(isPredicted) {
-                    startCountDown()
                     viewModel.getDementiaLastInfo()
                     initBottomSheet()
                     initMeaningfulListRVA()
+                    showLoadingDialog(requireContext())
                 } else {
                     countDownJob?.cancelAndJoin()
                     lastLocationMarker.map = null
@@ -84,6 +84,8 @@ class NokHomeFragment : BaseFragment<kr.ac.tukorea.whereareu.databinding.Fragmen
             }
             is NokHomeViewModel.PredictEvent.MeaningFulPlaceEvent -> {
                 meaningfulListRVA.submitList(event.meaningfulPlace)
+                dismissLoadingDialog()
+                startCountDown()
             }
 
             is NokHomeViewModel.PredictEvent.LastLocationEvent -> {
