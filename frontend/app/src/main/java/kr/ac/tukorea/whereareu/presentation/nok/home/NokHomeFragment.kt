@@ -63,6 +63,7 @@ class NokHomeFragment : BaseFragment<kr.ac.tukorea.whereareu.databinding.Fragmen
                     showLoadingDialog(requireContext())
                 } else {
                     countDownJob?.cancelAndJoin()
+                    binding.countDownT.text = "00:00"
                     lastLocationMarker.map = null
                 }
             }
