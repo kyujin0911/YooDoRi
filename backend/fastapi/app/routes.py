@@ -123,20 +123,17 @@ async def receive_dementia_info(request: Request):
     finally:
         session.close()
 
-@router.post("/is-connected")
-async def is_connected(request: Request):
-    data = await request.json()
-    _dementia_key = data.get("dementiaKey")
+@router.post("/connect/{dementiaKey}")
+async def is_connected(dementiaKey : str):
 
-    session = next(db.get_session())
     try:
-        existing_dementia = session.query(models.nok_info).filter_by(dementia_info_key = _dementia_key).first()
-        if existing_dementia:
+        existing_nok = session.query(models.nok_info).filter_by(dementia_info_key = dementiaKey).first()
+        if existing_nok:
             result = {
                 'nokInfoRecord':{
-                    'nokKey': existing_dementia.nok_key,
-                    'nokName': existing_dementia.nok_name,
-                    'nokPhoneNumber': existing_dementia.nok_phonenumber
+                    'nokKey': existing_nok.nok_key,
+                    'nokName': existing_nok.nok_name,
+                    'nokPhoneNumber': existing_nok.nok_phonenumber
                 }
             }
             response = {
@@ -145,10 +142,10 @@ async def is_connected(request: Request):
                 'result': result
             }
 
-            print(f"[INFO] Connection check from {existing_dementia.dementia_name}({existing_dementia.dementia_key})")
+            print(f"[INFO] Connection check from {existing_nok.nok_name}(from {existing_nok.dementia_info_key})")
         
         else:
-            print (f"[ERROR] Connection denied from Dementia key({_dementia_key})")
+            print (f"[ERROR] Connection denied from Dementia key({dementiaKey})")
 
             response = {
                 'status': 'error',
