@@ -17,6 +17,8 @@ import kr.ac.tukorea.whereareu.data.model.naver.ReverseGeocodingResponse
 import kr.ac.tukorea.whereareu.data.model.nok.home.DementiaLastInfoResponse
 import kr.ac.tukorea.whereareu.data.model.nok.home.LocationInfoResponse
 import kr.ac.tukorea.whereareu.data.model.nok.home.MeaningfulPlaceResponse
+import kr.ac.tukorea.whereareu.data.repository.kakao.KakaoRepository
+import kr.ac.tukorea.whereareu.data.repository.kakao.KakaoRepositoryImpl
 import kr.ac.tukorea.whereareu.data.repository.naver.NaverRepositoryImpl
 import kr.ac.tukorea.whereareu.data.repository.nok.home.NokHomeRepositoryImpl
 import kr.ac.tukorea.whereareu.domain.home.LastAddress
@@ -30,7 +32,8 @@ import javax.inject.Inject
 @HiltViewModel
 class NokHomeViewModel @Inject constructor(
     private val nokHomeRepository: NokHomeRepositoryImpl,
-    private val naverRepository: NaverRepositoryImpl
+    private val naverRepository: NaverRepositoryImpl,
+    private val kakaoRepository: KakaoRepositoryImpl
 ) : ViewModel() {
 
     private val _dementiaLocation = MutableSharedFlow<LocationInfoResponse>(replay = 1)
@@ -141,6 +144,7 @@ class NokHomeViewModel @Inject constructor(
                         response.lastLatitude,
                         response.lastLongitude
                     )
+                    getAddress(response.lastLongitude.toString(), response.lastLatitude.toString())
                 }.onException {
                     Log.d("error", it.toString())
                 }
@@ -175,7 +179,7 @@ class NokHomeViewModel @Inject constructor(
                             )
                         )
                     )
-                    getMeaningfulPlace()
+                    //getMeaningfulPlace()
                 }.onException {
                     Log.d("error", it.toString())
                 }
@@ -190,5 +194,19 @@ class NokHomeViewModel @Inject constructor(
                 if (land.number2.isNullOrEmpty()) {
                     ""
                 } else "-${land.number2}"
+    }
+
+    fun getAddress(x: String, y: String){
+        viewModelScope.launch {
+            kakaoRepository.getAddress("126.9340687", "37.401623").onSuccess {
+                Log.d("kakao api", it.toString())
+            }.onError {
+                Log.d("kakao api error", it.toString())
+            }.onFail {
+                Log.d("kakao api fail", it.toString())
+            }.onException {
+                Log.d("kakao api exception", it.toString())
+            }
+        }
     }
 }

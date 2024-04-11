@@ -10,6 +10,7 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        maven ("https://devrepo.kakao.com/nexus/repository/kakaomap-releases/")
         maven("https://naver.jfrog.io/artifactory/maven/")
     }
 }

@@ -11,6 +11,7 @@ import kr.ac.tukorea.whereareu.data.api.dementia.DementiaHomeService
 import kr.ac.tukorea.whereareu.data.api.LoginService
 import kr.ac.tukorea.whereareu.data.api.nok.NokHomeService
 import kr.ac.tukorea.whereareu.util.location.LocationService
+import kr.ac.tukorea.whereareu.util.network.KakaoInterceptor
 import kr.ac.tukorea.whereareu.util.network.NaverInterceptor
 import okhttp3.Interceptor
 import okhttp3.Interceptor.*
@@ -36,6 +37,10 @@ object NetworkModule {
     @Qualifier
     @Retention(AnnotationRetention.BINARY)
     annotation class NaverRetrofit
+
+    @Qualifier
+    @Retention(AnnotationRetention.BINARY)
+    annotation class KaKaoRetrofit
 
     const val NETWORK_EXCEPTION_OFFLINE_CASE = "network status is offline"
     const val NETWORK_EXCEPTION_BODY_IS_NULL = "result body is null"
@@ -91,6 +96,31 @@ object NetworkModule {
 
     @Provides
     @Singleton
+    @KaKaoRetrofit
+    fun provideKakaoOKHttpClient(): OkHttpClient {
+        val interceptor = HttpLoggingInterceptor().apply {
+            level = HttpLoggingInterceptor.Level.BODY
+        }
+
+        val closeInterceptor = Interceptor { chain ->
+            val request: Request =
+                chain.request().newBuilder().addHeader("Connection", "close").build()
+            chain.proceed(request)
+        }
+
+        return OkHttpClient.Builder()
+            .connectTimeout(10, TimeUnit.SECONDS)
+            .readTimeout(10, TimeUnit.SECONDS)
+            .writeTimeout(5, TimeUnit.SECONDS)
+            .addInterceptor(KakaoInterceptor())
+            .addInterceptor(interceptor)
+            .addNetworkInterceptor(closeInterceptor)
+            .retryOnConnectionFailure(false)
+            .build()
+    }
+
+    @Provides
+    @Singleton
     @BaseRetrofit
     fun provideRetrofit(
         @BaseRetrofit okHttpClient: OkHttpClient): Retrofit {
@@ -110,6 +140,19 @@ object NetworkModule {
         return Retrofit.Builder()
             .client(okHttpClient)
             .baseUrl(WhereAreUApplication.getString(R.string. naver_url))
+            .addConverterFactory(ScalarsConverterFactory.create())
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+    }
+
+    @Provides
+    @Singleton
+    @KaKaoRetrofit
+    fun provideKakaoRetrofit(
+        @KaKaoRetrofit okHttpClient: OkHttpClient): Retrofit {
+        return Retrofit.Builder()
+            .client(okHttpClient)
+            .baseUrl(WhereAreUApplication.getString(R.string. kakao_url))
             .addConverterFactory(ScalarsConverterFactory.create())
             .addConverterFactory(GsonConverterFactory.create())
             .build()
