@@ -31,7 +31,7 @@ class MeaningfulListRVA: ListAdapter<MeaningfulPlaceInfo, MeaningfulListRVA.Mean
                     val time = "${meaningfulPlaceListInfo.time.substring(0 until 2)}시~${
                         meaningfulPlaceListInfo.time.substring(2 until 4)
                     }시"
-                    MeaningfulPlaceListInfo(index+1, date, time)
+                    MeaningfulPlaceListInfo(index+1, date, time, meaningfulPlaceListInfo.latitude, meaningfulPlaceListInfo.longitude)
                 }
                 val adapter = InnerMeaningfulListRVA()
                 innerRv.adapter = adapter

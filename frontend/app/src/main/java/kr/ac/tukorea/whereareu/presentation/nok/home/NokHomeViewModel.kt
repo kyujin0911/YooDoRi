@@ -208,12 +208,12 @@ class NokHomeViewModel @Inject constructor(
     }
 
     private fun preprocessingList(list: List<MeaningfulPlace>): MutableList<MeaningfulPlaceInfo> {
-        val groupList = list.groupBy { it.address }
-        /*val meaningfulPlaceInfoList = mutableListOf<MeaningfulPlaceInfo>()
+        /*val groupList = list.groupBy { it.address }
+        val meaningfulPlaceInfoList = mutableListOf<MeaningfulPlaceInfo>()
         groupList.keys.forEach { key ->
             val list = groupList[key]
             val meaningfulPlaceListInfo =
-                list?.map { MeaningfulPlaceListInfo(date = it.date, time = it.time, index = 0) }
+                list?.map { MeaningfulPlaceListInfo(date = it.date, time = it.time, index = 0, latitude = it.latitude, longitude = it.longitude) }
                     ?.sortedBy { it.time }
             meaningfulPlaceInfoList.add(MeaningfulPlaceInfo(key, meaningfulPlaceListInfo!!))
         }
@@ -226,53 +226,79 @@ class NokHomeViewModel @Inject constructor(
                 MeaningfulPlaceListInfo(
                 date = "Tuesday",
                 time = "0004",
-                    index = 0
+                    index = 0,
+                    latitude = 37.401623,
+                    longitude = 126.9340687
             ), MeaningfulPlaceListInfo(
                 date = "Tuesday",
                 time = "0004",
-                    index = 0
+                    index = 0,
+                    latitude = 37.401623,
+                    longitude = 126.9340687
             ), MeaningfulPlaceListInfo(
                 date = "Tuesday",
                 time = "0004",
-                    index = 0
+                    index = 0,
+                    latitude = 37.401623,
+                    longitude = 126.9340687
             ), MeaningfulPlaceListInfo(
                 date = "Tuesday",
                 time = "0004",
-                    index = 0
+                    index = 0,
+                    latitude = 37.401623,
+                    longitude = 126.9340687
             ), MeaningfulPlaceListInfo(
                 date = "Tuesday",
                 time = "0004",
-                    index = 0
+                    index = 0,
+                    latitude = 37.401623,
+                    longitude = 126.9340687
             ), MeaningfulPlaceListInfo(
                 date = "Tuesday",
                 time = "0004",
-                    index = 0
+                    index = 0,
+                    latitude = 37.401623,
+                    longitude = 126.9340687
             ), MeaningfulPlaceListInfo(
                 date = "Tuesday",
                 time = "0408",
-                    index = 0
+                    index = 0,
+                    latitude = 37.401623,
+                    longitude = 126.9340687
             ), MeaningfulPlaceListInfo(
                 date = "Tuesday",
                 time = "0408",
-                    index = 0
+                    index = 0,
+                    latitude = 37.401623,
+                    longitude = 126.9340687
             ), MeaningfulPlaceListInfo(
                 date = "Tuesday",
                 time = "0408",
-                    index = 0
+                    index = 0,
+                    latitude = 37.401623,
+                    longitude = 126.9340687
             ), MeaningfulPlaceListInfo(date = "Tuesday", time = "0812",
-                    index = 0))
+                    index = 0,
+                    latitude = 37.401623,
+                    longitude = 126.9340687))
         ), MeaningfulPlaceInfo(
             address = "경기 시흥시 정왕동 1308",
             meaningfulPlaceListInfo = listOf(MeaningfulPlaceListInfo(date = "Tuesday", time = "1620",
-                index = 0))
+                index = 0,
+                latitude = 37.401623,
+                longitude = 126.9340687))
         ), MeaningfulPlaceInfo(
             address = "경기도 시흥시 산기대학로 237 한국공학대학교",
             meaningfulPlaceListInfo = listOf(MeaningfulPlaceListInfo(
                 date = "Tuesday",
                 time = "1620",
-                index = 0
+                index = 0,
+                latitude = 37.401623,
+                longitude = 126.9340687
             ), MeaningfulPlaceListInfo(date = "Tuesday", time = "1620",
-                index = 0))
+                index = 0,
+                latitude = 37.401623,
+                longitude = 126.9340687))
         ))
         return meaningfulPlaceInfoList
     }

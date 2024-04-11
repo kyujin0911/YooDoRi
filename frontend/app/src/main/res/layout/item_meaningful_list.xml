@@ -36,23 +36,29 @@
             app:layout_constraintStart_toEndOf="@id/icon_iv"
             app:layout_constraintEnd_toEndOf="parent"/>
 
-        <TextView
-            android:id="@+id/date_tv"
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textAppearance="@style/TextAppearance.App.14sp.Regular"
-            app:layout_constraintStart_toStartOf="@id/address_tv"
             app:layout_constraintTop_toBottomOf="@id/address_tv"
-            tools:text="요일" />
+            app:layout_constraintEnd_toEndOf="parent"
+            android:orientation="horizontal"
+            android:layout_marginTop="20dp">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="더보기"
+                android:textAppearance="@style/TextAppearance.App.16sp.ExtraBold"
+                android:textColor="@color/blue"
+                />
 
-        <TextView
-            android:id="@+id/time_tv"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="@style/TextAppearance.App.14sp.Regular"
-            app:layout_constraintStart_toEndOf="@id/date_tv"
-            app:layout_constraintBaseline_toBaselineOf="@id/date_tv"
-            tools:text="16시~20시" />
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginStart="4dp"
+                android:src="@drawable/ic_arrow_down_24"
+                app:tint="@color/gray60"
+                />
+        </LinearLayout>
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/inner_rv"
@@ -60,6 +66,7 @@
             android:layout_height="wrap_content"
             android:nestedScrollingEnabled="false"
             android:overScrollMode="never"
+            android:visibility="gone"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             android:layout_marginStart="16dp"
             android:layout_marginTop="8dp"
