@@ -6,7 +6,7 @@
     <data>
         <variable
             name="model"
-            type="kr.ac.tukorea.whereareu.domain.home.MeaningfulPlaceInfo" />
+            type="kr.ac.tukorea.whereareu.domain.home.MeaningfulPlaceListInfo" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

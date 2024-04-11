@@ -6,21 +6,21 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import kr.ac.tukorea.whereareu.databinding.ItemInnerMeaningfulListBinding
-import kr.ac.tukorea.whereareu.domain.home.MeaningfulPlaceInfo
+import kr.ac.tukorea.whereareu.domain.home.MeaningfulPlaceListInfo
 
 class InnerMeaningfulListRVA :
-    ListAdapter<MeaningfulPlaceInfo, InnerMeaningfulListRVA.InnerMeaningfulListViewHolder>(object :
-        DiffUtil.ItemCallback<MeaningfulPlaceInfo>() {
+    ListAdapter<MeaningfulPlaceListInfo, InnerMeaningfulListRVA.InnerMeaningfulListViewHolder>(object :
+        DiffUtil.ItemCallback<MeaningfulPlaceListInfo>() {
         override fun areItemsTheSame(
-            oldItem: MeaningfulPlaceInfo,
-            newItem: MeaningfulPlaceInfo
+            oldItem: MeaningfulPlaceListInfo,
+            newItem: MeaningfulPlaceListInfo
         ): Boolean {
             return oldItem === newItem
         }
 
         override fun areContentsTheSame(
-            oldItem: MeaningfulPlaceInfo,
-            newItem: MeaningfulPlaceInfo
+            oldItem: MeaningfulPlaceListInfo,
+            newItem: MeaningfulPlaceListInfo
         ): Boolean {
             return oldItem == newItem
         }
@@ -28,13 +28,13 @@ class InnerMeaningfulListRVA :
     }) {
     inner class InnerMeaningfulListViewHolder(private val binding: ItemInnerMeaningfulListBinding) :
         RecyclerView.ViewHolder(binding.root) {
-            fun bind(meaningfulPlaceInfo: MeaningfulPlaceInfo){
+            fun bind(meaningfulPlaceListInfo: MeaningfulPlaceListInfo){
                 with(binding) {
-                    model = meaningfulPlaceInfo
-                    dateTv.text = convertDayOfWeekInKorean(meaningfulPlaceInfo.date)
-                    timeTv.text = "${meaningfulPlaceInfo.time.substring(0 until 2)}시~${
-                        meaningfulPlaceInfo.time.substring(2 until 4)
-                    }시"
+                    model = meaningfulPlaceListInfo
+                    /*dateTv.text = convertDayOfWeekInKorean(meaningfulPlaceListInfo.date)
+                    timeTv.text = "${meaningfulPlaceListInfo.time.substring(0 until 2)}시~${
+                        meaningfulPlaceListInfo.time.substring(2 until 4)
+                    }시"*/
                 }
             }
     }

@@ -6,32 +6,36 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import kr.ac.tukorea.whereareu.databinding.ItemMeaningfulListBinding
-import kr.ac.tukorea.whereareu.domain.home.MeaningfulPlaceInfo
+import kr.ac.tukorea.whereareu.domain.home.MeaningfulPlaceListInfo
 import kr.ac.tukorea.whereareu.domain.home.MeaningfulPlace
+import kr.ac.tukorea.whereareu.domain.home.MeaningfulPlaceInfo
 
-class MeaningfulListRVA: ListAdapter<MeaningfulPlace, MeaningfulListRVA.MeaningfulListViewHolder>
-    (object : DiffUtil.ItemCallback<MeaningfulPlace>(){
-    override fun areItemsTheSame(oldItem: MeaningfulPlace, newItem: MeaningfulPlace): Boolean {
+class MeaningfulListRVA: ListAdapter<MeaningfulPlaceInfo, MeaningfulListRVA.MeaningfulListViewHolder>
+    (object : DiffUtil.ItemCallback<MeaningfulPlaceInfo>(){
+    override fun areItemsTheSame(oldItem: MeaningfulPlaceInfo, newItem: MeaningfulPlaceInfo): Boolean {
         return oldItem == newItem
     }
 
-    override fun areContentsTheSame(oldItem: MeaningfulPlace, newItem: MeaningfulPlace): Boolean {
+    override fun areContentsTheSame(oldItem: MeaningfulPlaceInfo, newItem: MeaningfulPlaceInfo): Boolean {
         return oldItem.address == newItem.address
     }
 
 }) {
 
     inner class MeaningfulListViewHolder(private val binding: ItemMeaningfulListBinding): RecyclerView.ViewHolder(binding.root){
-        fun bind(meaningfulPlace: MeaningfulPlace){
+        fun bind(meaningfulPlace: MeaningfulPlaceInfo){
             with(binding) {
                 model = meaningfulPlace
-                val date = convertDayOfWeekInKorean(meaningfulPlace.date)
-                val time = "${meaningfulPlace.time.substring(0 until 2)}시~${
-                    meaningfulPlace.time.substring(2 until 4)
-                }시"
+                val listInfo = meaningfulPlace.meaningfulPlaceListInfo.map {
+                    val date = convertDayOfWeekInKorean(it.date)
+                    val time = "${it.time.substring(0 until 2)}시~${
+                        it.time.substring(2 until 4)
+                    }시"
+                    MeaningfulPlaceListInfo(date, time)
+                }
                 val adapter = InnerMeaningfulListRVA()
                 innerRv.adapter = adapter
-                adapter.submitList(listOf(MeaningfulPlaceInfo(date, time)))
+                adapter.submitList(listInfo)
             }
         }
     }

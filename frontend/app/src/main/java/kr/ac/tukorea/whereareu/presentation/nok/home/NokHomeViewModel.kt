@@ -3,10 +3,7 @@ package kr.ac.tukorea.whereareu.presentation.nok.home
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.kakao.vectormap.utils.MapUtils.isNullOrEmpty
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -15,18 +12,16 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kr.ac.tukorea.whereareu.data.model.DementiaKeyRequest
 import kr.ac.tukorea.whereareu.data.model.kakao.AddressResponse
-import kr.ac.tukorea.whereareu.data.model.naver.ReverseGeocodingResponse
 import kr.ac.tukorea.whereareu.data.model.nok.home.DementiaLastInfoResponse
 import kr.ac.tukorea.whereareu.data.model.nok.home.LocationInfoResponse
 import kr.ac.tukorea.whereareu.data.model.nok.home.MeaningfulPlaceResponse
-import kr.ac.tukorea.whereareu.data.repository.kakao.KakaoRepository
 import kr.ac.tukorea.whereareu.data.repository.kakao.KakaoRepositoryImpl
 import kr.ac.tukorea.whereareu.data.repository.naver.NaverRepositoryImpl
 import kr.ac.tukorea.whereareu.data.repository.nok.home.NokHomeRepositoryImpl
 import kr.ac.tukorea.whereareu.domain.home.LastAddress
 import kr.ac.tukorea.whereareu.domain.home.MeaningfulPlace
+import kr.ac.tukorea.whereareu.domain.home.MeaningfulPlaceListInfo
 import kr.ac.tukorea.whereareu.domain.home.MeaningfulPlaceInfo
-import kr.ac.tukorea.whereareu.domain.home.Temp
 import kr.ac.tukorea.whereareu.util.network.onError
 import kr.ac.tukorea.whereareu.util.network.onException
 import kr.ac.tukorea.whereareu.util.network.onFail
@@ -63,7 +58,7 @@ class NokHomeViewModel @Inject constructor(
     private val addressList = mutableListOf<String>()
 
     sealed class PredictEvent {
-        data class MeaningFulPlaceEvent(val meaningfulPlace: List<MeaningfulPlace>) : PredictEvent()
+        data class MeaningFulPlaceEvent(val meaningfulPlace: List<MeaningfulPlaceInfo>) : PredictEvent()
         data class DementiaLastInfoEvent(val dementiaLastInfo: DementiaLastInfoResponse) :
             PredictEvent()
 
@@ -132,10 +127,7 @@ class NokHomeViewModel @Inject constructor(
                 if (isLastAddress) {
                     eventPredict(
                         PredictEvent.LastLocationEvent(
-                            LastAddress(
-                                y.toDouble(), x.toDouble(),
-                                address
-                            )
+                            LastAddress(y.toDouble(), x.toDouble(), address)
                         )
                     )
                     getMeaningfulPlace()
@@ -164,22 +156,13 @@ class NokHomeViewModel @Inject constructor(
 
                 Log.d("meaningful address", addressList.toString())
 
-                /*val dateList = response.meaningfulLocations.map { it.date }
-                val timeList = response.meaningfulLocations.map { it.time }
-                val meaningfulPlaceList = mutableListOf<MeaningfulPlace>()
-                for (i in response.meaningfulLocations.indices) {
-                    meaningfulPlaceList.add(
-                        MeaningfulPlace(
-                            date = dateList[i],
-                            time = timeList[i],
-                            address = addressList[i]
-                        )
-                    )
+                val meaningfulPlaceList = response.meaningfulLocations.zip(addressList)
+                    .map{
+                    MeaningfulPlace(address = it.second, date = it.first.dayOfTheWeek, time = it.first.time,
+                        latitude = it.first.latitude, longitude = it.first.longitude)
                 }
-
-                Log.d("meaningful place", meaningfulPlaceList.toString())
-
-                eventPredict(PredictEvent.MeaningFulPlaceEvent(meaningfulPlaceList))*/
+                val meaningfulPlaceInfo = preprocessingList(meaningfulPlaceList)
+                eventPredict(PredictEvent.MeaningFulPlaceEvent(meaningfulPlaceInfo))
             }.onException {
                 Log.d("error", it.toString())
             }
@@ -195,8 +178,8 @@ class NokHomeViewModel @Inject constructor(
         }
     }
 
-    fun makeList(){
-        val list = listOf(MeaningfulPlace(
+    private fun preprocessingList(list: List<MeaningfulPlace>): MutableList<MeaningfulPlaceInfo>{
+        /*val list = listOf(MeaningfulPlace(
             address = "서울특별시 용산구 이촌로2가길36 중산아파트 1 동",
             date = "Tuesday",
             time = "0408"
@@ -248,14 +231,15 @@ class NokHomeViewModel @Inject constructor(
             address = "경기도 시흥시 산기대학로237 한국공학대학교",
             date = "Tuesday",
             time = "1620"
-        ))
+        ))*/
         val groupList = list.groupBy { it.address }
-        val tempList = mutableListOf<Temp>()
+        val meaningfulPlaceInfoList = mutableListOf<MeaningfulPlaceInfo>()
         groupList.keys.forEach {key ->
             val list = groupList[key]
-            val meaningfulPlaceInfoList = list?.map { MeaningfulPlaceInfo(date = it.date, time = it.time) }?.sortedBy { it.time }
-            tempList.add(Temp(key, meaningfulPlaceInfoList!!))
+            val meaningfulPlaceListInfo = list?.map { MeaningfulPlaceListInfo(date = it.date, time = it.time) }?.sortedBy { it.time }
+            meaningfulPlaceInfoList.add(MeaningfulPlaceInfo(key, meaningfulPlaceListInfo!!))
         }
-        Log.d("tempList", tempList.toString())
+        Log.d("tempList", meaningfulPlaceInfoList.toString())
+        return meaningfulPlaceInfoList
     }
 }
