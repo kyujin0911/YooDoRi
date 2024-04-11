@@ -13,7 +13,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetBehavior
-import com.naver.maps.geometry.Coord
 import com.naver.maps.geometry.LatLng
 import com.naver.maps.map.CameraUpdate
 import com.naver.maps.map.MapFragment
@@ -54,21 +53,6 @@ class NokHomeFragment : BaseFragment<kr.ac.tukorea.whereareu.databinding.Fragmen
     private var countDownJob: Job? = null
     override fun initObserver() {
         repeatOnStarted {
-            viewModel.isPredicted.collect{ isPredicted ->
-                if(isPredicted) {
-                    viewModel.getDementiaLastInfo()
-                    initBottomSheet()
-                    initMeaningfulListRVA()
-                    showLoadingDialog(requireContext())
-                } else {
-                    countDownJob?.cancelAndJoin()
-                    binding.countDownT.text = "00:00"
-                    lastLocationMarker.map = null
-                }
-            }
-        }
-
-        repeatOnStarted {
             viewModel.predictEvent.collect{ predictEvent ->
                 handlePredictEvent(predictEvent)
             }
@@ -77,11 +61,19 @@ class NokHomeFragment : BaseFragment<kr.ac.tukorea.whereareu.databinding.Fragmen
 
     private fun handlePredictEvent(event: NokHomeViewModel.PredictEvent){
         when(event){
+            is NokHomeViewModel.PredictEvent.StartPredictEvent -> {
+                viewModel.getDementiaLastInfo()
+                initBottomSheet()
+                initMeaningfulListRVA()
+                showLoadingDialog(requireContext())
+            }
+
             is NokHomeViewModel.PredictEvent.DementiaLastInfoEvent -> {
                 binding.averageMovementSpeedTv.text = String.format("%.2fkm", event.dementiaLastInfo.averageSpeed)
                 naverMap?.locationOverlay?.isVisible = false
 
             }
+
             is NokHomeViewModel.PredictEvent.MeaningFulPlaceEvent -> {
                 meaningfulListRVA.submitList(event.meaningfulPlace)
                 dismissLoadingDialog()
@@ -107,6 +99,14 @@ class NokHomeFragment : BaseFragment<kr.ac.tukorea.whereareu.databinding.Fragmen
                     }
                 }
                 infoWindow.open(lastLocationMarker)
+            }
+
+            is NokHomeViewModel.PredictEvent.StopPredictEvent -> {
+                viewLifecycleOwner.lifecycleScope.launch {
+                    countDownJob?.cancelAndJoin()
+                    binding.countDownT.text = "00:00"
+                    lastLocationMarker.map = null
+                }
             }
         }
     }

@@ -11,14 +11,9 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kr.ac.tukorea.whereareu.data.model.DementiaKeyRequest
-import kr.ac.tukorea.whereareu.data.model.kakao.Address
 import kr.ac.tukorea.whereareu.data.model.kakao.AddressResponse
-import kr.ac.tukorea.whereareu.data.model.kakao.Documents
-import kr.ac.tukorea.whereareu.data.model.kakao.Meta
-import kr.ac.tukorea.whereareu.data.model.kakao.RoadAddress
 import kr.ac.tukorea.whereareu.data.model.nok.home.DementiaLastInfoResponse
 import kr.ac.tukorea.whereareu.data.model.nok.home.LocationInfoResponse
-import kr.ac.tukorea.whereareu.data.model.nok.home.MeaningfulPlaceResponse
 import kr.ac.tukorea.whereareu.data.repository.kakao.KakaoRepositoryImpl
 import kr.ac.tukorea.whereareu.data.repository.naver.NaverRepositoryImpl
 import kr.ac.tukorea.whereareu.data.repository.nok.home.NokHomeRepositoryImpl
@@ -53,15 +48,13 @@ class NokHomeViewModel @Inject constructor(
 
     private val _dementiaKey = MutableStateFlow("")
 
-    private val _meaningfulPlace = MutableSharedFlow<MeaningfulPlaceResponse>()
-    val meaningfulPlace = _meaningfulPlace.asSharedFlow()
-
     private val _predictEvent = MutableSharedFlow<PredictEvent>()
     val predictEvent = _predictEvent.asSharedFlow()
 
     private val addressList = mutableListOf<String>()
 
     sealed class PredictEvent {
+        data class StartPredictEvent(val isPredicted: Boolean): PredictEvent()
         data class MeaningFulPlaceEvent(val meaningfulPlace: List<MeaningfulPlaceInfo>) :
             PredictEvent()
 
@@ -69,6 +62,8 @@ class NokHomeViewModel @Inject constructor(
             PredictEvent()
 
         data class LastLocationEvent(val lastAddress: LastAddress) : PredictEvent()
+
+        data class StopPredictEvent(val isPredicted: Boolean): PredictEvent()
     }
 
     private fun eventPredict(event: PredictEvent) {
@@ -81,9 +76,14 @@ class NokHomeViewModel @Inject constructor(
         _dementiaKey.value = dementiaKey
     }
 
-    fun setIsPredicted(boolean: Boolean) {
+    fun setIsPredicted(isPredicted: Boolean) {
         viewModelScope.launch {
-            _isPredicted.emit(boolean)
+            _isPredicted.emit(isPredicted)
+            if(isPredicted){
+                eventPredict(PredictEvent.StartPredictEvent(true))
+            } else {
+                eventPredict(PredictEvent.StopPredictEvent(false))
+            }
         }
     }
 
