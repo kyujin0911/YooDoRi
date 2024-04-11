@@ -4,6 +4,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import kr.ac.tukorea.whereareu.data.api.KakaoService
 import kr.ac.tukorea.whereareu.data.api.LoginService
 import kr.ac.tukorea.whereareu.data.api.NaverService
 import kr.ac.tukorea.whereareu.data.api.dementia.DementiaHomeService
@@ -39,6 +40,12 @@ object ServiceModule {
     @Provides
     @Singleton
     fun provideNaverApi(@NetworkModule.NaverRetrofit retrofit: Retrofit): NaverService {
+        return retrofit.buildService()
+    }
+
+    @Provides
+    @Singleton
+    fun provideKakaoApi(@NetworkModule.KaKaoRetrofit retrofit: Retrofit): KakaoService {
         return retrofit.buildService()
     }
 }

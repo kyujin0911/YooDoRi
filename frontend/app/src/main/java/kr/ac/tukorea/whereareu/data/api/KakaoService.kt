@@ -1,0 +1,11 @@
+package kr.ac.tukorea.whereareu.data.api
+
+import kr.ac.tukorea.whereareu.data.model.kakao.AddressResponse
+import retrofit2.Response
+import retrofit2.http.GET
+import retrofit2.http.Query
+
+interface KakaoService {
+    @GET("geo/coord2address")
+    fun getAddress(@Query("x") x: String, @Query("y") y: String): Response<AddressResponse>
+}
