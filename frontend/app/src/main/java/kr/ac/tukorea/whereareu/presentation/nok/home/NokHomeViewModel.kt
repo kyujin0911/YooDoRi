@@ -3,6 +3,7 @@ package kr.ac.tukorea.whereareu.presentation.nok.home
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.kakao.vectormap.utils.MapUtils.isNullOrEmpty
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
@@ -13,6 +14,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kr.ac.tukorea.whereareu.data.model.DementiaKeyRequest
+import kr.ac.tukorea.whereareu.data.model.kakao.AddressResponse
 import kr.ac.tukorea.whereareu.data.model.naver.ReverseGeocodingResponse
 import kr.ac.tukorea.whereareu.data.model.nok.home.DementiaLastInfoResponse
 import kr.ac.tukorea.whereareu.data.model.nok.home.LocationInfoResponse
@@ -103,25 +105,57 @@ class NokHomeViewModel @Inject constructor(
             }
         }
     }
+    fun getDementiaLastInfo() {
+        viewModelScope.launch {
+            nokHomeRepository.getDementiaLastInfo(DementiaKeyRequest("253050"))
+                .onSuccess { response ->
+                    Log.d("last info", response.toString())
+                    eventPredict(PredictEvent.DementiaLastInfoEvent(response))
+                    getAddress(response.lastLongitude.toString(), response.lastLatitude.toString(), true)
+                }.onException {
+                    Log.d("error", it.toString())
+                }
+        }
+    }
+
+    private fun getAddress(x: String, y: String, isLastAddress: Boolean){
+        viewModelScope.launch {
+            kakaoRepository.getAddress(x, y).onSuccess {
+                val address = convertResponseToAddress(it)
+                if(isLastAddress){
+                    eventPredict(PredictEvent.LastLocationEvent(LastAddress(y.toDouble(), x.toDouble(),
+                        address)))
+                    getMeaningfulPlace()
+                } else {
+                    addressList.add(address)
+                }
+                Log.d("kakao api", it.toString())
+            }.onError {
+                Log.d("kakao api error", it.toString())
+            }.onFail {
+                Log.d("kakao api fail", it.toString())
+            }.onException {
+                Log.d("kakao api exception", it.toString())
+            }
+        }
+    }
 
     private fun getMeaningfulPlace() {
         viewModelScope.launch {
             nokHomeRepository.getMeaningfulPlace("253050").onSuccess { response ->
-                Log.d("meaningful response", response.toString())
-                response.meaningfulLocations.forEach { meaningfulPlace ->
-                    getReverseGeocoding(
-                            "${meaningfulPlace.longitude},${meaningfulPlace.latitude}",
-                            meaningfulPlace.latitude, meaningfulPlace.longitude
-                        )
+                Log.d("getMeaningfulPlace", response.toString())
+                response.meaningfulLocations.forEach {
+                    getAddress(it.longitude.toString(), it.latitude.toString(), false)
                     delay(500)
                 }
+                
                 Log.d("meaningful address", addressList.toString())
 
                 val dateList = response.meaningfulLocations.map { it.date }
                 val timeList = response.meaningfulLocations.map { it.time }
                 val meaningfulPlaceList = mutableListOf<MeaningfulPlace>()
                 for (i in response.meaningfulLocations.indices){
-                    meaningfulPlaceList.add(MeaningfulPlace(dateList[i], timeList[i], addressList[i]))
+                    meaningfulPlaceList.add(MeaningfulPlace(date = dateList[i], time = timeList[i], address = addressList[i]))
                 }
 
                 Log.d("meaningful place", meaningfulPlaceList.toString())
@@ -133,80 +167,13 @@ class NokHomeViewModel @Inject constructor(
         }
     }
 
-    fun getDementiaLastInfo() {
-        viewModelScope.launch {
-            nokHomeRepository.getDementiaLastInfo(DementiaKeyRequest("253050"))
-                .onSuccess { response ->
-                    Log.d("last info", response.toString())
-                    eventPredict(PredictEvent.DementiaLastInfoEvent(response))
-                    getLastLocationAddress(
-                        "${response.lastLongitude},${response.lastLatitude}",
-                        response.lastLatitude,
-                        response.lastLongitude
-                    )
-                    getAddress(response.lastLongitude.toString(), response.lastLatitude.toString())
-                }.onException {
-                    Log.d("error", it.toString())
-                }
+    private fun convertResponseToAddress(response: AddressResponse): String{
+        val documents = response.documents[0]
+        return if(documents.roadAddress == null)
+            documents.address.addressName
+        else{
+            documents.roadAddress.addressName + " " + documents.roadAddress.buildingName
         }
-    }
 
-    private fun getReverseGeocoding(coords: String, latitude: Double, longitude: Double) {
-        viewModelScope.launch {
-            naverRepository.getReverseGeocodingInfo(coords, "addr", "json")
-                .onSuccess { response ->
-                    Log.d("reverse Geocoding", response.toString())
-                    addressList.add(setAddress(response))
-                }.onException {
-                    Log.d("error", it.toString())
-                }
-        }
-    }
-
-    private fun getLastLocationAddress(coords: String, latitude: Double, longitude: Double) {
-        viewModelScope.launch {
-            naverRepository.getReverseGeocodingInfo(coords, "addr", "json")
-                .onSuccess { response ->
-                    Log.d("reverse Geocoding", response.toString())
-                    val address = setAddress(response)
-                    Log.d("address result", address)
-                    eventPredict(
-                        PredictEvent.LastLocationEvent(
-                            LastAddress(
-                                latitude,
-                                longitude,
-                                address
-                            )
-                        )
-                    )
-                    //getMeaningfulPlace()
-                }.onException {
-                    Log.d("error", it.toString())
-                }
-        }
-    }
-
-    private fun setAddress(response: ReverseGeocodingResponse): String {
-        val region = response.results[0].region
-        val land = response.results[0].land
-        return "${region.area1.name} ${region.area2.name} " +
-                "${region.area3.name} ${land.number1}" +
-                if (land.number2.isNullOrEmpty()) {
-                    ""
-                } else "-${land.number2}"
-    }
-
-    fun getAddress(x: String, y: String){
-        viewModelScope.launch {
-            kakaoRepository.getAddress("126.9340687", "37.401623").onSuccess {
-                Log.d("kakao api", it.toString())
-            }.onError {
-                Log.d("kakao api error", it.toString())
-            }.onFail {
-                Log.d("kakao api fail", it.toString())
-            }.onException {
-                Log.d("kakao api exception", it.toString())
-            }
-        }
     }
 }

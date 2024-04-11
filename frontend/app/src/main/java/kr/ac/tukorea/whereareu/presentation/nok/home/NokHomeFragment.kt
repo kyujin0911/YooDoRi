@@ -57,8 +57,7 @@ class NokHomeFragment : BaseFragment<kr.ac.tukorea.whereareu.databinding.Fragmen
         repeatOnStarted {
             viewModel.isPredicted.collect{ isPredicted ->
                 if(isPredicted) {
-                    //viewModel.getDementiaLastInfo()
-                    viewModel.getAddress("x", "y")
+                    viewModel.getDementiaLastInfo()
                     initBottomSheet()
                     initMeaningfulListRVA()
                     showLoadingDialog(requireContext())

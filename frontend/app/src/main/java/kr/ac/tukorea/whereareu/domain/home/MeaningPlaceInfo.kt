@@ -1,7 +1,6 @@
 package kr.ac.tukorea.whereareu.domain.home
 
-data class MeaningfulPlace(
-    val address: String,
+data class MeaningPlaceInfo(
     val date: String,
     val time: String,
 )
