@@ -31,6 +31,10 @@ class MeaningfulListRVA :
         }
 
     }) {
+    private var innerRVAClickListener: InnerMeaningfulListRVA.InnerRVAClickListener? = null
+    fun setInnerRVAClickListener(listener: InnerMeaningfulListRVA.InnerRVAClickListener){
+        innerRVAClickListener = listener
+    }
     inner class MeaningfulListViewHolder(private val binding: ItemMeaningfulListBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(meaningfulPlace: MeaningfulPlaceInfo) {
@@ -56,6 +60,7 @@ class MeaningfulListRVA :
                     Log.d("isExpanded", meaningfulPlace.isExpanded.toString())
                 }
                 val adapter = InnerMeaningfulListRVA()
+                adapter.setInnerRVAClickListener(innerRVAClickListener!!)
                 innerRv.adapter = adapter
                 adapter.submitList(listInfo)
             }

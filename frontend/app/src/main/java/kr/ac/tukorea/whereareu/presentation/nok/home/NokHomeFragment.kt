@@ -13,6 +13,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.naver.maps.geometry.Coord
 import com.naver.maps.geometry.LatLng
 import com.naver.maps.map.CameraUpdate
 import com.naver.maps.map.MapFragment
@@ -30,7 +31,9 @@ import kotlinx.coroutines.launch
 import kr.ac.tukorea.whereareu.R
 import kr.ac.tukorea.whereareu.data.model.nok.home.LocationInfoResponse
 import kr.ac.tukorea.whereareu.databinding.IconLocationOverlayLayoutBinding
+import kr.ac.tukorea.whereareu.domain.home.MeaningfulPlaceListInfo
 import kr.ac.tukorea.whereareu.presentation.base.BaseFragment
+import kr.ac.tukorea.whereareu.presentation.nok.home.adapter.InnerMeaningfulListRVA
 import kr.ac.tukorea.whereareu.presentation.nok.home.adapter.MeaningfulListRVA
 import kr.ac.tukorea.whereareu.util.extension.repeatOnStarted
 import kotlin.math.roundToInt
@@ -38,7 +41,7 @@ import kotlin.math.roundToInt
 
 @AndroidEntryPoint
 class NokHomeFragment : BaseFragment<kr.ac.tukorea.whereareu.databinding.FragmentHomeBinding>(R.layout.fragment_home),
-    OnMapReadyCallback {
+    OnMapReadyCallback, InnerMeaningfulListRVA.InnerRVAClickListener {
     private val viewModel: NokHomeViewModel by activityViewModels()
     private val LOCATION_PERMISSION_REQUEST_CODE = 1001
     private var naverMap: NaverMap? = null
@@ -56,7 +59,7 @@ class NokHomeFragment : BaseFragment<kr.ac.tukorea.whereareu.databinding.Fragmen
                     viewModel.getDementiaLastInfo()
                     initBottomSheet()
                     initMeaningfulListRVA()
-                    //showLoadingDialog(requireContext())
+                    showLoadingDialog(requireContext())
                 } else {
                     countDownJob?.cancelAndJoin()
                     binding.countDownT.text = "00:00"
@@ -192,22 +195,7 @@ class NokHomeFragment : BaseFragment<kr.ac.tukorea.whereareu.databinding.Fragmen
                 LinearLayoutManager.VERTICAL
             )
         )}
-        /*val list = listOf<MeaningfulPlace>(
-            MeaningfulPlace("화", "0408", "시흥시"),
-            MeaningfulPlace("화", "0408", "시흥시"),
-            MeaningfulPlace("화", "0408", "시흥시"),
-            MeaningfulPlace("화", "0408", "시흥시"),
-            MeaningfulPlace("화", "0408", "시흥시"),
-            MeaningfulPlace("화", "0408", "시흥시"),
-            MeaningfulPlace("화", "0408", "시흥시"),
-            MeaningfulPlace("화", "0408", "시흥시"),
-            MeaningfulPlace("화", "0408", "시흥시"),
-            MeaningfulPlace("화", "0408", "시흥시"),
-            MeaningfulPlace("화", "0408", "시흥시"),
-            MeaningfulPlace("화", "0408", "시흥시"),
-            MeaningfulPlace("화", "0408", "시흥시"),
-        )
-        meaningfulListRVA.submitList(list)*/
+        meaningfulListRVA.setInnerRVAClickListener(this)
     }
 
     private fun initBottomSheet(){
@@ -330,5 +318,13 @@ class NokHomeFragment : BaseFragment<kr.ac.tukorea.whereareu.databinding.Fragmen
     }
 
     override fun onMapReady(p0: NaverMap) {
+    }
+
+
+    // inner RVA 클릭 이벤트
+    override fun onClick(meaningfulListInfo: MeaningfulPlaceListInfo) {
+        behavior.state = BottomSheetBehavior.STATE_COLLAPSED
+        val coord = LatLng(meaningfulListInfo.latitude, meaningfulListInfo.longitude)
+        naverMap?.moveCamera(CameraUpdate.scrollTo(coord))
     }
 }

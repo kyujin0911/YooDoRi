@@ -43,7 +43,7 @@ object NetworkModule {
     annotation class KaKaoRetrofit
 
     const val NETWORK_EXCEPTION_OFFLINE_CASE = "network status is offline"
-    const val NETWORK_EXCEPTION_BODY_IS_NULL = "result body is null"
+    const val NETWORK_EXCEPTION_BODY_IS_NULL = "result.json body is null"
 
     @Provides
     @Singleton
