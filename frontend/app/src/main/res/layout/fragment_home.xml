@@ -422,7 +422,7 @@
                         android:id="@+id/predict_location_title_tv"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="16dp"
+                        android:layout_marginTop="28dp"
                         android:text="보호대상자 예상 위치"
                         android:textAppearance="@style/TextAppearance.App.20sp.ExtraBold"
                         app:layout_constraintStart_toStartOf="parent"
@@ -432,6 +432,7 @@
                         android:id="@+id/rv"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
                         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                         app:layout_constraintTop_toBottomOf="@id/predict_location_title_tv"
                         tools:listitem="@layout/item_meaningful_list" />

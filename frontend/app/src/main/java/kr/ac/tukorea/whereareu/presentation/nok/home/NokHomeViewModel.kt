@@ -11,7 +11,11 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kr.ac.tukorea.whereareu.data.model.DementiaKeyRequest
+import kr.ac.tukorea.whereareu.data.model.kakao.Address
 import kr.ac.tukorea.whereareu.data.model.kakao.AddressResponse
+import kr.ac.tukorea.whereareu.data.model.kakao.Documents
+import kr.ac.tukorea.whereareu.data.model.kakao.Meta
+import kr.ac.tukorea.whereareu.data.model.kakao.RoadAddress
 import kr.ac.tukorea.whereareu.data.model.nok.home.DementiaLastInfoResponse
 import kr.ac.tukorea.whereareu.data.model.nok.home.LocationInfoResponse
 import kr.ac.tukorea.whereareu.data.model.nok.home.MeaningfulPlaceResponse
@@ -58,7 +62,9 @@ class NokHomeViewModel @Inject constructor(
     private val addressList = mutableListOf<String>()
 
     sealed class PredictEvent {
-        data class MeaningFulPlaceEvent(val meaningfulPlace: List<MeaningfulPlaceInfo>) : PredictEvent()
+        data class MeaningFulPlaceEvent(val meaningfulPlace: List<MeaningfulPlaceInfo>) :
+            PredictEvent()
+
         data class DementiaLastInfoEvent(val dementiaLastInfo: DementiaLastInfoResponse) :
             PredictEvent()
 
@@ -105,7 +111,7 @@ class NokHomeViewModel @Inject constructor(
 
     fun getDementiaLastInfo() {
         viewModelScope.launch {
-            nokHomeRepository.getDementiaLastInfo(DementiaKeyRequest("253050"))
+            /*nokHomeRepository.getDementiaLastInfo(DementiaKeyRequest("253050"))
                 .onSuccess { response ->
                     Log.d("last info", response.toString())
                     eventPredict(PredictEvent.DementiaLastInfoEvent(response))
@@ -116,13 +122,20 @@ class NokHomeViewModel @Inject constructor(
                     )
                 }.onException {
                     Log.d("error", it.toString())
-                }
+                }*/
+            val response = DementiaLastInfoResponse(averageSpeed=0.23f, lastLatitude=37.401623, lastLongitude=126.9340687)
+            eventPredict(PredictEvent.DementiaLastInfoEvent(response))
+            getAddress(
+                response.lastLongitude.toString(),
+                response.lastLatitude.toString(),
+                true
+            )
         }
     }
 
     private fun getAddress(x: String, y: String, isLastAddress: Boolean) {
         viewModelScope.launch {
-            kakaoRepository.getAddress(x, y).onSuccess {
+            /*kakaoRepository.getAddress(x, y).onSuccess {
                 val address = convertResponseToAddress(it)
                 if (isLastAddress) {
                     eventPredict(
@@ -141,13 +154,25 @@ class NokHomeViewModel @Inject constructor(
                 Log.d("kakao api fail", it.toString())
             }.onException {
                 Log.d("kakao api exception", it.toString())
+            }*/
+            val response = AddressResponse(meta= Meta(totalCount=1), documents= listOf(Documents(roadAddress= RoadAddress(addressName="경기도 안양시 동안구 비산로 22", buildingName="평촌자이아이파크"), address= Address(addressName="경기 안양시 동안구 비산동 1185"))))
+            val address = convertResponseToAddress(response)
+            if (isLastAddress) {
+                eventPredict(
+                    PredictEvent.LastLocationEvent(
+                        LastAddress(y.toDouble(), x.toDouble(), address)
+                    )
+                )
+                getMeaningfulPlace()
+            } else {
+                addressList.add(address)
             }
         }
     }
 
     private fun getMeaningfulPlace() {
         viewModelScope.launch {
-            nokHomeRepository.getMeaningfulPlace("253050").onSuccess { response ->
+            /*nokHomeRepository.getMeaningfulPlace("253050").onSuccess { response ->
                 Log.d("getMeaningfulPlace", response.toString())
                 response.meaningfulLocations.forEach {
                     getAddress(it.longitude.toString(), it.latitude.toString(), false)
@@ -157,15 +182,19 @@ class NokHomeViewModel @Inject constructor(
                 Log.d("meaningful address", addressList.toString())
 
                 val meaningfulPlaceList = response.meaningfulLocations.zip(addressList)
-                    .map{
-                    MeaningfulPlace(address = it.second, date = it.first.dayOfTheWeek, time = it.first.time,
-                        latitude = it.first.latitude, longitude = it.first.longitude)
-                }
+                    .map {
+                        MeaningfulPlace(
+                            address = it.second, date = it.first.dayOfTheWeek, time = it.first.time,
+                            latitude = it.first.latitude, longitude = it.first.longitude
+                        )
+                    }
                 val meaningfulPlaceInfo = preprocessingList(meaningfulPlaceList)
                 eventPredict(PredictEvent.MeaningFulPlaceEvent(meaningfulPlaceInfo))
             }.onException {
                 Log.d("error", it.toString())
-            }
+            }*/
+            val meaningfulPlaceInfo = preprocessingList(emptyList())
+            eventPredict(PredictEvent.MeaningFulPlaceEvent(meaningfulPlaceInfo))
         }
     }
 
@@ -178,68 +207,73 @@ class NokHomeViewModel @Inject constructor(
         }
     }
 
-    private fun preprocessingList(list: List<MeaningfulPlace>): MutableList<MeaningfulPlaceInfo>{
-        /*val list = listOf(MeaningfulPlace(
-            address = "서울특별시 용산구 이촌로2가길36 중산아파트 1 동",
-            date = "Tuesday",
-            time = "0408"
-        ), MeaningfulPlace(
-            address = "서울특별시 용산구 이촌로2가길36 중산아파트 1 동",
-            date = "Tuesday",
-            time = "0004"
-        ), MeaningfulPlace(
-            address = "서울특별시 용산구 이촌로2가길36 중산아파트 1 동",
-            date = "Tuesday",
-            time = "0408"
-        ), MeaningfulPlace(
-            address = "서울특별시 용산구 이촌로2가길36 중산아파트 1 동",
-            date = "Tuesday",
-            time = "0004"
-        ), MeaningfulPlace(
-            address = "서울특별시 용산구 이촌로2가길36 중산아파트 1 동",
-            date = "Tuesday",
-            time = "0004"
-        ), MeaningfulPlace(
-            address = "서울특별시 용산구 이촌로2가길36 중산아파트 1 동",
-            date = "Tuesday",
-            time = "0004"
-        ), MeaningfulPlace(
-            address = "서울특별시 용산구 이촌로2가길36 중산아파트 1 동",
-            date = "Tuesday",
-            time = "0004"
-        ), MeaningfulPlace(
-            address = "서울특별시 용산구 이촌로2가길36 중산아파트 1 동",
-            date = "Tuesday",
-            time = "0408"
-        ), MeaningfulPlace(
-            address = "서울특별시 용산구 이촌로2가길36 중산아파트 1 동",
-            date = "Tuesday",
-            time = "0004"
-        ), MeaningfulPlace(
-            address = "서울특별시 용산구 이촌로2가길36 중산아파트 1 동",
-            date = "Tuesday",
-            time = "0812"
-        ), MeaningfulPlace(
-            address = "경기 시흥시 정왕동1308",
-            date = "Tuesday",
-            time = "1620"
-        ), MeaningfulPlace(
-            address = "경기도 시흥시 산기대학로237 한국공학대학교",
-            date = "Tuesday",
-            time = "1620"
-        ), MeaningfulPlace(
-            address = "경기도 시흥시 산기대학로237 한국공학대학교",
-            date = "Tuesday",
-            time = "1620"
-        ))*/
+    private fun preprocessingList(list: List<MeaningfulPlace>): MutableList<MeaningfulPlaceInfo> {
         val groupList = list.groupBy { it.address }
-        val meaningfulPlaceInfoList = mutableListOf<MeaningfulPlaceInfo>()
-        groupList.keys.forEach {key ->
+        /*val meaningfulPlaceInfoList = mutableListOf<MeaningfulPlaceInfo>()
+        groupList.keys.forEach { key ->
             val list = groupList[key]
-            val meaningfulPlaceListInfo = list?.map { MeaningfulPlaceListInfo(date = it.date, time = it.time) }?.sortedBy { it.time }
+            val meaningfulPlaceListInfo =
+                list?.map { MeaningfulPlaceListInfo(date = it.date, time = it.time, index = 0) }
+                    ?.sortedBy { it.time }
             meaningfulPlaceInfoList.add(MeaningfulPlaceInfo(key, meaningfulPlaceListInfo!!))
         }
-        Log.d("tempList", meaningfulPlaceInfoList.toString())
+        Log.d("tempList", meaningfulPlaceInfoList.toString())*/
+
+        //api 없이 테스트
+        val meaningfulPlaceInfoList = mutableListOf(MeaningfulPlaceInfo(
+            address = "서울특별시 용산구 이촌로2가길36 중산아파트 1 동",
+            meaningfulPlaceListInfo = listOf(
+                MeaningfulPlaceListInfo(
+                date = "Tuesday",
+                time = "0004",
+                    index = 0
+            ), MeaningfulPlaceListInfo(
+                date = "Tuesday",
+                time = "0004",
+                    index = 0
+            ), MeaningfulPlaceListInfo(
+                date = "Tuesday",
+                time = "0004",
+                    index = 0
+            ), MeaningfulPlaceListInfo(
+                date = "Tuesday",
+                time = "0004",
+                    index = 0
+            ), MeaningfulPlaceListInfo(
+                date = "Tuesday",
+                time = "0004",
+                    index = 0
+            ), MeaningfulPlaceListInfo(
+                date = "Tuesday",
+                time = "0004",
+                    index = 0
+            ), MeaningfulPlaceListInfo(
+                date = "Tuesday",
+                time = "0408",
+                    index = 0
+            ), MeaningfulPlaceListInfo(
+                date = "Tuesday",
+                time = "0408",
+                    index = 0
+            ), MeaningfulPlaceListInfo(
+                date = "Tuesday",
+                time = "0408",
+                    index = 0
+            ), MeaningfulPlaceListInfo(date = "Tuesday", time = "0812",
+                    index = 0))
+        ), MeaningfulPlaceInfo(
+            address = "경기 시흥시 정왕동 1308",
+            meaningfulPlaceListInfo = listOf(MeaningfulPlaceListInfo(date = "Tuesday", time = "1620",
+                index = 0))
+        ), MeaningfulPlaceInfo(
+            address = "경기도 시흥시 산기대학로 237 한국공학대학교",
+            meaningfulPlaceListInfo = listOf(MeaningfulPlaceListInfo(
+                date = "Tuesday",
+                time = "1620",
+                index = 0
+            ), MeaningfulPlaceListInfo(date = "Tuesday", time = "1620",
+                index = 0))
+        ))
         return meaningfulPlaceInfoList
     }
 }

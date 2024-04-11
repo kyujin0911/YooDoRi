@@ -26,12 +26,12 @@ class MeaningfulListRVA: ListAdapter<MeaningfulPlaceInfo, MeaningfulListRVA.Mean
         fun bind(meaningfulPlace: MeaningfulPlaceInfo){
             with(binding) {
                 model = meaningfulPlace
-                val listInfo = meaningfulPlace.meaningfulPlaceListInfo.map {
-                    val date = convertDayOfWeekInKorean(it.date)
-                    val time = "${it.time.substring(0 until 2)}시~${
-                        it.time.substring(2 until 4)
+                val listInfo = meaningfulPlace.meaningfulPlaceListInfo.mapIndexed { index, meaningfulPlaceListInfo ->
+                    val date = convertDayOfWeekInKorean(meaningfulPlaceListInfo.date)
+                    val time = "${meaningfulPlaceListInfo.time.substring(0 until 2)}시~${
+                        meaningfulPlaceListInfo.time.substring(2 until 4)
                     }시"
-                    MeaningfulPlaceListInfo(date, time)
+                    MeaningfulPlaceListInfo(index+1, date, time)
                 }
                 val adapter = InnerMeaningfulListRVA()
                 innerRv.adapter = adapter

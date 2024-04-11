@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
+
         <variable
             name="model"
             type="kr.ac.tukorea.whereareu.domain.home.MeaningfulPlaceListInfo" />
@@ -15,13 +16,23 @@
         android:paddingVertical="12dp">
 
         <TextView
+            android:id="@+id/index_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@{String.valueOf(model.index)+'.'}"
+            android:textAppearance="@style/TextAppearance.App.14sp.ExtraBold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
             android:id="@+id/date_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textAppearance="@style/TextAppearance.App.14sp.Regular"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginStart="12dp"
             android:text="@{model.date}"
+            android:textAppearance="@style/TextAppearance.App.14sp.SemiBold"
+            app:layout_constraintBaseline_toBaselineOf="@id/index_tv"
+            app:layout_constraintStart_toEndOf="@id/index_tv"
             tools:text="요일" />
 
         <TextView
@@ -29,12 +40,37 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="12dp"
-            android:textAppearance="@style/TextAppearance.App.14sp.Regular"
-            app:layout_constraintBaseline_toBaselineOf="@id/date_tv"
-            app:layout_constraintStart_toEndOf="@id/date_tv"
             android:text="@{model.time}"
+            android:textAppearance="@style/TextAppearance.App.14sp.SemiBold"
+            app:layout_constraintBaseline_toBaselineOf="@id/index_tv"
+            app:layout_constraintStart_toEndOf="@id/date_tv"
             tools:text="16시~20시" />
 
+        <LinearLayout
+            android:id="@+id/map_view_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/date_tv"
+            app:layout_constraintBottom_toBottomOf="@id/date_tv">
+            <TextView
+                android:id="@+id/map_view_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="지도로 보기"
+                android:textColor="@color/blue"
+                android:textAppearance="@style/TextAppearance.App.14sp.SemiBold" />
+
+            <ImageView
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:layout_marginStart="4dp"
+                android:src="@drawable/ic_arrow_back_24"
+                android:scaleX="-1"
+                app:tint="@color/gray60"/>
+        </LinearLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
