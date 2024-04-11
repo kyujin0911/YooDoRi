@@ -23,20 +23,16 @@ LOGINSUCCESS = 700
 LOGINFAILED = 750
 UNDEFERR = 500
 
-@router.post("/receive-nok-info")
-async def receive_nok_info(request: Request):
-    data = await request.json()
+@router.post("/noks/{keyFromDementia}/{nokName}-{nokPhoneNumber}")
+async def receive_nok_info(keyFromDementia: str, nokName: str, nokPhoneNumber: str):
 
-    _key_from_dementia = data.get("keyFromDementia")
     rng = RandomNumberGenerator()
 
     try:
-        existing_dementia = session.query(models.dementia_info).filter(models.dementia_info.dementia_key == _key_from_dementia).first()
+        existing_dementia = session.query(models.dementia_info).filter(models.dementia_info.dementia_key == keyFromDementia).first()
         if existing_dementia:
-            _nok_name = data.get("nokName")
-            _nok_phonenumber = data.get("nokPhoneNumber")
             
-            duplication_check = session.query(models.nok_info).filter(models.nok_info.nok_name == _nok_name, models.nok_info.nok_phonenumber == _nok_phonenumber, models.nok_info.dementia_info_key == _key_from_dementia).first()
+            duplication_check = session.query(models.nok_info).filter(models.nok_info.nok_name == nokName, models.nok_info.nok_phonenumber == nokPhoneNumber, models.nok_info.dementia_info_key == keyFromDementia).first()
 
             if duplication_check:
                 _key = duplication_check.nok_key
@@ -47,7 +43,7 @@ async def receive_nok_info(request: Request):
                 
                 _key = str(unique_key)
 
-            new_nok = models.nok_info(nok_key=_key, nok_name=_nok_name, nok_phonenumber=_nok_phonenumber, dementia_info_key=_key_from_dementia)
+            new_nok = models.nok_info(nok_key=_key, nok_name=nokName, nok_phonenumber=nokPhoneNumber, dementia_info_key=keyFromDementia)
             session.add(new_nok)
             session.commit()
             result = {
@@ -69,7 +65,7 @@ async def receive_nok_info(request: Request):
             
         else: # 보호 대상자 인증번호가 등록되어 있지 않은 경우
 
-            print(f"[ERROR] Dementia key({_key_from_dementia}) not found")
+            print(f"[ERROR] Dementia key({keyFromDementia}) not found")
 
             response = {
                 'status': 'error',
@@ -81,17 +77,14 @@ async def receive_nok_info(request: Request):
     finally:
         session.close()
 
-@router.post("/receive-dementia-info")
-async def receive_dementia_info(request: Request):
-    data = await request.json()
+@router.post("/dementias/{name}-{phoneNumber}")
+async def receive_dementia_info(name: str, phoneNumber: str):
 
     rng = RandomNumberGenerator()
 
     try:
-        _dementia_name = data.get("name")
-        _dementia_phonenumber = data.get("phoneNumber")
 
-        duplication_check = session.query(models.dementia_info).filter(models.dementia_info.dementia_name == _dementia_name, models.dementia_info.dementia_phonenumber == _dementia_phonenumber).first()
+        duplication_check = session.query(models.dementia_info).filter(models.dementia_info.dementia_name == name, models.dementia_info.dementia_phonenumber == phoneNumber).first()
 
         if duplication_check: # 기존의 인증번호를 가져옴
             _key = duplication_check.dementia_key
@@ -102,7 +95,7 @@ async def receive_dementia_info(request: Request):
             
             _key = str(unique_key)
 
-            new_dementia = models.dementia_info(dementia_key=_key, dementia_name=_dementia_name, dementia_phonenumber=_dementia_phonenumber)
+            new_dementia = models.dementia_info(dementia_key=_key, dementia_name=name, dementia_phonenumber=phoneNumber)
             session.add(new_dementia)
             session.commit()
 
@@ -116,14 +109,14 @@ async def receive_dementia_info(request: Request):
             'result': result
         }
 
-        print(f"[INFO] Dementia information received from {_dementia_name}({_key})")
+        print(f"[INFO] Dementia information received from {name}({_key})")
 
         return response
     
     finally:
         session.close()
 
-@router.post("/connect/{dementiaKey}")
+@router.post("/connection/{dementiaKey}")
 async def is_connected(dementiaKey : str):
 
     try:
@@ -156,16 +149,12 @@ async def is_connected(dementiaKey : str):
     finally:
         session.close()
 
-@router.post("/receive-user-login")
-async def receive_user_login(request: Request):
-    data = await request.json()
-
-    _key = data.get("key")
-    _isdementia = data.get("isDementia")
+@router.post("/login/{isDementia}/{key}")
+async def receive_user_login(isDementia: int, key: str):
 
     try:
-        if _isdementia == 0: # 보호자인 경우
-            existing_nok = session.query(models.nok_info).filter_by(nok_key = _key).first()
+        if isDementia == 0: # 보호자인 경우
+            existing_nok = session.query(models.nok_info).filter_by(nok_key = key).first()
 
             if existing_nok:
                 response = {
@@ -179,10 +168,10 @@ async def receive_user_login(request: Request):
                     'status': 'error',
                     'message': 'User login failed'
                 }
-                print(f"[ERROR] User login failed from NOK key({_key})")
+                print(f"[ERROR] User login failed from NOK key({key})")
 
-        elif _isdementia == 1: # 보호 대상자인 경우
-            existing_dementia = session.query(models.dementia_info).filter_by(dementia_key = _key).first()
+        elif isDementia == 1: # 보호 대상자인 경우
+            existing_dementia = session.query(models.dementia_info).filter_by(dementia_key = key).first()
 
             if existing_dementia:
                 response = {
@@ -196,23 +185,21 @@ async def receive_user_login(request: Request):
                     'status': 'error',
                     'message': 'User login failed'
                 }
-                print(f"[ERROR] User login failed from Dementia key({_key})")
+                print(f"[ERROR] User login failed from Dementia key({key})")
 
         return response
             
     finally:
         session.close()
 
-@router.post("/receive-location-info")
-async def receive_location_info(request: Request):
+@router.post("/locations/dementias/{dementiaKey}")
+async def receive_location_info(request: Request, dementiaKey: str):
     data = await request.json()
 
     json_data = json.dumps(data)
 
-    _dementia_key = data.get("dementiaKey")
-
     try:
-        existing_dementia = session.query(models.dementia_info).filter_by(dementia_key = _dementia_key).first()
+        existing_dementia = session.query(models.dementia_info).filter_by(dementia_key = dementiaKey).first()
 
         if existing_dementia:
 
@@ -223,7 +210,7 @@ async def receive_location_info(request: Request):
             prediction = user_status_updater.predict(json_data)
 
             new_location = models.location_info(
-                dementia_key = data.get("dementiaKey"),
+                dementia_key = dementiaKey,
                 date = data.get("date"),
                 time = data.get("time"),
                 latitude = data.get("latitude"),
@@ -262,19 +249,18 @@ async def receive_location_info(request: Request):
                 'status': 'error',
                 'message': 'Dementia key not found'
             }
-            print(f"[ERROR] Dementia key({_dementia_key}) not found(receive location info)")
+            print(f"[ERROR] Dementia key({dementiaKey}) not found(receive location info)")
 
         return response
         
     finally:
         session.close()
 
-@router.get("/send-live-location-info")
-async def send_live_location_info(request: Request):
-    _dementia_key = request.query_params.get("dementiaKey")
+@router.get("/locations/noks/{dementiaKey}")
+async def send_live_location_info(dementiaKey: str):
 
     try:
-        latest_location = session.query(models.location_info).filter_by(dementia_key = _dementia_key).order_by(models.location_info.num.desc()).first()
+        latest_location = session.query(models.location_info).filter_by(dementia_key = dementiaKey).order_by(models.location_info.num.desc()).first()
 
         if latest_location:
             result = {
@@ -300,33 +286,28 @@ async def send_live_location_info(request: Request):
                 'status': 'error',
                 'message': 'Location data not found'
             }
-            print(f"[ERROR] Location data not found for Dementia key({_dementia_key})")
+            print(f"[ERROR] Location data not found for Dementia key({dementiaKey})")
 
         return response
     
     finally:
         session.close()
 
-@router.post("/modify-user-info")
-async def modify_user_info(request: Request):
-    data = await request.json()
-
-    _is_dementia = data.get("isDementia")
-    _before_name = data.get("name")
-    _before_phonenumber = data.get("phoneNumber")
+@router.post("/users/{isDementia}/{key}/{name}-{phoneNumber}")
+async def modify_user_info(isDementia : int, key : str, name : str, phoneNumber : str):
 
     try:
-        if _is_dementia == 0: #보호자
-            existing_nok = session.query(models.nok_info).filter_by(nok_key = data.get("key")).first()
+        if isDementia == 0: #보호자
+            existing_nok = session.query(models.nok_info).filter_by(nok_key = key).first()
 
             if existing_nok:
                 # 수정된 정보를 제외한 나머지 정보들은 기존의 값을 그대로 수신받음
 
-                if not existing_nok.nok_name == _before_name:
-                    existing_nok.nok_name = data.get("name")
+                if not existing_nok.nok_name == name:
+                    existing_nok.nok_name = name
                 
-                if not existing_nok.nok_phonenumber == _before_phonenumber:
-                    existing_nok.nok_phonenumber = data.get("phoneNumber")
+                if not existing_nok.nok_phonenumber == phoneNumber:
+                    existing_nok.nok_phonenumber = phoneNumber
                 
                 session.commit()
 
@@ -344,17 +325,17 @@ async def modify_user_info(request: Request):
                     'message': 'User key not found'
                 }
 
-        elif _is_dementia == 1: #보호대상자
-            existing_dementia = session.query(models.dementia_info).filter_by(dementia_key = data.get("key")).first()
+        elif isDementia == 1: #보호대상자
+            existing_dementia = session.query(models.dementia_info).filter_by(dementia_key = key).first()
 
             if existing_dementia:
                 # 수정된 정보를 제외한 나머지 정보들은 기존의 값을 그대로 수신받음
 
-                if not existing_dementia.dementia_name == _before_name:
-                    existing_dementia.dementia_name = data.get("name")
+                if not existing_dementia.dementia_name == name:
+                    existing_dementia.dementia_name = name
                 
-                if not existing_dementia.dementia_phonenumber == _before_phonenumber:
-                    existing_dementia.dementia_phonenumber = data.get("phoneNumber")
+                if not existing_dementia.dementia_phonenumber == phoneNumber:
+                    existing_dementia.dementia_phonenumber = phoneNumber
                 
                 session.commit()
 
@@ -378,23 +359,18 @@ async def modify_user_info(request: Request):
     finally:
         session.close()
 
-@router.post("/update-rate")
-async def modify_updatint_rate(request: Request):
-    data = await request.json()
-
-    _is_dementia = data.get("isDementia")
-    _key = data.get("key")
-    _update_rate = data.get("updateRate")
+@router.post("/users/{isDementia}/{key}/{updateRate}")
+async def modify_updatint_rate(isDementia : int, key : str, updateRate : int):
 
     #보호자와 보호대상자 모두 업데이트
     try:
-        if _is_dementia == 0: #보호자
-            existing_nok = session.query(models.nok_info).filter_by(nok_key = _key).first()
+        if isDementia == 0: #보호자
+            existing_nok = session.query(models.nok_info).filter_by(nok_key = key).first()
 
             if existing_nok:
                 connected_dementia = session.query(models.dementia_info).filter_by(dementia_key = existing_nok.dementia_info_key).first()
-                existing_nok.update_rate = _update_rate
-                connected_dementia.update_rate = _update_rate
+                existing_nok.update_rate = updateRate
+                connected_dementia.update_rate = updateRate
 
                 print(f"[INFO] Update rate modified by {existing_nok.nok_name}, {connected_dementia.dementia_name}")
 
@@ -409,13 +385,13 @@ async def modify_updatint_rate(request: Request):
                     'status': 'error',
                     'message': 'User key not found'
                 }
-        elif _is_dementia == 1:
-            existing_dementia = session.query(models.dementia_info).filter_by(dementia_key = _key).first()
+        elif isDementia == 1:
+            existing_dementia = session.query(models.dementia_info).filter_by(dementia_key = key).first()
 
             if existing_dementia:
                 connected_nok = session.query(models.nok_info).filter_by(dementia_info_key = existing_dementia.dementia_key).first()
-                existing_dementia.update_rate = _update_rate
-                connected_nok.update_rate = _update_rate
+                existing_dementia.update_rate = updateRate
+                connected_nok.update_rate = updateRate
 
                 print(f"[INFO] Update rate modified by {existing_dementia.dementia_name}, {connected_nok.nok_name}")
 
@@ -438,13 +414,10 @@ async def modify_updatint_rate(request: Request):
     finally:
         session.close()
 
-@router.post("/caculate-dementia-avarage-walking-speed")
-async def caculate_dementia_average_walking_speed(requset: Request):
-    data = await requset.json()
+@router.post("/dementias/{dementiaKey}/avarageWalkingSpeed")
+async def caculate_dementia_average_walking_speed(dementiaKey : str):
 
-    _dementia_key = data.get("dementiaKey")
-
-    if _dementia_key is None:
+    if dementiaKey is None:
         print(f"[ERROR] Dementia key not found(calculate dementia average walking speed)")
         response = {
             'status': 'error',
@@ -454,7 +427,7 @@ async def caculate_dementia_average_walking_speed(requset: Request):
     
     try:
         #최근 10개의 정보를 가져와 평균 속도 계산(임시)
-        location_info_list = session.query(models.location_info).filter_by(dementia_key = _dementia_key).order_by(models.location_info.num.desc()).limit(10).all()
+        location_info_list = session.query(models.location_info).filter_by(dementia_key = dementiaKey).order_by(models.location_info.num.desc()).limit(10).all()
         
         if location_info_list:
             sum_speed = 0
@@ -479,19 +452,18 @@ async def caculate_dementia_average_walking_speed(requset: Request):
                 'status': 'error',
                 'message': 'Not enough location data'
             }
-            print(f"[ERROR] Not enough location data for Dementia key({_dementia_key})")
+            print(f"[ERROR] Not enough location data for Dementia key({dementiaKey})")
 
         return response
     
     finally:
         session.close()
 
-@router.get("/get-user-info")
-async def get_user_info(request: Request):
-    _nok_key = request.query_params.get("nokKey")
+@router.get("/users/{nokKey}")
+async def get_user_info(nokKey : str):
 
     try:
-        nok_info_record = session.query(models.nok_info).filter_by(nok_key = _nok_key).first()
+        nok_info_record = session.query(models.nok_info).filter_by(nok_key = nokKey).first()
         
 
         if nok_info_record:
@@ -502,7 +474,7 @@ async def get_user_info(request: Request):
                     'message': 'Dementia information not found'
                 }
 
-                print(f"[ERROR] Dementia information not found for nok key({_nok_key})")
+                print(f"[ERROR] Dementia information not found for nok key({nokKey})")
 
                 return response
             
@@ -532,19 +504,18 @@ async def get_user_info(request: Request):
                 'message': 'User information not found'
             }
 
-            print(f"[ERROR] User information not found for nok key({_nok_key})")
+            print(f"[ERROR] User information not found for nok key({nokKey})")
 
         return response
     
     finally:
         session.close()
 
-@router.get("/send-meaningful-location-info")
-async def send_meaningful_location_info(request: Request):
-    _key = request.query_params.get("dementiaKey")
+@router.get("/locations/meaningful/{dementiaKey}")
+async def send_meaningful_location_info(dementiaKey : str):
 
     try:
-        meaningful_location_list = session.query(models.meaningful_location_info).filter_by(dementia_key = _key).all()
+        meaningful_location_list = session.query(models.meaningful_location_info).filter_by(dementia_key = dementiaKey).all()
 
         if meaningful_location_list:
             meaningful_locations = []
@@ -567,7 +538,7 @@ async def send_meaningful_location_info(request: Request):
                 'result': result
             }
 
-            print(f"[INFO] Meaningful location data sent to {_key}")
+            print(f"[INFO] Meaningful location data sent to {dementiaKey}")
 
         else:
             response = {
@@ -575,20 +546,18 @@ async def send_meaningful_location_info(request: Request):
                 'message': 'Meaningful location data not found'
             }
 
-            print(f"[ERROR] Meaningful location data not found for {_key}")
+            print(f"[ERROR] Meaningful location data not found for {dementiaKey}")
         
         return response
     
     finally:
         session.close()
 
-@router.get("/send-location-history")
-async def send_location_history(request: Request):
-    _key = request.query_params.get("dementiaKey")
-    date = request.query_params.get("date")
+@router.get("/locations/history/{date}/{dementiaKey}")
+async def send_location_history(date : str, dementiaKey : str):
 
     try:
-        location_list = session.query(models.location_info).filter_by(dementia_key = _key, date = date).all()
+        location_list = session.query(models.location_info).filter_by(dementia_key = dementiaKey, date = date).all()
 
         if location_list:
             locHistory = []
@@ -610,7 +579,7 @@ async def send_location_history(request: Request):
                 'result': result
             }
 
-            print(f"[INFO] Location history data sent to {_key}")
+            print(f"[INFO] Location history data sent to {dementiaKey}")
 
         else:
             response = {
@@ -618,7 +587,7 @@ async def send_location_history(request: Request):
                 'message': 'Location history data not found'
             }
 
-            print(f"[ERROR] Location history data not found for {_key}")
+            print(f"[ERROR] Location history data not found for {dementiaKey}")
 
         return response
     
