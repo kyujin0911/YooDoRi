@@ -1,86 +1,3 @@
-<!--<layout xmlns:android="http://schemas.android.com/apk/res/android"-->
-<!--    xmlns:app="http://schemas.android.com/apk/res-auto">-->
-
-<!--    <data>-->
-<!--        <variable-->
-<!--            name="view"-->
-<!--            type="kr.ac.tukorea.whereareu.presentation.nok.setting.SettingUpdateTimeFragment" />-->
-<!--    </data>-->
-
-<!--    <androidx.constraintlayout.widget.ConstraintLayout-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="match_parent"-->
-<!--        android:background="@drawable/rectangle_corner_10_white"-->
-<!--        android:padding="24dp"-->
-<!--        >-->
-
-<!--        <ImageView-->
-<!--            android:id="@+id/back_btn"-->
-<!--            android:layout_width="wrap_content"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:onClick="@{() -> view.onClickBackBtn()}"-->
-<!--            android:src="@drawable/ic_arrow_back_24"-->
-<!--            app:layout_constraintStart_toStartOf="parent"-->
-<!--            app:layout_constraintTop_toTopOf="parent" />-->
-
-<!--        <ImageView-->
-<!--            android:layout_width="60dp"-->
-<!--            android:layout_height="60dp"-->
-<!--            android:id="@+id/update_time_iv"-->
-<!--            android:src="@drawable/ic_time"-->
-<!--            app:layout_constraintStart_toStartOf="parent"-->
-<!--            app:layout_constraintEnd_toEndOf="parent"-->
-<!--            app:layout_constraintTop_toBottomOf="@+id/guide_tv"-->
-<!--            android:layout_marginTop="40dp"-->
-<!--            />-->
-
-<!--        <TextView-->
-<!--            android:id="@+id/guide_tv"-->
-<!--            android:layout_width="wrap_content"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:text="보호대상자 위치 업데이트 주기를 설정해주세요."-->
-<!--            android:textAppearance="@style/TextAppearance.App.18sp.ExtraBold"-->
-<!--            app:layout_constraintStart_toStartOf="parent"-->
-<!--            app:layout_constraintEnd_toEndOf="parent"-->
-<!--            app:layout_constraintTop_toBottomOf="@+id/back_btn"-->
-<!--            android:layout_marginTop="30dp"/>-->
-
-<!--        <NumberPicker-->
-<!--            android:id="@+id/number_picker"-->
-<!--            android:layout_width="120dp"-->
-<!--            android:layout_height="200dp"-->
-<!--            android:layout_marginTop="70dp"-->
-<!--            android:switchTextAppearance="@style/TextAppearance.App.14sp.SemiBold"-->
-<!--            android:orientation="horizontal"-->
-<!--            app:layout_constraintEnd_toEndOf="parent"-->
-<!--            app:layout_constraintStart_toStartOf="parent"-->
-<!--            app:layout_constraintTop_toBottomOf="@id/guide_tv" />-->
-
-<!--        <TextView-->
-<!--            android:layout_width="wrap_content"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:text="분"-->
-<!--            android:layout_marginStart="10dp"-->
-<!--            android:textAppearance="@style/TextAppearance.App.18sp.ExtraBold"-->
-<!--            app:layout_constraintBottom_toBottomOf="@id/number_picker"-->
-<!--            app:layout_constraintStart_toEndOf="@id/number_picker"-->
-<!--            app:layout_constraintTop_toTopOf="@id/number_picker" />-->
-
-<!--        <Button-->
-<!--            android:id="@+id/finish_btn"-->
-<!--            android:layout_width="0dp"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            style="@style/Widget.App.DialogButton"-->
-<!--            android:textSize="14sp"-->
-<!--            android:text="변경"-->
-<!--            android:layout_marginBottom="32dp"-->
-<!--            android:background="@drawable/rectangle_corner_10"-->
-<!--            app:layout_constraintEnd_toEndOf="parent"-->
-<!--            app:layout_constraintStart_toStartOf="parent"-->
-<!--            app:layout_constraintBottom_toBottomOf="parent" />-->
-<!--    </androidx.constraintlayout.widget.ConstraintLayout>-->
-<!--</layout>-->
-
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
@@ -88,7 +5,7 @@
 
         <variable
             name="view"
-            type="kr.ac.tukorea.whereareu.presentation.nok.setting.SettingUpdateTimeFragment" />
+            type="kr.ac.tukorea.whereareu.presentation.nok.setting.updateTime.SettingUpdateTimeFragment" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -119,12 +36,13 @@
             />
 
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/update_time_view"
+            android:id="@+id/update_time_list"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="400dp"
             android:layout_marginTop="40dp"
             android:padding="20dp"
-            app:layout_constraintTop_toBottomOf="@+id/guide_tv" />
+            app:layout_constraintTop_toBottomOf="@+id/guide_tv"
+            app:layout_constraintBottom_toTopOf="@+id/finish_btn"/>
 
         <Button
             android:id="@+id/finish_btn"

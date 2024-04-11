@@ -204,6 +204,7 @@
                     android:textAppearance="@style/TextAppearance.App.14sp.ExtraBold"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
+                    android:layout_marginTop="10dp"
                     android:id="@+id/update_time_title"
                     />
 

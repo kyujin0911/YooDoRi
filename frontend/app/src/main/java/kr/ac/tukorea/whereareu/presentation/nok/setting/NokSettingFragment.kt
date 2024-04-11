@@ -2,6 +2,7 @@ package kr.ac.tukorea.whereareu.presentation.nok.setting
 
 import android.content.Context.MODE_PRIVATE
 import android.util.Log
+import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import dagger.hilt.android.AndroidEntryPoint
@@ -9,6 +10,7 @@ import kr.ac.tukorea.whereareu.R
 import kr.ac.tukorea.whereareu.databinding.FragmentNokSettingBinding
 import kr.ac.tukorea.whereareu.presentation.base.BaseFragment
 import kr.ac.tukorea.whereareu.presentation.nok.home.NokHomeViewModel
+import kr.ac.tukorea.whereareu.presentation.nok.setting.updateTime.SettingUpdateTimeFragment
 import kr.ac.tukorea.whereareu.util.extension.repeatOnStarted
 
 @AndroidEntryPoint
@@ -30,17 +32,16 @@ class NokSettingFragment : BaseFragment<FragmentNokSettingBinding>(R.layout.frag
         binding.otherNameTv.setText(otherSpf.getString("name", ""))
         binding.otherPhoneTv.setText((otherSpf.getString("phone", "")))
 
-        /*binding.testBtn.setOnClickListener {
-            val duration = binding.durationEt.text.toString().toLong()
-            viewModel.setUpdateDuration(duration * 10000)
-        }*/
-
         binding.updateTimeLayout.setOnClickListener {
-            val dialog = SettingUpdateTimeFragment { time ->
-                viewModel.setUpdateDuration(time.toLong())
-                binding.updateTimeTv.text = time
-            }
-            dialog.show(childFragmentManager, dialog.tag)
+            onUpdateSettingTime()
+//            val updateTime = SettingUpdateTimeFragment{ time ->
+//                viewModel.setUpdateDuration(time.toLong())
+//                binding.updateTimeTv.text = time
+//            }
+//            childFragmentManager.beginTransaction().apply {
+//                add(updateTime, "SettingUpdateFragment")
+//                commit()
+//            }
         }
 
         binding.updateUserInfoLayout.setOnClickListener {
@@ -79,11 +80,15 @@ class NokSettingFragment : BaseFragment<FragmentNokSettingBinding>(R.layout.frag
         binding.otherPhoneTv.text = otherSpf.getString("phone", "")
     }
 
-    fun onClickUpdateUserInfo() {
-        findNavController().navigate(R.id.action_nokSettingFragment_to_modifyUserInfoFragment2)
-    }
+//    fun onClickUpdateUserInfo() {
+//        findNavController().navigate(R.id.action_nokSettingFragment_to_modifyUserInfoFragment2)
+//    }
 
     fun onUpdateUserInfoLayoutClicked() {
-        findNavController().navigate(R.id.action_nokSettingFragment_to_modifyUserInfoFragment2)
+        findNavController().navigate(R.id.action_nokSettingFragment_to_modifyUserInfoFragment)
+    }
+
+    fun onUpdateSettingTime(){
+        findNavController().navigate(R.id.action_nokSettingFragment_to_settingUpdateTimeFragment)
     }
 }

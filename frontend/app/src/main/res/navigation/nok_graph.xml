@@ -28,7 +28,7 @@
             android:name="kr.ac.tukorea.whereareu.presentation.nok.setting.NokSettingFragment"
             android:label="NokSettingFragment" >
             <action
-                android:id="@+id/action_nokSettingFragment_to_modifyUserInfoFragment2"
+                android:id="@+id/action_nokSettingFragment_to_modifyUserInfoFragment"
                 app:destination="@id/modifyUserInfoFragment" />
             <action
                 android:id="@+id/action_nokSettingFragment_to_settingUpdateTimeFragment"
@@ -45,7 +45,7 @@
         </fragment>
         <fragment
             android:id="@+id/settingUpdateTimeFragment"
-            android:name="kr.ac.tukorea.whereareu.presentation.nok.setting.SettingUpdateTimeFragment"
+            android:name="kr.ac.tukorea.whereareu.presentation.nok.setting.updateTime.SettingUpdateTimeFragment"
             android:label="fragment_setting_update_time"
             tools:layout="@layout/fragment_setting_update_time">
             <action
