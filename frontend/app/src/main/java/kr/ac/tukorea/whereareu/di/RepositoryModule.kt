@@ -5,12 +5,15 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.android.scopes.ViewModelScoped
+import kr.ac.tukorea.whereareu.data.api.KakaoService
 import kr.ac.tukorea.whereareu.data.api.dementia.DementiaHomeService
 import kr.ac.tukorea.whereareu.data.api.LoginService
 import kr.ac.tukorea.whereareu.data.api.NaverService
 import kr.ac.tukorea.whereareu.data.api.nok.NokHomeService
 import kr.ac.tukorea.whereareu.data.repository.dementia.home.DementiaHomeRepository
 import kr.ac.tukorea.whereareu.data.repository.dementia.home.DementiaHomeRepositoryImpl
+import kr.ac.tukorea.whereareu.data.repository.kakao.KakaoRepository
+import kr.ac.tukorea.whereareu.data.repository.kakao.KakaoRepositoryImpl
 import kr.ac.tukorea.whereareu.data.repository.login.LoginRepository
 import kr.ac.tukorea.whereareu.data.repository.login.LoginRepositoryImpl
 import kr.ac.tukorea.whereareu.data.repository.naver.NaverRepository
@@ -45,4 +48,10 @@ object RepositoryModule {
     fun provideNaverRepository(
         naverService: NaverService
     ): NaverRepository = NaverRepositoryImpl(naverService)
+
+    @ViewModelScoped
+    @Provides
+    fun provideKakaoRepository(
+        kakaoService: KakaoService
+    ): KakaoRepository = KakaoRepositoryImpl(kakaoService)
 }

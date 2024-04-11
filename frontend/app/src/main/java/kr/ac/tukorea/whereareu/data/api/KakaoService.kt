@@ -6,6 +6,6 @@ import retrofit2.http.GET
 import retrofit2.http.Query
 
 interface KakaoService {
-    @GET("geo/coord2address")
-    fun getAddress(@Query("x") x: String, @Query("y") y: String): Response<AddressResponse>
+    @GET("geo/coord2address.json")
+    suspend fun getAddress(@Query("x") x: String, @Query("y") y: String): Response<AddressResponse>
 }

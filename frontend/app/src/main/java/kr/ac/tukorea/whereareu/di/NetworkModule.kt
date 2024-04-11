@@ -11,6 +11,7 @@ import kr.ac.tukorea.whereareu.data.api.dementia.DementiaHomeService
 import kr.ac.tukorea.whereareu.data.api.LoginService
 import kr.ac.tukorea.whereareu.data.api.nok.NokHomeService
 import kr.ac.tukorea.whereareu.util.location.LocationService
+import kr.ac.tukorea.whereareu.util.network.KakaoInterceptor
 import kr.ac.tukorea.whereareu.util.network.NaverInterceptor
 import okhttp3.Interceptor
 import okhttp3.Interceptor.*
@@ -111,7 +112,7 @@ object NetworkModule {
             .connectTimeout(10, TimeUnit.SECONDS)
             .readTimeout(10, TimeUnit.SECONDS)
             .writeTimeout(5, TimeUnit.SECONDS)
-            .addInterceptor(NaverInterceptor())
+            .addInterceptor(KakaoInterceptor())
             .addInterceptor(interceptor)
             .addNetworkInterceptor(closeInterceptor)
             .retryOnConnectionFailure(false)
