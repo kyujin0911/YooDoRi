@@ -12,4 +12,7 @@
     <color name="gray20">#FEFEFE</color>
     <color name="gray40">#CACACA</color>
     <color name="blue">#0054BD</color>
+    <color name="purple">#4D9D8CD8</color>
+    <color name="deep_purple">#673AB7</color>
+    <color name="deep_prple">#FFFFFF</color>
 </resources>

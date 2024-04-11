@@ -52,12 +52,11 @@ class NokHomeViewModel @Inject constructor(
     val predictEvent = _predictEvent.asSharedFlow()
 
     private val addressList = mutableListOf<String>()
-
     sealed class PredictEvent {
         data class StartPredictEvent(val isPredicted: Boolean): PredictEvent()
-        data class MeaningFulPlaceEvent(val meaningfulPlace: List<MeaningfulPlaceInfo>) :
-            PredictEvent()
-
+        data class MeaningFulPlaceEvent(
+            val meaningfulPlaceForList: List<MeaningfulPlaceInfo>,
+            val meaningfulPlaceForMarker: List<MeaningfulPlace>) : PredictEvent()
         data class DementiaLastInfoEvent(val dementiaLastInfo: DementiaLastInfoResponse) :
             PredictEvent()
 
@@ -109,7 +108,7 @@ class NokHomeViewModel @Inject constructor(
         }
     }
 
-    fun getDementiaLastInfo() {
+    private fun getDementiaLastInfo() {
         viewModelScope.launch {
             nokHomeRepository.getDementiaLastInfo(DementiaKeyRequest("253050"))
                 .onSuccess { response ->
@@ -145,7 +144,6 @@ class NokHomeViewModel @Inject constructor(
                             LastAddress(y.toDouble(), x.toDouble(), address)
                         )
                     )
-                    getMeaningfulPlace()
                 } else {
                     addressList.add(address)
                 }
@@ -175,7 +173,7 @@ class NokHomeViewModel @Inject constructor(
         }
     }
 
-    private fun getMeaningfulPlace() {
+    fun getMeaningfulPlace() {
         viewModelScope.launch {
             nokHomeRepository.getMeaningfulPlace("253050").onSuccess { response ->
                 Log.d("getMeaningfulPlace", response.toString())
@@ -186,15 +184,16 @@ class NokHomeViewModel @Inject constructor(
 
                 Log.d("meaningful address", addressList.toString())
 
-                val meaningfulPlaceList = response.meaningfulLocations.zip(addressList)
+                val meaningfulPlaces = response.meaningfulLocations.zip(addressList)
                     .map {
                         MeaningfulPlace(
                             address = it.second, date = it.first.dayOfTheWeek, time = it.first.time,
                             latitude = it.first.latitude, longitude = it.first.longitude
                         )
                     }
-                val meaningfulPlaceInfo = preprocessingList(meaningfulPlaceList)
-                eventPredict(PredictEvent.MeaningFulPlaceEvent(meaningfulPlaceInfo))
+                val meaningfulPlaceInfo = preprocessingList(meaningfulPlaces)
+                eventPredict(PredictEvent.MeaningFulPlaceEvent(meaningfulPlaceInfo, meaningfulPlaces))
+                getDementiaLastInfo()
             }.onException {
                 Log.d("error", it.toString())
             }

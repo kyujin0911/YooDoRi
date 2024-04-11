@@ -2,6 +2,7 @@ package kr.ac.tukorea.whereareu.presentation.nok.home
 
 import android.content.Context.MODE_PRIVATE
 import android.content.pm.PackageManager
+import android.graphics.Color
 import android.graphics.PointF
 import android.util.Log
 import android.view.View
@@ -18,6 +19,7 @@ import com.naver.maps.map.CameraUpdate
 import com.naver.maps.map.MapFragment
 import com.naver.maps.map.NaverMap
 import com.naver.maps.map.OnMapReadyCallback
+import com.naver.maps.map.overlay.CircleOverlay
 import com.naver.maps.map.overlay.InfoWindow
 import com.naver.maps.map.overlay.Marker
 import com.naver.maps.map.overlay.OverlayImage
@@ -35,6 +37,7 @@ import kr.ac.tukorea.whereareu.presentation.base.BaseFragment
 import kr.ac.tukorea.whereareu.presentation.nok.home.adapter.InnerMeaningfulListRVA
 import kr.ac.tukorea.whereareu.presentation.nok.home.adapter.MeaningfulListRVA
 import kr.ac.tukorea.whereareu.util.extension.repeatOnStarted
+import kotlin.math.max
 import kotlin.math.roundToInt
 
 
@@ -46,6 +49,7 @@ class NokHomeFragment : BaseFragment<kr.ac.tukorea.whereareu.databinding.Fragmen
     private var naverMap: NaverMap? = null
     private var dementiaName: String? = null
     private val lastLocationMarker = Marker()
+    private val circleOverlay = CircleOverlay()
     private val meaningfulListRVA by lazy {
         MeaningfulListRVA()
     }
@@ -62,22 +66,36 @@ class NokHomeFragment : BaseFragment<kr.ac.tukorea.whereareu.databinding.Fragmen
     private fun handlePredictEvent(event: NokHomeViewModel.PredictEvent){
         when(event){
             is NokHomeViewModel.PredictEvent.StartPredictEvent -> {
-                viewModel.getDementiaLastInfo()
+                viewModel.getMeaningfulPlace()
                 initBottomSheet()
                 initMeaningfulListRVA()
                 showLoadingDialog(requireContext())
             }
 
             is NokHomeViewModel.PredictEvent.DementiaLastInfoEvent -> {
+                dismissLoadingDialog()
+                val coord = LatLng(event.dementiaLastInfo.lastLatitude, event.dementiaLastInfo.lastLongitude)
+                startCountDown(event.dementiaLastInfo.averageSpeed.div(3.6), coord)
                 binding.averageMovementSpeedTv.text = String.format("%.2fkm", event.dementiaLastInfo.averageSpeed)
                 naverMap?.locationOverlay?.isVisible = false
 
             }
 
             is NokHomeViewModel.PredictEvent.MeaningFulPlaceEvent -> {
-                meaningfulListRVA.submitList(event.meaningfulPlace)
-                dismissLoadingDialog()
-                startCountDown()
+                meaningfulListRVA.submitList(event.meaningfulPlaceForList)
+
+                event.meaningfulPlaceForMarker.forEach {meaningfulPlace ->
+                    val latitude = meaningfulPlace.latitude
+                    val longitude = meaningfulPlace.longitude
+                    val marker = Marker()
+                    with(marker){
+                        position = LatLng(latitude, longitude)
+                        icon = MarkerIcons.YELLOW
+                        captionText = meaningfulPlace.address
+                        captionRequestedWidth = 400
+                        map = naverMap
+                    }
+                }
             }
 
             is NokHomeViewModel.PredictEvent.LastLocationEvent -> {
@@ -104,6 +122,7 @@ class NokHomeFragment : BaseFragment<kr.ac.tukorea.whereareu.databinding.Fragmen
             is NokHomeViewModel.PredictEvent.StopPredictEvent -> {
                 viewLifecycleOwner.lifecycleScope.launch {
                     countDownJob?.cancelAndJoin()
+                    circleOverlay.isVisible = false
                     binding.countDownT.text = "00:00"
                     lastLocationMarker.map = null
                 }
@@ -237,12 +256,21 @@ class NokHomeFragment : BaseFragment<kr.ac.tukorea.whereareu.databinding.Fragmen
         })
     }
 
-    private fun startCountDown(){
+    private fun startCountDown(averageSpeed: Double, coord: LatLng){
+        with(circleOverlay){
+            center = coord
+            color = ContextCompat.getColor(requireContext(), R.color.purple)
+            outlineWidth = 5
+            outlineColor = ContextCompat.getColor(requireContext(), R.color.deep_purple)
+            radius = 0.0
+        }
         countDownJob = lifecycleScope.launch {
             var second = 0
             var minute = 0
             while (true) {
                 second+=1
+                circleOverlay.radius += averageSpeed
+                circleOverlay.map = naverMap
                 if(second % 60 == 0){
                     minute += 1
                     second = 0
