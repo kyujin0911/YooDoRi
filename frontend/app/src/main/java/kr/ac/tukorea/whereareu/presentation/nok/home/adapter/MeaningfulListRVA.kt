@@ -1,12 +1,12 @@
-package kr.ac.tukorea.whereareu.presentation.nok.home
+package kr.ac.tukorea.whereareu.presentation.nok.home.adapter
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import kr.ac.tukorea.whereareu.databinding.ItemMeaningfulListBinding
+import kr.ac.tukorea.whereareu.domain.home.MeaningfulPlaceInfo
 import kr.ac.tukorea.whereareu.domain.home.MeaningfulPlace
 
 class MeaningfulListRVA: ListAdapter<MeaningfulPlace, MeaningfulListRVA.MeaningfulListViewHolder>
@@ -24,9 +24,14 @@ class MeaningfulListRVA: ListAdapter<MeaningfulPlace, MeaningfulListRVA.Meaningf
     inner class MeaningfulListViewHolder(private val binding: ItemMeaningfulListBinding): RecyclerView.ViewHolder(binding.root){
         fun bind(meaningfulPlace: MeaningfulPlace){
             with(binding) {
-                addressTv.text = meaningfulPlace.address
-                dateTv.text = convertDayOfWeekInKorean(meaningfulPlace.date)
-                timeTv.text = "${meaningfulPlace.time.substring(0 until 2)}시~${meaningfulPlace.time.substring(2 until 4)}시"
+                model = meaningfulPlace
+                val date = convertDayOfWeekInKorean(meaningfulPlace.date)
+                val time = "${meaningfulPlace.time.substring(0 until 2)}시~${
+                    meaningfulPlace.time.substring(2 until 4)
+                }시"
+                val adapter = InnerMeaningfulListRVA()
+                innerRv.adapter = adapter
+                adapter.submitList(listOf(MeaningfulPlaceInfo(date, time)))
             }
         }
     }
@@ -55,5 +60,4 @@ class MeaningfulListRVA: ListAdapter<MeaningfulPlace, MeaningfulListRVA.Meaningf
             else-> "알 수 없음"
         }
     }
-
 }

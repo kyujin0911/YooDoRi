@@ -25,6 +25,8 @@ import kr.ac.tukorea.whereareu.data.repository.naver.NaverRepositoryImpl
 import kr.ac.tukorea.whereareu.data.repository.nok.home.NokHomeRepositoryImpl
 import kr.ac.tukorea.whereareu.domain.home.LastAddress
 import kr.ac.tukorea.whereareu.domain.home.MeaningfulPlace
+import kr.ac.tukorea.whereareu.domain.home.MeaningfulPlaceInfo
+import kr.ac.tukorea.whereareu.domain.home.Temp
 import kr.ac.tukorea.whereareu.util.network.onError
 import kr.ac.tukorea.whereareu.util.network.onException
 import kr.ac.tukorea.whereareu.util.network.onFail
@@ -105,26 +107,37 @@ class NokHomeViewModel @Inject constructor(
             }
         }
     }
+
     fun getDementiaLastInfo() {
         viewModelScope.launch {
             nokHomeRepository.getDementiaLastInfo(DementiaKeyRequest("253050"))
                 .onSuccess { response ->
                     Log.d("last info", response.toString())
                     eventPredict(PredictEvent.DementiaLastInfoEvent(response))
-                    getAddress(response.lastLongitude.toString(), response.lastLatitude.toString(), true)
+                    getAddress(
+                        response.lastLongitude.toString(),
+                        response.lastLatitude.toString(),
+                        true
+                    )
                 }.onException {
                     Log.d("error", it.toString())
                 }
         }
     }
 
-    private fun getAddress(x: String, y: String, isLastAddress: Boolean){
+    private fun getAddress(x: String, y: String, isLastAddress: Boolean) {
         viewModelScope.launch {
             kakaoRepository.getAddress(x, y).onSuccess {
                 val address = convertResponseToAddress(it)
-                if(isLastAddress){
-                    eventPredict(PredictEvent.LastLocationEvent(LastAddress(y.toDouble(), x.toDouble(),
-                        address)))
+                if (isLastAddress) {
+                    eventPredict(
+                        PredictEvent.LastLocationEvent(
+                            LastAddress(
+                                y.toDouble(), x.toDouble(),
+                                address
+                            )
+                        )
+                    )
                     getMeaningfulPlace()
                 } else {
                     addressList.add(address)
@@ -148,32 +161,101 @@ class NokHomeViewModel @Inject constructor(
                     getAddress(it.longitude.toString(), it.latitude.toString(), false)
                     delay(500)
                 }
-                
+
                 Log.d("meaningful address", addressList.toString())
 
-                val dateList = response.meaningfulLocations.map { it.date }
+                /*val dateList = response.meaningfulLocations.map { it.date }
                 val timeList = response.meaningfulLocations.map { it.time }
                 val meaningfulPlaceList = mutableListOf<MeaningfulPlace>()
-                for (i in response.meaningfulLocations.indices){
-                    meaningfulPlaceList.add(MeaningfulPlace(date = dateList[i], time = timeList[i], address = addressList[i]))
+                for (i in response.meaningfulLocations.indices) {
+                    meaningfulPlaceList.add(
+                        MeaningfulPlace(
+                            date = dateList[i],
+                            time = timeList[i],
+                            address = addressList[i]
+                        )
+                    )
                 }
 
                 Log.d("meaningful place", meaningfulPlaceList.toString())
 
-                eventPredict(PredictEvent.MeaningFulPlaceEvent(meaningfulPlaceList))
+                eventPredict(PredictEvent.MeaningFulPlaceEvent(meaningfulPlaceList))*/
             }.onException {
                 Log.d("error", it.toString())
             }
         }
     }
 
-    private fun convertResponseToAddress(response: AddressResponse): String{
+    private fun convertResponseToAddress(response: AddressResponse): String {
         val documents = response.documents[0]
-        return if(documents.roadAddress == null)
+        return if (documents.roadAddress == null)
             documents.address.addressName
-        else{
+        else {
             documents.roadAddress.addressName + " " + documents.roadAddress.buildingName
         }
+    }
 
+    fun makeList(){
+        val list = listOf(MeaningfulPlace(
+            address = "서울특별시 용산구 이촌로2가길36 중산아파트 1 동",
+            date = "Tuesday",
+            time = "0408"
+        ), MeaningfulPlace(
+            address = "서울특별시 용산구 이촌로2가길36 중산아파트 1 동",
+            date = "Tuesday",
+            time = "0004"
+        ), MeaningfulPlace(
+            address = "서울특별시 용산구 이촌로2가길36 중산아파트 1 동",
+            date = "Tuesday",
+            time = "0408"
+        ), MeaningfulPlace(
+            address = "서울특별시 용산구 이촌로2가길36 중산아파트 1 동",
+            date = "Tuesday",
+            time = "0004"
+        ), MeaningfulPlace(
+            address = "서울특별시 용산구 이촌로2가길36 중산아파트 1 동",
+            date = "Tuesday",
+            time = "0004"
+        ), MeaningfulPlace(
+            address = "서울특별시 용산구 이촌로2가길36 중산아파트 1 동",
+            date = "Tuesday",
+            time = "0004"
+        ), MeaningfulPlace(
+            address = "서울특별시 용산구 이촌로2가길36 중산아파트 1 동",
+            date = "Tuesday",
+            time = "0004"
+        ), MeaningfulPlace(
+            address = "서울특별시 용산구 이촌로2가길36 중산아파트 1 동",
+            date = "Tuesday",
+            time = "0408"
+        ), MeaningfulPlace(
+            address = "서울특별시 용산구 이촌로2가길36 중산아파트 1 동",
+            date = "Tuesday",
+            time = "0004"
+        ), MeaningfulPlace(
+            address = "서울특별시 용산구 이촌로2가길36 중산아파트 1 동",
+            date = "Tuesday",
+            time = "0812"
+        ), MeaningfulPlace(
+            address = "경기 시흥시 정왕동1308",
+            date = "Tuesday",
+            time = "1620"
+        ), MeaningfulPlace(
+            address = "경기도 시흥시 산기대학로237 한국공학대학교",
+            date = "Tuesday",
+            time = "1620"
+        ), MeaningfulPlace(
+            address = "경기도 시흥시 산기대학로237 한국공학대학교",
+            date = "Tuesday",
+            time = "1620"
+        ))
+        val groupList = list.groupBy { it.address }
+        val tempList = mutableListOf<Temp>()
+        groupList.keys.forEach {key ->
+            val list = groupList[key]
+            val meaningfulPlaceInfoList = list?.map { MeaningfulPlaceInfo(date = it.date, time = it.time) }?.sortedBy { it.time }
+            tempList.add(Temp(key, meaningfulPlaceInfoList!!))
+        }
+        Log.d("tempList", tempList.toString())
     }
 }

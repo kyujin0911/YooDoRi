@@ -3,11 +3,8 @@ package kr.ac.tukorea.whereareu.presentation.nok.home
 import android.content.Context.MODE_PRIVATE
 import android.content.pm.PackageManager
 import android.graphics.PointF
-import android.os.Build.VERSION_CODES.M
 import android.util.Log
 import android.view.View
-import android.view.ViewTreeObserver
-import android.view.ViewTreeObserver.OnGlobalLayoutListener
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -33,10 +30,9 @@ import kotlinx.coroutines.launch
 import kr.ac.tukorea.whereareu.R
 import kr.ac.tukorea.whereareu.data.model.nok.home.LocationInfoResponse
 import kr.ac.tukorea.whereareu.databinding.IconLocationOverlayLayoutBinding
-import kr.ac.tukorea.whereareu.domain.home.MeaningfulPlace
 import kr.ac.tukorea.whereareu.presentation.base.BaseFragment
+import kr.ac.tukorea.whereareu.presentation.nok.home.adapter.MeaningfulListRVA
 import kr.ac.tukorea.whereareu.util.extension.repeatOnStarted
-import java.time.DayOfWeek
 import kotlin.math.roundToInt
 
 
@@ -57,10 +53,11 @@ class NokHomeFragment : BaseFragment<kr.ac.tukorea.whereareu.databinding.Fragmen
         repeatOnStarted {
             viewModel.isPredicted.collect{ isPredicted ->
                 if(isPredicted) {
-                    viewModel.getDementiaLastInfo()
+                    //viewModel.getDementiaLastInfo()
+                    viewModel.makeList()
                     initBottomSheet()
                     initMeaningfulListRVA()
-                    showLoadingDialog(requireContext())
+                    //showLoadingDialog(requireContext())
                 } else {
                     countDownJob?.cancelAndJoin()
                     binding.countDownT.text = "00:00"

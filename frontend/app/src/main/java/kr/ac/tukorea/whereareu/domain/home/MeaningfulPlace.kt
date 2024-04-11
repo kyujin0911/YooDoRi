@@ -4,4 +4,5 @@ data class MeaningfulPlace(
     val address: String,
     val date: String,
     val time: String,
+
 )
