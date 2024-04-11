@@ -12,12 +12,12 @@ import retrofit2.http.POST
 import retrofit2.http.Query
 
 interface NokHomeService {
-    @GET("send-live-location-info")
+    @GET("locations/noks")
     suspend fun getDementiaLocationInfo(@Query("dementiaKey") dementiaKey: String): Response<ResponseBody<LocationInfoResponse>>
 
-    @GET("send-meaningful-location-info")
+    @GET("locations/noks")
     suspend fun getMeaningfulPlace(@Query("dementiaKey") dementiaKey: String): Response<ResponseBody<MeaningfulPlaceResponse>>
 
-    @POST("caculate-dementia-avarage-walking-speed")
+    @POST("dementias/averageWalkingSpeed")
     suspend fun getDementiaLastInfo(@Body request: DementiaKeyRequest): Response<ResponseBody<DementiaLastInfoResponse>>
 }
