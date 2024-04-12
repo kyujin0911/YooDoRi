@@ -4,6 +4,7 @@ import kr.ac.tukorea.whereareu.data.api.SettingService
 import kr.ac.tukorea.whereareu.data.model.ResponseBody
 import kr.ac.tukorea.whereareu.data.model.setting.ModifyUserInfoRequest
 import kr.ac.tukorea.whereareu.data.model.setting.StateResponse
+import kr.ac.tukorea.whereareu.data.model.setting.UpdateRateRequest
 import kr.ac.tukorea.whereareu.domain.login.userinfo.GetUserInfoResult
 import kr.ac.tukorea.whereareu.util.network.NetworkResult
 import kr.ac.tukorea.whereareu.util.network.handleApi
@@ -18,5 +19,9 @@ class SettingRepositoryImpl @Inject constructor(
 
     override suspend fun getUserInfo(nokKey: String): NetworkResult<GetUserInfoResult> {
         return handleApi({api.getUserInfo(nokKey)}) {response: ResponseBody<GetUserInfoResult> -> response.result}
+    }
+
+    override suspend fun sendUpdateRate(request: UpdateRateRequest): NetworkResult<StateResponse> {
+        return handleApi({api.postUpdateRate(request)}){response: ResponseBody<StateResponse> -> response.result}
     }
 }
