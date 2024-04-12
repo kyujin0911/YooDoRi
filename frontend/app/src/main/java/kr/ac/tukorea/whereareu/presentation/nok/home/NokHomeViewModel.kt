@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kr.ac.tukorea.whereareu.data.model.DementiaKeyRequest
-import kr.ac.tukorea.whereareu.data.model.kakao.AddressResponse
+import kr.ac.tukorea.whereareu.data.model.kakao.address.AddressResponse
 import kr.ac.tukorea.whereareu.data.model.nok.home.DementiaLastInfoResponse
 import kr.ac.tukorea.whereareu.data.model.nok.home.LocationInfoResponse
 import kr.ac.tukorea.whereareu.data.repository.kakao.KakaoRepositoryImpl
@@ -21,6 +21,7 @@ import kr.ac.tukorea.whereareu.domain.home.LastAddress
 import kr.ac.tukorea.whereareu.domain.home.MeaningfulPlace
 import kr.ac.tukorea.whereareu.domain.home.MeaningfulPlaceListInfo
 import kr.ac.tukorea.whereareu.domain.home.MeaningfulPlaceInfo
+import kr.ac.tukorea.whereareu.domain.home.PoliceStationInfo
 import kr.ac.tukorea.whereareu.util.network.onError
 import kr.ac.tukorea.whereareu.util.network.onException
 import kr.ac.tukorea.whereareu.util.network.onFail
@@ -52,6 +53,8 @@ class NokHomeViewModel @Inject constructor(
     val predictEvent = _predictEvent.asSharedFlow()
 
     private val addressList = mutableListOf<String>()
+
+    private val policeStationInfoList = mutableListOf<PoliceStationInfo>()
     sealed class PredictEvent {
         data class StartPredictEvent(val isPredicted: Boolean): PredictEvent()
         data class MeaningFulPlaceEvent(
@@ -193,6 +196,7 @@ class NokHomeViewModel @Inject constructor(
                     }
                 val meaningfulPlaceInfo = preprocessingList(meaningfulPlaces)
                 eventPredict(PredictEvent.MeaningFulPlaceEvent(meaningfulPlaceInfo, meaningfulPlaces))
+                getPoliceStationInfoNearby(meaningfulPlaceInfo)
                 getDementiaLastInfo()
             }.onException {
                 Log.d("error", it.toString())
@@ -203,6 +207,32 @@ class NokHomeViewModel @Inject constructor(
             val meaningfulPlaceInfo = preprocessingList(emptyList())
             eventPredict(PredictEvent.MeaningFulPlaceEvent(meaningfulPlaceInfo))
              */
+        }
+    }
+
+    private fun getPoliceStationInfoNearby(list: MutableList<MeaningfulPlaceInfo>){
+        viewModelScope.launch {
+            list.forEach { meaningfulPlaceInfo ->
+                val meaningfulPlace = meaningfulPlaceInfo.meaningfulPlaceListInfo.first()
+                val x = meaningfulPlace.longitude.toString()
+                val y = meaningfulPlace.latitude.toString()
+                searchWithKeyword(x, y)
+                delay(300)
+            }
+            Log.d("police list", policeStationInfoList.toString())
+        }
+    }
+
+    fun searchWithKeyword(x: String, y: String){
+        viewModelScope.launch {
+            kakaoRepository.searchWithKeyword("경찰서", "126.9340687", "37.401623", 1000).onSuccess {
+                Log.d("kakao keyword", it.toString())
+                it.documents.forEach { document ->
+                    val policeStationInfo = PoliceStationInfo(document.placeName, document.distance, document.roadAddressName, document.phone,
+                        document.x, document.y)
+                    policeStationInfoList.add(policeStationInfo)
+                }
+            }
         }
     }
 

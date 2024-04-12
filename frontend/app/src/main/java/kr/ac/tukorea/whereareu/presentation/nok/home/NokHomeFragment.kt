@@ -66,7 +66,8 @@ class NokHomeFragment : BaseFragment<kr.ac.tukorea.whereareu.databinding.Fragmen
     private fun handlePredictEvent(event: NokHomeViewModel.PredictEvent){
         when(event){
             is NokHomeViewModel.PredictEvent.StartPredictEvent -> {
-                viewModel.getMeaningfulPlace()
+                //viewModel.getMeaningfulPlace()
+                viewModel.searchWithKeyword("x", "y")
                 initBottomSheet()
                 initMeaningfulListRVA()
                 showLoadingDialog(requireContext())
