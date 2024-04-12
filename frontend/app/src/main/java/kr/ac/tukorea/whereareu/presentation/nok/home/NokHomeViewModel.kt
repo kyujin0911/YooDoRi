@@ -225,13 +225,14 @@ class NokHomeViewModel @Inject constructor(
 
     fun searchWithKeyword(x: String, y: String){
         viewModelScope.launch {
-            kakaoRepository.searchWithKeyword("경찰서", "126.9340687", "37.401623", 1000).onSuccess {
+            kakaoRepository.searchWithKeyword("경찰서", "126.9340687", "37.401623", 1500).onSuccess {
                 Log.d("kakao keyword", it.toString())
                 it.documents.forEach { document ->
                     val policeStationInfo = PoliceStationInfo(document.placeName, document.distance, document.roadAddressName, document.phone,
                         document.x, document.y)
                     policeStationInfoList.add(policeStationInfo)
                 }
+                Log.d("police list", policeStationInfoList.toString())
             }
         }
     }
