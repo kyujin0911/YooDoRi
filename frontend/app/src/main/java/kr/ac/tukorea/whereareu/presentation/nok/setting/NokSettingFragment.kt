@@ -7,6 +7,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import dagger.hilt.android.AndroidEntryPoint
 import kr.ac.tukorea.whereareu.R
+import kr.ac.tukorea.whereareu.data.model.setting.UpdateRateRequest
 import kr.ac.tukorea.whereareu.databinding.FragmentNokSettingBinding
 import kr.ac.tukorea.whereareu.presentation.base.BaseFragment
 import kr.ac.tukorea.whereareu.presentation.nok.home.NokHomeViewModel
@@ -48,7 +49,12 @@ class NokSettingFragment : BaseFragment<FragmentNokSettingBinding>(R.layout.frag
         settingViewModel.getUserInfo(key)
 
         repeatOnStarted {
-            Log.d("Nok Setting Fragment", "repeatOnStarted")
+            val updateRate = settingViewModel.settingTime.value.toInt() * 60
+            Log.d("SettingFragment","$updateRate")
+            val key = otherSpf.getString("key", "")
+            settingViewModel.sendUpdateTime(
+                UpdateRateRequest(key?:"", 0, updateRate))
+
             settingViewModel.userInfo.collect {
                 Log.d("Nok_Setting_Fragment", "get User Info API")
 
@@ -72,15 +78,11 @@ class NokSettingFragment : BaseFragment<FragmentNokSettingBinding>(R.layout.frag
         binding.updateTimeTv.text = "${settingViewModel.settingTime.value}분"
     }
 
-//    fun onClickUpdateUserInfo() {
-//        findNavController().navigate(R.id.action_nokSettingFragment_to_modifyUserInfoFragment2)
-//    }
-
     fun onUpdateUserInfoLayoutClicked() {
         findNavController().navigate(R.id.action_nokSettingFragment_to_modifyUserInfoFragment)
     }
 
-    fun onUpdateSettingTime(){
+    fun onUpdateSettingTime() {
         findNavController().navigate(R.id.action_nokSettingFragment_to_settingUpdateTimeFragment)
     }
 }

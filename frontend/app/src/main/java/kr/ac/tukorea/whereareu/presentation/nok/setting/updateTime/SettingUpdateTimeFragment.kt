@@ -42,7 +42,6 @@ class SettingUpdateTimeFragment() :
     }
 
     override fun initObserver() {
-        // Observer initialization, if any
     }
 
     private fun initializeViews() {

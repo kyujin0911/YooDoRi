@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kr.ac.tukorea.whereareu.data.model.setting.ModifyUserInfoRequest
 import kr.ac.tukorea.whereareu.data.model.setting.StateResponse
+import kr.ac.tukorea.whereareu.data.model.setting.UpdateRateRequest
 import kr.ac.tukorea.whereareu.data.repository.setting.SettingRepositoryImpl
 import kr.ac.tukorea.whereareu.domain.login.userinfo.GetUserInfoResult
 import kr.ac.tukorea.whereareu.util.network.onError
@@ -77,5 +78,12 @@ class SettingViewModel @Inject constructor(
         }
     }
 
-//    fun sendUpdateTime(request:)
+    fun sendUpdateTime(request: UpdateRateRequest){
+        viewModelScope.launch(Dispatchers.IO){
+            repository.sendUpdateRate(request).onSuccess {
+                Log.d("UpdateRate", "UpdateRateChanged")
+                _settingTime.emit(it.message)
+            }
+        }
+    }
 }
