@@ -24,7 +24,6 @@ class NokSettingFragment : BaseFragment<FragmentNokSettingBinding>(R.layout.frag
     override fun initView() {
         val spf = requireActivity().getSharedPreferences("User", MODE_PRIVATE)
         val otherSpf = requireActivity().getSharedPreferences("OtherUser", MODE_PRIVATE)
-//        val upTime = requireActivity().getSharedPreferences("UpdateTime", MODE_PRIVATE)
 
         binding.userNameTv.text = spf.getString("name", "")
         binding.userPhoneNumberTv.text = spf.getString("phone", "")
@@ -34,16 +33,7 @@ class NokSettingFragment : BaseFragment<FragmentNokSettingBinding>(R.layout.frag
 
         binding.updateTimeLayout.setOnClickListener {
             onUpdateSettingTime()
-//            val updateTime = SettingUpdateTimeFragment{ time ->
-//                viewModel.setUpdateDuration(time.toLong())
-//                binding.updateTimeTv.text = time
-//            }
-//            childFragmentManager.beginTransaction().apply {
-//                add(updateTime, "SettingUpdateFragment")
-//                commit()
-//            }
         }
-
         binding.updateUserInfoLayout.setOnClickListener {
             onUpdateUserInfoLayoutClicked()
         }
@@ -78,6 +68,8 @@ class NokSettingFragment : BaseFragment<FragmentNokSettingBinding>(R.layout.frag
         binding.userPhoneNumberTv.text = spf.getString("phone", "")
         binding.otherNameTv.text = otherSpf.getString("name", "")
         binding.otherPhoneTv.text = otherSpf.getString("phone", "")
+
+        binding.updateTimeTv.text = "${settingViewModel.settingTime.value}분"
     }
 
 //    fun onClickUpdateUserInfo() {

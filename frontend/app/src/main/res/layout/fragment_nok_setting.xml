@@ -219,16 +219,6 @@
                     app:layout_constraintStart_toEndOf="@id/update_time_title"
                     app:layout_constraintTop_toTopOf="parent" />
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="2dp"
-                    android:text="분"
-                    android:textAppearance="@style/TextAppearance.App.14sp.SemiBold"
-                    app:layout_constraintBaseline_toBaselineOf="@+id/update_time_title"
-                    app:layout_constraintStart_toEndOf="@+id/update_time_tv"
-                    app:layout_constraintTop_toTopOf="parent" />
-
                 <ImageView
                     android:id="@+id/update_time_btn"
                     android:layout_width="18dp"
