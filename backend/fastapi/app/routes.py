@@ -25,7 +25,6 @@ sched = BackgroundScheduler(timezone="Asia/Seoul")
 
 위치 정보, 키 없음 = 404
 
-
 정의되지 않은 오류 = 500
 '''
 
@@ -128,7 +127,7 @@ async def receive_dementia_info(request: ReceiveDementiaInfoRequest):
     finally:
         session.close()
 
-@router.post("/connection", status_code=status.HTTP_200_OK, responses = {200 : {"model" : ConnectionResponse, "description" : "연결 확인 성공" }, 400: {"model": ErrorResponse, "description": "연결 실패"}}, description="보호자와 보호 대상자의 연결 확인")
+@router.post("/connection", responses = {200 : {"model" : ConnectionResponse, "description" : "연결 확인 성공" }, 400: {"model": ErrorResponse, "description": "연결 실패"}}, description="보호자와 보호 대상자의 연결 확인")
 async def is_connected(request: ConnectionRequest):
 
     _dementia_key = request.dementiaKey
@@ -547,7 +546,7 @@ async def send_meaningful_location_info(dementiaKey : int):
     finally:
         session.close()
 
-@router.get("/locations/history/{date}/{dementiaKey}", responses = {200 : {"model" : LocHistoryResponse, "description" : "위치 이력 전송 성공" }, 404: {"model": ErrorResponse, "description": "위치 이력 없음"}}, description="보호 대상자의 위치 이력 정보 전달")
+@router.get("/locations/history/{date}/{dementiaKey}", responses = {200 : {"model" : LocHistoryResponse, "description" : "위치 이력 전송 성공" }, 404: {"model": ErrorResponse, "description": "위치 이력 없음"}}, description="보호 대상자의 위치 이력 정보 전달 | date : YYYY-MM-DD")
 async def send_location_history(date : str, dementiaKey : int):
     _key = dementiaKey
 
@@ -588,7 +587,7 @@ async def send_location_history(date : str, dementiaKey : int):
 
 
 #스케줄러 비활성화
-"""@sched.scheduled_job('cron', hour=0, minute=18, id = 'analyze_location_data')
+"""@sched.scheduled_job('cron', hour=0, minute=0, id = 'analyze_location_data')
 def analyze_location_data():
     today = datetime.datetime.now()
     today = today - datetime.timedelta(days=1) # 어제 날짜의 위치 정보를 분석
