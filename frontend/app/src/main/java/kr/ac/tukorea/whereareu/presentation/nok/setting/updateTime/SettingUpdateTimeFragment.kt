@@ -50,10 +50,9 @@ class SettingUpdateTimeFragment() :
         binding.updateTimeList.layoutManager = LinearLayoutManager(context)
         timeAdapter = TimeAdapter(timeList, position)
         binding.updateTimeList.adapter = timeAdapter
-
+        timeAdapter?.submitList(timeList.toMutableList()) // ListAdapter를 사용하기 위해 작성
         timeAdapter?.setOnItemClickListener(object : TimeAdapter.OnItemClickListener {
             override fun onItemClick(item: TimeData, position: Int) {
-                Log.d("SettingUpdateTimeFragment", "..")
                 viewModel.setSettingTime(positionToTime(position))
             }
         })
