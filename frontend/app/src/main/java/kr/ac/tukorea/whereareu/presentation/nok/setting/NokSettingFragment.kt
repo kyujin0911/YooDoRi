@@ -57,6 +57,7 @@ class NokSettingFragment : BaseFragment<FragmentNokSettingBinding>(R.layout.frag
 
             settingViewModel.userInfo.collect {
                 Log.d("Nok_Setting_Fragment", "get User Info API")
+                Log.d("Nok_Setting_Fragment", "$key")
 
                 val nokName = it.nokInfoRecord.nokName
                 val nokPhone = it.nokInfoRecord.nokPhoneNumber
