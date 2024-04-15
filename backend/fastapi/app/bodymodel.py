@@ -1,6 +1,5 @@
 from pydantic import BaseModel, Field
-from typing import Optional, Dict, Optional, Union, List
-from fastapi import HTTPException
+from typing import List
 
 # Define request and response models
 class CommonResponse(BaseModel):
@@ -120,7 +119,6 @@ class AverageWalkingSpeedResponse(BaseModel):
     status: str = Field("success")
     message: str = Field("메~시~지~")
     result: AverageAndLastLoc
-
 
 class GetUserInfoResponse(BaseModel):
     status: str = Field("success")
