@@ -50,7 +50,7 @@ import kotlin.math.roundToInt
 
 @AndroidEntryPoint
 class NokHomeFragment : BaseFragment<kr.ac.tukorea.whereareu.databinding.FragmentHomeBinding>(R.layout.fragment_home),
-    OnMapReadyCallback, InnerMeaningfulListRVA.InnerRVAClickListener {
+    OnMapReadyCallback, MeaningfulListRVA.OuterRVAClickListener, InnerMeaningfulListRVA.InnerRVAClickListener {
     private val viewModel: NokHomeViewModel by activityViewModels()
     private val LOCATION_PERMISSION_REQUEST_CODE = 1001
     private var naverMap: NaverMap? = null
@@ -244,7 +244,7 @@ class NokHomeFragment : BaseFragment<kr.ac.tukorea.whereareu.databinding.Fragmen
                 LinearLayoutManager.VERTICAL
             )
         )}
-        meaningfulListRVA.setInnerRVAClickListener(this)
+        meaningfulListRVA.setRVAClickListener(this, this)
     }
 
     private fun initBottomSheet(){
@@ -400,5 +400,11 @@ class NokHomeFragment : BaseFragment<kr.ac.tukorea.whereareu.databinding.Fragmen
         if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2) {
             requireActivity().showToastShort(requireContext(), "주소가 복사되었습니다.")
         }
+    }
+
+    override fun onClickMapView(latitude: Double, longitude: Double) {
+        behavior.state = BottomSheetBehavior.STATE_COLLAPSED
+        val coord = LatLng(latitude, longitude)
+        naverMap?.moveCamera(CameraUpdate.scrollTo(coord))
     }
 }

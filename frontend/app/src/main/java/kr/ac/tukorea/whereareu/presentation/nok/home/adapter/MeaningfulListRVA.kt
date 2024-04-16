@@ -2,16 +2,13 @@ package kr.ac.tukorea.whereareu.presentation.nok.home.adapter
 
 import android.util.Log
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import kr.ac.tukorea.whereareu.databinding.ItemMeaningfulListBinding
 import kr.ac.tukorea.whereareu.domain.home.MeaningfulPlaceListInfo
-import kr.ac.tukorea.whereareu.domain.home.MeaningfulPlace
 import kr.ac.tukorea.whereareu.domain.home.MeaningfulPlaceInfo
-import okhttp3.internal.notify
 
 class MeaningfulListRVA :
     ListAdapter<MeaningfulPlaceInfo, MeaningfulListRVA.MeaningfulListViewHolder>
@@ -32,8 +29,10 @@ class MeaningfulListRVA :
 
     }) {
     private var innerRVAClickListener: InnerMeaningfulListRVA.InnerRVAClickListener? = null
-    fun setInnerRVAClickListener(listener: InnerMeaningfulListRVA.InnerRVAClickListener){
-        innerRVAClickListener = listener
+    private var outerRVAClickListener: OuterRVAClickListener? = null
+    fun setRVAClickListener(outerListener: OuterRVAClickListener , innerListener: InnerMeaningfulListRVA.InnerRVAClickListener){
+        innerRVAClickListener = innerListener
+        outerRVAClickListener = outerListener
     }
     inner class MeaningfulListViewHolder(private val binding: ItemMeaningfulListBinding) :
         RecyclerView.ViewHolder(binding.root) {
@@ -57,6 +56,11 @@ class MeaningfulListRVA :
                     notifyItemChanged(bindingAdapterPosition)
                     Log.d("isExpanded", meaningfulPlace.isExpanded.toString())
                 }
+
+                mapViewBtn.setOnClickListener {
+                    outerRVAClickListener?.onClickMapView(meaningfulPlace.latitude, meaningfulPlace.longitude)
+                }
+
                 val adapter = InnerMeaningfulListRVA()
                 adapter.setInnerRVAClickListener(innerRVAClickListener!!)
                 innerRv.adapter = adapter
@@ -91,6 +95,6 @@ class MeaningfulListRVA :
     }
 
     interface OuterRVAClickListener{
-        fun onClick()
+        fun onClickMapView(latitude: Double, longitude: Double)
     }
 }

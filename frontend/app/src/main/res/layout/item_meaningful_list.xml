@@ -49,19 +49,31 @@
             app:layout_constraintBottom_toBottomOf="@id/more_view_btn"
             app:layout_constraintStart_toStartOf="parent"/>
 
+
+        <TextView
+            android:id="@+id/map_view_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="지도로 보기"
+            android:textColor="@color/blue"
+            android:layout_marginTop="12dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/address_tv"
+            android:textAppearance="@style/TextAppearance.App.14sp.SemiBold" />
+
         <LinearLayout
             android:id="@+id/more_view_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@id/address_tv"
+            app:layout_constraintTop_toBottomOf="@id/map_view_btn"
             app:layout_constraintEnd_toEndOf="parent"
             android:orientation="horizontal"
-            android:layout_marginTop="20dp">
+            android:layout_marginTop="12dp">
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text='@{model.isExpanded ? "접기" : "인근 경찰서 정보 보기" }'
-                android:textAppearance="@style/TextAppearance.App.14sp.ExtraBold"
+                android:textAppearance="@style/TextAppearance.App.14sp.SemiBold"
                 android:textColor="@color/blue"
                 />
 
