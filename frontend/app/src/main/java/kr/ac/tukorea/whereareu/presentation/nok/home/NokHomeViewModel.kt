@@ -213,25 +213,24 @@ class NokHomeViewModel @Inject constructor(
     private fun getPoliceStationInfoNearby(list: MutableList<MeaningfulPlaceInfo>){
         viewModelScope.launch {
             list.forEach { meaningfulPlaceInfo ->
-                val meaningfulPlace = meaningfulPlaceInfo.meaningfulPlaceListInfo.first()
-                val x = meaningfulPlace.longitude.toString()
-                val y = meaningfulPlace.latitude.toString()
-                searchWithKeyword(x, y)
+                searchWithKeyword(meaningfulPlaceInfo)
                 delay(300)
             }
-            Log.d("police list", policeStationInfoList.toString())
+            Log.d("after police list", list.toString())
         }
     }
 
-    fun searchWithKeyword(x: String, y: String){
+    fun searchWithKeyword(meaningfulPlaceInfo: MeaningfulPlaceInfo){
         viewModelScope.launch {
-            kakaoRepository.searchWithKeyword("경찰서", "126.9340687", "37.401623", 1500).onSuccess {
+            val x = meaningfulPlaceInfo.longitude.toString()
+            val y = meaningfulPlaceInfo.latitude.toString()
+            kakaoRepository.searchWithKeyword("경찰서", x, y, 1000).onSuccess {
                 Log.d("kakao keyword", it.toString())
-                it.documents.forEach { document ->
-                    val policeStationInfo = PoliceStationInfo(document.placeName, document.distance, document.roadAddressName, document.phone,
+                val policeList = it.documents.map { document ->
+                    PoliceStationInfo(document.placeName, document.distance, document.roadAddressName, document.phone,
                         document.x, document.y)
-                    policeStationInfoList.add(policeStationInfo)
                 }
+                meaningfulPlaceInfo.policeStationInfo = policeList
                 Log.d("police list", policeStationInfoList.toString())
             }
         }
@@ -252,9 +251,10 @@ class NokHomeViewModel @Inject constructor(
         groupList.keys.forEach { key ->
             val list = groupList[key]
             val meaningfulPlaceListInfo =
-                list?.map { MeaningfulPlaceListInfo(date = it.date, time = it.time, index = 0, latitude = it.latitude, longitude = it.longitude) }
+                list?.map { MeaningfulPlaceListInfo(date = it.date, time = it.time) }
                     ?.sortedBy { it.time }
-            meaningfulPlaceInfoList.add(MeaningfulPlaceInfo(key, meaningfulPlaceListInfo!!))
+            meaningfulPlaceInfoList.add(MeaningfulPlaceInfo(key, meaningfulPlaceListInfo?.distinct()!!,
+                list.first().latitude, list.first().longitude))
         }
         Log.d("tempList", meaningfulPlaceInfoList.toString())
 

@@ -13,11 +13,11 @@ import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface NokHomeService {
-    @GET("locations/noks/{dementiaKey}")
-    suspend fun getDementiaLocationInfo(@Path("dementiaKey") dementiaKey: String): Response<ResponseBody<LocationInfoResponse>>
+    @GET("locations/noks")
+    suspend fun getDementiaLocationInfo(@Query("dementiaKey") dementiaKey: String): Response<ResponseBody<LocationInfoResponse>>
 
-    @GET("locatoins/meaningful/{dementiaKey}")
-    suspend fun getMeaningfulPlace(@Path("dementiaKey") dementiaKey: String): Response<ResponseBody<MeaningfulPlaceResponse>>
+    @GET("locatoins/meaningful")
+    suspend fun getMeaningfulPlace(@Query("dementiaKey") dementiaKey: String): Response<ResponseBody<MeaningfulPlaceResponse>>
 
     @POST("dementias/averageWalkingSpeed")
     suspend fun getDementiaLastInfo(@Body request: DementiaKeyRequest): Response<ResponseBody<DementiaLastInfoResponse>>

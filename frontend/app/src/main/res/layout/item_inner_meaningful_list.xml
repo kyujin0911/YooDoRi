@@ -7,7 +7,7 @@
 
         <variable
             name="model"
-            type="kr.ac.tukorea.whereareu.domain.home.MeaningfulPlaceListInfo" />
+            type="kr.ac.tukorea.whereareu.domain.home.PoliceStationInfo" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -19,32 +19,54 @@
             android:id="@+id/index_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@{String.valueOf(model.index)+'.'}"
+
             android:textAppearance="@style/TextAppearance.App.14sp.ExtraBold"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            android:id="@+id/date_tv"
+            android:id="@+id/name_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="12dp"
-            android:text="@{model.date}"
-            android:textAppearance="@style/TextAppearance.App.14sp.SemiBold"
+            android:text="@{model.placeName}"
+            android:textAppearance="@style/TextAppearance.App.14sp.ExtraBold"
             app:layout_constraintBaseline_toBaselineOf="@id/index_tv"
             app:layout_constraintStart_toEndOf="@id/index_tv"
-            tools:text="요일" />
+            tools:text="경찰서 이름" />
 
         <TextView
-            android:id="@+id/time_tv"
+            android:id="@+id/phone_number_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="12dp"
-            android:text="@{model.time}"
+            android:text="@{model.phone}"
             android:textAppearance="@style/TextAppearance.App.14sp.SemiBold"
             app:layout_constraintBaseline_toBaselineOf="@id/index_tv"
-            app:layout_constraintStart_toEndOf="@id/date_tv"
-            tools:text="16시~20시" />
+            app:layout_constraintStart_toEndOf="@id/name_tv"
+            tools:text="전화번호: " />
+
+        <TextView
+            android:id="@+id/distance_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:text="@{model.distance}"
+            android:textAppearance="@style/TextAppearance.App.14sp.SemiBold"
+            app:layout_constraintBaseline_toBaselineOf="@id/index_tv"
+            app:layout_constraintStart_toEndOf="@id/phone_number_tv"
+            tools:text="의미장소 기준 거리: " />
+
+        <TextView
+            android:id="@+id/road_address_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@{model.roadAddressName}"
+            android:layout_marginTop="8dp"
+            android:textAppearance="@style/TextAppearance.App.14sp.SemiBold"
+            app:layout_constraintTop_toBottomOf="@id/name_tv"
+            app:layout_constraintStart_toStartOf="@id/name_tv"
+            tools:text="주소" />
 
         <LinearLayout
             android:id="@+id/map_view_btn"
@@ -53,8 +75,7 @@
             android:orientation="horizontal"
             android:gravity="center"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@id/date_tv"
-            app:layout_constraintBottom_toBottomOf="@id/date_tv">
+            app:layout_constraintTop_toBottomOf="@id/road_address_tv">
             <TextView
                 android:id="@+id/map_view_tv"
                 android:layout_width="wrap_content"

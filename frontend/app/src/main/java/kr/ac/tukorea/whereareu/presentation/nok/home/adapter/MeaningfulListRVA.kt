@@ -47,11 +47,9 @@ class MeaningfulListRVA :
                             meaningfulPlaceListInfo.time.substring(2 until 4)
                         }시"
                         MeaningfulPlaceListInfo(
-                            index + 1,
+
                             date,
-                            time,
-                            meaningfulPlaceListInfo.latitude,
-                            meaningfulPlaceListInfo.longitude
+                            time
                         )
                     }
                 moreViewBtn.setOnClickListener {
@@ -62,7 +60,7 @@ class MeaningfulListRVA :
                 val adapter = InnerMeaningfulListRVA()
                 adapter.setInnerRVAClickListener(innerRVAClickListener!!)
                 innerRv.adapter = adapter
-                adapter.submitList(listInfo)
+                adapter.submitList(meaningfulPlace.policeStationInfo)
             }
         }
     }

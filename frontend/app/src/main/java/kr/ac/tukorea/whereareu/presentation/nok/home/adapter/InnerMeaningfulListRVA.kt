@@ -7,21 +7,22 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import kr.ac.tukorea.whereareu.databinding.ItemInnerMeaningfulListBinding
 import kr.ac.tukorea.whereareu.domain.home.MeaningfulPlaceListInfo
+import kr.ac.tukorea.whereareu.domain.home.PoliceStationInfo
 
 class InnerMeaningfulListRVA() :
-    ListAdapter<MeaningfulPlaceListInfo, InnerMeaningfulListRVA.InnerMeaningfulListViewHolder>(
+    ListAdapter<PoliceStationInfo, InnerMeaningfulListRVA.InnerMeaningfulListViewHolder>(
         object :
-            DiffUtil.ItemCallback<MeaningfulPlaceListInfo>() {
+            DiffUtil.ItemCallback<PoliceStationInfo>() {
             override fun areItemsTheSame(
-                oldItem: MeaningfulPlaceListInfo,
-                newItem: MeaningfulPlaceListInfo
+                oldItem: PoliceStationInfo,
+                newItem: PoliceStationInfo
             ): Boolean {
                 return oldItem === newItem
             }
 
             override fun areContentsTheSame(
-                oldItem: MeaningfulPlaceListInfo,
-                newItem: MeaningfulPlaceListInfo
+                oldItem: PoliceStationInfo,
+                newItem: PoliceStationInfo
             ): Boolean {
                 return oldItem == newItem
             }
@@ -34,15 +35,15 @@ class InnerMeaningfulListRVA() :
     }
     inner class InnerMeaningfulListViewHolder(private val binding: ItemInnerMeaningfulListBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        fun bind(meaningfulPlaceListInfo: MeaningfulPlaceListInfo) {
+        fun bind(policeStationInfo: PoliceStationInfo) {
             with(binding) {
-                model = meaningfulPlaceListInfo
+                model = policeStationInfo
                 /*dateTv.text = convertDayOfWeekInKorean(meaningfulPlaceListInfo.date)
                 timeTv.text = "${meaningfulPlaceListInfo.time.substring(0 until 2)}시~${
                     meaningfulPlaceListInfo.time.substring(2 until 4)
                 }시"*/
                 mapViewBtn.setOnClickListener {
-                    innerRVAClickListener?.onClick(meaningfulPlaceListInfo)
+                    innerRVAClickListener?.onClick(policeStationInfo)
                 }
             }
         }
@@ -79,6 +80,6 @@ class InnerMeaningfulListRVA() :
     }
 
     interface InnerRVAClickListener {
-        fun onClick(meaningfulListInfo: MeaningfulPlaceListInfo)
+        fun onClick(policeStationInfo: PoliceStationInfo)
     }
 }

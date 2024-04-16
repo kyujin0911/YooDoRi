@@ -33,6 +33,7 @@ import kr.ac.tukorea.whereareu.R
 import kr.ac.tukorea.whereareu.data.model.nok.home.LocationInfoResponse
 import kr.ac.tukorea.whereareu.databinding.IconLocationOverlayLayoutBinding
 import kr.ac.tukorea.whereareu.domain.home.MeaningfulPlaceListInfo
+import kr.ac.tukorea.whereareu.domain.home.PoliceStationInfo
 import kr.ac.tukorea.whereareu.presentation.base.BaseFragment
 import kr.ac.tukorea.whereareu.presentation.nok.home.adapter.InnerMeaningfulListRVA
 import kr.ac.tukorea.whereareu.presentation.nok.home.adapter.MeaningfulListRVA
@@ -66,8 +67,8 @@ class NokHomeFragment : BaseFragment<kr.ac.tukorea.whereareu.databinding.Fragmen
     private fun handlePredictEvent(event: NokHomeViewModel.PredictEvent){
         when(event){
             is NokHomeViewModel.PredictEvent.StartPredictEvent -> {
-                //viewModel.getMeaningfulPlace()
-                viewModel.searchWithKeyword("x", "y")
+                viewModel.getMeaningfulPlace()
+                //viewModel.searchWithKeyword("x", "y")
                 initBottomSheet()
                 initMeaningfulListRVA()
                 showLoadingDialog(requireContext())
@@ -351,9 +352,9 @@ class NokHomeFragment : BaseFragment<kr.ac.tukorea.whereareu.databinding.Fragmen
 
 
     // inner RVA 클릭 이벤트
-    override fun onClick(meaningfulListInfo: MeaningfulPlaceListInfo) {
+    override fun onClick(policeStationInfo: PoliceStationInfo) {
         behavior.state = BottomSheetBehavior.STATE_COLLAPSED
-        val coord = LatLng(meaningfulListInfo.latitude, meaningfulListInfo.longitude)
-        naverMap?.moveCamera(CameraUpdate.scrollTo(coord))
+        //val coord = LatLng(meaningfulListInfo.latitude, meaningfulListInfo.longitude)
+        //naverMap?.moveCamera(CameraUpdate.scrollTo(coord))
     }
 }
