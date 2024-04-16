@@ -18,8 +18,9 @@ class KakaoRepositoryImpl @Inject constructor(
         query: String,
         x: String,
         y: String,
-        radius: Int
+        radius: Int,
+        sort: String
     ): NetworkResult<KeywordResponse> {
-        return handleApi({api.searchWithKeyword(query, x, y, radius)}) {response: KeywordResponse -> response}
+        return handleApi({api.searchWithKeyword(query, x, y, radius, sort)}) {response: KeywordResponse -> response}
     }
 }

@@ -224,12 +224,13 @@ class NokHomeViewModel @Inject constructor(
         viewModelScope.launch {
             val x = meaningfulPlaceInfo.longitude.toString()
             val y = meaningfulPlaceInfo.latitude.toString()
-            kakaoRepository.searchWithKeyword("경찰서", x, y, 1000).onSuccess {
+            kakaoRepository.searchWithKeyword("경찰서", x, y, 1000, "distance").onSuccess {
                 Log.d("kakao keyword", it.toString())
                 val policeList = it.documents.map { document ->
                     PoliceStationInfo(document.placeName, document.distance, document.roadAddressName, document.phone,
                         document.x, document.y)
-                }
+                }.filter {document ->
+                    document.roadAddressName.isNullOrEmpty() or document.phone.isNullOrEmpty() }
                 meaningfulPlaceInfo.policeStationInfo = policeList
                 Log.d("police list", policeStationInfoList.toString())
             }

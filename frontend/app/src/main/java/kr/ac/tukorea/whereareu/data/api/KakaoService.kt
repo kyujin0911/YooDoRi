@@ -15,6 +15,7 @@ interface KakaoService {
         @Query("query") query: String,
         @Query("x") x: String,
         @Query("y") y: String,
-        @Query("radius") radius: Int
+        @Query("radius") radius: Int,
+        @Query("sort") sort: String
     ): Response<KeywordResponse>
 }
