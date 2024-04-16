@@ -26,6 +26,7 @@ import kr.ac.tukorea.whereareu.util.network.onError
 import kr.ac.tukorea.whereareu.util.network.onException
 import kr.ac.tukorea.whereareu.util.network.onFail
 import kr.ac.tukorea.whereareu.util.network.onSuccess
+import java.util.Locale.filter
 import javax.inject.Inject
 
 @HiltViewModel
@@ -213,24 +214,25 @@ class NokHomeViewModel @Inject constructor(
     private fun getPoliceStationInfoNearby(list: MutableList<MeaningfulPlaceInfo>){
         viewModelScope.launch {
             list.forEach { meaningfulPlaceInfo ->
-                searchWithKeyword(meaningfulPlaceInfo)
+                searchPoliceStationNearby(meaningfulPlaceInfo)
                 delay(300)
             }
             Log.d("after police list", list.toString())
         }
     }
 
-    fun searchWithKeyword(meaningfulPlaceInfo: MeaningfulPlaceInfo){
+    private fun searchPoliceStationNearby(meaningfulPlaceInfo: MeaningfulPlaceInfo){
         viewModelScope.launch {
             val x = meaningfulPlaceInfo.longitude.toString()
             val y = meaningfulPlaceInfo.latitude.toString()
-            kakaoRepository.searchWithKeyword("경찰서", x, y, 1000, "distance").onSuccess {
+            kakaoRepository.searchWithKeyword(x, y).onSuccess {
                 Log.d("kakao keyword", it.toString())
-                val policeList = it.documents.map { document ->
+                val policeList = it.documents.filter {document ->
+                    document.roadAddressName.isNullOrEmpty().not() or document.phone.isNullOrEmpty().not() }
+                    .map { document ->
                     PoliceStationInfo(document.placeName, document.distance, document.roadAddressName, document.phone,
                         document.x, document.y)
-                }.filter {document ->
-                    document.roadAddressName.isNullOrEmpty() or document.phone.isNullOrEmpty() }
+                }.take(3)
                 meaningfulPlaceInfo.policeStationInfo = policeList
                 Log.d("police list", policeStationInfoList.toString())
             }

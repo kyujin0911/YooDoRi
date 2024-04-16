@@ -1,5 +1,6 @@
 package kr.ac.tukorea.whereareu.presentation.nok.home.adapter
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
@@ -36,6 +37,7 @@ class InnerMeaningfulListRVA() :
     inner class InnerMeaningfulListViewHolder(private val binding: ItemInnerMeaningfulListBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(policeStationInfo: PoliceStationInfo) {
+            Log.d("police station info", policeStationInfo.toString())
             with(binding) {
                 model = policeStationInfo
                 /*dateTv.text = convertDayOfWeekInKorean(meaningfulPlaceListInfo.date)

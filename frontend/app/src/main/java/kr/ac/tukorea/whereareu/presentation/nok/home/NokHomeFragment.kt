@@ -354,7 +354,7 @@ class NokHomeFragment : BaseFragment<kr.ac.tukorea.whereareu.databinding.Fragmen
     // inner RVA 클릭 이벤트
     override fun onClick(policeStationInfo: PoliceStationInfo) {
         behavior.state = BottomSheetBehavior.STATE_COLLAPSED
-        //val coord = LatLng(meaningfulListInfo.latitude, meaningfulListInfo.longitude)
-        //naverMap?.moveCamera(CameraUpdate.scrollTo(coord))
+        val coord = LatLng(policeStationInfo.y.toDouble(), policeStationInfo.x.toDouble())
+        naverMap?.moveCamera(CameraUpdate.scrollTo(coord))
     }
 }

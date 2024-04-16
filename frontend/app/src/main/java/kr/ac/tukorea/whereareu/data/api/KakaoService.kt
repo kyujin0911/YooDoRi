@@ -11,11 +11,12 @@ interface KakaoService {
     suspend fun getAddress(@Query("x") x: String, @Query("y") y: String): Response<AddressResponse>
 
     @GET("search/keyword.json")
-    suspend fun searchWithKeyword(
-        @Query("query") query: String,
+    suspend fun searchPoliceStationNearby(
         @Query("x") x: String,
         @Query("y") y: String,
-        @Query("radius") radius: Int,
-        @Query("sort") sort: String
+        //@Query("radius") radius: Int,
+        @Query("query") query: String = "경찰서",
+        @Query("sort") sort: String = "distance",
+        @Query("size") size: Int = 5
     ): Response<KeywordResponse>
 }
