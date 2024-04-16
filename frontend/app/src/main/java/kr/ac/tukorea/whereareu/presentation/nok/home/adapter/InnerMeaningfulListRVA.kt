@@ -7,7 +7,6 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import kr.ac.tukorea.whereareu.databinding.ItemInnerMeaningfulListBinding
-import kr.ac.tukorea.whereareu.domain.home.MeaningfulPlaceListInfo
 import kr.ac.tukorea.whereareu.domain.home.PoliceStationInfo
 
 class InnerMeaningfulListRVA() :
@@ -45,7 +44,13 @@ class InnerMeaningfulListRVA() :
                     meaningfulPlaceListInfo.time.substring(2 until 4)
                 }시"*/
                 mapViewBtn.setOnClickListener {
-                    innerRVAClickListener?.onClick(policeStationInfo)
+                    innerRVAClickListener?.onClickMoreView(policeStationInfo)
+                }
+                copyPhoneNumberBtn.setOnClickListener {
+                    innerRVAClickListener?.onClickCopyPhoneNumber(policeStationInfo.phone)
+                }
+                copyRoadAddressBtn.setOnClickListener {
+                    innerRVAClickListener?.onClickCopyAddress(policeStationInfo.roadAddressName)
                 }
             }
         }
@@ -82,6 +87,8 @@ class InnerMeaningfulListRVA() :
     }
 
     interface InnerRVAClickListener {
-        fun onClick(policeStationInfo: PoliceStationInfo)
+        fun onClickMoreView(policeStationInfo: PoliceStationInfo)
+        fun onClickCopyPhoneNumber(phoneNumber: String)
+        fun onClickCopyAddress(address: String)
     }
 }

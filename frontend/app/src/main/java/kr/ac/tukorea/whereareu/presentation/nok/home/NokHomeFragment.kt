@@ -1,5 +1,8 @@
 package kr.ac.tukorea.whereareu.presentation.nok.home
 
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context.CLIPBOARD_SERVICE
 import android.content.Context.MODE_PRIVATE
 import android.content.pm.PackageManager
 import android.graphics.Color
@@ -352,9 +355,18 @@ class NokHomeFragment : BaseFragment<kr.ac.tukorea.whereareu.databinding.Fragmen
 
 
     // inner RVA 클릭 이벤트
-    override fun onClick(policeStationInfo: PoliceStationInfo) {
+    override fun onClickMoreView(policeStationInfo: PoliceStationInfo) {
         behavior.state = BottomSheetBehavior.STATE_COLLAPSED
         val coord = LatLng(policeStationInfo.y.toDouble(), policeStationInfo.x.toDouble())
         naverMap?.moveCamera(CameraUpdate.scrollTo(coord))
+    }
+
+    override fun onClickCopyPhoneNumber(phoneNumber: String) {
+        val clipboardManager = requireContext().getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
+        clipboardManager.setPrimaryClip(ClipData.newPlainText("", phoneNumber))
+    }
+
+    override fun onClickCopyAddress(address: String) {
+
     }
 }
