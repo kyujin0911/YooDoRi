@@ -334,7 +334,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
                     android:text="마지막 위치"
-                    android:textAppearance="@style/TextAppearance.App.16sp.ExtraBold"
+                    android:textAppearance="@style/TextAppearance.App.14sp.ExtraBold"
                     app:layout_constraintStart_toStartOf="@id/count_down_title_tv"
                     app:layout_constraintTop_toBottomOf="@id/count_down_tv" />
 
@@ -345,7 +345,7 @@
                     android:layout_marginStart="8dp"
                     android:layout_marginTop="16dp"
                     android:text="마지막 위치"
-                    android:textAppearance="@style/TextAppearance.App.16sp.Medium"
+                    android:textAppearance="@style/TextAppearance.App.14sp.Medium"
                     app:layout_constraintStart_toEndOf="@id/last_location_title_tv"
                     app:layout_constraintTop_toBottomOf="@id/count_down_tv" />
 

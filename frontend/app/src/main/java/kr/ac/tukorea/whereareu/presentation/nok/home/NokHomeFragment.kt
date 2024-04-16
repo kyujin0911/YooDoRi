@@ -13,6 +13,7 @@ import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.content.getSystemService
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -91,7 +92,7 @@ class NokHomeFragment : BaseFragment<kr.ac.tukorea.whereareu.databinding.Fragmen
             is NokHomeViewModel.PredictEvent.MeaningFulPlaceEvent -> {
                 meaningfulListRVA.submitList(event.meaningfulPlaceForList)
 
-                event.meaningfulPlaceForMarker.forEach {meaningfulPlace ->
+                event.meaningfulPlaceForList.forEach {meaningfulPlace ->
                     val latitude = meaningfulPlace.latitude
                     val longitude = meaningfulPlace.longitude
                     val marker = Marker()
@@ -99,6 +100,27 @@ class NokHomeFragment : BaseFragment<kr.ac.tukorea.whereareu.databinding.Fragmen
                         position = LatLng(latitude, longitude)
                         icon = MarkerIcons.YELLOW
                         captionText = meaningfulPlace.address
+                        captionRequestedWidth = 400
+                        map = naverMap
+                    }
+
+                    val infoWindow = InfoWindow()
+                    infoWindow.adapter = object : InfoWindow.DefaultTextAdapter(requireContext()) {
+                        override fun getText(infoWindow: InfoWindow): CharSequence {
+                            return "예상 위치"
+                        }
+                    }
+                    infoWindow.open(marker)
+                }
+            }
+
+            is NokHomeViewModel.PredictEvent.SearchPoliceStationNearbyEvent -> {
+                event.policeStationList.forEach {policeStation ->
+                    val marker = Marker()
+                    with(marker){
+                        position = LatLng(policeStation.y.toDouble(), policeStation.x.toDouble())
+                        icon = MarkerIcons.BLUE
+                        captionText = policeStation.placeName
                         captionRequestedWidth = 400
                         map = naverMap
                     }

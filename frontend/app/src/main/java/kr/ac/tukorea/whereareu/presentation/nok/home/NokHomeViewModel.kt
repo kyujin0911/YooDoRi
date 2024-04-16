@@ -59,12 +59,13 @@ class NokHomeViewModel @Inject constructor(
     sealed class PredictEvent {
         data class StartPredictEvent(val isPredicted: Boolean): PredictEvent()
         data class MeaningFulPlaceEvent(
-            val meaningfulPlaceForList: List<MeaningfulPlaceInfo>,
-            val meaningfulPlaceForMarker: List<MeaningfulPlace>) : PredictEvent()
+            val meaningfulPlaceForList: List<MeaningfulPlaceInfo>): PredictEvent()
         data class DementiaLastInfoEvent(val dementiaLastInfo: DementiaLastInfoResponse) :
             PredictEvent()
 
         data class LastLocationEvent(val lastAddress: LastAddress) : PredictEvent()
+
+        data class SearchPoliceStationNearbyEvent(val policeStationList: List<PoliceStationInfo>): PredictEvent()
 
         data class StopPredictEvent(val isPredicted: Boolean): PredictEvent()
     }
@@ -196,7 +197,7 @@ class NokHomeViewModel @Inject constructor(
                         )
                     }
                 val meaningfulPlaceInfo = preprocessingList(meaningfulPlaces)
-                eventPredict(PredictEvent.MeaningFulPlaceEvent(meaningfulPlaceInfo, meaningfulPlaces))
+                eventPredict(PredictEvent.MeaningFulPlaceEvent(meaningfulPlaceInfo))
                 getPoliceStationInfoNearby(meaningfulPlaceInfo)
                 getDementiaLastInfo()
             }.onException {
@@ -234,6 +235,7 @@ class NokHomeViewModel @Inject constructor(
                         document.x, document.y)
                 }.take(3)
                 meaningfulPlaceInfo.policeStationInfo = policeList
+                eventPredict(PredictEvent.SearchPoliceStationNearbyEvent(policeList))
                 Log.d("police list", policeStationInfoList.toString())
             }
         }

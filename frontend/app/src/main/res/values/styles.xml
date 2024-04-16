@@ -84,6 +84,12 @@
         <item name="android:textColor">@color/black</item>
     </style>
 
+    <style name="TextAppearance.App.14sp.Medium" parent="TextAppearance.AppCompat">
+        <item name="android:textSize">14sp</item>
+        <item name="android:fontFamily">@font/suite_medium</item>
+        <item name="android:textColor">@color/black</item>
+    </style>
+
     <style name="TextAppearance.App.14sp.Regular" parent="TextAppearance.AppCompat">
         <item name="android:textSize">14sp</item>
         <item name="android:fontFamily">@font/suite_regular</item>
