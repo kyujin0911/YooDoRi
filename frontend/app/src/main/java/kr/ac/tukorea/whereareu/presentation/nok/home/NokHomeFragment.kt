@@ -7,6 +7,7 @@ import android.content.Context.MODE_PRIVATE
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.graphics.PointF
+import android.os.Build
 import android.util.Log
 import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -41,6 +42,7 @@ import kr.ac.tukorea.whereareu.presentation.base.BaseFragment
 import kr.ac.tukorea.whereareu.presentation.nok.home.adapter.InnerMeaningfulListRVA
 import kr.ac.tukorea.whereareu.presentation.nok.home.adapter.MeaningfulListRVA
 import kr.ac.tukorea.whereareu.util.extension.repeatOnStarted
+import kr.ac.tukorea.whereareu.util.extension.showToastShort
 import kotlin.math.max
 import kotlin.math.roundToInt
 
@@ -104,6 +106,7 @@ class NokHomeFragment : BaseFragment<kr.ac.tukorea.whereareu.databinding.Fragmen
             }
 
             is NokHomeViewModel.PredictEvent.LastLocationEvent -> {
+                binding.lastLocationTv.text = event.lastAddress.address
                 val latitude = event.lastAddress.latitude
                 val longitude = event.lastAddress.longitude
                 naverMap?.moveCamera(CameraUpdate.scrollTo(LatLng(latitude, longitude)))
@@ -364,9 +367,16 @@ class NokHomeFragment : BaseFragment<kr.ac.tukorea.whereareu.databinding.Fragmen
     override fun onClickCopyPhoneNumber(phoneNumber: String) {
         val clipboardManager = requireContext().getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
         clipboardManager.setPrimaryClip(ClipData.newPlainText("", phoneNumber))
+        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2) {
+            requireActivity().showToastShort(requireContext(), "전화번호가 복사되었습니다.")
+        }
     }
 
     override fun onClickCopyAddress(address: String) {
-
+        val clipboardManager = requireContext().getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
+        clipboardManager.setPrimaryClip(ClipData.newPlainText("", address))
+        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2) {
+            requireActivity().showToastShort(requireContext(), "주소가 복사되었습니다.")
+        }
     }
 }
