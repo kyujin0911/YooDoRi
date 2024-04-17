@@ -19,6 +19,7 @@ import kr.ac.tukorea.whereareu.presentation.base.BaseDialogFragment
 import kr.ac.tukorea.whereareu.presentation.base.BaseFragment
 import kr.ac.tukorea.whereareu.presentation.nok.home.NokHomeViewModel
 import kr.ac.tukorea.whereareu.presentation.nok.setting.SettingViewModel
+import kr.ac.tukorea.whereareu.util.extension.statusBarHeight
 
 @AndroidEntryPoint
 class SettingUpdateTimeFragment() :
@@ -38,6 +39,7 @@ class SettingUpdateTimeFragment() :
     private var timeAdapter: TimeAdapter? = null
 
     override fun initView() {
+        binding.layout.setPadding(0,requireActivity().statusBarHeight() ,0, 0)
         initializeViews()
     }
 
