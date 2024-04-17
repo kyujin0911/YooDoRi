@@ -22,6 +22,7 @@ import kr.ac.tukorea.whereareu.presentation.nok.home.NokHomeViewModel
 import kr.ac.tukorea.whereareu.util.extension.navigationHeight
 import kr.ac.tukorea.whereareu.util.extension.repeatOnStarted
 import kr.ac.tukorea.whereareu.util.extension.setStatusBarTransparent
+import kr.ac.tukorea.whereareu.util.extension.statusBarHeight
 
 @AndroidEntryPoint
 class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_nok_main) {

@@ -38,6 +38,7 @@ class SettingUpdateTimeFragment() :
     private var timeAdapter: TimeAdapter? = null
 
     override fun initView() {
+        binding.layout.setPadding(0,requireActivity().statusBarHeight() ,0, 0)
         initializeViews()
     }
 

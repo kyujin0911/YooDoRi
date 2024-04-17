@@ -17,6 +17,7 @@ import kr.ac.tukorea.whereareu.util.extension.EditTextUtil.hideKeyboard
 import kr.ac.tukorea.whereareu.util.extension.EditTextUtil.setOnEditorActionListener
 import kr.ac.tukorea.whereareu.util.extension.repeatOnStarted
 import kr.ac.tukorea.whereareu.util.extension.showToastOnView
+import kr.ac.tukorea.whereareu.util.extension.statusBarHeight
 
 @AndroidEntryPoint
 class ModifyUserInfoFragment :
@@ -46,6 +47,7 @@ class ModifyUserInfoFragment :
     }
 
     override fun initView() {
+        binding.layout.setPadding(0,requireActivity().statusBarHeight() ,0, 0)
         binding.view = this
         binding.userPhoneEt.addTextChangedListener(PhoneNumberFormattingTextWatcher())
 

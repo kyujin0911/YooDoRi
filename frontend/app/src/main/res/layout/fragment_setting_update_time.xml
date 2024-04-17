@@ -9,6 +9,11 @@
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@drawable/rectangle_corner_10_white"
@@ -41,8 +46,8 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="40dp"
             android:overScrollMode="never"
-            app:layout_constraintTop_toBottomOf="@+id/guide_tv"
-            app:layout_constraintBottom_toBottomOf="parent"/>
+            app:layout_constraintTop_toBottomOf="@+id/guide_tv" />
 
+    </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
