@@ -46,8 +46,6 @@ class DementiaSettingFragment : BaseFragment<FragmentDementiaSettingBinding>(R.l
         binding.userNameTv.text = spf.getString("name", "")
         binding.userPhoneNumberTv.text = spf.getString("phone", "")
 
-        binding.otherNameEditTv.setText(otherSpf.getString("name", ""))
-        binding.otherPhoneNumberTv.setText((otherSpf.getString("phone", "")))
 
         binding.startBtn.setOnClickListener {
             Intent(requireActivity().applicationContext, LocationService::class.java).apply {

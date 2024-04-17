@@ -1,4 +1,4 @@
-package kr.ac.tukorea.whereareu.presentation.nok.setting
+package kr.ac.tukorea.whereareu.presentation
 
 import android.util.Log
 import androidx.lifecycle.ViewModel

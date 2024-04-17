@@ -15,10 +15,10 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import dagger.hilt.android.AndroidEntryPoint
 import kr.ac.tukorea.whereareu.R
 import kr.ac.tukorea.whereareu.databinding.FragmentSettingUpdateTimeBinding
+import kr.ac.tukorea.whereareu.presentation.SettingViewModel
 import kr.ac.tukorea.whereareu.presentation.base.BaseDialogFragment
 import kr.ac.tukorea.whereareu.presentation.base.BaseFragment
 import kr.ac.tukorea.whereareu.presentation.nok.home.NokHomeViewModel
-import kr.ac.tukorea.whereareu.presentation.nok.setting.SettingViewModel
 
 @AndroidEntryPoint
 class SettingUpdateTimeFragment() :

@@ -11,6 +11,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kr.ac.tukorea.whereareu.R
 import kr.ac.tukorea.whereareu.data.model.setting.ModifyUserInfoRequest
 import kr.ac.tukorea.whereareu.databinding.FragmentNokModifyUserInfoBinding
+import kr.ac.tukorea.whereareu.presentation.SettingViewModel
 import kr.ac.tukorea.whereareu.presentation.base.BaseFragment
 import kr.ac.tukorea.whereareu.util.extension.EditTextUtil.hideKeyboard
 import kr.ac.tukorea.whereareu.util.extension.EditTextUtil.setOnEditorActionListener
