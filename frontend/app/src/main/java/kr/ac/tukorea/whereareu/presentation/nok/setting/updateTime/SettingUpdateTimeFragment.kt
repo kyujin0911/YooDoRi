@@ -19,6 +19,7 @@ import kr.ac.tukorea.whereareu.presentation.SettingViewModel
 import kr.ac.tukorea.whereareu.presentation.base.BaseDialogFragment
 import kr.ac.tukorea.whereareu.presentation.base.BaseFragment
 import kr.ac.tukorea.whereareu.presentation.nok.home.NokHomeViewModel
+import kr.ac.tukorea.whereareu.util.extension.statusBarHeight
 
 @AndroidEntryPoint
 class SettingUpdateTimeFragment() :

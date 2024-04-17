@@ -2,12 +2,29 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/dementia_graph"
-    app:startDestination="@id/settingFragment2">
+    app:startDestination="@id/dementiaHomeFragment">
 
-    <fragment
-        android:id="@+id/settingFragment2"
-        android:name="kr.ac.tukorea.whereareu.presentation.dementia.setting.DementiaSettingFragment"
-        android:label="SettingFragment" />
+    <navigation
+        android:id="@+id/settingTab"
+        android:label="SettingFragment">
+        <fragment
+            android:id="@+id/dementiaSettingFragment"
+            android:name="kr.ac.tukorea.whereareu.presentation.dementia.setting.DementiaSettingFragment"
+            android:label="DementiaSettingFragment">
+            <action
+                android:id="@+id/action_dementiaSettingFragment_to_modifyDementiaInfoFragment"
+                app:destination="@+id/modifyDementiaInfoFragment"/>
+        </fragment>
+        <fragment
+            android:id="@+id/modifyDementiaInfoFragment"
+            android:name="kr.ac.tukorea.whereareu.presentation.nok.setting.ModifyDementiaInfoFragment"
+            android:label="ModifyDementiaInfoFragment">
+            <action
+                android:id="@+id/action_modifyDementiaInfoFragment_to_dementiaSettingFragment"
+                app:destination="@+id/dementiaSettingFragment"/>
+        </fragment>
+
+    </navigation>
     <fragment
         android:id="@+id/locationHistoryFragment2"
         android:name="kr.ac.tukorea.whereareu.presentation.LocationHistoryFragment"
