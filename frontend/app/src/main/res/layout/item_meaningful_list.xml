@@ -95,6 +95,7 @@
             android:visibility="@{model.isExpanded ? View.VISIBLE : View.GONE}"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             android:layout_marginTop="8dp"
+            tools:listitem="@layout/item_meaningful_list"
             app:layout_constraintTop_toBottomOf="@id/more_view_btn"
             app:layout_constraintStart_toStartOf="@id/police_station_title_tv"
             app:layout_constraintEnd_toEndOf="parent"/>

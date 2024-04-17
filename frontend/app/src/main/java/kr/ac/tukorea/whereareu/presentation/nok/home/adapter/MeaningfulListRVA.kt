@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import kr.ac.tukorea.whereareu.databinding.ItemMeaningfulListBinding
+import kr.ac.tukorea.whereareu.domain.home.DateInfo
 import kr.ac.tukorea.whereareu.domain.home.MeaningfulPlaceListInfo
 import kr.ac.tukorea.whereareu.domain.home.MeaningfulPlaceInfo
 
@@ -39,18 +40,18 @@ class MeaningfulListRVA :
         fun bind(meaningfulPlace: MeaningfulPlaceInfo) {
             with(binding) {
                 model = meaningfulPlace
-                val listInfo =
-                    meaningfulPlace.meaningfulPlaceListInfo.mapIndexed { index, meaningfulPlaceListInfo ->
-                        val date = convertDayOfWeekInKorean(meaningfulPlaceListInfo.date)
-                        val time = "${meaningfulPlaceListInfo.time.substring(0 until 2)}시~${
-                            meaningfulPlaceListInfo.time.substring(2 until 4)
+                val dateInfoList = mutableListOf<DateInfo>()
+                val listGroupedByDayOfWeek = meaningfulPlace.meaningfulPlaceListInfo.groupBy { it.date }
+                listGroupedByDayOfWeek.keys.forEach { key ->
+                    val dayOfWeek = convertDayOfWeekInKorean(key)
+                    val times = listGroupedByDayOfWeek[key]?.map { timeInfo ->
+                        "${timeInfo.time.substring(0 until 2)}시~${
+                            timeInfo.time.substring(2 until 4)
                         }시"
-                        MeaningfulPlaceListInfo(
-
-                            date,
-                            time
-                        )
                     }
+                    dateInfoList.add(DateInfo(dayOfWeek, times!!))
+                }
+                Log.d("dateInfoList", dateInfoList.toString())
                 moreViewBtn.setOnClickListener {
                     meaningfulPlace.isExpanded = meaningfulPlace.isExpanded.not()
                     notifyItemChanged(bindingAdapterPosition)
