@@ -152,6 +152,7 @@ class NokHomeFragment : BaseFragment<kr.ac.tukorea.whereareu.databinding.Fragmen
             is NokHomeViewModel.PredictEvent.StopPredictEvent -> {
                 viewLifecycleOwner.lifecycleScope.launch {
                     countDownJob?.cancelAndJoin()
+                    countDownJob = null
                     circleOverlay.isVisible = false
                     binding.countDownT.text = "00:00"
                     lastLocationMarker.map = null
