@@ -31,7 +31,7 @@ class ModifyDementiaInfoFragment :
         binding.viewModel = viewModel
         repeatOnStarted {
             viewModel.updateOtherUserInfo.collect{otherUserInfo ->
-                otherUserInfo.let{
+                otherUserInfo?.let{
                     Log.d("updateDementiaInfo", otherUserInfo.message)
                 }
             }
@@ -83,7 +83,7 @@ class ModifyDementiaInfoFragment :
             }
             val key = dementiaSpf.getString("key", "")
 
-            viewModel.sendUpdateUserInfo(
+            viewModel.sendUpdateOtherUserInfo(
                 ModifyUserInfoRequest(
                     key ?: "",
                     1,

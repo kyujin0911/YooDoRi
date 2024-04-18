@@ -20,15 +20,14 @@ import kr.ac.tukorea.whereareu.util.extension.repeatOnStarted
 class NokSettingFragment : BaseFragment<FragmentNokSettingBinding>(R.layout.fragment_nok_setting) {
     private val viewModel: NokHomeViewModel by activityViewModels()
     private val settingViewModel: SettingViewModel by activityViewModels()
-    private val nokSpf = requireActivity().getSharedPreferences("User", MODE_PRIVATE)
-    private val otherSpf = requireActivity().getSharedPreferences("OtherUser", MODE_PRIVATE)
-    private val key: String = nokSpf.getString("key", "") as String
-    private val otherKey : String = otherSpf.getString("key", "") as String
 
     override fun initObserver() {
     }
 
     override fun initView() {
+        val nokSpf = requireActivity().getSharedPreferences("User", MODE_PRIVATE)
+        val otherSpf = requireActivity().getSharedPreferences("OtherUser", MODE_PRIVATE)
+
         binding.userNameTv.text = nokSpf.getString("name", "")
         binding.userPhoneNumberTv.text = nokSpf.getString("phone", "")
 
@@ -45,6 +44,12 @@ class NokSettingFragment : BaseFragment<FragmentNokSettingBinding>(R.layout.frag
 
     override fun onResume() {
         super.onResume()
+
+        val nokSpf = requireActivity().getSharedPreferences("User", MODE_PRIVATE)
+        val otherSpf = requireActivity().getSharedPreferences("OtherUser", MODE_PRIVATE)
+        val key: String = nokSpf.getString("key", "") as String
+        val otherKey : String = otherSpf.getString("key", "") as String
+
         Log.d("settingFragment", "onResume")
         settingViewModel.getUserInfo(key)
 
@@ -66,6 +71,11 @@ class NokSettingFragment : BaseFragment<FragmentNokSettingBinding>(R.layout.frag
                 nokSpf.edit{
                     putString("name", nokName)
                     putString("phone", nokPhone)
+                    commit()
+                }
+                otherSpf.edit{
+                    putString("name", dementiaName)
+                    putString("phone", dementiaPhone)
                     commit()
                 }
                 binding.userNameTv.text = nokName

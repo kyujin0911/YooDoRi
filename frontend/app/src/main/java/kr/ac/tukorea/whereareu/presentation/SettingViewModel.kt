@@ -49,7 +49,7 @@ class SettingViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             repository.sendModifyUserInfo(request).onSuccess {response ->
                 Log.d("UpdateUserInfo", "UserInfoChanged")
-                _updateOtherUserInfo.emit(response)
+                _updateUserInfo.emit(response)
                 _toastEvent.emit("정보가 변경되었습니다.")
             }
         }

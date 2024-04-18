@@ -7,22 +7,24 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.os.Build
 import android.util.Log
+import androidx.core.content.edit
+import androidx.fragment.app.activityViewModels
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.navigation.fragment.findNavController
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collect
 //import kotlinx.coroutines.flow.EmptyFlow.collect
 import kr.ac.tukorea.whereareu.R
 import kr.ac.tukorea.whereareu.data.model.home.LocationInfo
 import kr.ac.tukorea.whereareu.databinding.FragmentDementiaSettingBinding
+import kr.ac.tukorea.whereareu.presentation.SettingViewModel
 import kr.ac.tukorea.whereareu.presentation.base.BaseFragment
+import kr.ac.tukorea.whereareu.util.extension.repeatOnStarted
 import kr.ac.tukorea.whereareu.util.location.LocationService
 
 @AndroidEntryPoint
 class DementiaSettingFragment : BaseFragment<FragmentDementiaSettingBinding>(R.layout.fragment_dementia_setting) {
-    private val dementiaSpf = requireActivity().getSharedPreferences("User", MODE_PRIVATE)
-    private val nokSpf = requireActivity().getSharedPreferences("OtherUser", MODE_PRIVATE)
-    private val key: String = dementiaSpf.getString("key", "") as String
-    private val otherKey: String = nokSpf.getString("key", "") as String
+    private val settingViewModel: SettingViewModel by activityViewModels()
 
     private val mMessageReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
@@ -41,6 +43,8 @@ class DementiaSettingFragment : BaseFragment<FragmentDementiaSettingBinding>(R.l
         )
     }
     override fun initView() {
+        val dementiaSpf = requireActivity().getSharedPreferences("User", MODE_PRIVATE)
+        val nokSpf = requireActivity().getSharedPreferences("OtherUser", MODE_PRIVATE)
 
         binding.userNameTv.text = dementiaSpf.getString("name", "")
         binding.userPhoneNumberTv.text = dementiaSpf.getString("phone","")
@@ -70,7 +74,37 @@ class DementiaSettingFragment : BaseFragment<FragmentDementiaSettingBinding>(R.l
 
     override fun onResume() {
         super.onResume()
-        
+
+        val dementiaSpf = requireActivity().getSharedPreferences("User", MODE_PRIVATE)
+        val nokSpf = requireActivity().getSharedPreferences("OtherUser", MODE_PRIVATE)
+        val nokKey: String = nokSpf.getString("key", "") as String
+
+        settingViewModel.getUserInfo(nokKey)
+
+        repeatOnStarted {
+            settingViewModel.userInfo.collect{
+                val dementiaName = it.dementiaInfoRecord.dementiaName
+                val dementiaPhone = it.dementiaInfoRecord.dementiaPhoneNumber
+                val nokName = it.nokInfoRecord.nokName
+                val nokPhone = it.nokInfoRecord.nokPhoneNumber
+
+                dementiaSpf.edit {
+                    putString("name", dementiaName)
+                    putString("phone", dementiaPhone)
+                    commit()
+                }
+                nokSpf.edit{
+                    putString("name", nokName)
+                    putString("phone", nokPhone)
+                    commit()
+                }
+
+                binding.userNameTv.text = dementiaName
+                binding.userPhoneNumberTv.text = dementiaPhone
+                binding.otherNameTv.text = nokName
+                binding.otherPhoneTv.text = nokPhone
+            }
+        }
     }
 
     private fun onUpdateDementiaInfoLayoutClicked() {
