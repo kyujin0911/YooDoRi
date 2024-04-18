@@ -19,6 +19,11 @@ import kr.ac.tukorea.whereareu.util.location.LocationService
 
 @AndroidEntryPoint
 class DementiaSettingFragment : BaseFragment<FragmentDementiaSettingBinding>(R.layout.fragment_dementia_setting) {
+    private val dementiaSpf = requireActivity().getSharedPreferences("User", MODE_PRIVATE)
+    private val nokSpf = requireActivity().getSharedPreferences("OtherUser", MODE_PRIVATE)
+    private val key: String = dementiaSpf.getString("key", "") as String
+    private val otherKey: String = nokSpf.getString("key", "") as String
+
     private val mMessageReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             val info = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -36,16 +41,7 @@ class DementiaSettingFragment : BaseFragment<FragmentDementiaSettingBinding>(R.l
         )
     }
     override fun initView() {
-        val dementiaSpf = requireActivity().getSharedPreferences("User", MODE_PRIVATE)
-        val nokSpf = requireActivity().getSharedPreferences("OtherUser", MODE_PRIVATE)
-        binding.userNameTv.text = dementiaSpf.getString("name", "")
 
-//        val isDementia = dementiaSpf.getBoolean("isDementia", true)
-//        binding.userTypeTv.text = if (isDementia) "보호대상자" else "보호자"
-//        binding.otherNameTv.text = if (isDementia) "보호자 이름" else "보호대상자 이름"
-//        binding.otherPhoneTv.text = if (isDementia) "보호자 전화번호" else "보호대상자 전화번호"
-//        binding.userNameTv.text = dementiaSpf.getString("name", "")
-//        binding.userPhoneNumberTv.text = dementiaSpf.getString("phone", "")
         binding.userNameTv.text = dementiaSpf.getString("name", "")
         binding.userPhoneNumberTv.text = dementiaSpf.getString("phone","")
 
@@ -71,6 +67,12 @@ class DementiaSettingFragment : BaseFragment<FragmentDementiaSettingBinding>(R.l
             }
         }
     }
+
+    override fun onResume() {
+        super.onResume()
+        
+    }
+
     private fun onUpdateDementiaInfoLayoutClicked() {
         findNavController().navigate(R.id.action_dementiaSettingFragment_to_modifyDementiaInfoFragment)
     }

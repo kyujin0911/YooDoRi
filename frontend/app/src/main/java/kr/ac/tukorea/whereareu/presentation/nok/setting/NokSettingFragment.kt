@@ -2,6 +2,7 @@ package kr.ac.tukorea.whereareu.presentation.nok.setting
 
 import android.content.Context.MODE_PRIVATE
 import android.util.Log
+import androidx.core.content.edit
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
@@ -19,16 +20,17 @@ import kr.ac.tukorea.whereareu.util.extension.repeatOnStarted
 class NokSettingFragment : BaseFragment<FragmentNokSettingBinding>(R.layout.fragment_nok_setting) {
     private val viewModel: NokHomeViewModel by activityViewModels()
     private val settingViewModel: SettingViewModel by activityViewModels()
+    private val nokSpf = requireActivity().getSharedPreferences("User", MODE_PRIVATE)
+    private val otherSpf = requireActivity().getSharedPreferences("OtherUser", MODE_PRIVATE)
+    private val key: String = nokSpf.getString("key", "") as String
+    private val otherKey : String = otherSpf.getString("key", "") as String
 
     override fun initObserver() {
     }
 
     override fun initView() {
-        val spf = requireActivity().getSharedPreferences("User", MODE_PRIVATE)
-        val otherSpf = requireActivity().getSharedPreferences("OtherUser", MODE_PRIVATE)
-
-        binding.userNameTv.text = spf.getString("name", "")
-        binding.userPhoneNumberTv.text = spf.getString("phone", "")
+        binding.userNameTv.text = nokSpf.getString("name", "")
+        binding.userPhoneNumberTv.text = nokSpf.getString("phone", "")
 
         binding.otherNameTv.setText(otherSpf.getString("name", ""))
         binding.otherPhoneTv.setText((otherSpf.getString("phone", "")))
@@ -44,38 +46,34 @@ class NokSettingFragment : BaseFragment<FragmentNokSettingBinding>(R.layout.frag
     override fun onResume() {
         super.onResume()
         Log.d("settingFragment", "onResume")
-        val spf = requireActivity().getSharedPreferences("User", MODE_PRIVATE)
-        val otherSpf = requireActivity().getSharedPreferences("OtherUser", MODE_PRIVATE)
-        val key: String = spf.getString("key", null) as String
         settingViewModel.getUserInfo(key)
 
         repeatOnStarted {
             val updateRate = settingViewModel.settingTime.value.toInt() * 60
             Log.d("SettingFragment","$updateRate")
-            val key = otherSpf.getString("key", "")
             settingViewModel.sendUpdateTime(
-                UpdateRateRequest(key?:"", 0, updateRate))
+                UpdateRateRequest(otherKey?:"", 0, updateRate))
 
             settingViewModel.userInfo.collect {
                 Log.d("Nok_Setting_Fragment", "get User Info API")
-                Log.d("Nok_Setting_Fragment", "$key")
+                Log.d("Nok_Setting_Fragment", "$otherKey")
 
                 val nokName = it.nokInfoRecord.nokName
                 val nokPhone = it.nokInfoRecord.nokPhoneNumber
                 val dementiaName = it.dementiaInfoRecord.dementiaName
                 val dementiaPhone = it.dementiaInfoRecord.dementiaPhoneNumber
 
+                nokSpf.edit{
+                    putString("name", nokName)
+                    putString("phone", nokPhone)
+                    commit()
+                }
                 binding.userNameTv.text = nokName
                 binding.userPhoneNumberTv.text = nokPhone
                 binding.otherNameTv.text = dementiaName
                 binding.otherPhoneTv.text = dementiaPhone
             }
         }
-
-        binding.userNameTv.text = spf.getString("name", "")
-        binding.userPhoneNumberTv.text = spf.getString("phone", "")
-        binding.otherNameTv.text = otherSpf.getString("name", "")
-        binding.otherPhoneTv.text = otherSpf.getString("phone", "")
 
         binding.updateTimeTv.text = "${settingViewModel.settingTime.value}분"
     }
