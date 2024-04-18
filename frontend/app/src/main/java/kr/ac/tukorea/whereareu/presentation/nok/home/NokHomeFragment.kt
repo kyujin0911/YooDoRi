@@ -5,7 +5,6 @@ import android.content.ClipboardManager
 import android.content.Context.CLIPBOARD_SERVICE
 import android.content.Context.MODE_PRIVATE
 import android.content.pm.PackageManager
-import android.graphics.Color
 import android.graphics.PointF
 import android.os.Build
 import android.util.Log
@@ -13,7 +12,6 @@ import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.core.content.getSystemService
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -37,28 +35,26 @@ import kotlinx.coroutines.launch
 import kr.ac.tukorea.whereareu.R
 import kr.ac.tukorea.whereareu.data.model.nok.home.LocationInfoResponse
 import kr.ac.tukorea.whereareu.databinding.IconLocationOverlayLayoutBinding
-import kr.ac.tukorea.whereareu.domain.home.MeaningfulPlaceListInfo
 import kr.ac.tukorea.whereareu.domain.home.PoliceStationInfo
 import kr.ac.tukorea.whereareu.presentation.base.BaseFragment
-import kr.ac.tukorea.whereareu.presentation.nok.home.adapter.InnerMeaningfulListRVA
-import kr.ac.tukorea.whereareu.presentation.nok.home.adapter.MeaningfulListRVA
+import kr.ac.tukorea.whereareu.presentation.nok.home.adapter.PoliceStationRVA
+import kr.ac.tukorea.whereareu.presentation.nok.home.adapter.MeaningfulPlaceRVA
 import kr.ac.tukorea.whereareu.util.extension.repeatOnStarted
 import kr.ac.tukorea.whereareu.util.extension.showToastShort
-import kotlin.math.max
 import kotlin.math.roundToInt
 
 
 @AndroidEntryPoint
 class NokHomeFragment : BaseFragment<kr.ac.tukorea.whereareu.databinding.FragmentHomeBinding>(R.layout.fragment_home),
-    OnMapReadyCallback, MeaningfulListRVA.OuterRVAClickListener, InnerMeaningfulListRVA.InnerRVAClickListener {
+    OnMapReadyCallback, MeaningfulPlaceRVA.MeaningfulPlaceRVAClickListener, PoliceStationRVA.PoliceStationRVAClickListener {
     private val viewModel: NokHomeViewModel by activityViewModels()
     private val LOCATION_PERMISSION_REQUEST_CODE = 1001
     private var naverMap: NaverMap? = null
     private var dementiaName: String? = null
     private val lastLocationMarker = Marker()
     private val circleOverlay = CircleOverlay()
-    private val meaningfulListRVA by lazy {
-        MeaningfulListRVA()
+    private val meaningfulPlaceRVA by lazy {
+        MeaningfulPlaceRVA()
     }
     private lateinit var behavior: BottomSheetBehavior<ConstraintLayout>
     private var countDownJob: Job? = null
@@ -72,7 +68,7 @@ class NokHomeFragment : BaseFragment<kr.ac.tukorea.whereareu.databinding.Fragmen
 
     private fun handlePredictEvent(event: NokHomeViewModel.PredictEvent){
         when(event){
-            is NokHomeViewModel.PredictEvent.StartPredictEvent -> {
+            is NokHomeViewModel.PredictEvent.StartPredict -> {
                 viewModel.test()
                 //viewModel.getMeaningfulPlace()
                 //viewModel.searchWithKeyword("x", "y")
@@ -81,20 +77,21 @@ class NokHomeFragment : BaseFragment<kr.ac.tukorea.whereareu.databinding.Fragmen
                 showLoadingDialog(requireContext())
             }
 
-            is NokHomeViewModel.PredictEvent.DementiaLastInfoEvent -> {
+            is NokHomeViewModel.PredictEvent.DisplayDementiaLastInfo -> {
                 val coord = LatLng(event.dementiaLastInfo.lastLatitude, event.dementiaLastInfo.lastLongitude)
-                startCountDown(event.dementiaLastInfo.averageSpeed.div(3.6), coord)
+                startCountDownJob(event.dementiaLastInfo.averageSpeed.div(3.6), coord)
+
                 binding.averageMovementSpeedTv.text = String.format("%.2fkm", event.dementiaLastInfo.averageSpeed)
                 naverMap?.locationOverlay?.isVisible = false
-
             }
 
             is NokHomeViewModel.PredictEvent.MeaningFulPlaceEvent -> {
-                meaningfulListRVA.submitList(event.meaningfulPlaceForList)
+                meaningfulPlaceRVA.submitList(event.meaningfulPlaceForList)
 
                 event.meaningfulPlaceForList.forEach {meaningfulPlace ->
                     val latitude = meaningfulPlace.latitude
                     val longitude = meaningfulPlace.longitude
+
                     val marker = Marker()
                     with(marker){
                         position = LatLng(latitude, longitude)
@@ -114,7 +111,7 @@ class NokHomeFragment : BaseFragment<kr.ac.tukorea.whereareu.databinding.Fragmen
                 }
             }
 
-            is NokHomeViewModel.PredictEvent.SearchPoliceStationNearbyEvent -> {
+            is NokHomeViewModel.PredictEvent.SearchNearbyPoliceStation -> {
                 event.policeStationList.forEach {policeStation ->
                     val marker = Marker()
                     with(marker){
@@ -125,19 +122,21 @@ class NokHomeFragment : BaseFragment<kr.ac.tukorea.whereareu.databinding.Fragmen
                         map = naverMap
                     }
                 }
+
                 dismissLoadingDialog()
             }
 
-            is NokHomeViewModel.PredictEvent.LastLocationEvent -> {
-                Log.d("됐나", event.toString())
-                binding.lastLocationTv.text = event.lastAddress.address
-                val latitude = event.lastAddress.latitude
-                val longitude = event.lastAddress.longitude
+            is NokHomeViewModel.PredictEvent.DisplayDementiaLastLocation -> {
+                binding.lastLocationTv.text = event.lastLocation.address
+
+                val latitude = event.lastLocation.latitude
+                val longitude = event.lastLocation.longitude
                 naverMap?.moveCamera(CameraUpdate.scrollTo(LatLng(latitude, longitude)))
+
                 with(lastLocationMarker){
                     position = LatLng(latitude, longitude)
                     icon = MarkerIcons.RED
-                    captionText = event.lastAddress.address
+                    captionText = event.lastLocation.address
                     captionRequestedWidth = 400
                     map = naverMap
                 }
@@ -151,7 +150,7 @@ class NokHomeFragment : BaseFragment<kr.ac.tukorea.whereareu.databinding.Fragmen
                 infoWindow.open(lastLocationMarker)
             }
 
-            is NokHomeViewModel.PredictEvent.StopPredictEvent -> {
+            is NokHomeViewModel.PredictEvent.StopPredict -> {
                 viewLifecycleOwner.lifecycleScope.launch {
                     countDownJob?.cancelAndJoin()
                     countDownJob = null
@@ -240,14 +239,14 @@ class NokHomeFragment : BaseFragment<kr.ac.tukorea.whereareu.databinding.Fragmen
 
     private fun initMeaningfulListRVA(){
         binding.rv.apply {
-            adapter = meaningfulListRVA
+            adapter = meaningfulPlaceRVA
             addItemDecoration(
             DividerItemDecoration(
                 requireContext(),
                 LinearLayoutManager.VERTICAL
             )
         )}
-        meaningfulListRVA.setRVAClickListener(this, this)
+        meaningfulPlaceRVA.setRVAClickListener(this, this)
     }
 
     private fun initBottomSheet(){
@@ -289,7 +288,7 @@ class NokHomeFragment : BaseFragment<kr.ac.tukorea.whereareu.databinding.Fragmen
         })
     }
 
-    private fun startCountDown(averageSpeed: Double, coord: LatLng){
+    private fun startCountDownJob(averageSpeed: Double, coord: LatLng){
         with(circleOverlay){
             center = coord
             color = ContextCompat.getColor(requireContext(), R.color.purple)
@@ -297,6 +296,7 @@ class NokHomeFragment : BaseFragment<kr.ac.tukorea.whereareu.databinding.Fragmen
             outlineColor = ContextCompat.getColor(requireContext(), R.color.deep_purple)
             radius = 0.0
         }
+
         countDownJob = lifecycleScope.launch {
             var second = 0
             var minute = 0

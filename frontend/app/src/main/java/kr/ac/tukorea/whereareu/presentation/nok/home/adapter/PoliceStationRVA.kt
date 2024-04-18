@@ -9,8 +9,8 @@ import androidx.recyclerview.widget.RecyclerView
 import kr.ac.tukorea.whereareu.databinding.ItemInnerMeaningfulListBinding
 import kr.ac.tukorea.whereareu.domain.home.PoliceStationInfo
 
-class InnerMeaningfulListRVA() :
-    ListAdapter<PoliceStationInfo, InnerMeaningfulListRVA.InnerMeaningfulListViewHolder>(
+class PoliceStationRVA() :
+    ListAdapter<PoliceStationInfo, PoliceStationRVA.PoliceStationViewHolder>(
         object :
             DiffUtil.ItemCallback<PoliceStationInfo>() {
             override fun areItemsTheSame(
@@ -29,28 +29,27 @@ class InnerMeaningfulListRVA() :
 
         }) {
 
-        private var innerRVAClickListener: InnerRVAClickListener? = null
-    fun setInnerRVAClickListener(listener: InnerRVAClickListener){
-        innerRVAClickListener = listener
+        private var policeStationRVAClickListener: PoliceStationRVAClickListener? = null
+    fun setPoliceStationRVAClickListener(listener: PoliceStationRVAClickListener){
+        policeStationRVAClickListener = listener
     }
-    inner class InnerMeaningfulListViewHolder(private val binding: ItemInnerMeaningfulListBinding) :
+    inner class PoliceStationViewHolder(private val binding: ItemInnerMeaningfulListBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(policeStationInfo: PoliceStationInfo) {
             Log.d("police station info", policeStationInfo.toString())
             with(binding) {
                 model = policeStationInfo
-                /*dateTv.text = convertDayOfWeekInKorean(meaningfulPlaceListInfo.date)
-                timeTv.text = "${meaningfulPlaceListInfo.time.substring(0 until 2)}시~${
-                    meaningfulPlaceListInfo.time.substring(2 until 4)
-                }시"*/
+
                 mapViewBtn.setOnClickListener {
-                    innerRVAClickListener?.onClickMoreView(policeStationInfo)
+                    policeStationRVAClickListener?.onClickMoreView(policeStationInfo)
                 }
+
                 copyPhoneNumberBtn.setOnClickListener {
-                    innerRVAClickListener?.onClickCopyPhoneNumber(policeStationInfo.phone)
+                    policeStationRVAClickListener?.onClickCopyPhoneNumber(policeStationInfo.phone)
                 }
+
                 copyRoadAddressBtn.setOnClickListener {
-                    innerRVAClickListener?.onClickCopyAddress(policeStationInfo.roadAddressName)
+                    policeStationRVAClickListener?.onClickCopyAddress(policeStationInfo.roadAddressName)
                 }
             }
         }
@@ -59,8 +58,8 @@ class InnerMeaningfulListRVA() :
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
-    ): InnerMeaningfulListViewHolder {
-        return InnerMeaningfulListViewHolder(
+    ): PoliceStationViewHolder {
+        return PoliceStationViewHolder(
             ItemInnerMeaningfulListBinding.inflate(
                 LayoutInflater.from(parent.context),
                 parent,
@@ -69,24 +68,10 @@ class InnerMeaningfulListRVA() :
         )
     }
 
-    override fun onBindViewHolder(holder: InnerMeaningfulListViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: PoliceStationViewHolder, position: Int) {
         holder.bind(currentList[position])
     }
-
-    private fun convertDayOfWeekInKorean(day: String): String {
-        return when (day) {
-            "Monday" -> "월요일"
-            "Tuesday" -> "화요일"
-            "Wednesday" -> "수요일"
-            "Thursday" -> "목요일"
-            "Friday" -> "금요일"
-            "Saturday" -> "토요일"
-            "Sunday" -> "일요일"
-            else -> "알 수 없음"
-        }
-    }
-
-    interface InnerRVAClickListener {
+    interface PoliceStationRVAClickListener {
         fun onClickMoreView(policeStationInfo: PoliceStationInfo)
         fun onClickCopyPhoneNumber(phoneNumber: String)
         fun onClickCopyAddress(address: String)

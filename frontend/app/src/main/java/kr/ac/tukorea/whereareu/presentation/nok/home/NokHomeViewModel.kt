@@ -5,7 +5,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -18,9 +17,9 @@ import kr.ac.tukorea.whereareu.data.model.nok.home.LocationInfoResponse
 import kr.ac.tukorea.whereareu.data.repository.kakao.KakaoRepositoryImpl
 import kr.ac.tukorea.whereareu.data.repository.naver.NaverRepositoryImpl
 import kr.ac.tukorea.whereareu.data.repository.nok.home.NokHomeRepositoryImpl
-import kr.ac.tukorea.whereareu.domain.home.LastAddress
+import kr.ac.tukorea.whereareu.domain.home.LastLocation
 import kr.ac.tukorea.whereareu.domain.home.MeaningfulPlace
-import kr.ac.tukorea.whereareu.domain.home.MeaningfulPlaceListInfo
+import kr.ac.tukorea.whereareu.domain.home.TimeInfo
 import kr.ac.tukorea.whereareu.domain.home.MeaningfulPlaceInfo
 import kr.ac.tukorea.whereareu.domain.home.PoliceStationInfo
 import kr.ac.tukorea.whereareu.util.network.onError
@@ -55,20 +54,20 @@ class NokHomeViewModel @Inject constructor(
     val predictEvent = _predictEvent.asSharedFlow()
 
     sealed class PredictEvent {
-        data class StartPredictEvent(val isPredicted: Boolean) : PredictEvent()
+        data class StartPredict(val isPredicted: Boolean) : PredictEvent()
         data class MeaningFulPlaceEvent(
             val meaningfulPlaceForList: List<MeaningfulPlaceInfo>
         ) : PredictEvent()
 
-        data class DementiaLastInfoEvent(val dementiaLastInfo: DementiaLastInfoResponse) :
+        data class DisplayDementiaLastInfo(val dementiaLastInfo: DementiaLastInfoResponse) :
             PredictEvent()
 
-        data class LastLocationEvent(val lastAddress: LastAddress) : PredictEvent()
+        data class DisplayDementiaLastLocation(val lastLocation: LastLocation) : PredictEvent()
 
-        data class SearchPoliceStationNearbyEvent(val policeStationList: List<PoliceStationInfo>) :
+        data class SearchNearbyPoliceStation(val policeStationList: List<PoliceStationInfo>) :
             PredictEvent()
 
-        data class StopPredictEvent(val isPredicted: Boolean) : PredictEvent()
+        data class StopPredict(val isPredicted: Boolean) : PredictEvent()
     }
 
     private fun eventPredict(event: PredictEvent) {
@@ -85,9 +84,9 @@ class NokHomeViewModel @Inject constructor(
         viewModelScope.launch {
             _isPredicted.emit(isPredicted)
             if (isPredicted) {
-                eventPredict(PredictEvent.StartPredictEvent(true))
+                eventPredict(PredictEvent.StartPredict(true))
             } else {
-                eventPredict(PredictEvent.StopPredictEvent(false))
+                eventPredict(PredictEvent.StopPredict(false))
             }
         }
     }
@@ -119,10 +118,9 @@ class NokHomeViewModel @Inject constructor(
             val time = measureTimeMillis {
                 val dementiaLastInfo = async { getDementiaLastInfo() }
                 Log.d("lastInfo", dementiaLastInfo.toString())
-                val meaningfulPlaceList = async { getMeaningfulPlace() }.await()
+                val meaningfulPlaceList = async { getMeaningfulPlaces() }.await()
 
-
-                val addressList = makeMeaningfulPlaceAddressList(meaningfulPlaceList)
+                val addressList = getAddressList(meaningfulPlaceList)
 
                 val zippedMeaningfulPlaceList =
                     zipMeaningfulPlaceListWithAddress(meaningfulPlaceList, addressList)
@@ -141,18 +139,17 @@ class NokHomeViewModel @Inject constructor(
             .onSuccess { response ->
                 result = response
                 Log.d("last info", response.toString())
-                eventPredict(PredictEvent.DementiaLastInfoEvent(response))
+                eventPredict(PredictEvent.DisplayDementiaLastInfo(response))
                 val address = viewModelScope.async {
                     getAddress(
                         response.lastLongitude.toString(),
                         response.lastLatitude.toString(),
-                        true
                     )
                 }.await()
 
                 eventPredict(
-                    PredictEvent.LastLocationEvent(
-                        LastAddress(response.lastLatitude, response.lastLongitude, address)
+                    PredictEvent.DisplayDementiaLastLocation(
+                        LastLocation(response.lastLatitude, response.lastLongitude, address)
                     )
                 )
             }.onException {
@@ -161,10 +158,11 @@ class NokHomeViewModel @Inject constructor(
         return result
     }
 
-    private suspend fun getAddress(x: String, y: String, isLastAddress: Boolean): String {
+    private suspend fun getAddress(x: String, y: String): String {
         var address = ""
+
         kakaoRepository.getAddress(x, y).onSuccess {
-            address = convertResponseToAddress(it)
+            address = convertDocumentToAddress(it)
             Log.d("kakao api", it.toString())
         }.onError {
             Log.d("kakao api error", it.toString())
@@ -173,55 +171,34 @@ class NokHomeViewModel @Inject constructor(
         }.onException {
             Log.d("kakao api exception", it.toString())
         }
-
         return address
     }
 
-    private suspend fun getMeaningfulPlace(): List<kr.ac.tukorea.whereareu.data.model.nok.home.MeaningfulPlace> {
+    private suspend fun getMeaningfulPlaces(): List<kr.ac.tukorea.whereareu.data.model.nok.home.MeaningfulPlace> {
         var result = emptyList<kr.ac.tukorea.whereareu.data.model.nok.home.MeaningfulPlace>()
+
         nokHomeRepository.getMeaningfulPlace("253050").onSuccess { response ->
             Log.d("getMeaningfulPlace", response.toString())
             result = response.meaningfulLocations
-            /*response.meaningfulLocations.forEach {
-                val result = viewModelScope.async {
-                    getAddress(it.longitude.toString(), it.latitude.toString(), false)
-                }.await()
-                addressList.add(result)
-            }*/
-
-            /*Log.d("meaningful address", addressList.toString())
-
-            val meaningfulPlaces = response.meaningfulLocations.zip(addressList)
-                .map {
-                    MeaningfulPlace(
-                        address = it.second,
-                        date = it.first.dayOfTheWeek,
-                        time = it.first.time,
-                        latitude = it.first.latitude,
-                        longitude = it.first.longitude
-                    )
-                }
-            val meaningfulPlaceInfo = preprocessingList(meaningfulPlaces)
-            eventPredict(PredictEvent.MeaningFulPlaceEvent(meaningfulPlaceInfo))
-            getPoliceStationInfoNearby(meaningfulPlaceInfo)
-            getDementiaLastInfo()*/
         }.onException {
             Log.d("error", it.toString())
         }
         return result
     }
 
-    private suspend fun makeMeaningfulPlaceAddressList(list: List<kr.ac.tukorea.whereareu.data.model.nok.home.MeaningfulPlace>): List<String> {
+    private suspend fun getAddressList(list: List<kr.ac.tukorea.whereareu.data.model.nok.home.MeaningfulPlace>): List<String> {
         val addressList = mutableListOf<String>()
+
         list.forEach {
             val result = viewModelScope.async {
-                getAddress(it.longitude.toString(), it.latitude.toString(), false)
+                getAddress(it.longitude.toString(), it.latitude.toString())
             }.await()
             addressList.add(result)
         }
         return addressList
     }
 
+    // Geocoding으로 얻은 주소와 의미장소 매핑
     private fun zipMeaningfulPlaceListWithAddress(
         meaningfulPlaceList: List<kr.ac.tukorea.whereareu.data.model.nok.home.MeaningfulPlace>,
         addressList: List<String>
@@ -230,7 +207,7 @@ class NokHomeViewModel @Inject constructor(
             .map {
                 MeaningfulPlace(
                     address = it.second,
-                    date = it.first.dayOfTheWeek,
+                    dayOfWeek = it.first.dayOfTheWeek,
                     time = it.first.time,
                     latitude = it.first.latitude,
                     longitude = it.first.longitude
@@ -242,18 +219,21 @@ class NokHomeViewModel @Inject constructor(
     private suspend fun getPoliceStationInfoNearby(list: MutableList<MeaningfulPlaceInfo>): List<MeaningfulPlaceInfo> {
         list.forEach { meaningfulPlaceInfo ->
             val result =
-                viewModelScope.async { searchPoliceStationNearby(meaningfulPlaceInfo) }.await()
+                viewModelScope.async { searchNearbyPoliceStation(meaningfulPlaceInfo) }.await()
             meaningfulPlaceInfo.policeStationInfo = result
         }
+
         Log.d("after police list", list.toString())
         eventPredict(PredictEvent.MeaningFulPlaceEvent(list))
         return list
     }
 
-    private suspend fun searchPoliceStationNearby(meaningfulPlaceInfo: MeaningfulPlaceInfo): List<PoliceStationInfo> {
+    private suspend fun searchNearbyPoliceStation(meaningfulPlaceInfo: MeaningfulPlaceInfo): List<PoliceStationInfo> {
         var result = emptyList<PoliceStationInfo>()
+
         val x = meaningfulPlaceInfo.longitude.toString()
         val y = meaningfulPlaceInfo.latitude.toString()
+
         kakaoRepository.searchWithKeyword(x, y).onSuccess {
             Log.d("kakao keyword", it.toString())
             val policeList = it.documents.filter { document ->
@@ -268,32 +248,37 @@ class NokHomeViewModel @Inject constructor(
                     document.y
                 )
             }.take(3)
+
             result = policeList
-            eventPredict(PredictEvent.SearchPoliceStationNearbyEvent(policeList))
+            eventPredict(PredictEvent.SearchNearbyPoliceStation(policeList))
         }
         return result
     }
 
-    private fun convertResponseToAddress(response: AddressResponse): String {
-        val documents = response.documents[0]
-        return if (documents.roadAddress == null)
-            documents.address.addressName
-        else {
-            documents.roadAddress.addressName + " " + documents.roadAddress.buildingName
-        }
+    // Geocoding response로 받은 document 주소로 변환
+    private fun convertDocumentToAddress(response: AddressResponse): String {
+        val document = response.documents[0]
+        return document.roadAddress.addressName + " " + document.roadAddress.buildingName
     }
 
+    // MeaningfulPlaceRVA에 데이터를 넣기 위한 전처리 작업
     private fun preprocessingList(list: List<MeaningfulPlace>): MutableList<MeaningfulPlaceInfo> {
+
+        // 주소를 기준으로 의미장소 리스트 그룹화
         val groupList = list.groupBy { it.address }
         val meaningfulPlaceInfoList = mutableListOf<MeaningfulPlaceInfo>()
-        groupList.keys.forEach { key ->
-            val list = groupList[key]
-            val meaningfulPlaceListInfo =
-                list?.map { MeaningfulPlaceListInfo(date = it.date, time = it.time) }
+
+        // 동일한 주소에 대한 시간 정보 리스트 생성
+        groupList.keys.forEach { address ->
+            val list = groupList[address]
+            val timeInfoList =
+                list?.map { TimeInfo(it.dayOfWeek, it.time) }
                     ?.sortedBy { it.time }
+
+            // 의미장소 리스트에 방문한 시간정보 추가
             meaningfulPlaceInfoList.add(
                 MeaningfulPlaceInfo(
-                    key, meaningfulPlaceListInfo?.distinct()!!,
+                    address, timeInfoList?.distinct()!!,
                     list.first().latitude, list.first().longitude
                 )
             )

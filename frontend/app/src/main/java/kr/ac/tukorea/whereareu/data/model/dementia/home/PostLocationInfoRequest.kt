@@ -1,10 +1,8 @@
 package kr.ac.tukorea.whereareu.data.model.dementia.home
 
-import com.google.gson.annotations.SerializedName
 import java.io.Serializable
-import java.util.Date
 
-data class LocationInfo(
+data class PostLocationInfoRequest(
     val dementiaKey: String,
     val latitude: Double,
     val longitude: Double,

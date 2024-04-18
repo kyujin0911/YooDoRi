@@ -1,6 +1,6 @@
 package kr.ac.tukorea.whereareu.domain.home
 
-data class MeaningfulPlaceListInfo(
-    val date: String,
+data class TimeInfo(
+    val dayOfWeek: String,
     val time: String,
 )

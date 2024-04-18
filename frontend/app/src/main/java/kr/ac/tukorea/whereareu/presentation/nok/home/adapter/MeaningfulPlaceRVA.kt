@@ -7,12 +7,12 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import kr.ac.tukorea.whereareu.databinding.ItemMeaningfulListBinding
-import kr.ac.tukorea.whereareu.domain.home.DateInfo
-import kr.ac.tukorea.whereareu.domain.home.MeaningfulPlaceListInfo
+import kr.ac.tukorea.whereareu.domain.home.GroupedTimeInfo
 import kr.ac.tukorea.whereareu.domain.home.MeaningfulPlaceInfo
+import kr.ac.tukorea.whereareu.domain.home.TimeInfo
 
-class MeaningfulListRVA :
-    ListAdapter<MeaningfulPlaceInfo, MeaningfulListRVA.MeaningfulListViewHolder>
+class MeaningfulPlaceRVA :
+    ListAdapter<MeaningfulPlaceInfo, MeaningfulPlaceRVA.MeaningfulPlaceViewHolder>
         (object : DiffUtil.ItemCallback<MeaningfulPlaceInfo>() {
         override fun areItemsTheSame(
             oldItem: MeaningfulPlaceInfo,
@@ -29,29 +29,22 @@ class MeaningfulListRVA :
         }
 
     }) {
-    private var innerRVAClickListener: InnerMeaningfulListRVA.InnerRVAClickListener? = null
-    private var outerRVAClickListener: OuterRVAClickListener? = null
-    fun setRVAClickListener(outerListener: OuterRVAClickListener , innerListener: InnerMeaningfulListRVA.InnerRVAClickListener){
-        innerRVAClickListener = innerListener
-        outerRVAClickListener = outerListener
+    private var policeStationRVAClickListener: PoliceStationRVA.PoliceStationRVAClickListener? = null
+    private var meaningfulPlaceRVAClickListener: MeaningfulPlaceRVAClickListener? = null
+
+    //RVA 클릭 리스너 초기화
+    fun setRVAClickListener(outerListener: MeaningfulPlaceRVAClickListener, innerListener: PoliceStationRVA.PoliceStationRVAClickListener){
+        policeStationRVAClickListener = innerListener
+        meaningfulPlaceRVAClickListener = outerListener
     }
-    inner class MeaningfulListViewHolder(private val binding: ItemMeaningfulListBinding) :
+
+    inner class MeaningfulPlaceViewHolder(private val binding: ItemMeaningfulListBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(meaningfulPlace: MeaningfulPlaceInfo) {
             with(binding) {
                 model = meaningfulPlace
-                val dateInfoList = mutableListOf<DateInfo>()
-                val listGroupedByDayOfWeek = meaningfulPlace.meaningfulPlaceListInfo.groupBy { it.date }
-                listGroupedByDayOfWeek.keys.forEach { key ->
-                    val dayOfWeek = convertDayOfWeekInKorean(key)
-                    val times = listGroupedByDayOfWeek[key]?.map { timeInfo ->
-                        "${timeInfo.time.substring(0 until 2)}시~${
-                            timeInfo.time.substring(2 until 4)
-                        }시"
-                    }
-                    dateInfoList.add(DateInfo(dayOfWeek, times!!))
-                }
-                Log.d("dateInfoList", dateInfoList.toString())
+                val groupedTimeInfoList = groupTimeInfoList(meaningfulPlace.timeInfo.groupBy { it.dayOfWeek })
+
                 moreViewBtn.setOnClickListener {
                     meaningfulPlace.isExpanded = meaningfulPlace.isExpanded.not()
                     notifyItemChanged(bindingAdapterPosition)
@@ -59,26 +52,44 @@ class MeaningfulListRVA :
                 }
 
                 mapViewBtn.setOnClickListener {
-                    outerRVAClickListener?.onClickMapView(meaningfulPlace.latitude, meaningfulPlace.longitude)
+                    meaningfulPlaceRVAClickListener?.onClickMapView(meaningfulPlace.latitude, meaningfulPlace.longitude)
                 }
 
-                val adapter = InnerMeaningfulListRVA()
-                adapter.setInnerRVAClickListener(innerRVAClickListener!!)
+                val adapter = PoliceStationRVA()
+                adapter.setPoliceStationRVAClickListener(policeStationRVAClickListener!!)
                 innerRv.adapter = adapter
                 adapter.submitList(meaningfulPlace.policeStationInfo)
             }
         }
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MeaningfulListViewHolder {
-        return MeaningfulListViewHolder(
+    // 요일을 기준으로 시간 정보 그룹화
+    private fun groupTimeInfoList(timeInfoMap: Map<String, List<TimeInfo>>): List<GroupedTimeInfo>{
+        val groupedTimeInfoList = mutableListOf<GroupedTimeInfo>()
+
+        val dayOfWeeks = timeInfoMap.keys
+        dayOfWeeks.forEach { dayOfWeek ->
+            val dayOfWeekInKorean = convertDayOfWeekInKorean(dayOfWeek)
+            val timeList = timeInfoMap[dayOfWeek]?.map { timeInfo ->
+                "${timeInfo.time.substring(0 until 2)}시~${
+                    timeInfo.time.substring(2 until 4)
+                }시"
+            }
+            groupedTimeInfoList.add(GroupedTimeInfo(dayOfWeekInKorean, timeList!!))
+        }
+
+        return groupedTimeInfoList
+    }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MeaningfulPlaceViewHolder {
+        return MeaningfulPlaceViewHolder(
             ItemMeaningfulListBinding.inflate(
                 LayoutInflater.from(parent.context), parent, false
             )
         )
     }
 
-    override fun onBindViewHolder(holder: MeaningfulListViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: MeaningfulPlaceViewHolder, position: Int) {
         holder.bind(currentList[position])
     }
 
@@ -95,7 +106,7 @@ class MeaningfulListRVA :
         }
     }
 
-    interface OuterRVAClickListener{
+    interface MeaningfulPlaceRVAClickListener{
         fun onClickMapView(latitude: Double, longitude: Double)
     }
 }

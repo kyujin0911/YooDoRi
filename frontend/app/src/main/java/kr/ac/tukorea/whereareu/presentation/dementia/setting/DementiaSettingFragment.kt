@@ -11,7 +11,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import dagger.hilt.android.AndroidEntryPoint
 //import kotlinx.coroutines.flow.EmptyFlow.collect
 import kr.ac.tukorea.whereareu.R
-import kr.ac.tukorea.whereareu.data.model.dementia.home.LocationInfo
+import kr.ac.tukorea.whereareu.data.model.dementia.home.PostLocationInfoRequest
 import kr.ac.tukorea.whereareu.databinding.FragmentDementiaSettingBinding
 import kr.ac.tukorea.whereareu.presentation.base.BaseFragment
 import kr.ac.tukorea.whereareu.util.location.LocationService
@@ -21,9 +21,9 @@ class DementiaSettingFragment : BaseFragment<FragmentDementiaSettingBinding>(R.l
     private val mMessageReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             val info = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                intent?.getSerializableExtra("postInfo", LocationInfo::class.java)
+                intent?.getSerializableExtra("postInfo", PostLocationInfoRequest::class.java)
             } else {
-                intent?.getSerializableExtra("postInfo") as LocationInfo
+                intent?.getSerializableExtra("postInfo") as PostLocationInfoRequest
             }
             Log.d("info", info.toString())
             binding.postInfoTv.text = "서버에 보낸 정보: " + info.toString()
