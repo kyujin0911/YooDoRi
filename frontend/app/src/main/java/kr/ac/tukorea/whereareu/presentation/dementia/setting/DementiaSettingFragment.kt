@@ -8,6 +8,7 @@ import android.content.IntentFilter
 import android.os.Build
 import android.util.Log
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import androidx.navigation.fragment.findNavController
 import dagger.hilt.android.AndroidEntryPoint
 //import kotlinx.coroutines.flow.EmptyFlow.collect
 import kr.ac.tukorea.whereareu.R
@@ -35,16 +36,25 @@ class DementiaSettingFragment : BaseFragment<FragmentDementiaSettingBinding>(R.l
         )
     }
     override fun initView() {
-        val spf = requireActivity().getSharedPreferences("User", MODE_PRIVATE)
-        val otherSpf = requireActivity().getSharedPreferences("OtherUser", MODE_PRIVATE)
-        binding.userNameTv.text = spf.getString("name", "")
+        val dementiaSpf = requireActivity().getSharedPreferences("User", MODE_PRIVATE)
+        val nokSpf = requireActivity().getSharedPreferences("OtherUser", MODE_PRIVATE)
+        binding.userNameTv.text = dementiaSpf.getString("name", "")
 
-        val isDementia = spf.getBoolean("isDementia", true)
-        binding.userTypeTv.text = if (isDementia) "보호대상자" else "보호자"
-        binding.otherNameTv.text = if (isDementia) "보호자 이름" else "보호대상자 이름"
-        binding.otherPhoneTv.text = if (isDementia) "보호자 전화번호" else "보호대상자 전화번호"
-        binding.userNameTv.text = spf.getString("name", "")
-        binding.userPhoneNumberTv.text = spf.getString("phone", "")
+//        val isDementia = dementiaSpf.getBoolean("isDementia", true)
+//        binding.userTypeTv.text = if (isDementia) "보호대상자" else "보호자"
+//        binding.otherNameTv.text = if (isDementia) "보호자 이름" else "보호대상자 이름"
+//        binding.otherPhoneTv.text = if (isDementia) "보호자 전화번호" else "보호대상자 전화번호"
+//        binding.userNameTv.text = dementiaSpf.getString("name", "")
+//        binding.userPhoneNumberTv.text = dementiaSpf.getString("phone", "")
+        binding.userNameTv.text = dementiaSpf.getString("name", "")
+        binding.userPhoneNumberTv.text = dementiaSpf.getString("phone","")
+
+        binding.otherNameTv.text = nokSpf.getString("name", "")
+        binding.otherPhoneTv.text = nokSpf.getString("phone", "")
+
+        binding.updateUserInfoLayout.setOnClickListener {
+            onUpdateDementiaInfoLayoutClicked()
+        }
 
 
         binding.startBtn.setOnClickListener {
@@ -60,5 +70,8 @@ class DementiaSettingFragment : BaseFragment<FragmentDementiaSettingBinding>(R.l
                 requireActivity().startService(this)
             }
         }
+    }
+    private fun onUpdateDementiaInfoLayoutClicked() {
+        findNavController().navigate(R.id.action_dementiaSettingFragment_to_modifyDementiaInfoFragment)
     }
 }

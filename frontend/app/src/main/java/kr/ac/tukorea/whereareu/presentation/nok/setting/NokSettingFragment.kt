@@ -80,11 +80,11 @@ class NokSettingFragment : BaseFragment<FragmentNokSettingBinding>(R.layout.frag
         binding.updateTimeTv.text = "${settingViewModel.settingTime.value}분"
     }
 
-    fun onUpdateUserInfoLayoutClicked() {
+    private fun onUpdateUserInfoLayoutClicked() {
         findNavController().navigate(R.id.action_nokSettingFragment_to_modifyUserInfoFragment)
     }
 
-    fun onUpdateSettingTime() {
+    private fun onUpdateSettingTime() {
         findNavController().navigate(R.id.action_nokSettingFragment_to_settingUpdateTimeFragment)
     }
 }
