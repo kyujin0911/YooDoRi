@@ -57,9 +57,10 @@ class SettingViewModel @Inject constructor(
 
     fun sendUpdateOtherUserInfo(request: ModifyUserInfoRequest) {
         viewModelScope.launch(Dispatchers.IO) {
-            repository.sendModifyUserInfo(request).onSuccess {
+            repository.sendModifyUserInfo(request).onSuccess {response ->
                 Log.d("UpdateOtherUserInfo", "OtherUserInfoChanged")
-                _updateOtherUserInfo.emit(StateResponse(it.message, it.status))
+                _updateOtherUserInfo.emit(response)
+                _toastEvent.emit("정보가 변경되었습니다.")
             }
         }
     }

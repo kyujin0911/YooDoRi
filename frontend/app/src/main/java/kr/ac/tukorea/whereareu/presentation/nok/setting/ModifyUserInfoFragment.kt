@@ -81,13 +81,12 @@ class ModifyUserInfoFragment :
                 putString("phone", binding.userPhoneEt.text.toString())
                 apply()
             }
-            val spf = requireActivity().getSharedPreferences("User", MODE_PRIVATE)
-            val key = spf.getString("key", "")
+            val key = nokSpf.getString("key", "")
 
             viewModel.sendUpdateUserInfo(
                 ModifyUserInfoRequest(
-                    0,
                     key ?: "",
+                    0,
                     binding.userNameEt.text.toString().trim()!!,
                     binding.userPhoneEt.text.toString().trim()!!
                 )
