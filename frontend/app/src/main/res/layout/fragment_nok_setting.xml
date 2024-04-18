@@ -13,8 +13,8 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="24dp"
-        android:background="@color/white">
+        android:background="@color/white"
+        android:padding="24dp">
 
         <androidx.cardview.widget.CardView
             android:id="@+id/nok_cardView"
@@ -35,37 +35,33 @@
                 android:src="@drawable/ic_nok" />
         </androidx.cardview.widget.CardView>
 
-        <androidx.constraintlayout.widget.Guideline
-            android:id="@+id/guideline_half_parent_end"
+        <LinearLayout
+            android:id="@+id/user_info_layout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            app:layout_constraintGuide_percent="0.5" />
-
-        <TextView
-            android:id="@+id/user_type_tv"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="5dp"
-            android:text="보호자"
-            android:textAppearance="@style/TextAppearance.App.24sp.ExtraBold"
-            app:layout_constraintBaseline_toBaselineOf="@+id/user_name_tv"
-            app:layout_constraintEnd_toStartOf="@+id/guideline_half_parent_end"
-            app:layout_constraintTop_toTopOf="parent"
-
-            />
-
-        <TextView
-            android:id="@+id/user_name_tv"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="5dp"
             android:layout_marginTop="20dp"
-            android:text=""
-            android:textAppearance="@style/TextAppearance.App.24sp.Bold"
-            app:layout_constraintStart_toEndOf="@+id/guideline_half_parent_end"
-            app:layout_constraintTop_toBottomOf="@+id/nok_cardView"
-            tools:text="박승호" />
+            android:orientation="horizontal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/nok_cardView">
+
+            <TextView
+                android:id="@+id/user_type_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="보호자"
+                android:textAppearance="@style/TextAppearance.App.24sp.ExtraBold" />
+
+            <TextView
+                android:id="@+id/user_name_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:text=""
+                android:textAppearance="@style/TextAppearance.App.24sp.Bold"
+                tools:text="박승호" />
+
+        </LinearLayout>
 
         <TextView
             android:id="@+id/user_phone_number_tv"
@@ -74,9 +70,9 @@
             android:layout_marginTop="10dp"
             android:text=""
             android:textAppearance="@style/TextAppearance.App.16sp.SemiBold"
-            app:layout_constraintEnd_toEndOf="@+id/guideline_half_parent_end"
-            app:layout_constraintStart_toStartOf="@+id/guideline_half_parent_end"
-            app:layout_constraintTop_toBottomOf="@+id/user_name_tv"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/user_info_layout"
             tools:text="000-0000-0000" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -143,8 +139,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:clickable="true"
-                android:focusable="true"
                 android:elevation="8dp"
+                android:focusable="true"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
 
@@ -189,25 +185,24 @@
                 app:layout_constraintTop_toBottomOf="@+id/update_user_info_layout" />
 
             <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/update_time_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/update_time_layout"
-                app:layout_constraintTop_toBottomOf="@+id/update_user_info_v"
                 android:layout_marginTop="15dp"
-                app:layout_constraintStart_toStartOf="parent"
                 android:clickable="true"
                 android:focusable="true"
-                >
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/update_user_info_v">
+
                 <TextView
+                    android:id="@+id/update_time_title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
                     android:text="위치 정보 업데이트 주기"
                     android:textAppearance="@style/TextAppearance.App.14sp.ExtraBold"
-                    app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    android:layout_marginTop="10dp"
-                    android:id="@+id/update_time_title"
-                    />
+                    app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
                     android:id="@+id/update_time_tv"

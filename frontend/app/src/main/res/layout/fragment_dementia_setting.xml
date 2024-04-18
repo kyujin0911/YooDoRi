@@ -40,31 +40,30 @@
             </androidx.cardview.widget.CardView>
 
             <LinearLayout
+                android:id="@+id/user_info_layout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:id="@+id/user_info_layout"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/dementia_cardView"
                 android:layout_marginTop="20dp"
-                >
+                android:orientation="horizontal"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/dementia_cardView">
+
                 <TextView
+                    android:id="@+id/user_type_tv"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="보호대상자"
-                    android:id="@+id/user_type_tv"
-                    android:textAppearance="@style/TextAppearance.App.24sp.ExtraBold"/>
+                    android:textAppearance="@style/TextAppearance.App.24sp.ExtraBold" />
 
                 <TextView
-                    android:layout_width="wrap_content"
                     android:id="@+id/user_name_tv"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text=""
-                    tools:text="황순권"
-                    android:textAppearance="@style/TextAppearance.App.24sp.Bold"
                     android:layout_marginStart="10dp"
-                    />
+                    android:text=""
+                    android:textAppearance="@style/TextAppearance.App.24sp.Bold"
+                    tools:text="황순권" />
 
             </LinearLayout>
 
