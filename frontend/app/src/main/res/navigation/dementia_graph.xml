@@ -17,7 +17,7 @@
         </fragment>
         <fragment
             android:id="@+id/modifyDementiaInfoFragment"
-            android:name="kr.ac.tukorea.whereareu.presentation.nok.setting.ModifyDementiaInfoFragment"
+            android:name="kr.ac.tukorea.whereareu.presentation.nok.setting.ModifyUserInfoFragment"
             android:label="ModifyDementiaInfoFragment">
             <action
                 android:id="@+id/action_modifyDementiaInfoFragment_to_dementiaSettingFragment"
