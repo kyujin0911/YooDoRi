@@ -6,7 +6,7 @@
 
     <navigation
         android:id="@+id/settingTab"
-        android:label="SettingFragment">
+        app:startDestination="@id/dementiaSettingFragment">
         <fragment
             android:id="@+id/dementiaSettingFragment"
             android:name="kr.ac.tukorea.whereareu.presentation.dementia.setting.DementiaSettingFragment"
