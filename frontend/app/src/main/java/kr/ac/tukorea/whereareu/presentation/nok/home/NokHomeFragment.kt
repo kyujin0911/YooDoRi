@@ -73,7 +73,8 @@ class NokHomeFragment : BaseFragment<kr.ac.tukorea.whereareu.databinding.Fragmen
     private fun handlePredictEvent(event: NokHomeViewModel.PredictEvent){
         when(event){
             is NokHomeViewModel.PredictEvent.StartPredictEvent -> {
-                viewModel.getMeaningfulPlace()
+                viewModel.test()
+                //viewModel.getMeaningfulPlace()
                 //viewModel.searchWithKeyword("x", "y")
                 initBottomSheet()
                 initMeaningfulListRVA()
@@ -81,7 +82,6 @@ class NokHomeFragment : BaseFragment<kr.ac.tukorea.whereareu.databinding.Fragmen
             }
 
             is NokHomeViewModel.PredictEvent.DementiaLastInfoEvent -> {
-                dismissLoadingDialog()
                 val coord = LatLng(event.dementiaLastInfo.lastLatitude, event.dementiaLastInfo.lastLongitude)
                 startCountDown(event.dementiaLastInfo.averageSpeed.div(3.6), coord)
                 binding.averageMovementSpeedTv.text = String.format("%.2fkm", event.dementiaLastInfo.averageSpeed)
@@ -125,9 +125,11 @@ class NokHomeFragment : BaseFragment<kr.ac.tukorea.whereareu.databinding.Fragmen
                         map = naverMap
                     }
                 }
+                dismissLoadingDialog()
             }
 
             is NokHomeViewModel.PredictEvent.LastLocationEvent -> {
+                Log.d("됐나", event.toString())
                 binding.lastLocationTv.text = event.lastAddress.address
                 val latitude = event.lastAddress.latitude
                 val longitude = event.lastAddress.longitude

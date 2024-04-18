@@ -4,4 +4,6 @@ data class DementiaLastInfoResponse(
     val averageSpeed: Float,
     val lastLatitude: Double,
     val lastLongitude: Double,
-)
+){
+    constructor(): this(0f, 0.0, 0.0)
+}
