@@ -2,7 +2,7 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/dementia_graph"
-    app:startDestination="@id/dementiaHomeFragment">
+    app:startDestination="@id/settingTab">
 
     <navigation
         android:id="@+id/settingTab"

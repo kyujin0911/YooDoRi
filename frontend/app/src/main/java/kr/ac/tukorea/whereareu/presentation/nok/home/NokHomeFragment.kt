@@ -2,6 +2,7 @@ package kr.ac.tukorea.whereareu.presentation.nok.home
 
 import android.content.Context
 import android.content.Context.MODE_PRIVATE
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.util.Log
 import androidx.core.app.ActivityCompat
@@ -17,6 +18,7 @@ import kr.ac.tukorea.whereareu.R
 import kr.ac.tukorea.whereareu.data.model.home.GetLocationInfoResponse
 import kr.ac.tukorea.whereareu.databinding.FragmentHomeBinding
 import kr.ac.tukorea.whereareu.presentation.base.BaseFragment
+import kr.ac.tukorea.whereareu.presentation.login.SplashActivity
 import kr.ac.tukorea.whereareu.util.extension.repeatOnStarted
 
 @AndroidEntryPoint
