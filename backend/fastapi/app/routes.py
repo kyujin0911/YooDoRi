@@ -27,6 +27,7 @@ sched = BackgroundScheduler(timezone="Asia/Seoul")
 정의되지 않은 오류 = 500
 '''
 
+
 # Define API endpoint
 @router.post("/noks",status_code=status.HTTP_201_CREATED, responses = {201 : {"model" : ReceiveNokInfoResponse, "description" : "유저 등록 성공" },404: {"model": ErrorResponse, "description": "보호 대상자 키 조회 실패"}}, description="보호자가 보호 대상자의 정보를 등록")
 async def receive_nok_info(request: ReceiveNokInfoRequest):
@@ -201,7 +202,7 @@ async def receive_user_login(request: loginRequest):
     finally:
         session.close()
 
-@router.post("/locations/dementias", responses = {200 : {"model" : CommonResponse, "description" : "위치 정보 전송 성공" }, 404: {"model": ErrorResponse, "description": "보호 대상자 키 조회 실패"}}, description="보호 대상자의 위치 정보를 전송 | isRingstoneOn : 0(무음), 1(진동), 2(벨소리)")
+@router.post("/locations/dementias", responses = {200 : {"model" : TempResponse, "description" : "위치 정보 전송 성공" }, 404: {"model": ErrorResponse, "description": "보호 대상자 키 조회 실패"}}, description="보호 대상자의 위치 정보를 전송 | isRingstoneOn : 0(무음), 1(진동), 2(벨소리)")
 async def receive_location_info(request: ReceiveLocationRequest):
 
     try:
@@ -251,7 +252,8 @@ async def receive_location_info(request: ReceiveLocationRequest):
 
             response = {
                 'status': 'success',
-                'message': 'Location data received'
+                'message': 'Location data received',
+                'result' : int(prediction[0])
             }
 
         else:
