@@ -155,3 +155,8 @@ class LocHistoryResponse(BaseModel):
 class ErrorResponse(BaseModel):
     status: str = Field("error")
     message: str = Field("에러 내용")
+
+class TempResponse(BaseModel):
+    status: str = Field("success")
+    message: str = Field("메~시~지~")
+    result : int = Field("1", description="1(정지), 2(도보), 3(차량), 4(지하철)")
