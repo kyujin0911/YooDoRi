@@ -117,9 +117,6 @@ dependencies {
 
     //로딩화면
     implementation ("com.airbnb.android:lottie:5.0.2")
-
-    //kakao map
-    implementation ("com.kakao.maps.open:android:2.9.5")
 }
 kapt {
     correctErrorTypes = true

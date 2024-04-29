@@ -6,7 +6,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import kr.ac.tukorea.whereareu.databinding.ItemInnerMeaningfulListBinding
+import kr.ac.tukorea.whereareu.databinding.ItemPoliceStationBinding
 import kr.ac.tukorea.whereareu.domain.home.PoliceStationInfo
 
 class PoliceStationRVA() :
@@ -33,7 +33,7 @@ class PoliceStationRVA() :
     fun setPoliceStationRVAClickListener(listener: PoliceStationRVAClickListener){
         policeStationRVAClickListener = listener
     }
-    inner class PoliceStationViewHolder(private val binding: ItemInnerMeaningfulListBinding) :
+    inner class PoliceStationViewHolder(private val binding: ItemPoliceStationBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(policeStationInfo: PoliceStationInfo) {
             Log.d("police station info", policeStationInfo.toString())
@@ -60,7 +60,7 @@ class PoliceStationRVA() :
         viewType: Int
     ): PoliceStationViewHolder {
         return PoliceStationViewHolder(
-            ItemInnerMeaningfulListBinding.inflate(
+            ItemPoliceStationBinding.inflate(
                 LayoutInflater.from(parent.context),
                 parent,
                 false

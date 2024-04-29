@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import kr.ac.tukorea.whereareu.databinding.ItemMeaningfulPlaceBinding
 import kr.ac.tukorea.whereareu.domain.home.GroupedTimeInfo
 import kr.ac.tukorea.whereareu.domain.home.MeaningfulPlaceInfo
-import kr.ac.tukorea.whereareu.domain.home.TimeInfo
+import kr.ac.tukorea.whereareu.data.model.nok.home.TimeInfo
 
 class MeaningfulPlaceRVA :
     ListAdapter<MeaningfulPlaceInfo, MeaningfulPlaceRVA.MeaningfulPlaceViewHolder>
@@ -43,7 +43,7 @@ class MeaningfulPlaceRVA :
         fun bind(meaningfulPlace: MeaningfulPlaceInfo) {
             with(binding) {
                 model = meaningfulPlace
-                val groupedTimeInfoList = groupTimeInfoList(meaningfulPlace.timeInfo.groupBy { it.dayOfWeek })
+
 
                 moreViewBtn.setOnClickListener {
                     meaningfulPlace.isExpanded = meaningfulPlace.isExpanded.not()
@@ -57,7 +57,7 @@ class MeaningfulPlaceRVA :
 
                 val adapter = PoliceStationRVA()
                 adapter.setPoliceStationRVAClickListener(policeStationRVAClickListener!!)
-                innerRv.adapter = adapter
+                innerPoliceRv.adapter = adapter
                 adapter.submitList(meaningfulPlace.policeStationInfo)
             }
         }

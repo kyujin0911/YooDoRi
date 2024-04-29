@@ -9,7 +9,6 @@ import android.os.Build
 import androidx.annotation.StringRes
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
-import com.kakao.vectormap.KakaoMapSdk
 import kr.ac.tukorea.whereareu.util.network.NetworkConnectionChecker
 import dagger.hilt.android.HiltAndroidApp
 
@@ -29,8 +28,6 @@ class WhereAreUApplication: Application(), DefaultLifecycleObserver {
             val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             notificationManager.createNotificationChannel(channel)
         }
-
-        KakaoMapSdk.init(this, getString(R.string.kakao_native_key))
     }
 
     override fun onStop(owner: LifecycleOwner) {

@@ -78,14 +78,14 @@ class NokHomeFragment : BaseFragment<kr.ac.tukorea.whereareu.databinding.Fragmen
             }
 
             is NokHomeViewModel.PredictEvent.DisplayDementiaLastInfo -> {
-                val coord = LatLng(event.dementiaLastInfo.lastLatitude, event.dementiaLastInfo.lastLongitude)
-                startCountDownJob(event.dementiaLastInfo.averageSpeed.div(3.6), coord)
+                startCountDownJob(event.averageSpeed, event.coord)
 
-                binding.averageMovementSpeedTv.text = String.format("%.2fkm", event.dementiaLastInfo.averageSpeed)
+                binding.averageMovementSpeedTv.text = String.format("%.2fkm", event.averageSpeed)
                 naverMap?.locationOverlay?.isVisible = false
             }
 
             is NokHomeViewModel.PredictEvent.MeaningFulPlaceEvent -> {
+                Log.d("뭐고", event.meaningfulPlaceForList.toString())
                 meaningfulPlaceRVA.submitList(event.meaningfulPlaceForList)
 
                 event.meaningfulPlaceForList.forEach {meaningfulPlace ->
@@ -115,9 +115,9 @@ class NokHomeFragment : BaseFragment<kr.ac.tukorea.whereareu.databinding.Fragmen
                 event.policeStationList.forEach {policeStation ->
                     val marker = Marker()
                     with(marker){
-                        position = LatLng(policeStation.y.toDouble(), policeStation.x.toDouble())
+                        position = LatLng(policeStation.latitude.toDouble(), policeStation.longitude.toDouble())
                         icon = MarkerIcons.BLUE
-                        captionText = policeStation.placeName
+                        captionText = policeStation.policeName
                         captionRequestedWidth = 400
                         map = naverMap
                     }
@@ -385,7 +385,7 @@ class NokHomeFragment : BaseFragment<kr.ac.tukorea.whereareu.databinding.Fragmen
     // inner RVA 클릭 이벤트
     override fun onClickMoreView(policeStationInfo: PoliceStationInfo) {
         behavior.state = BottomSheetBehavior.STATE_COLLAPSED
-        val coord = LatLng(policeStationInfo.y.toDouble(), policeStationInfo.x.toDouble())
+        val coord = LatLng(policeStationInfo.latitude.toDouble(), policeStationInfo.longitude.toDouble())
         naverMap?.moveCamera(CameraUpdate.scrollTo(coord))
     }
 
