@@ -16,21 +16,13 @@
         android:paddingVertical="12dp">
 
         <TextView
-            android:id="@+id/index_tv"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="@style/TextAppearance.App.14sp.ExtraBold"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <TextView
             android:id="@+id/name_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@{model.policeName}"
-            android:textAppearance="@style/TextAppearance.App.14sp.ExtraBold"
-            app:layout_constraintBaseline_toBaselineOf="@id/index_tv"
-            app:layout_constraintStart_toEndOf="@id/index_tv"
+            android:textAppearance="@style/TextAppearance.App.14sp.Bold"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
             tools:text="경찰서 이름" />
 
         <TextView
@@ -50,7 +42,7 @@
             android:layout_marginTop="8dp"
             android:layout_marginStart="8dp"
             android:text="@{model.phone}"
-            android:textAppearance="@style/TextAppearance.App.14sp.SemiBold"
+            android:textAppearance="@style/TextAppearance.App.14sp.Regular"
             app:layout_constraintTop_toBottomOf="@id/road_address_tv"
             app:layout_constraintStart_toEndOf="@id/phone_number_title_tv"
             tools:text="010-0000-0000" />
@@ -62,7 +54,7 @@
             android:layout_marginStart="8dp"
             android:text='@{String.valueOf("예상 위치 기준 거리 ") + model.distance + String.valueOf("m")}'
             android:textColor="@color/gray80"
-            android:textAppearance="@style/TextAppearance.App.14sp.SemiBold"
+            android:textAppearance="@style/TextAppearance.App.14sp.Regular"
             app:layout_constraintBaseline_toBaselineOf="@id/name_tv"
             app:layout_constraintStart_toEndOf="@id/name_tv"
             tools:text="의미장소 기준 거리: " />
@@ -95,7 +87,7 @@
             android:text='@{model.roadAddressName}'
             android:layout_marginTop="8dp"
             android:layout_marginStart="8dp"
-            android:textAppearance="@style/TextAppearance.App.14sp.SemiBold"
+            android:textAppearance="@style/TextAppearance.App.14sp.Regular"
             app:layout_constraintTop_toBottomOf="@id/name_tv"
             app:layout_constraintStart_toEndOf="@id/road_address_title_tv"
             tools:text="경기도 무슨시 무슨동" />

@@ -44,7 +44,6 @@ class MeaningfulPlaceRVA :
             with(binding) {
                 model = meaningfulPlace
 
-
                 moreViewBtn.setOnClickListener {
                     meaningfulPlace.isExpanded = meaningfulPlace.isExpanded.not()
                     notifyItemChanged(bindingAdapterPosition)
@@ -55,10 +54,17 @@ class MeaningfulPlaceRVA :
                     meaningfulPlaceRVAClickListener?.onClickMapView(meaningfulPlace.latitude, meaningfulPlace.longitude)
                 }
 
-                val adapter = PoliceStationRVA()
-                adapter.setPoliceStationRVAClickListener(policeStationRVAClickListener!!)
-                innerPoliceRv.adapter = adapter
-                adapter.submitList(meaningfulPlace.policeStationInfo)
+                val policeStationRVA = PoliceStationRVA()
+                policeStationRVA.setPoliceStationRVAClickListener(policeStationRVAClickListener!!)
+                policeRv.adapter = policeStationRVA
+                policeStationRVA.submitList(meaningfulPlace.policeStationInfo)
+
+                val timeInfoRVA = TimeInfoRVA()
+                timeInfoRv.adapter = timeInfoRVA
+                val timeInfo = meaningfulPlace.timeInfo.map {info ->
+                    TimeInfo(convertDayOfWeekInKorean(info.dayOfTheWeek), convertTimeInKorean(info.time))
+                }
+                timeInfoRVA.submitList(timeInfo)
             }
         }
     }
@@ -104,6 +110,12 @@ class MeaningfulPlaceRVA :
             "Sunday" -> "일요일"
             else -> "알 수 없음"
         }
+    }
+
+    private fun convertTimeInKorean(time: String): String{
+        return "${time.substring(0 until 2)}시~${
+            time.substring(2 until 4)
+        }시"
     }
 
     interface MeaningfulPlaceRVAClickListener{
