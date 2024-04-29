@@ -59,13 +59,17 @@ class meaningful_location_info(Base):
     latitude = Column(Double)
     longitude = Column(Double)
     address = Column(String)
+    key = Column(String)
 
-class geo_result(Base):
-    __tablename__ = 'geo_result'
+class police_info(Base):
+    __tablename__ = 'police_info'
 
     num = Column(Integer, index=True, primary_key=True)
-    dementia_key = Column(String)
-    day_of_the_week = Column(String)
+    key = Column(String)
+    policeName = Column(String)
+    policeAddress = Column(String)
+    roadAddress = Column(String)
+    policePhoneNumber = Column(String)
+    distance = Column(Integer)
     latitude = Column(Double)
     longitude = Column(Double)
-    address = Column(String)
