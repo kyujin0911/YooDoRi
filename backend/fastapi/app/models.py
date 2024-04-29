@@ -6,8 +6,8 @@ Base = declarative_base()
 class nok_info(Base):
     __tablename__ = 'nok_info'
 
-    num = Column(Integer, index=True)
-    nok_key = Column(String, primary_key=True)
+    num = Column(Integer, index=True, primary_key=True)
+    nok_key = Column(String)
     nok_name = Column(String)
     nok_phonenumber = Column(String)
     update_rate = Column(String)
@@ -16,8 +16,8 @@ class nok_info(Base):
 class dementia_info(Base):
     __tablename__ = 'dementia_info'
 
-    num = Column(Integer, index = True)
-    dementia_key = Column(String, primary_key=True)
+    num = Column(Integer, index = True, primary_key=True)
+    dementia_key = Column(String)
     dementia_name = Column(String)
     dementia_phonenumber = Column(String)
     update_rate = Column(String)
@@ -58,3 +58,14 @@ class meaningful_location_info(Base):
     time = Column(String)
     latitude = Column(Double)
     longitude = Column(Double)
+    address = Column(String)
+
+class geo_result(Base):
+    __tablename__ = 'geo_result'
+
+    num = Column(Integer, index=True, primary_key=True)
+    dementia_key = Column(String)
+    day_of_the_week = Column(String)
+    latitude = Column(Double)
+    longitude = Column(Double)
+    address = Column(String)
