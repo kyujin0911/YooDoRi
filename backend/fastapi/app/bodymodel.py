@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-from typing import List
+from typing import List, Dict
 
 # Define request and response models
 class CommonResponse(BaseModel):
@@ -126,14 +126,30 @@ class GetUserInfoResponse(BaseModel):
     message: str = Field("메~시~지~")
     result: UserRecord
 
+class timeInfoList(BaseModel):
+    day_of_the_week : str = Field(examples=["월요일"])
+    time : str = Field(examples=["0408"])
+
+class PoliceStationInfoList(BaseModel):
+    policeName : str = Field(examples=["서울동작경찰서"])
+    policePhoneNumber : str = Field(examples=["02-1234-5678"])
+    policeAddress : str = Field(examples=["서울 동작구 노량진동 72-35"])
+    roadAddress : str = Field(examples=["서울 동작구 노량진로 148"])
+    phone : str = Field(examples=["02-1234-5678"])
+    distance : int = Field(examples=["2005"], description="미터 단위")
+    latitude : float = Field(examples=["37.123456"])
+    longitude : float = Field(examples=["127.123456"])
+
+
 class MeaningfulLoc(BaseModel):
-    dayOfTheWeek : str = Field(examples=["Monday"])
-    time : str = Field(examples=["0408"], description="04 ~ 08")
-    latitude : float
-    longitude : float
+    address : str = Field(examples=["서울특별시 강남구 니가 사는 그 집"])
+    timeInfo : Dict[str, timeInfoList]
+    latitude : float = Field(examples=["37.123456"])
+    longitude : float = Field(examples=["127.123456"])
+    PoliceStationInfo : Dict[str, PoliceStationInfoList]
 
 class MeaningfulLocRecord(BaseModel):
-    meaningfulLocations : List[MeaningfulLoc] = Field(..., examples=[{"dayOfTheWeek": "Monday", "time": "0408", "latitude": 37.123456, "longitude": 127.123456}])
+    meaningfulLocations : MeaningfulLoc
 
 class MeaningfulLocResponse(BaseModel):
     status: str = Field("success")
