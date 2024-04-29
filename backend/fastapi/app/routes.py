@@ -5,6 +5,8 @@ from .update_user_status import UpdateUserStatus
 from .LocationAnalyzer import LocationAnalyzer
 from .database import Database
 from .bodymodel import *
+from .config import Config
+from PyKakao import Local
 from apscheduler.schedulers.background import BackgroundScheduler
 
 
@@ -15,6 +17,7 @@ router = APIRouter()
 db = Database()
 session = next(db.get_session())
 sched = BackgroundScheduler(timezone="Asia/Seoul")
+kakao = Local(service_key=Config.service_key)
 
 '''
 성공 = 200
@@ -439,6 +442,14 @@ async def caculate_dementia_average_walking_speed(requset: AverageWalkingSpeedRe
                 sum_speed += float(location_info.current_speed)
             
             average_speed = round(sum_speed / len(location_info_list), 2)
+            
+            geo = kakao.geo_coord2address(location_info_list[0].longitude, location_info_list[0].latitude)
+
+            if not geo['documents'][0]['road_address'] == None:
+                xy2addr = geo['documents'][0]['road_address']['address_name'] + " " + geo['documents'][0]['road_address']['building_name']
+                    
+            else:
+                xy2addr = geo['documents'][0]['address']['address_name']
 
             response = {
                 'status': 'success',
@@ -446,7 +457,8 @@ async def caculate_dementia_average_walking_speed(requset: AverageWalkingSpeedRe
                 'result': {
                     'averageSpeed': average_speed,
                     'lastLatitude': location_info_list[0].latitude,
-                    'lastLongitude': location_info_list[0].longitude
+                    'lastLongitude': location_info_list[0].longitude,
+                    'addressName' : xy2addr
                 }
             }
             print(f"[INFO] Dementia average walking speed calculated for {location_info_list[0].dementia_key}")
@@ -585,6 +597,37 @@ async def send_location_history(date : str, dementiaKey : int):
     
     finally:
         session.close()
+
+
+#스케줄러 비활성화
+'''@sched.scheduled_job('cron', hour=18, minute=55, id = 'geocoding')
+def kakao_api():
+    try:
+
+        # db 에서 의미장소 정보 가져오기
+        meaningful_location_list = session.query(models.meaningful_location_info).all()
+
+        # dementia_key 별로 분류
+        dementia_keys = set([location.dementia_key for location in meaningful_location_list])
+
+        # dementia_key별 의미장소 위경도 값으로 주소 변환 후 의미 장소 테이블에 address란에 추가
+        for key in dementia_keys:
+            key_location_list = [location for location in meaningful_location_list if location.dementia_key == key]
+            for location in key_location_list:
+                geo = kakao.geo_coord2address(location.longitude, location.latitude)
+                if not geo['documents'][0]['road_address'] == None:
+                    xy2addr = geo['documents'][0]['road_address']['address_name'] + " " + geo['documents'][0]['road_address']['building_name']
+                    
+                else:
+                    xy2addr = geo['documents'][0]['address']['address_name']
+                
+                location.address = xy2addr
+
+
+        session.commit()
+    
+    finally:
+        session.close()'''
 
 
 #스케줄러 비활성화
