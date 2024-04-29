@@ -114,6 +114,7 @@ class AverageAndLastLoc(BaseModel):
     averageSpeed : float = Field(examples=["2.0"])
     lastLatitude : float = Field(examples=["37.123456"])
     lastLongitude : float = Field(examples=["127.123456"])
+    addressName : str = Field(examples=["서울특별시 강남구 니가 사는 그 집"])
 
 class AverageWalkingSpeedResponse(BaseModel):
     status: str = Field("success")
