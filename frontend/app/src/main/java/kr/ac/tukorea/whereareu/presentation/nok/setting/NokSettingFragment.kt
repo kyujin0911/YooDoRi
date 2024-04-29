@@ -17,8 +17,8 @@ class NokSettingFragment: BaseFragment<FragmentNokSettingBinding>(R.layout.fragm
     override fun initObserver() {
     }
     override fun initView() {
-        val spf = requireActivity().getSharedPreferences("User", Context.MODE_PRIVATE)
-        val otherSpf = requireActivity().getSharedPreferences("OtherUser", Context.MODE_PRIVATE)
+        val spf = requireActivity().getSharedPreferences("User", MODE_PRIVATE)
+        val otherSpf = requireActivity().getSharedPreferences("OtherUser", MODE_PRIVATE)
         val upTime = requireActivity().getSharedPreferences("UpdateTime", MODE_PRIVATE)
         binding.userNameTv.text = spf.getString("name", "")
 
