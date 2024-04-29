@@ -65,6 +65,39 @@
             app:layout_constraintStart_toEndOf="@id/road_address_title_tv"
             tools:text="경기도 무슨시 무슨동" />
 
+        <TextView
+            android:id="@+id/phone_number_title_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="전화번호"
+            android:textAppearance="@style/TextAppearance.App.14sp.Regular"
+            app:layout_constraintTop_toBottomOf="@id/road_address_tv"
+            app:layout_constraintStart_toStartOf="@id/name_tv" />
+
+        <TextView
+            android:id="@+id/phone_number_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginStart="8dp"
+            android:text='@{model.phone}'
+            android:textAppearance="@style/TextAppearance.App.14sp.SemiBold"
+            app:layout_constraintTop_toBottomOf="@id/road_address_tv"
+            app:layout_constraintStart_toEndOf="@id/phone_number_title_tv"
+            tools:text="010-0000-0000" />
+
+        <TextView
+            android:id="@+id/copy_phone_number_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/blue"
+            android:text="복사"
+            android:layout_marginStart="8dp"
+            android:textAppearance="@style/TextAppearance.App.14sp.SemiBold"
+            app:layout_constraintBaseline_toBaselineOf="@id/phone_number_title_tv"
+            app:layout_constraintStart_toEndOf="@id/phone_number_tv"/>
+
         <LinearLayout
             android:id="@+id/map_view_btn"
             android:layout_width="wrap_content"
@@ -72,8 +105,7 @@
             android:orientation="horizontal"
             android:gravity="center"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/road_address_tv">
-
+            app:layout_constraintTop_toBottomOf="@id/phone_number_tv">
             <TextView
                 android:id="@+id/map_view_tv"
                 android:layout_width="wrap_content"
@@ -90,6 +122,8 @@
                 android:scaleX="-1"
                 app:tint="@color/gray60"/>
         </LinearLayout>
+
+
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
