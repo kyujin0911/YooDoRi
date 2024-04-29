@@ -535,39 +535,22 @@ async def send_meaningful_location_info(dementiaKey: int):
                 day_of_week = location.day_of_the_week
                 time = location.time
 
-                police = kakao.search_keyword("경찰서", x = location.longitude, y = location.latitude, sort = 'distance')
-
-                police_list = []
-                if police['meta']['total_count'] == 0:
-                    print("주변에 경찰서가 없습니다.")
-                elif police['meta']['total_count'] > 1:
-                    for pol in police['documents']:
-                        if not pol['phone'] == '':
-                            new_police = {
-                                'policeName': pol['place_name'],
-                                'policeAddress': pol['address_name'],
-                                'roadAddressName': pol['road_address_name'],
-                                'phone': pol['phone'],
-                                'distance': pol['distance'],
-                                'latitude' : pol['y'],
-                                'longitude': pol['x']
-                            }
-                            police_list.append(new_police)
-                        else:
-                            pass
-                            
-                else:
-                    police_list.append(police['documents'][0]['place_name'])
-                    police_list.append(police['documents'][0]['address_name'])
-
                 # 주소가 이미 존재하는지 확인하고, 없으면 새로운 딕셔너리 엔트리 생성
                 if address not in meaningful_places_dict:
+                    # 해당 주소의 경찰서 정보 가져오기(distance 순으로 정렬)
+                    police_list = session.query(models.police_info).filter_by(key = location.key).order_by(models.police_info.distance).limit(3).all()
+
+                    #police_list의 num 속성 제거
+                    for police in police_list:
+                        del police.num
+                        del police.key
+
                     meaningful_places_dict[address] = {
                         'address': address,
                         'timeInfo': [],
                         'latitude': location.latitude,
                         'longitude': location.longitude,
-                        'PoliceStationInfo' : police_list[-3:]
+                        'policeStationInfo' : police_list
                     }
 
                 # 해당 주소의 시간 정보 리스트에 현재 시간 정보가 없으면 추가
@@ -598,7 +581,6 @@ async def send_meaningful_location_info(dementiaKey: int):
 
     finally:
         session.close()
-
 
 @router.get("/locations/history", responses = {200 : {"model" : LocHistoryResponse, "description" : "위치 이력 전송 성공" }, 404: {"model": ErrorResponse, "description": "위치 이력 없음"}}, description="보호 대상자의 위치 이력 정보 전달(쿼리 스트링) | date : YYYY-MM-DD")
 async def send_location_history(date : str, dementiaKey : int):
@@ -640,18 +622,27 @@ async def send_location_history(date : str, dementiaKey : int):
         session.close()
 
 
+
+
+
+
+
 #스케줄러 비활성화
-'''@sched.scheduled_job('cron', hour=18, minute=55, id = 'geocoding')
+'''@sched.scheduled_job('cron', hour=0, minute=56, id = 'geocoding')
 def kakao_api():
     try:
-
+        print(f"[INFO] Start geocoding")
         # db 에서 의미장소 정보 가져오기
         meaningful_location_list = session.query(models.meaningful_location_info).all()
 
         # dementia_key 별로 분류
         dementia_keys = set([location.dementia_key for location in meaningful_location_list])
 
+        rng = RandomNumberGenerator()
+
         # dementia_key별 의미장소 위경도 값으로 주소 변환 후 의미 장소 테이블에 address란에 추가
+        address_list = []
+        key_dict = {}
         for key in dementia_keys:
             key_location_list = [location for location in meaningful_location_list if location.dementia_key == key]
             for location in key_location_list:
@@ -664,12 +655,43 @@ def kakao_api():
                 
                 location.address = xy2addr
 
+                if xy2addr not in address_list:
+                    address_list.append(xy2addr)
+                    new_key = rng.generate_unique_random_number(100000, 999999)
+                    key_dict[xy2addr] = str(new_key)
+                    location.key = str(new_key)
+                    police = kakao.search_keyword("경찰서", x = location.longitude, y = location.latitude, sort = 'distance')
+                    index = 0
+                    
+                    police_list = []
+                    if police['meta']['total_count'] == 0:
+                        print(f"[INFO] No police station found near {xy2addr}")
+                    else:
+                        for pol in police['documents']:
+                            if not pol['phone'] == '':
+                                new_police = models.police_info(
+                                    policeName =  pol['place_name'],
+                                    policeAddress = pol['address_name'],
+                                    roadAddress = pol['road_address_name'],
+                                    policePhoneNumber = pol['phone'],
+                                    distance = pol['distance'],
+                                    latitude = pol['y'],
+                                    longitude = pol['x'],
+                                    key = str(new_key)
+                                )
+                                police_list.append(new_police)
+                            else:
+                                pass
+                    
+                    session.add_all(police_list)
+                else:
+                    location.key = key_dict[xy2addr]
 
         session.commit()
+        print(f"[INFO] Geocoding completed")
     
     finally:
         session.close()'''
-
 
 #스케줄러 비활성화
 """@sched.scheduled_job('cron', hour=0, minute=0, id = 'analyze_location_data')
