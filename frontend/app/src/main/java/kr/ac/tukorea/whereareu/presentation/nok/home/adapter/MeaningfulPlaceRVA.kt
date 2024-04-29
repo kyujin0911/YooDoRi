@@ -6,7 +6,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import kr.ac.tukorea.whereareu.databinding.ItemMeaningfulListBinding
+import kr.ac.tukorea.whereareu.databinding.ItemMeaningfulPlaceBinding
 import kr.ac.tukorea.whereareu.domain.home.GroupedTimeInfo
 import kr.ac.tukorea.whereareu.domain.home.MeaningfulPlaceInfo
 import kr.ac.tukorea.whereareu.domain.home.TimeInfo
@@ -38,7 +38,7 @@ class MeaningfulPlaceRVA :
         meaningfulPlaceRVAClickListener = outerListener
     }
 
-    inner class MeaningfulPlaceViewHolder(private val binding: ItemMeaningfulListBinding) :
+    inner class MeaningfulPlaceViewHolder(private val binding: ItemMeaningfulPlaceBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(meaningfulPlace: MeaningfulPlaceInfo) {
             with(binding) {
@@ -83,7 +83,7 @@ class MeaningfulPlaceRVA :
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MeaningfulPlaceViewHolder {
         return MeaningfulPlaceViewHolder(
-            ItemMeaningfulListBinding.inflate(
+            ItemMeaningfulPlaceBinding.inflate(
                 LayoutInflater.from(parent.context), parent, false
             )
         )

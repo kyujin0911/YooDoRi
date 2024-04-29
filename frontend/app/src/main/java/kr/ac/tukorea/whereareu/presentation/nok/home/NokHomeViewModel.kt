@@ -258,7 +258,11 @@ class NokHomeViewModel @Inject constructor(
     // Geocoding response로 받은 document 주소로 변환
     private fun convertDocumentToAddress(response: AddressResponse): String {
         val document = response.documents[0]
-        return document.roadAddress.addressName + " " + document.roadAddress.buildingName
+        return if(document.roadAddress.addressName == null){
+            document.address.addressName
+        } else {
+            document.roadAddress.addressName + " " + document.roadAddress.buildingName
+        }
     }
 
     // MeaningfulPlaceRVA에 데이터를 넣기 위한 전처리 작업
