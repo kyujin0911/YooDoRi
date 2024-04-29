@@ -422,7 +422,7 @@ async def modify_updatint_rate(request: ModifyUserUpdateRateRequest):
     finally:
         session.close()
 
-@router.post("/dementias/averageWalkingSpeed", responses = {200 : {"model" : AverageWalkingSpeedResponse, "description" : "평균 걷기 속도 계산 성공" }, 404: {"model": ErrorResponse, "description": "보호 대상자 키 조회 실패 or 위치 정보 부족"}}, description="보호 대상자의 평균 걷기 속도를 계산")
+@router.post("/dementias/averageWalkingSpeed", responses = {200 : {"model" : AverageWalkingSpeedResponse, "description" : "평균 걷기 속도 계산 성공" }, 404: {"model": ErrorResponse, "description": "보호 대상자 키 조회 실패 or 위치 정보 부족"}}, description="보호 대상자의 평균 걷기 속도를 계산 및 마지막 정보 전송")
 async def caculate_dementia_average_walking_speed(requset: AverageWalkingSpeedRequest):
 
     _dementia_key = requset.dementiaKey
@@ -519,28 +519,69 @@ async def get_user_info(nokKey : int):
     finally:
         session.close()
 
-@router.get("/locatoins/meaningful", responses = {200 : {"model" : MeaningfulLocResponse, "description" : "의미장소 전송 성공" }, 404: {"model": ErrorResponse, "description": "의미 장소 없음"}}, description="보호 대상자의 의미 장소 정보 전달(쿼리 스트링)")
-async def send_meaningful_location_info(dementiaKey : int):
+@router.get("/locatoins/meaningful", responses = {200 : {"model" : MeaningfulLocResponse, "description" : "의미장소 전송 성공" }, 404: {"model": ErrorResponse, "description": "의미 장소 없음"}}, description="보호 대상자의 의미 장소 정보 및 주변 경찰서 정보 전달(쿼리 스트링)")
+async def send_meaningful_location_info(dementiaKey: int):
     _key = dementiaKey
 
     try:
-        meaningful_location_list = session.query(models.meaningful_location_info).filter_by(dementia_key = _key).all()
+        meaningful_location_list = session.query(models.meaningful_location_info).filter_by(dementia_key=_key).all()
 
         if meaningful_location_list:
-            meaningful_locations = []
+            meaningful_places_dict = {}
+
 
             for location in meaningful_location_list:
-                meaningful_locations.append({
-                    'dayOfTheWeek': location.day_of_the_week,
-                    'time': location.time,
-                    'latitude': location.latitude,
-                    'longitude': location.longitude
-                })
-            
+                address = location.address
+                day_of_week = location.day_of_the_week
+                time = location.time
+
+                police = kakao.search_keyword("경찰서", x = location.longitude, y = location.latitude, sort = 'distance')
+
+                police_list = []
+                if police['meta']['total_count'] == 0:
+                    print("주변에 경찰서가 없습니다.")
+                elif police['meta']['total_count'] > 1:
+                    for pol in police['documents']:
+                        if not pol['phone'] == '':
+                            new_police = {
+                                'policeName': pol['place_name'],
+                                'policeAddress': pol['address_name'],
+                                'roadAddressName': pol['road_address_name'],
+                                'phone': pol['phone'],
+                                'distance': pol['distance'],
+                                'latitude' : pol['y'],
+                                'longitude': pol['x']
+                            }
+                            police_list.append(new_police)
+                        else:
+                            pass
+                            
+                else:
+                    police_list.append(police['documents'][0]['place_name'])
+                    police_list.append(police['documents'][0]['address_name'])
+
+                # 주소가 이미 존재하는지 확인하고, 없으면 새로운 딕셔너리 엔트리 생성
+                if address not in meaningful_places_dict:
+                    meaningful_places_dict[address] = {
+                        'address': address,
+                        'timeInfo': [],
+                        'latitude': location.latitude,
+                        'longitude': location.longitude,
+                        'PoliceStationInfo' : police_list[-3:]
+                    }
+
+                # 해당 주소의 시간 정보 리스트에 현재 시간 정보가 없으면 추가
+                time_info_list = meaningful_places_dict[address]['timeInfo']
+                if {'dayOfTheWeek': day_of_week, 'time': time} not in time_info_list:
+                    time_info_list.append({'dayOfTheWeek': day_of_week, 'time': time})
+
+            # 결과를 리스트 형태로 변환
+            meaningful_places = list(meaningful_places_dict.values())
+
             result = {
-                'meaningfulLocations': meaningful_locations
+                'meaningfulPlaces': meaningful_places
             }
-            
+
             response = {
                 'status': 'success',
                 'message': 'Meaningful location data sent',
@@ -551,13 +592,13 @@ async def send_meaningful_location_info(dementiaKey : int):
 
         else:
             print(f"[ERROR] Meaningful location data not found for {_key}")
-
             raise HTTPException(status_code=404, detail="Meaningful location data not found")
-        
+
         return response
-    
+
     finally:
         session.close()
+
 
 @router.get("/locations/history", responses = {200 : {"model" : LocHistoryResponse, "description" : "위치 이력 전송 성공" }, 404: {"model": ErrorResponse, "description": "위치 이력 없음"}}, description="보호 대상자의 위치 이력 정보 전달(쿼리 스트링) | date : YYYY-MM-DD")
 async def send_location_history(date : str, dementiaKey : int):
