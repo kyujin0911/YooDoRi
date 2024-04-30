@@ -141,6 +141,7 @@
                 android:clickable="true"
                 android:elevation="8dp"
                 android:focusable="true"
+                android:onClick="@{() -> view.navigateToModifyUserInfo()}"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
 
@@ -191,6 +192,7 @@
                 android:layout_marginTop="15dp"
                 android:clickable="true"
                 android:focusable="true"
+                android:onClick="@{() -> view.navigateToModifyUpdateTime()}"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/update_user_info_v">
 
@@ -209,7 +211,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="10dp"
-                    android:text="1"
+                    android:text="1분"
                     android:textAppearance="@style/TextAppearance.App.14sp.SemiBold"
                     app:layout_constraintBaseline_toBaselineOf="@+id/update_time_title"
                     app:layout_constraintStart_toEndOf="@id/update_time_title"

@@ -1,24 +1,18 @@
 package kr.ac.tukorea.whereareu.presentation.nok.setting.updateTime
 
-import android.os.Bundle
-import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.widget.Toast
-import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.content.ContentProviderCompat.requireContext
-import androidx.databinding.DataBindingUtil
+import android.content.Context.MODE_PRIVATE
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collect
 import kr.ac.tukorea.whereareu.R
+import kr.ac.tukorea.whereareu.data.model.setting.UpdateRateRequest
 import kr.ac.tukorea.whereareu.databinding.FragmentSettingUpdateTimeBinding
-import kr.ac.tukorea.whereareu.presentation.SettingViewModel
-import kr.ac.tukorea.whereareu.presentation.base.BaseDialogFragment
+import kr.ac.tukorea.whereareu.presentation.nok.setting.SettingViewModel
 import kr.ac.tukorea.whereareu.presentation.base.BaseFragment
-import kr.ac.tukorea.whereareu.presentation.nok.home.NokHomeViewModel
+import kr.ac.tukorea.whereareu.util.extension.repeatOnStarted
+import kr.ac.tukorea.whereareu.util.extension.showToastShort
 import kr.ac.tukorea.whereareu.util.extension.statusBarHeight
 
 @AndroidEntryPoint
@@ -36,26 +30,39 @@ class SettingUpdateTimeFragment() :
         TimeData("45", false),
         TimeData("60", false)
     )
-    private var timeAdapter: TimeAdapter? = null
+    private lateinit var timeAdapter: TimeAdapter
 
     override fun initView() {
-        binding.layout.setPadding(0,requireActivity().statusBarHeight() ,0, 0)
+        binding.layout.setPadding(0, requireActivity().statusBarHeight(), 0, 0)
         initializeViews()
+
+        binding.backBtn.setOnClickListener {
+            onClickBackBtn()
+        }
     }
 
     override fun initObserver() {
+        repeatOnStarted {
+            viewModel.toastEvent.collect{
+                requireActivity().showToastShort(requireContext(), it)
+                findNavController().popBackStack()
+            }
+        }
     }
 
     private fun initializeViews() {
-        binding.view = this
         var position = invertTime(viewModel.settingTime.value.toInt())
         binding.updateTimeList.layoutManager = LinearLayoutManager(context)
+
         timeAdapter = TimeAdapter(timeList, position)
         binding.updateTimeList.adapter = timeAdapter
-        timeAdapter?.submitList(timeList.toMutableList()) // ListAdapter를 사용하기 위해 작성
-        timeAdapter?.setOnItemClickListener(object : TimeAdapter.OnItemClickListener {
+        timeAdapter.submitList(timeList.toMutableList()) // ListAdapter를 사용하기 위해 작성
+        timeAdapter.setOnItemClickListener(object : TimeAdapter.OnItemClickListener {
             override fun onItemClick(item: TimeData, position: Int) {
                 viewModel.setSettingTime(positionToTime(position))
+                /*viewModel.sendUpdateTime(
+                    UpdateRateRequest(key, 0, item.title.toInt() * 60)
+                )*/
             }
         })
     }
@@ -75,7 +82,7 @@ class SettingUpdateTimeFragment() :
         }
     }
 
-    private fun positionToTime(position: Int): String{
+    private fun positionToTime(position: Int): String {
         return when (position) {
             0 -> "1"
             1 -> "3"
@@ -90,7 +97,9 @@ class SettingUpdateTimeFragment() :
         }
     }
 
-    fun onClickBackBtn() {
-        findNavController().popBackStack()
+    private fun onClickBackBtn() {
+        val key =
+            requireActivity().getSharedPreferences("User", MODE_PRIVATE).getString("key", "") ?: ""
+        viewModel.sendUpdateTime(key, 0)
     }
 }

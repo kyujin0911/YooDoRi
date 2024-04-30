@@ -10,7 +10,7 @@
             type="kr.ac.tukorea.whereareu.presentation.dementia.setting.ModifyDementiaInfoFragment" />
         <variable
             name="viewModel"
-            type="kr.ac.tukorea.whereareu.presentation.SettingViewModel" />
+            type="kr.ac.tukorea.whereareu.presentation.nok.setting.SettingViewModel" />
 
     </data>
     <androidx.constraintlayout.widget.ConstraintLayout

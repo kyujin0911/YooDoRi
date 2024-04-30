@@ -1,4 +1,4 @@
-package kr.ac.tukorea.whereareu.presentation
+package kr.ac.tukorea.whereareu.presentation.nok.setting
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
@@ -79,11 +79,13 @@ class SettingViewModel @Inject constructor(
         }
     }
 
-    fun sendUpdateTime(request: UpdateRateRequest){
+    fun sendUpdateTime(key: String, isDementia: Int){
         viewModelScope.launch(Dispatchers.IO){
-            repository.sendUpdateRate(request).onSuccess {
+            repository.sendUpdateRate(
+                UpdateRateRequest(key, isDementia, _settingTime.value.toInt() * 60)
+            ).onSuccess {
+                _toastEvent.emit("정보가 변경되었습니다.")
                 Log.d("UpdateRate", "UpdateRateChanged")
-                _settingTime.emit(it.message)
             }
         }
     }
