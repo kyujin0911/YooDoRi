@@ -123,7 +123,7 @@ class LocationService: Service() {
                     }
                     // AI 정보 수집을 위한 함수
                     saveFile(currentTime[DATE], currentTime[TIME].trim(), userState.toString(), isSuccess.toString())
-                    delay(60000)
+                    delay(10000)
                 }
             }
         }
@@ -190,7 +190,7 @@ class LocationService: Service() {
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
         locationClient
-            .getLocationUpdates(1000L)
+            .getLocationUpdates(5*1000L)
             .catch { e -> e.printStackTrace() }
             .onEach { location ->
                 locationInfo[LATITUDE] = location.latitude

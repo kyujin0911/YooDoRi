@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main_graph"
-    app:startDestination="@id/nokHomeFragment">
+    app:startDestination="@id/homeTab">
 
     <fragment
         android:id="@+id/meaningfulPlaceFragment"
@@ -51,8 +51,6 @@
             <action
                 android:id="@+id/action_settingUpdateTimeFragment_to_nokSettingFragment"
                 app:destination="@id/nokSettingFragment" />
-
         </fragment>
     </navigation>
-
 </navigation>

@@ -4,29 +4,49 @@ import android.content.Context
 import android.content.Context.MODE_PRIVATE
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.PointF
 import android.util.Log
+import android.view.View
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.naver.maps.geometry.LatLng
 import com.naver.maps.map.CameraUpdate
 import com.naver.maps.map.MapFragment
 import com.naver.maps.map.NaverMap
 import com.naver.maps.map.OnMapReadyCallback
+import com.naver.maps.map.overlay.OverlayImage
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import kr.ac.tukorea.whereareu.R
 import kr.ac.tukorea.whereareu.data.model.home.GetLocationInfoResponse
-import kr.ac.tukorea.whereareu.databinding.FragmentHomeBinding
+import kr.ac.tukorea.whereareu.databinding.IconLocationOverlayLayoutBinding
+import kr.ac.tukorea.whereareu.domain.home.MeaningfulPlace
 import kr.ac.tukorea.whereareu.presentation.base.BaseFragment
 import kr.ac.tukorea.whereareu.presentation.login.SplashActivity
 import kr.ac.tukorea.whereareu.util.extension.repeatOnStarted
+import kotlin.math.roundToInt
 
 @AndroidEntryPoint
-class NokHomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home),
+class NokHomeFragment : BaseFragment<kr.ac.tukorea.whereareu.databinding.FragmentHomeBinding>(R.layout.fragment_home),
     OnMapReadyCallback {
     private val viewModel: NokHomeViewModel by activityViewModels()
     private val LOCATION_PERMISSION_REQUEST_CODE = 1001
     private var naverMap: NaverMap? = null
+    private var dementiaName: String? = null
+    private val navigator by lazy {
+        findNavController()
+    }
+    private val meaningfulListRVA by lazy {
+        MeaningfulListRVA()
+    }
+    private lateinit var behavior: BottomSheetBehavior<ConstraintLayout>
 
     override fun initObserver() {
     }
@@ -83,12 +103,21 @@ class NokHomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home
         }
     }
 
-    private fun trackingDementiaLocation(coord: LatLng, bearing: Float){
+    private fun trackingDementiaLocation(coord: LatLng, bearing: Float, name: String, speed: Float){
         naverMap?.let {
             val locationOverlay = it.locationOverlay
             locationOverlay.isVisible = true
+            val iconBinding = IconLocationOverlayLayoutBinding.inflate(layoutInflater)
+            iconBinding.nameTv.text = name
+
+            // m/s to km/h
+            iconBinding.speedTv.text = (speed * 3.6).roundToInt().toString()
+            val speedTv = iconBinding.layout
+            locationOverlay.icon = OverlayImage.fromView(speedTv)
+            locationOverlay.circleRadius = 0
             locationOverlay.position = coord
-            locationOverlay.bearing = bearing
+            //locationOverlay.bearing = bearing
+            locationOverlay.anchor = PointF(0.5f, 1f)
 
             it.moveCamera(CameraUpdate.scrollTo(coord))
         }
@@ -98,11 +127,86 @@ class NokHomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home
         checkLocationPermission()
         updateDementiaName()
         initMap()
+        goToPredictLocationFragment()
+    }
+
+    private fun goToPredictLocationFragment(){
+        binding.predictTv.setOnClickListener {
+            viewModel.setIsPredicted(true)
+            binding.homeGroup.visibility = View.GONE
+            binding.bottomSheet.visibility = View.VISIBLE
+            initBottomSheet()
+            initMeaningfulListRVA()
+            //navigator.navigate(R.id.action_nokHomeFragment_to_predictLocationFragment)
+        }
+    }
+
+    private fun initMeaningfulListRVA(){
+        binding.rv.adapter = meaningfulListRVA
+        binding.rv.addItemDecoration(
+            DividerItemDecoration(
+                requireContext(),
+                LinearLayoutManager.VERTICAL
+            )
+        )
+        val list = listOf<MeaningfulPlace>(
+            MeaningfulPlace("한국공학대학교", "시흥시 뭐시기"),
+            MeaningfulPlace("한국공학대학교", "시흥시 뭐시기"),
+            MeaningfulPlace("한국공학대학교", "시흥시 뭐시기"),
+            MeaningfulPlace("한국공학대학교", "시흥시 뭐시기"),
+            MeaningfulPlace("한국공학대학교", "시흥시 뭐시기"),
+            MeaningfulPlace("한국공학대학교", "시흥시 뭐시기"),
+            MeaningfulPlace("한국공학대학교", "시흥시 뭐시기"),
+            MeaningfulPlace("한국공학대학교", "시흥시 뭐시기"),
+            MeaningfulPlace("한국공학대학교", "시흥시 뭐시기"),
+            MeaningfulPlace("한국공학대학교", "시흥시 뭐시기"),
+            MeaningfulPlace("한국공학대학교", "시흥시 뭐시기"),
+            MeaningfulPlace("한국공학대학교", "시흥시 뭐시기"),
+            MeaningfulPlace("한국공학대학교", "시흥시 뭐시기"),
+            MeaningfulPlace("한국공학대학교", "시흥시 뭐시기"),
+            MeaningfulPlace("한국공학대학교", "시흥시 뭐시기"),
+            MeaningfulPlace("한국공학대학교", "시흥시 뭐시기"),
+            MeaningfulPlace("한국공학대학교", "시흥시 뭐시기"),
+            MeaningfulPlace("한국공학대학교", "시흥시 뭐시기"),
+        )
+        meaningfulListRVA.submitList(list)
+    }
+
+    private fun initBottomSheet(){
+        behavior = BottomSheetBehavior.from(binding.bottomSheet)
+        behavior.state = BottomSheetBehavior.STATE_COLLAPSED
+        behavior.peekHeight = 20
+        behavior.isFitToContents = false
+        behavior.halfExpandedRatio = 0.4f
+        behavior.expandedOffset = 100
+
+
+        // half expanded state일 때 접기 제어
+        behavior.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback(){
+            var isHalfExpanded = false
+            override fun onStateChanged(bottomSheet: View, newState: Int) {
+                when(newState){
+                    BottomSheetBehavior.STATE_HALF_EXPANDED -> {
+                        isHalfExpanded = true
+                    }
+                    BottomSheetBehavior.STATE_COLLAPSED and BottomSheetBehavior.STATE_HALF_EXPANDED-> {
+                        isHalfExpanded = false
+                    }
+                }
+            }
+
+            override fun onSlide(bottomSheet: View, slideOffset: Float) {
+                if(isHalfExpanded && slideOffset < 0.351f){
+                    behavior.state = BottomSheetBehavior.STATE_COLLAPSED
+                }
+            }
+
+        })
     }
 
     private fun updateDementiaName(){
         val spf = requireActivity().getSharedPreferences("OtherUser", MODE_PRIVATE)
-        val dementiaName = spf.getString("name", "")
+        dementiaName = spf.getString("name", "")
         if (!dementiaName.isNullOrBlank()){
             binding.dementiaNameTv.text = dementiaName
         }
@@ -179,7 +283,7 @@ class NokHomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home
                 Log.d("response", response.toString())
                 updateDementiaStatus(response)
                 val coord = LatLng(response.latitude, response.longitude)
-                trackingDementiaLocation(coord, response.bearing)
+                trackingDementiaLocation(coord, response.bearing, dementiaName?:"", response.currentSpeed)
             }
         }
     }
