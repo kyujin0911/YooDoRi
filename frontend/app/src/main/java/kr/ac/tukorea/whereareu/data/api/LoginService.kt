@@ -20,13 +20,9 @@ interface LoginService {
     @POST("dementias")
     suspend fun postDementiaIdentity(@Body request: DementiaIdentityRequest): Response<ResponseBody<DementiaIdentityResponse>>
 
-    @POST("connection")
-<<<<<<< HEAD
-    suspend fun postIsConnected(@Body request: CheckInterConnectRequest): Response<ResponseBody<CheckInterConnectResponse>>
-
     @POST("login")
     suspend fun postUserLogin(@Body request: UserLoginRequest): Response<ResponseBody<StateResponse>>
-=======
+
+    @POST("connection")
     suspend fun postIsConnected(@Body request: DementiaKeyRequest): Response<ResponseBody<CheckInterConnectResponse>>
->>>>>>> 32-feat-위치-예측-화면-구성-중복된-주소-제거-및-경찰서-정보-추가
 }

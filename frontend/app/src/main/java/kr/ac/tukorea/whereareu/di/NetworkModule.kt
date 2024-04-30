@@ -158,18 +158,6 @@ object NetworkModule {
             .addConverterFactory(GsonConverterFactory.create())
             .build()
     }
-
-    @Provides
-    @Singleton
-    fun provideLocationService(): LocationService{
-        return LocationService()
-    }
-
-    @Provides
-    @Singleton
-    fun provideSettingAPI(retrofit: Retrofit): SettingService{
-        return retrofit.buildService()
-    }
     
     private inline fun <reified T> Retrofit.buildService(): T {
         return this.create(T::class.java)

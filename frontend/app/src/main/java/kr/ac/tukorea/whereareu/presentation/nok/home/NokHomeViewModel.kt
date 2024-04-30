@@ -95,12 +95,6 @@ class NokHomeViewModel @Inject constructor(
             _updateDuration.emit(duration * 60 * 1000)
         }
     }
-    fun setUpdateUserName(request: ModifyUserInfoRequest){
-        viewModelScope.launch(Dispatchers.IO){
-            Log.d("UpdateUserName","UserNameChanged")
-            repository
-        }
-    }
 
     fun getDementiaLocation() {
         viewModelScope.launch {
