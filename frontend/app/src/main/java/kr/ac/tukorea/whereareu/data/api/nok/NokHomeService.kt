@@ -20,4 +20,5 @@ interface NokHomeService {
 
     @POST("dementias/averageWalkingSpeed")
     suspend fun getDementiaLastInfo(@Body request: DementiaKeyRequest): Response<ResponseBody<DementiaLastInfoResponse>>
+
 }
