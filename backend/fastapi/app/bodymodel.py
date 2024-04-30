@@ -10,11 +10,13 @@ class dementiaInfoRecord(BaseModel):
     dementiaKey : str = Field(examples=["123456"])
     dementiaName : str = Field(examples=["성춘향"])
     dementiaPhoneNumber : str = Field(examples=["010-1234-5678"])
+    updateRate : int = Field(examples=["15"], description="초 단위")
 
 class nokInfoRecord(BaseModel):
     nokKey : str = Field(examples=["123456"])
     nokName : str = Field(examples=["홍길동"])
     nokPhoneNumber : str = Field(examples=["010-1234-5678"])
+    updateRate : int = Field(examples=["15"], description="초 단위")
 
 class UserRecord(BaseModel):
     dementiaInfoRecord: dementiaInfoRecord
@@ -176,3 +178,12 @@ class TempResponse(BaseModel):
     status: str = Field("success")
     message: str = Field("메~시~지~")
     result : int = Field("1", description="1(정지), 2(도보), 3(차량), 4(지하철)")
+
+class Token(BaseModel):
+    access_token: str = Field("ksjdnfjkdasnfljsknafljansdfjlsakn")
+    token_type: str = Field("bearer")
+
+class TokenResponse(BaseModel):
+    status: str = Field("success")
+    message: str = Field("메~시~지~")
+    result : List[Token]
