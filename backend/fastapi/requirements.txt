@@ -12,3 +12,5 @@ pyclustering==0.10.1.2
 DateTime==5.2
 mangum==0.17.0
 PyKakao==0.0.7
+python-jose==3.3.0
+python-multipart==0.0.9
