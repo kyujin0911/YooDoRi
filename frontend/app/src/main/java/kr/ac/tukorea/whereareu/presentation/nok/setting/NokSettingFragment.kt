@@ -7,9 +7,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import dagger.hilt.android.AndroidEntryPoint
 import kr.ac.tukorea.whereareu.R
-import kr.ac.tukorea.whereareu.data.model.setting.UpdateRateRequest
 import kr.ac.tukorea.whereareu.databinding.FragmentNokSettingBinding
-import kr.ac.tukorea.whereareu.domain.login.userinfo.GetUserInfoResult
 import kr.ac.tukorea.whereareu.presentation.base.BaseFragment
 import kr.ac.tukorea.whereareu.presentation.nok.home.NokHomeViewModel
 import kr.ac.tukorea.whereareu.util.extension.repeatOnStarted
@@ -88,7 +86,7 @@ class NokSettingFragment : BaseFragment<FragmentNokSettingBinding>(R.layout.frag
             putString("phone", nokPhone)
             commit()
         }
-        
+
         dementiaSpf.edit {
             putString("name", dementiaName)
             putString("phone", dementiaPhone)

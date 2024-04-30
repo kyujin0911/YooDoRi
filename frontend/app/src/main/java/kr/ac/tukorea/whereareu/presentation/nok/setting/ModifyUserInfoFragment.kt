@@ -28,13 +28,7 @@ class ModifyUserInfoFragment :
 
     override fun initObserver() {
         binding.viewModel = viewModel
-        repeatOnStarted {
-            viewModel.updateUserInfo.collect { userInfo ->
-                userInfo.let {
-                    Log.d("updateUserInfo", userInfo.message)
-                }
-            }
-        }
+
         repeatOnStarted {
             viewModel.toastEvent.collect{
                 if (navigator.currentDestination?.id == R.id.modifyUserInfoFragment) {

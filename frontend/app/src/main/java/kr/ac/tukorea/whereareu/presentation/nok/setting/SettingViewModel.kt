@@ -14,7 +14,7 @@ import kr.ac.tukorea.whereareu.data.model.setting.ModifyUserInfoRequest
 import kr.ac.tukorea.whereareu.data.model.setting.StateResponse
 import kr.ac.tukorea.whereareu.data.model.setting.UpdateRateRequest
 import kr.ac.tukorea.whereareu.data.repository.setting.SettingRepositoryImpl
-import kr.ac.tukorea.whereareu.domain.login.userinfo.GetUserInfoResult
+import kr.ac.tukorea.whereareu.data.model.setting.GetUserInfoResponse
 import kr.ac.tukorea.whereareu.util.network.onError
 import kr.ac.tukorea.whereareu.util.network.onException
 import kr.ac.tukorea.whereareu.util.network.onFail
@@ -25,13 +25,8 @@ import javax.inject.Inject
 class SettingViewModel @Inject constructor(
     private val repository: SettingRepositoryImpl
 ) : ViewModel() {
-    private val _updateUserInfo = MutableSharedFlow<StateResponse>()
-    val updateUserInfo = _updateUserInfo.asSharedFlow()
 
-    private val _updateOtherUserInfo = MutableSharedFlow<StateResponse>()
-    val updateOtherUserInfo = _updateOtherUserInfo.asSharedFlow()
-
-    private val _userInfo = MutableSharedFlow<GetUserInfoResult>()
+    private val _userInfo = MutableSharedFlow<GetUserInfoResponse>()
     val userInfo =  _userInfo.asSharedFlow()
 
     private val _settingTime = MutableStateFlow<String>("1")
@@ -49,7 +44,6 @@ class SettingViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             repository.sendModifyUserInfo(request).onSuccess {response ->
                 Log.d("UpdateUserInfo", "UserInfoChanged")
-                _updateUserInfo.emit(response)
                 _toastEvent.emit("정보가 변경되었습니다.")
             }
         }
@@ -59,7 +53,6 @@ class SettingViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             repository.sendModifyUserInfo(request).onSuccess {response ->
                 Log.d("UpdateOtherUserInfo", "OtherUserInfoChanged")
-                _updateOtherUserInfo.emit(response)
                 _toastEvent.emit("정보가 변경되었습니다.")
             }
         }

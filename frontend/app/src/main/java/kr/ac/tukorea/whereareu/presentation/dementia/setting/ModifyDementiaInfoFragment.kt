@@ -29,13 +29,7 @@ class ModifyDementiaInfoFragment :
 
     override fun initObserver() {
         binding.viewModel = viewModel
-        repeatOnStarted {
-            viewModel.updateOtherUserInfo.collect{otherUserInfo ->
-                otherUserInfo?.let{
-                    Log.d("updateDementiaInfo", otherUserInfo.message)
-                }
-            }
-        }
+
         repeatOnStarted {
             viewModel.toastEvent.collect{
                 if(navigator.currentDestination?.id == R.id.modifyDementiaInfoFragment) {
