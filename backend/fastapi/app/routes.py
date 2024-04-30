@@ -1,4 +1,8 @@
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, HTTPException, status, Depends
+from fastapi.security import OAuth2PasswordRequestForm
+
+from jose import jwt
+
 from . import models
 from .random_generator import RandomNumberGenerator
 from .update_user_status import UpdateUserStatus
@@ -6,8 +10,11 @@ from .LocationAnalyzer import LocationAnalyzer
 from .database import Database
 from .bodymodel import *
 from .config import Config
+
 from PyKakao import Local
 from apscheduler.schedulers.background import BackgroundScheduler
+from datetime import timedelta, datetime
+
 
 
 import json
@@ -19,6 +26,8 @@ session = next(db.get_session())
 sched = BackgroundScheduler(timezone="Asia/Seoul")
 kakao = Local(service_key=Config.service_key)
 
+
+
 '''
 성공 = 200
 실패 = 400
@@ -29,6 +38,16 @@ kakao = Local(service_key=Config.service_key)
 
 정의되지 않은 오류 = 500
 '''
+
+def get_user(userName, key):
+    userInfo = session.query(models.nok_info).filter_by(nok_name = userName, nok_key = key).first()
+    if userInfo:
+        return userInfo, 0
+    else:
+        userInfo = session.query(models.dementia_info).filter_by(dementia_name = userName, dementia_key = key).first()
+        if userInfo:
+            return userInfo, 1
+
 
 
 # Define API endpoint
@@ -164,41 +183,38 @@ async def is_connected(request: ConnectionRequest):
     finally:
         session.close()
 
-@router.post("/login", responses = {200 : {"model" : CommonResponse, "description" : "로그인 성공" }, 400: {"model": ErrorResponse, "description": "로그인 실패"}}, description="보호자와 보호 대상자의 로그인 | isDementia : 0(보호자), 1(보호 대상자)")
-async def receive_user_login(request: loginRequest):
-    _key = request.key
-    _isdementia = request.isDementia
-
+@router.post("/login", responses = {200 : {"model" : TokenResponse, "description" : "로그인 성공" }, 400: {"model": ErrorResponse, "description": "로그인 실패"}}, description="보호자와 보호 대상자의 로그인(보호자, 보호 대상자 구분 불필요) | username : 이름, password : key")
+async def receive_user_login(from_data: OAuth2PasswordRequestForm = Depends()):
     try:
-        if _isdementia == 0: # 보호자인 경우
-            existing_nok = session.query(models.nok_info).filter_by(nok_key = _key).first()
+        user = get_user(from_data.username, from_data.password)
+        if not user[0]:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Incorrect key",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
+        if user[1] == 0:
+            key = user[0].nok_key
+        else:
+            key = user[0].dementia_key
 
-            if existing_nok:
-                response = {
-                    'status': 'success',
-                    'message': 'User login success',
-                }
-                print(f"[INFO] User login from {existing_nok.nok_name}({existing_nok.nok_key})")
+        data = {
+            "sub": key,
+            "exp": datetime.datetime.utcnow() + timedelta(minutes = Config.ACCESS_TOKEN_EXPIRE_MINUTES)
+        }
 
-            else:
-                print(f"[ERROR] User login failed from NOK key({_key})")
+        access_token = jwt.encode(data, Config.SECRET_KEY, Config.ALGORITHM)
 
-                raise HTTPException(status_code=400, detail="User login failed")
+        result = {
+            'accessToken': access_token,
+            'tokenType': 'bearer'
+        }
 
-        elif _isdementia == 1: # 보호 대상자인 경우
-            existing_dementia = session.query(models.dementia_info).filter_by(dementia_key = _key).first()
-
-            if existing_dementia:
-                response = {
-                    'status': 'success',
-                    'message': 'User login success',
-                }
-                print(f"[INFO] User login from {existing_dementia.dementia_name}({existing_dementia.dementia_key})")
-
-            else:
-                print(f"[ERROR] User login failed from Dementia key({_key})")
-
-                raise HTTPException(status_code=400, detail="User login failed")
+        response = {
+            'status': 'success',
+            'message': 'Login success',
+            'result': result
+        }
 
         return response
             
@@ -270,7 +286,7 @@ async def receive_location_info(request: ReceiveLocationRequest):
         session.close()
 
 @router.get("/locations/noks", responses = {200 : {"model" : GetLocationResponse, "description" : "위치 정보 전송 성공" }, 404: {"model": ErrorResponse, "description": "위치 정보 없음"}}, description="보호자에게 보호 대상자의 위치 정보를 전송(쿼리 스트링) | userStatus : 1(정지), 2(도보), 3(차량), 4(지하철) | isRingstoneOn : 0(무음), 1(진동), 2(벨소리)")
-async def send_live_location_info(dementiaKey : int):
+async def send_live_location_info(dementiaKey : str):
 
     try:
         latest_location = session.query(models.location_info).filter_by(dementia_key = dementiaKey).order_by(models.location_info.num.desc()).first()
@@ -474,7 +490,7 @@ async def caculate_dementia_average_walking_speed(requset: AverageWalkingSpeedRe
         session.close()
 
 @router.get("/users/info", responses = {200 : {"model" : GetUserInfoResponse, "description" : "유저 정보 전송 성공" }, 404: {"model": ErrorResponse, "description": "유저 정보 없음"}}, description="보호자와 보호 대상자 정보 전달(쿼리 스트링)")
-async def get_user_info(nokKey : int):
+async def get_user_info(nokKey : str):
     _nok_key = nokKey
 
     try:
@@ -492,12 +508,14 @@ async def get_user_info(nokKey : int):
                 'dementiaInfoRecord': {
                     'dementiaKey': dementia_info_record.dementia_key,
                     'dementiaName': dementia_info_record.dementia_name,
-                    'dementiaPhoneNumber': dementia_info_record.dementia_phonenumber
+                    'dementiaPhoneNumber': dementia_info_record.dementia_phonenumber,
+                    'updateRate': dementia_info_record.update_rate
                 },
                 'nokInfoRecord': {
                     'nokKey': nok_info_record.nok_key,
                     'nokName': nok_info_record.nok_name,
-                    'nokPhoneNumber': nok_info_record.nok_phonenumber
+                    'nokPhoneNumber': nok_info_record.nok_phonenumber,
+                    'updateRate': nok_info_record.update_rate
                 }
             }
 
@@ -520,7 +538,7 @@ async def get_user_info(nokKey : int):
         session.close()
 
 @router.get("/locatoins/meaningful", responses = {200 : {"model" : MeaningfulLocResponse, "description" : "의미장소 전송 성공" }, 404: {"model": ErrorResponse, "description": "의미 장소 없음"}}, description="보호 대상자의 의미 장소 정보 및 주변 경찰서 정보 전달(쿼리 스트링)")
-async def send_meaningful_location_info(dementiaKey: int):
+async def send_meaningful_location_info(dementiaKey: str):
     _key = dementiaKey
 
     try:
@@ -583,7 +601,7 @@ async def send_meaningful_location_info(dementiaKey: int):
         session.close()
 
 @router.get("/locations/history", responses = {200 : {"model" : LocHistoryResponse, "description" : "위치 이력 전송 성공" }, 404: {"model": ErrorResponse, "description": "위치 이력 없음"}}, description="보호 대상자의 위치 이력 정보 전달(쿼리 스트링) | date : YYYY-MM-DD")
-async def send_location_history(date : str, dementiaKey : int):
+async def send_location_history(date : str, dementiaKey : str):
     _key = dementiaKey
 
     try:
@@ -621,14 +639,8 @@ async def send_location_history(date : str, dementiaKey : int):
     finally:
         session.close()
 
-
-
-
-
-
-
 #스케줄러 비활성화
-'''@sched.scheduled_job('cron', hour=0, minute=56, id = 'geocoding')
+'''@sched.scheduled_job('cron', hour=1, minute=0, id = 'geocoding')
 def kakao_api():
     try:
         print(f"[INFO] Start geocoding")
