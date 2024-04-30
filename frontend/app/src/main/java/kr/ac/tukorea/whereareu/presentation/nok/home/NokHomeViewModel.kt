@@ -127,15 +127,6 @@ class NokHomeViewModel @Inject constructor(
                 }.onException {
                     Log.d("error", it.toString())
                 }
-            /*
-            // api 연결 없이 테스트
-            val response = DementiaLastInfoResponse(averageSpeed=0.23f, lastLatitude=37.401623, lastLongitude=126.9340687)
-            eventPredict(PredictEvent.DementiaLastInfoEvent(response))
-            getAddress(
-                response.lastLongitude.toString(),
-                response.lastLatitude.toString(),
-                true
-            )*/
         }
     }
 
@@ -160,21 +151,6 @@ class NokHomeViewModel @Inject constructor(
             }.onException {
                 Log.d("kakao api exception", it.toString())
             }
-
-            /*
-            // api 연결 없이 테스트
-            val response = AddressResponse(meta= Meta(totalCount=1), documents= listOf(Documents(roadAddress= RoadAddress(addressName="경기도 안양시 동안구 비산로 22", buildingName="평촌자이아이파크"), address= Address(addressName="경기 안양시 동안구 비산동 1185"))))
-            val address = convertResponseToAddress(response)
-            if (isLastAddress) {
-                eventPredict(
-                    PredictEvent.LastLocationEvent(
-                        LastAddress(y.toDouble(), x.toDouble(), address)
-                    )
-                )
-                getMeaningfulPlace()
-            } else {
-                addressList.add(address)
-            }*/
         }
     }
 
@@ -203,12 +179,6 @@ class NokHomeViewModel @Inject constructor(
             }.onException {
                 Log.d("error", it.toString())
             }
-
-            /*
-            // api 연결 없이 테스트
-            val meaningfulPlaceInfo = preprocessingList(emptyList())
-            eventPredict(PredictEvent.MeaningFulPlaceEvent(meaningfulPlaceInfo))
-             */
         }
     }
 
@@ -262,91 +232,6 @@ class NokHomeViewModel @Inject constructor(
                 list.first().latitude, list.first().longitude))
         }
         Log.d("tempList", meaningfulPlaceInfoList.toString())
-
-        /*
-        // api 연결 없이 테스트
-        val meaningfulPlaceInfoList = mutableListOf(MeaningfulPlaceInfo(
-            address = "서울특별시 용산구 이촌로2가길36 중산아파트 1 동",
-            meaningfulPlaceListInfo = listOf(
-                MeaningfulPlaceListInfo(
-                date = "Tuesday",
-                time = "0004",
-                    index = 0,
-                    latitude = 37.401623,
-                    longitude = 129.9340687
-            ), MeaningfulPlaceListInfo(
-                date = "Tuesday",
-                time = "0004",
-                    index = 0,
-                    latitude = 37.401623,
-                    longitude = 126.9340687
-            ), MeaningfulPlaceListInfo(
-                date = "Tuesday",
-                time = "0004",
-                    index = 0,
-                    latitude = 37.401623,
-                    longitude = 126.9340687
-            ), MeaningfulPlaceListInfo(
-                date = "Tuesday",
-                time = "0004",
-                    index = 0,
-                    latitude = 37.401623,
-                    longitude = 126.9340687
-            ), MeaningfulPlaceListInfo(
-                date = "Tuesday",
-                time = "0004",
-                    index = 0,
-                    latitude = 37.401623,
-                    longitude = 126.9340687
-            ), MeaningfulPlaceListInfo(
-                date = "Tuesday",
-                time = "0004",
-                    index = 0,
-                    latitude = 37.401623,
-                    longitude = 126.9340687
-            ), MeaningfulPlaceListInfo(
-                date = "Tuesday",
-                time = "0408",
-                    index = 0,
-                    latitude = 37.401623,
-                    longitude = 126.9340687
-            ), MeaningfulPlaceListInfo(
-                date = "Tuesday",
-                time = "0408",
-                    index = 0,
-                    latitude = 37.401623,
-                    longitude = 126.9340687
-            ), MeaningfulPlaceListInfo(
-                date = "Tuesday",
-                time = "0408",
-                    index = 0,
-                    latitude = 37.401623,
-                    longitude = 126.9340687
-            ), MeaningfulPlaceListInfo(date = "Tuesday", time = "0812",
-                    index = 0,
-                    latitude = 37.401623,
-                    longitude = 126.9340687))
-        ), MeaningfulPlaceInfo(
-            address = "경기 시흥시 정왕동 1308",
-            meaningfulPlaceListInfo = listOf(MeaningfulPlaceListInfo(date = "Tuesday", time = "1620",
-                index = 0,
-                latitude = 37.401623,
-                longitude = 126.9340687))
-        ), MeaningfulPlaceInfo(
-            address = "경기도 시흥시 산기대학로 237 한국공학대학교",
-            meaningfulPlaceListInfo = listOf(MeaningfulPlaceListInfo(
-                date = "Tuesday",
-                time = "1620",
-                index = 0,
-                latitude = 37.401623,
-                longitude = 126.9340687
-            ), MeaningfulPlaceListInfo(date = "Tuesday", time = "1620",
-                index = 0,
-                latitude = 37.401623,
-                longitude = 126.9340687))
-        ))
-
-         */
         return meaningfulPlaceInfoList
     }
 }
