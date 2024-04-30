@@ -29,6 +29,7 @@ import kr.ac.tukorea.whereareu.data.model.home.GetLocationInfoResponse
 import kr.ac.tukorea.whereareu.databinding.IconLocationOverlayLayoutBinding
 import kr.ac.tukorea.whereareu.domain.home.MeaningfulPlace
 import kr.ac.tukorea.whereareu.presentation.base.BaseFragment
+import kr.ac.tukorea.whereareu.presentation.login.SplashActivity
 import kr.ac.tukorea.whereareu.util.extension.repeatOnStarted
 import kotlin.math.roundToInt
 
@@ -59,7 +60,6 @@ class NokHomeFragment : BaseFragment<kr.ac.tukorea.whereareu.databinding.Fragmen
             else -> "알수없음"
         }
     }
-
     private fun updateDementiaStatus(dementiaStatus: GetLocationInfoResponse){
         with(binding){
             stateTv.text = updateDementiaMovementStatus(dementiaStatus.userStatus)

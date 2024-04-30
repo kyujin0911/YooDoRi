@@ -9,6 +9,7 @@ import kr.ac.tukorea.whereareu.R
 import kr.ac.tukorea.whereareu.WhereAreUApplication
 import kr.ac.tukorea.whereareu.data.api.dementia.DementiaHomeService
 import kr.ac.tukorea.whereareu.data.api.LoginService
+import kr.ac.tukorea.whereareu.data.api.SettingService
 import kr.ac.tukorea.whereareu.data.api.nok.NokHomeService
 import kr.ac.tukorea.whereareu.util.location.LocationService
 import okhttp3.Interceptor
@@ -87,6 +88,12 @@ object NetworkModule {
         return LocationService()
     }
 
+    @Provides
+    @Singleton
+    fun provideSettingAPI(retrofit: Retrofit): SettingService{
+        return retrofit.buildService()
+    }
+    
     private inline fun <reified T> Retrofit.buildService(): T {
         return this.create(T::class.java)
     }
