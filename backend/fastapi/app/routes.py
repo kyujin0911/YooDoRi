@@ -1,7 +1,8 @@
 from fastapi import APIRouter, HTTPException, status, Depends
-from fastapi.security import OAuth2PasswordRequestForm
+from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer, APIKeyHeader
 
-from jose import jwt
+from jose import jwt, JWTError
+from passlib.context import CryptContext
 
 from . import models
 from .random_generator import RandomNumberGenerator
@@ -25,6 +26,7 @@ db = Database()
 session = next(db.get_session())
 sched = BackgroundScheduler(timezone="Asia/Seoul")
 kakao = Local(service_key=Config.service_key)
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
 
@@ -39,6 +41,17 @@ kakao = Local(service_key=Config.service_key)
 정의되지 않은 오류 = 500
 '''
 
+def make_token(name: str, key: str):
+    data = {
+        "name": name,
+        "key": key,
+        "exp": datetime.datetime.utcnow() + timedelta(minutes = Config.ACCESS_TOKEN_EXPIRE_MINUTES)
+    }
+
+    access_token = jwt.encode(data, Config.SECRET_KEY, Config.ALGORITHM)
+
+    return access_token
+
 def get_user(userName, key):
     userInfo = session.query(models.nok_info).filter_by(nok_name = userName, nok_key = key).first()
     if userInfo:
@@ -47,8 +60,71 @@ def get_user(userName, key):
         userInfo = session.query(models.dementia_info).filter_by(dementia_name = userName, dementia_key = key).first()
         if userInfo:
             return userInfo, 1
+        else:
+            return None
 
+def get_current_user(token: str = Depends(OAuth2PasswordBearer(tokenUrl="/login"))):
+    credentials_exception = HTTPException(
+        status_code=401,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+    try:
+        payload = jwt.decode(token, Config.SECRET_KEY, algorithms=[Config.ALGORITHM])
+        return payload
+        #username: str = payload.get("name")
 
+        #if username is None:
+        #    raise credentials_exception
+        
+    except JWTError:
+        raise credentials_exception
+    
+    #user, user_type = get_user(username, payload.get("key"))
+
+    #if user is None:
+    #    raise credentials_exception
+    
+    #return user, user_type
+
+@router.get("/test", responses = {200 : {"model" : CommonResponse, "description" : "테스트 성공" }}, description="토큰을 사용했을 때 유저 정보가 반환되면 성공(앞으로 이렇게 바뀔 예정)")
+async def protected_route(current_user= Depends(APIKeyHeader(name="Authorization"))):
+    return get_current_user(current_user)
+
+@router.get("/test/login", responses = {200 : {"model" : TokenResponse, "description" : "로그인 성공" }, 400: {"model": ErrorResponse, "description": "로그인 실패"}}, description="로그인 테스트(앞으로 이렇게 바뀔예정) | username : 이름, password : key -> 이 두개만 채워서 보내면 됨")
+async def test_login(from_data: OAuth2PasswordRequestForm = Depends()):
+    try:
+        user = get_user(from_data.username, from_data.password)
+        if not user:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Incorrect key",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
+        if user[1] == 0:
+            key = user[0].nok_key
+            name = user[0].nok_name
+        else:
+            key = user[0].dementia_key
+            name = user[0].dementia_name
+
+        access_token = make_token(name, key)
+
+        result = {
+            'accessToken': access_token,
+            'tokenType': 'bearer'
+        }
+
+        response = {
+            'status': 'success',
+            'message': 'Login success',
+            'result': result
+        }
+
+        return response
+            
+    finally:
+        session.close()
 
 # Define API endpoint
 @router.post("/noks",status_code=status.HTTP_201_CREATED, responses = {201 : {"model" : ReceiveNokInfoResponse, "description" : "유저 등록 성공" },404: {"model": ErrorResponse, "description": "보호 대상자 키 조회 실패"}}, description="보호자가 보호 대상자의 정보를 등록")
@@ -128,6 +204,8 @@ async def receive_dementia_info(request: ReceiveDementiaInfoRequest):
             
             _key = str(unique_key)
 
+            #_key = pwd_context.hash(unique_key)
+
             new_dementia = models.dementia_info(dementia_key=_key, dementia_name=_dementia_name, dementia_phonenumber=_dementia_phonenumber)
             session.add(new_dementia)
             session.commit()
@@ -183,41 +261,43 @@ async def is_connected(request: ConnectionRequest):
     finally:
         session.close()
 
-@router.post("/login", responses = {200 : {"model" : TokenResponse, "description" : "로그인 성공" }, 400: {"model": ErrorResponse, "description": "로그인 실패"}}, description="보호자와 보호 대상자의 로그인(보호자, 보호 대상자 구분 불필요) | username : 이름, password : key")
-async def receive_user_login(from_data: OAuth2PasswordRequestForm = Depends()):
+@router.post("/login", responses = {200 : {"model" : CommonResponse, "description" : "로그인 성공" }, 400: {"model": ErrorResponse, "description": "로그인 실패"}}, description="보호자와 보호 대상자의 로그인 | isDementia : 0(보호자), 1(보호 대상자)")
+async def receive_user_login(request: loginRequest):
+    _key = request.key
+    _isdementia = request.isDementia
     try:
-        user = get_user(from_data.username, from_data.password)
-        if not user[0]:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Incorrect key",
-                headers={"WWW-Authenticate": "Bearer"},
-            )
-        if user[1] == 0:
-            key = user[0].nok_key
-        else:
-            key = user[0].dementia_key
+        if _isdementia == 0: # 보호자인 경우
+            existing_nok = session.query(models.nok_info).filter_by(nok_key = _key).first()
 
-        data = {
-            "sub": key,
-            "exp": datetime.datetime.utcnow() + timedelta(minutes = Config.ACCESS_TOKEN_EXPIRE_MINUTES)
-        }
+            if existing_nok:
+                response = {
+                    'status': 'success',
+                    'message': 'User login success',
+                }
+                print(f"[INFO] User login from {existing_nok.nok_name}({existing_nok.nok_key})")
 
-        access_token = jwt.encode(data, Config.SECRET_KEY, Config.ALGORITHM)
+            else:
+                print(f"[ERROR] User login failed from NOK key({_key})")
 
-        result = {
-            'accessToken': access_token,
-            'tokenType': 'bearer'
-        }
+                raise HTTPException(status_code=400, detail="User login failed")
+        
+        elif _isdementia == 1: # 보호 대상자인 경우
+            existing_dementia = session.query(models.dementia_info).filter_by(dementia_key = _key).first()
 
-        response = {
-            'status': 'success',
-            'message': 'Login success',
-            'result': result
-        }
+            if existing_dementia:
+                response = {
+                    'status': 'success',
+                    'message': 'User login success',
+                }
+                print(f"[INFO] User login from {existing_dementia.dementia_name}({existing_dementia.dementia_key})")
+
+            else:
+                print(f"[ERROR] User login failed from Dementia key({_key})")
+
+                raise HTTPException(status_code=400, detail="User login failed")
 
         return response
-            
+        
     finally:
         session.close()
 
@@ -439,9 +519,9 @@ async def modify_updatint_rate(request: ModifyUserUpdateRateRequest):
         session.close()
 
 @router.post("/dementias/averageWalkingSpeed", responses = {200 : {"model" : AverageWalkingSpeedResponse, "description" : "평균 걷기 속도 계산 성공" }, 404: {"model": ErrorResponse, "description": "보호 대상자 키 조회 실패 or 위치 정보 부족"}}, description="보호 대상자의 평균 걷기 속도를 계산 및 마지막 정보 전송")
-async def caculate_dementia_average_walking_speed(requset: AverageWalkingSpeedRequest):
+async def caculate_dementia_average_walking_speed(current_user : int = Depends(APIKeyHeader(name = "Authorization"))): #requset: AverageWalkingSpeedRequest
 
-    _dementia_key = requset.dementiaKey
+    _dementia_key = get_current_user(current_user)["key"]
 
     if _dementia_key is None:
         print(f"[ERROR] Dementia key not found(calculate dementia average walking speed)")
@@ -638,6 +718,13 @@ async def send_location_history(date : str, dementiaKey : str):
     
     finally:
         session.close()
+
+
+
+
+
+
+
 
 #스케줄러 비활성화
 '''@sched.scheduled_job('cron', hour=1, minute=0, id = 'geocoding')
