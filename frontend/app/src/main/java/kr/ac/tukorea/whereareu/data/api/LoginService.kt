@@ -1,6 +1,6 @@
 package kr.ac.tukorea.whereareu.data.api
 
-import kr.ac.tukorea.whereareu.data.model.login.request.CheckInterConnectRequest
+import kr.ac.tukorea.whereareu.data.model.DementiaKeyRequest
 import kr.ac.tukorea.whereareu.data.model.login.response.CheckInterConnectResponse
 import kr.ac.tukorea.whereareu.data.model.login.request.DementiaIdentityRequest
 import kr.ac.tukorea.whereareu.data.model.login.response.DementiaIdentityResponse
@@ -21,8 +21,12 @@ interface LoginService {
     suspend fun postDementiaIdentity(@Body request: DementiaIdentityRequest): Response<ResponseBody<DementiaIdentityResponse>>
 
     @POST("connection")
+<<<<<<< HEAD
     suspend fun postIsConnected(@Body request: CheckInterConnectRequest): Response<ResponseBody<CheckInterConnectResponse>>
 
     @POST("login")
     suspend fun postUserLogin(@Body request: UserLoginRequest): Response<ResponseBody<StateResponse>>
+=======
+    suspend fun postIsConnected(@Body request: DementiaKeyRequest): Response<ResponseBody<CheckInterConnectResponse>>
+>>>>>>> 32-feat-위치-예측-화면-구성-중복된-주소-제거-및-경찰서-정보-추가
 }

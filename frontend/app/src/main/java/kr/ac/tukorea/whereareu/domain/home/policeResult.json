@@ -1,0 +1,184 @@
+{
+  "status": "success",
+  "message": "Meaningful location data sent",
+  "result": {
+    "meaningfulPlaces": [
+      {
+        "address": "서울특별시 용산구 이촌로2가길 36 중산아파트 1동",
+        "timeInfo": [
+          {
+            "dayOfTheWeek": "Tuesday",
+            "time": "0408"
+          },
+          {
+            "dayOfTheWeek": "Tuesday",
+            "time": "0004"
+          },
+          {
+            "dayOfTheWeek": "Tuesday",
+            "time": "0812"
+          }
+        ],
+        "latitude": 37.529083099999994,
+        "longitude": 126.95355130000002,
+        "policeStationInfo": [
+          {
+            "policeName": "서울용산경찰서",
+            "policeAddress": "서울 용산구 원효로1가 12-12",
+            "roadAddressName": "서울 용산구 원효로89길 24",
+            "phone": "182",
+            "distance": "1839",
+            "latitude": "37.54117933635974",
+            "longitude": "126.96777437089538"
+          },
+          {
+            "policeName": "이촌치안센터",
+            "policeAddress": "서울 용산구 이촌동 301-82",
+            "roadAddressName": "서울 용산구 이촌로71길 24",
+            "phone": "02-2198-0165",
+            "distance": "1944",
+            "latitude": "37.5213667965208",
+            "longitude": "126.973306634325"
+          },
+          {
+            "policeName": "서울동작경찰서 민원봉사실",
+            "policeAddress": "서울 동작구 노량진동 72-35",
+            "roadAddressName": "서울 동작구 노량진로 148",
+            "phone": "02-811-9003",
+            "distance": "2005",
+            "latitude": "37.5131469501846",
+            "longitude": "126.942861630018"
+          }
+        ]
+      },
+      {
+        "address": "경기 시흥시 정왕동 1308",
+        "timeInfo": [
+          {
+            "dayOfTheWeek": "Tuesday",
+            "time": "1620"
+          },
+          {
+            "dayOfTheWeek": "Monday",
+            "time": "1620"
+          },
+          {
+            "dayOfTheWeek": "Wednesday",
+            "time": "1620"
+          },
+          {
+            "dayOfTheWeek": "Thursday",
+            "time": "1620"
+          },
+          {
+            "dayOfTheWeek": "Friday",
+            "time": "1620"
+          },
+          {
+            "dayOfTheWeek": "Saturday",
+            "time": "1620"
+          },
+          {
+            "dayOfTheWeek": "Sunday",
+            "time": "1620"
+          }
+        ],
+        "latitude": 37.339610844999996,
+        "longitude": 126.73241688499998,
+        "policeStationInfo": [
+          {
+            "policeName": "군자파출소",
+            "policeAddress": "경기 시흥시 거모동 1757-6",
+            "roadAddressName": "경기 시흥시 군자로 513",
+            "phone": "031-491-0112",
+            "distance": "4718",
+            "latitude": "37.3443352758591",
+            "longitude": "126.78533493484"
+          },
+          {
+            "policeName": "원곡파출소",
+            "policeAddress": "경기 안산시 단원구 원곡동 753",
+            "roadAddressName": "경기 안산시 단원구 원곡공원로 30",
+            "phone": "031-495-0113",
+            "distance": "5564",
+            "latitude": "37.33263654339308",
+            "longitude": "126.7946006367876"
+          },
+          {
+            "policeName": "원선파출소",
+            "policeAddress": "경기 안산시 단원구 원곡동 821-3",
+            "roadAddressName": "경기 안산시 단원구 원선로 33",
+            "phone": "031-495-0112",
+            "distance": "5885",
+            "latitude": "37.328081884820094",
+            "longitude": "126.7972420041327"
+          }
+        ]
+      },
+      {
+        "address": "경기도 시흥시 산기대학로 237 한국공학대학교",
+        "timeInfo": [
+          {
+            "dayOfTheWeek": "Tuesday",
+            "time": "1620"
+          },
+          {
+            "dayOfTheWeek": "Monday",
+            "time": "1620"
+          },
+          {
+            "dayOfTheWeek": "Wednesday",
+            "time": "1620"
+          },
+          {
+            "dayOfTheWeek": "Thursday",
+            "time": "1620"
+          },
+          {
+            "dayOfTheWeek": "Friday",
+            "time": "1620"
+          },
+          {
+            "dayOfTheWeek": "Saturday",
+            "time": "1620"
+          },
+          {
+            "dayOfTheWeek": "Sunday",
+            "time": "1620"
+          }
+        ],
+        "latitude": 37.33978109999999,
+        "longitude": 126.73484030000006,
+        "policeStationInfo": [
+          {
+            "policeName": "군자파출소",
+            "policeAddress": "경기 시흥시 거모동 1757-6",
+            "roadAddressName": "경기 시흥시 군자로 513",
+            "phone": "031-491-0112",
+            "distance": "4502",
+            "latitude": "37.3443352758591",
+            "longitude": "126.78533493484"
+          },
+          {
+            "policeName": "원곡파출소",
+            "policeAddress": "경기 안산시 단원구 원곡동 753",
+            "roadAddressName": "경기 안산시 단원구 원곡공원로 30",
+            "phone": "031-495-0113",
+            "distance": "5355",
+            "latitude": "37.33263654339308",
+            "longitude": "126.7946006367876"
+          },
+          {
+            "policeName": "원선파출소",
+            "policeAddress": "경기 안산시 단원구 원곡동 821-3",
+            "roadAddressName": "경기 안산시 단원구 원선로 33",
+            "phone": "031-495-0112",
+            "distance": "5680",
+            "latitude": "37.328081884820094",
+            "longitude": "126.7972420041327"
+          }
+        ]
+      }
+    ]
+  }
+}

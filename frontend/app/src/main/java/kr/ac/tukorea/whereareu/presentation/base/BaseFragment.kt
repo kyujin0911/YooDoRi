@@ -1,5 +1,6 @@
 package kr.ac.tukorea.whereareu.presentation.base
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -8,11 +9,15 @@ import androidx.annotation.LayoutRes
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.Fragment
+import kr.ac.tukorea.whereareu.presentation.LoadingDialog
 
 abstract class BaseFragment<V : ViewDataBinding>(@LayoutRes val layoutResource: Int) : androidx.fragment.app.Fragment() {
 
     private var _binding: V? = null
     protected val binding: V get() = _binding!!
+
+    private lateinit var loadingDialog: LoadingDialog
+    private var loadingState = false
     abstract fun initObserver()
     abstract fun initView()
 
@@ -29,6 +34,21 @@ abstract class BaseFragment<V : ViewDataBinding>(@LayoutRes val layoutResource: 
         )
         binding.lifecycleOwner = this.viewLifecycleOwner
         return binding.root
+    }
+
+    fun showLoadingDialog(context: Context) {
+        if (!loadingState) {
+            loadingDialog = LoadingDialog(context)
+            loadingDialog.show()
+            loadingState = true
+        }
+
+    }
+    fun dismissLoadingDialog() {
+        if (loadingState) {
+            loadingDialog.dismiss()
+            loadingState = false
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

@@ -1,10 +1,12 @@
 package kr.ac.tukorea.whereareu.presentation.nok.home
 
-import android.content.Context
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context.CLIPBOARD_SERVICE
 import android.content.Context.MODE_PRIVATE
-import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.PointF
+import android.os.Build
 import android.util.Log
 import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -12,7 +14,6 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -21,34 +22,144 @@ import com.naver.maps.map.CameraUpdate
 import com.naver.maps.map.MapFragment
 import com.naver.maps.map.NaverMap
 import com.naver.maps.map.OnMapReadyCallback
+import com.naver.maps.map.overlay.CircleOverlay
+import com.naver.maps.map.overlay.InfoWindow
+import com.naver.maps.map.overlay.Marker
 import com.naver.maps.map.overlay.OverlayImage
+import com.naver.maps.map.util.MarkerIcons
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancelAndJoin
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kr.ac.tukorea.whereareu.R
-import kr.ac.tukorea.whereareu.data.model.home.GetLocationInfoResponse
+import kr.ac.tukorea.whereareu.data.model.nok.home.LocationInfoResponse
 import kr.ac.tukorea.whereareu.databinding.IconLocationOverlayLayoutBinding
-import kr.ac.tukorea.whereareu.domain.home.MeaningfulPlace
+import kr.ac.tukorea.whereareu.domain.home.PoliceStationInfo
 import kr.ac.tukorea.whereareu.presentation.base.BaseFragment
-import kr.ac.tukorea.whereareu.presentation.login.SplashActivity
+import kr.ac.tukorea.whereareu.presentation.nok.home.adapter.PoliceStationRVA
+import kr.ac.tukorea.whereareu.presentation.nok.home.adapter.MeaningfulPlaceRVA
 import kr.ac.tukorea.whereareu.util.extension.repeatOnStarted
+import kr.ac.tukorea.whereareu.util.extension.showToastShort
 import kotlin.math.roundToInt
+
 
 @AndroidEntryPoint
 class NokHomeFragment : BaseFragment<kr.ac.tukorea.whereareu.databinding.FragmentHomeBinding>(R.layout.fragment_home),
-    OnMapReadyCallback {
+    OnMapReadyCallback, MeaningfulPlaceRVA.MeaningfulPlaceRVAClickListener, PoliceStationRVA.PoliceStationRVAClickListener {
     private val viewModel: NokHomeViewModel by activityViewModels()
     private val LOCATION_PERMISSION_REQUEST_CODE = 1001
     private var naverMap: NaverMap? = null
     private var dementiaName: String? = null
-    private val navigator by lazy {
-        findNavController()
-    }
-    private val meaningfulListRVA by lazy {
-        MeaningfulListRVA()
+    private val lastLocationMarker = Marker()
+    private val circleOverlay = CircleOverlay()
+    private val meaningfulPlaceRVA by lazy {
+        MeaningfulPlaceRVA()
     }
     private lateinit var behavior: BottomSheetBehavior<ConstraintLayout>
-
+    private var countDownJob: Job? = null
     override fun initObserver() {
+        repeatOnStarted {
+            viewModel.predictEvent.collect{ predictEvent ->
+                handlePredictEvent(predictEvent)
+            }
+        }
+    }
+
+    private fun handlePredictEvent(event: NokHomeViewModel.PredictEvent){
+        when(event){
+            is NokHomeViewModel.PredictEvent.StartPredict -> {
+                viewModel.test()
+                //viewModel.getMeaningfulPlace()
+                //viewModel.searchWithKeyword("x", "y")
+                initBottomSheet()
+                initMeaningfulListRVA()
+                showLoadingDialog(requireContext())
+            }
+
+            is NokHomeViewModel.PredictEvent.DisplayDementiaLastInfo -> {
+                startCountDownJob(event.averageSpeed, event.coord)
+
+                binding.averageMovementSpeedTv.text = String.format("%.2fkm", event.averageSpeed)
+                naverMap?.locationOverlay?.isVisible = false
+            }
+
+            is NokHomeViewModel.PredictEvent.MeaningFulPlaceEvent -> {
+                Log.d("뭐고", event.meaningfulPlaceForList.toString())
+                meaningfulPlaceRVA.submitList(event.meaningfulPlaceForList)
+
+                event.meaningfulPlaceForList.forEach {meaningfulPlace ->
+                    val latitude = meaningfulPlace.latitude
+                    val longitude = meaningfulPlace.longitude
+
+                    val marker = Marker()
+                    with(marker){
+                        position = LatLng(latitude, longitude)
+                        icon = MarkerIcons.YELLOW
+                        captionText = meaningfulPlace.address
+                        captionRequestedWidth = 400
+                        map = naverMap
+                    }
+
+                    val infoWindow = InfoWindow()
+                    infoWindow.adapter = object : InfoWindow.DefaultTextAdapter(requireContext()) {
+                        override fun getText(infoWindow: InfoWindow): CharSequence {
+                            return "예상 위치"
+                        }
+                    }
+                    infoWindow.open(marker)
+                }
+            }
+
+            is NokHomeViewModel.PredictEvent.SearchNearbyPoliceStation -> {
+                event.policeStationList.forEach {policeStation ->
+                    val marker = Marker()
+                    with(marker){
+                        position = LatLng(policeStation.latitude.toDouble(), policeStation.longitude.toDouble())
+                        icon = MarkerIcons.BLUE
+                        captionText = policeStation.policeName
+                        captionRequestedWidth = 400
+                        map = naverMap
+                    }
+                }
+
+                dismissLoadingDialog()
+            }
+
+            is NokHomeViewModel.PredictEvent.DisplayDementiaLastLocation -> {
+                binding.lastLocationTv.text = event.lastLocation.address
+
+                val latitude = event.lastLocation.latitude
+                val longitude = event.lastLocation.longitude
+                naverMap?.moveCamera(CameraUpdate.scrollTo(LatLng(latitude, longitude)))
+
+                with(lastLocationMarker){
+                    position = LatLng(latitude, longitude)
+                    icon = MarkerIcons.RED
+                    captionText = event.lastLocation.address
+                    captionRequestedWidth = 400
+                    map = naverMap
+                }
+
+                val infoWindow = InfoWindow()
+                infoWindow.adapter = object : InfoWindow.DefaultTextAdapter(requireContext()) {
+                    override fun getText(infoWindow: InfoWindow): CharSequence {
+                        return "실종 직전 위치"
+                    }
+                }
+                infoWindow.open(lastLocationMarker)
+            }
+
+            is NokHomeViewModel.PredictEvent.StopPredict -> {
+                viewLifecycleOwner.lifecycleScope.launch {
+                    countDownJob?.cancelAndJoin()
+                    countDownJob = null
+                    circleOverlay.isVisible = false
+                    binding.countDownT.text = "00:00"
+                    lastLocationMarker.map = null
+                }
+            }
+        }
     }
 
     private fun updateDementiaMovementStatus(status: Int): String{
@@ -60,25 +171,11 @@ class NokHomeFragment : BaseFragment<kr.ac.tukorea.whereareu.databinding.Fragmen
             else -> "알수없음"
         }
     }
-    private fun updateDementiaStatus(dementiaStatus: GetLocationInfoResponse){
+
+    private fun updateDementiaStatus(dementiaStatus: LocationInfoResponse){
         with(binding){
             stateTv.text = updateDementiaMovementStatus(dementiaStatus.userStatus)
             batteryTv.text = "${dementiaStatus.battery}%"
-            if (dementiaStatus.isInternetOn){
-                internetStatusTv.text = "on"
-                wifiIv.setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.ic_wifi_on))
-            } else {
-                internetStatusTv.text = "off"
-                wifiIv.setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.ic_wifi_off))
-            }
-
-            if (dementiaStatus.isGpsOn){
-                gpsStatusTv.text = "on"
-                gpsIv.setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.ic_gps_on_24))
-            } else {
-                gpsStatusTv.text = "off"
-                gpsIv.setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.ic_gps_off_24))
-            }
 
             when(dementiaStatus.isRingstoneOn){
                 0 -> {
@@ -106,70 +203,50 @@ class NokHomeFragment : BaseFragment<kr.ac.tukorea.whereareu.databinding.Fragmen
     private fun trackingDementiaLocation(coord: LatLng, bearing: Float, name: String, speed: Float){
         naverMap?.let {
             val locationOverlay = it.locationOverlay
-            locationOverlay.isVisible = true
             val iconBinding = IconLocationOverlayLayoutBinding.inflate(layoutInflater)
-            iconBinding.nameTv.text = name
+            val icon = iconBinding.layout
 
-            // m/s to km/h
-            iconBinding.speedTv.text = (speed * 3.6).roundToInt().toString()
-            val speedTv = iconBinding.layout
-            locationOverlay.icon = OverlayImage.fromView(speedTv)
-            locationOverlay.circleRadius = 0
-            locationOverlay.position = coord
-            //locationOverlay.bearing = bearing
-            locationOverlay.anchor = PointF(0.5f, 1f)
+            with(locationOverlay){
+                isVisible = true
+                // m/s to km/h
+                iconBinding.speedTv.text = (speed * 3.6).roundToInt().toString()
+                iconBinding.nameTv.text = name
+                locationOverlay.icon = OverlayImage.fromView(icon)
+                circleRadius = 0
+                position = coord
+                anchor = PointF(0.5f, 1f)
+            }
 
             it.moveCamera(CameraUpdate.scrollTo(coord))
         }
     }
 
     override fun initView() {
+        binding.view = this
+        binding.viewModel = viewModel
         checkLocationPermission()
         updateDementiaName()
         initMap()
-        goToPredictLocationFragment()
     }
 
-    private fun goToPredictLocationFragment(){
-        binding.predictTv.setOnClickListener {
-            viewModel.setIsPredicted(true)
-            binding.homeGroup.visibility = View.GONE
-            binding.bottomSheet.visibility = View.VISIBLE
-            initBottomSheet()
-            initMeaningfulListRVA()
-            //navigator.navigate(R.id.action_nokHomeFragment_to_predictLocationFragment)
-        }
+    fun predict(){
+        viewModel.setIsPredicted(true)
+    }
+
+    fun stopPredict(){
+        viewModel.setIsPredicted(false)
     }
 
     private fun initMeaningfulListRVA(){
-        binding.rv.adapter = meaningfulListRVA
-        binding.rv.addItemDecoration(
+        binding.rv.apply {
+            adapter = meaningfulPlaceRVA
+            addItemDecoration(
             DividerItemDecoration(
                 requireContext(),
                 LinearLayoutManager.VERTICAL
             )
-        )
-        val list = listOf<MeaningfulPlace>(
-            MeaningfulPlace("한국공학대학교", "시흥시 뭐시기"),
-            MeaningfulPlace("한국공학대학교", "시흥시 뭐시기"),
-            MeaningfulPlace("한국공학대학교", "시흥시 뭐시기"),
-            MeaningfulPlace("한국공학대학교", "시흥시 뭐시기"),
-            MeaningfulPlace("한국공학대학교", "시흥시 뭐시기"),
-            MeaningfulPlace("한국공학대학교", "시흥시 뭐시기"),
-            MeaningfulPlace("한국공학대학교", "시흥시 뭐시기"),
-            MeaningfulPlace("한국공학대학교", "시흥시 뭐시기"),
-            MeaningfulPlace("한국공학대학교", "시흥시 뭐시기"),
-            MeaningfulPlace("한국공학대학교", "시흥시 뭐시기"),
-            MeaningfulPlace("한국공학대학교", "시흥시 뭐시기"),
-            MeaningfulPlace("한국공학대학교", "시흥시 뭐시기"),
-            MeaningfulPlace("한국공학대학교", "시흥시 뭐시기"),
-            MeaningfulPlace("한국공학대학교", "시흥시 뭐시기"),
-            MeaningfulPlace("한국공학대학교", "시흥시 뭐시기"),
-            MeaningfulPlace("한국공학대학교", "시흥시 뭐시기"),
-            MeaningfulPlace("한국공학대학교", "시흥시 뭐시기"),
-            MeaningfulPlace("한국공학대학교", "시흥시 뭐시기"),
-        )
-        meaningfulListRVA.submitList(list)
+        )}
+        meaningfulPlaceRVA.setRVAClickListener(this, this)
     }
 
     private fun initBottomSheet(){
@@ -177,31 +254,64 @@ class NokHomeFragment : BaseFragment<kr.ac.tukorea.whereareu.databinding.Fragmen
         behavior.state = BottomSheetBehavior.STATE_COLLAPSED
         behavior.peekHeight = 20
         behavior.isFitToContents = false
-        behavior.halfExpandedRatio = 0.4f
-        behavior.expandedOffset = 100
+        behavior.halfExpandedRatio = 0.3f
 
+        //bottom sheet predict layout과 높이 맞추기
+        /*val viewTreeObserver: ViewTreeObserver = binding.predictLayout.viewTreeObserver
+        viewTreeObserver.addOnGlobalLayoutListener(object : OnGlobalLayoutListener {
+            override fun onGlobalLayout() {
+                behavior.expandedOffset = binding.predictLayout.height + 35
+                binding.predictLayout.viewTreeObserver.removeOnGlobalLayoutListener(this)
+            }
+        })*/
 
         // half expanded state일 때 접기 제어
         behavior.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback(){
             var isHalfExpanded = false
             override fun onStateChanged(bottomSheet: View, newState: Int) {
-                when(newState){
+                /*when(newState){
                     BottomSheetBehavior.STATE_HALF_EXPANDED -> {
                         isHalfExpanded = true
                     }
                     BottomSheetBehavior.STATE_COLLAPSED and BottomSheetBehavior.STATE_HALF_EXPANDED-> {
                         isHalfExpanded = false
                     }
-                }
+                }*/
             }
 
             override fun onSlide(bottomSheet: View, slideOffset: Float) {
-                if(isHalfExpanded && slideOffset < 0.351f){
+                /*if(isHalfExpanded && slideOffset < 0.351f){
                     behavior.state = BottomSheetBehavior.STATE_COLLAPSED
-                }
+                }*/
             }
 
         })
+    }
+
+    private fun startCountDownJob(averageSpeed: Double, coord: LatLng){
+        with(circleOverlay){
+            center = coord
+            color = ContextCompat.getColor(requireContext(), R.color.purple)
+            outlineWidth = 5
+            outlineColor = ContextCompat.getColor(requireContext(), R.color.deep_purple)
+            radius = 0.0
+        }
+
+        countDownJob = lifecycleScope.launch {
+            var second = 0
+            var minute = 0
+            while (true) {
+                second+=1
+                circleOverlay.radius += averageSpeed
+                circleOverlay.map = naverMap
+                if(second % 60 == 0){
+                    minute += 1
+                    second = 0
+                }
+                binding.countDownT.text = String.format("%02d:%02d",minute, second)
+                delay(1000L)
+            }
+        }
     }
 
     private fun updateDementiaName(){
@@ -211,27 +321,6 @@ class NokHomeFragment : BaseFragment<kr.ac.tukorea.whereareu.databinding.Fragmen
             binding.dementiaNameTv.text = dementiaName
         }
     }
-
-    fun getStatusBarHeight(context: Context): Int {
-        val resourceId = context.resources.getIdentifier("status_bar_height", "dimen", "android")
-
-        return if (resourceId > 0) {
-            context.resources.getDimensionPixelSize(resourceId)
-        } else {
-            0
-        }
-    }
-
-    fun getNaviBarHeight(context: Context): Int {
-        val resourceId: Int =
-            context.resources.getIdentifier("navigation_bar_height", "dimen", "android")
-        return if (resourceId > 0) {
-            context.resources.getDimensionPixelSize(resourceId)
-        } else {
-            0
-        }
-    }
-
     private fun initMap() {
         val fm = childFragmentManager
         val mapFragment = fm.findFragmentById(R.id.map_fragment) as MapFragment?
@@ -279,16 +368,46 @@ class NokHomeFragment : BaseFragment<kr.ac.tukorea.whereareu.databinding.Fragmen
         super.onResume()
         Log.d("resume", "resume")
         repeatOnStarted {
+            delay(500)
             viewModel.dementiaLocation.collect{ response ->
                 Log.d("response", response.toString())
                 updateDementiaStatus(response)
                 val coord = LatLng(response.latitude, response.longitude)
-                trackingDementiaLocation(coord, response.bearing, dementiaName?:"", response.currentSpeed)
+                trackingDementiaLocation(coord, response.bearing, dementiaName ?: "", response.currentSpeed)
             }
         }
     }
 
     override fun onMapReady(p0: NaverMap) {
+    }
 
+
+    // inner RVA 클릭 이벤트
+    override fun onClickMoreView(policeStationInfo: PoliceStationInfo) {
+        behavior.state = BottomSheetBehavior.STATE_COLLAPSED
+        val coord = LatLng(policeStationInfo.latitude.toDouble(), policeStationInfo.longitude.toDouble())
+        naverMap?.moveCamera(CameraUpdate.scrollTo(coord))
+    }
+
+    override fun onClickCopyPhoneNumber(phoneNumber: String) {
+        val clipboardManager = requireContext().getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
+        clipboardManager.setPrimaryClip(ClipData.newPlainText("", phoneNumber))
+        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2) {
+            requireActivity().showToastShort(requireContext(), "전화번호가 복사되었습니다.")
+        }
+    }
+
+    override fun onClickCopyAddress(address: String) {
+        val clipboardManager = requireContext().getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
+        clipboardManager.setPrimaryClip(ClipData.newPlainText("", address))
+        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2) {
+            requireActivity().showToastShort(requireContext(), "주소가 복사되었습니다.")
+        }
+    }
+
+    override fun onClickMapView(latitude: Double, longitude: Double) {
+        behavior.state = BottomSheetBehavior.STATE_COLLAPSED
+        val coord = LatLng(latitude, longitude)
+        naverMap?.moveCamera(CameraUpdate.scrollTo(coord))
     }
 }

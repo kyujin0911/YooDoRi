@@ -27,7 +27,7 @@
     </navigation>
     <fragment
         android:id="@+id/locationHistoryFragment2"
-        android:name="kr.ac.tukorea.whereareu.presentation.LocationHistoryFragment"
+        android:name="kr.ac.tukorea.whereareu.presentation.nok.history.LocationHistoryFragment"
         android:label="LocationHistoryFragment" />
     <fragment
         android:id="@+id/safeAreaFragment2"
