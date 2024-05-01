@@ -71,27 +71,27 @@ def get_current_user(token: str = Depends(OAuth2PasswordBearer(tokenUrl="/login"
     )
     try:
         payload = jwt.decode(token, Config.SECRET_KEY, algorithms=[Config.ALGORITHM])
-        return payload
-        #username: str = payload.get("name")
 
-        #if username is None:
-        #    raise credentials_exception
+        username: str = payload.get("name")
+
+        if username is None:
+            raise credentials_exception
         
     except JWTError:
         raise credentials_exception
     
-    #user, user_type = get_user(username, payload.get("key"))
+    user, user_type = get_user(username, payload.get("key"))
 
-    #if user is None:
-    #    raise credentials_exception
+    if user is None:
+        raise credentials_exception
     
-    #return user, user_type
+    return user, user_type
 
 @router.get("/test", responses = {200 : {"model" : CommonResponse, "description" : "테스트 성공" }}, description="토큰을 사용했을 때 유저 정보가 반환되면 성공(앞으로 이렇게 바뀔 예정)")
 async def protected_route(current_user= Depends(APIKeyHeader(name="Authorization"))):
     return get_current_user(current_user)
 
-@router.get("/test/login", responses = {200 : {"model" : TokenResponse, "description" : "로그인 성공" }, 400: {"model": ErrorResponse, "description": "로그인 실패"}}, description="로그인 테스트(앞으로 이렇게 바뀔예정) | username : 이름, password : key -> 이 두개만 채워서 보내면 됨")
+@router.post("/test/login", responses = {200 : {"model" : TokenResponse, "description" : "로그인 성공" }, 400: {"model": ErrorResponse, "description": "로그인 실패"}}, description="로그인 테스트(앞으로 이렇게 바뀔예정) | username : 이름, password : key -> 이 두개만 채워서 보내면 됨")
 async def test_login(from_data: OAuth2PasswordRequestForm = Depends()):
     try:
         user = get_user(from_data.username, from_data.password)
@@ -302,10 +302,9 @@ async def receive_user_login(request: loginRequest):
         session.close()
 
 @router.post("/locations/dementias", responses = {200 : {"model" : TempResponse, "description" : "위치 정보 전송 성공" }, 404: {"model": ErrorResponse, "description": "보호 대상자 키 조회 실패"}}, description="보호 대상자의 위치 정보를 전송 | isRingstoneOn : 0(무음), 1(진동), 2(벨소리)")
-async def receive_location_info(request: ReceiveLocationRequest):
-
+async def receive_location_info(request: ReceiveLocationRequest, current_user: int = Depends(APIKeyHeader(name = "Authorization"))):
     try:
-        _dementia_key = request.dementiaKey
+        _dementia_key = get_current_user(current_user)[0].dementia_key
 
         existing_dementia = session.query(models.dementia_info).filter_by(dementia_key = _dementia_key).first()
 
@@ -519,9 +518,10 @@ async def modify_updatint_rate(request: ModifyUserUpdateRateRequest):
         session.close()
 
 @router.post("/dementias/averageWalkingSpeed", responses = {200 : {"model" : AverageWalkingSpeedResponse, "description" : "평균 걷기 속도 계산 성공" }, 404: {"model": ErrorResponse, "description": "보호 대상자 키 조회 실패 or 위치 정보 부족"}}, description="보호 대상자의 평균 걷기 속도를 계산 및 마지막 정보 전송")
-async def caculate_dementia_average_walking_speed(current_user : int = Depends(APIKeyHeader(name = "Authorization"))): #requset: AverageWalkingSpeedRequest
+async def caculate_dementia_average_walking_speed(requset: AverageWalkingSpeedRequest): # current_user : int = Depends(APIKeyHeader(name = "Authorization"))
 
-    _dementia_key = get_current_user(current_user)["key"]
+    #_dementia_key = get_current_user(current_user)["key"]
+    _dementia_key = requset.dementiaKey
 
     if _dementia_key is None:
         print(f"[ERROR] Dementia key not found(calculate dementia average walking speed)")
