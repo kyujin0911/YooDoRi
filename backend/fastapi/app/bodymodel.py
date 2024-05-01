@@ -66,7 +66,6 @@ class loginRequest(BaseModel):
     isDementia : int = Field(examples=["1"], description="1 : 보호대상자, 0 : 보호자")
 
 class ReceiveLocationRequest(BaseModel):
-    dementiaKey : int = Field(examples=["123456"])
     date : str = Field(examples=["2024-03-19"], description="yyyy-mm-dd")
     time : str = Field(examples=["12:00:00"])
     latitude : float = Field(examples=["37.123456"])
@@ -180,8 +179,8 @@ class TempResponse(BaseModel):
     result : int = Field("1", description="1(정지), 2(도보), 3(차량), 4(지하철)")
 
 class Token(BaseModel):
-    access_token: str = Field("ksjdnfjkdasnfljsknafljansdfjlsakn")
-    token_type: str = Field("bearer")
+    accessToken: str = Field("ksjdnfjkdasnfljsknafljansdfjlsakn")
+    tokenType: str = Field("bearer")
 
 class TokenResponse(BaseModel):
     status: str = Field("success")
