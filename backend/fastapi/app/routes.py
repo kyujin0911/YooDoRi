@@ -110,13 +110,16 @@ async def receive_nok_info(request: ReceiveNokInfoRequest):
                 session.add(new_nok)
                 session.commit()
 
+            token = make_token(_nok_name, _key)
+
             result = {
                 'dementiaInfoRecord' : {
                         'dementiaKey' : existing_dementia.dementia_key,
                         'dementiaName': existing_dementia.dementia_name,
                         'dementiaPhoneNumber': existing_dementia.dementia_phonenumber
                 },
-                'nokKey': _key
+                'nokKey': _key,
+                'token': token
             }
 
             print(f"[INFO] NOK information received from {existing_dementia.dementia_name}({existing_dementia.dementia_key})")
@@ -639,7 +642,7 @@ async def send_location_history(_date : str, user_info : int = Depends(APIKeyHea
 
 
 #스케줄러 비활성화
-"""@sched.scheduled_job('cron', hour=14, minute=21, id = 'geocoding')
+"""@sched.scheduled_job('cron', hour=0, minute=30, id = 'geocoding')
 def kakao_api():
     try:
         print(f"[INFO] Start geocoding")

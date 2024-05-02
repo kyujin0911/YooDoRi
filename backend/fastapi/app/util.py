@@ -4,6 +4,7 @@ from fastapi import Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer
 from datetime import timedelta, datetime
 from jose import JWTError, jwt
+from pytz import timezone
 from . import models
 
 
@@ -18,6 +19,17 @@ def make_token(name: str, key: str):
     access_token = jwt.encode(data, Config.SECRET_KEY, Config.ALGORITHM)
 
     return access_token
+
+def make_refresh_token(name: str, key: str):
+    data = {
+        "name": name,
+        "key": key,
+        "exp": datetime.now(timezone('Asia/Seoul')) + timedelta(minutes = Config.REFRESH_TOCKEN_EXPIRE_MINUTES)
+    }
+
+    refresh_token = jwt.encode(data, Config.SECRET_KEY, Config.ALGORITHM)
+
+    return refresh_token
 
 def get_user(userName, key, session = Depends(Database().get_session)):
     try:
@@ -37,26 +49,45 @@ def get_user(userName, key, session = Depends(Database().get_session)):
     finally:
         session.close()
 
-def get_current_user(token: str = Depends(OAuth2PasswordBearer(tokenUrl="/login")), session = Depends(Database().get_session)):
-    credentials_exception = HTTPException(
-        status_code=401,
-        detail="Could not validate credentials",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
+def check_token_expired(token: str):
     try:
         payload = jwt.decode(token, Config.SECRET_KEY, algorithms=[Config.ALGORITHM])
+        now = datetime.timestamp(datetime.now(timezone('Asia/Seoul')))
+        exp: datetime = payload.get("exp")
+
+        if exp < now:
+            return None
+        
+        return payload
+    
+    except JWTError:
+        return True
+
+def get_current_user(token: str = Depends(OAuth2PasswordBearer(tokenUrl="/login")), session = Depends(Database().get_session)):
+    try:
+        payload = jwt.decode(token, Config.SECRET_KEY, algorithms=[Config.ALGORITHM])
+
+        if check_token_expired(token):
+            pass
+        else:
+            raise HTTPException(
+                    status_code=401,
+                    detail="Expired token",
+                    headers={"WWW-Authenticate": "Bearer"},
+                    code="EXPIRED_TOKEN"
+                )
 
         username: str = payload.get("name")
 
         if username is None:
-            raise credentials_exception
+            raise HTTPException(status_code=401, detail="Could not validate credentials")
         
         user, user_type = get_user(username, payload.get("key"), session)
 
         if user is None:
-            raise credentials_exception
+            raise HTTPException(status_code=404, detail="User not found")
         
-    except JWTError:
-        raise credentials_exception
+    except HTTPException as e:
+        raise e
     
     return user, user_type
