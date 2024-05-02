@@ -3,7 +3,6 @@ package kr.ac.tukorea.whereareu.presentation.nok.home
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context.CLIPBOARD_SERVICE
-import android.content.Context.MODE_PRIVATE
 import android.content.pm.PackageManager
 import android.graphics.PointF
 import android.os.Build
@@ -50,7 +49,6 @@ class NokHomeFragment : BaseFragment<kr.ac.tukorea.whereareu.databinding.Fragmen
     private val viewModel: NokHomeViewModel by activityViewModels()
     private val LOCATION_PERMISSION_REQUEST_CODE = 1001
     private var naverMap: NaverMap? = null
-    private var dementiaName: String? = null
     private val lastLocationMarker = Marker()
     private val circleOverlay = CircleOverlay()
     private val meaningfulPlaceRVA by lazy {
@@ -70,7 +68,7 @@ class NokHomeFragment : BaseFragment<kr.ac.tukorea.whereareu.databinding.Fragmen
                 Log.d("response", response.toString())
                 updateDementiaStatus(response)
                 val coord = LatLng(response.latitude, response.longitude)
-                trackingDementiaLocation(coord, response.bearing, dementiaName ?: "", response.currentSpeed)
+                trackingDementiaLocation(coord, response.currentSpeed)
             }
         }
     }
@@ -209,7 +207,7 @@ class NokHomeFragment : BaseFragment<kr.ac.tukorea.whereareu.databinding.Fragmen
         }
     }
 
-    private fun trackingDementiaLocation(coord: LatLng, bearing: Float, name: String, speed: Float){
+    private fun trackingDementiaLocation(coord: LatLng, speed: Float){
         naverMap?.let {
             val locationOverlay = it.locationOverlay
             val iconBinding = IconLocationOverlayLayoutBinding.inflate(layoutInflater)
@@ -219,7 +217,7 @@ class NokHomeFragment : BaseFragment<kr.ac.tukorea.whereareu.databinding.Fragmen
                 isVisible = true
                 // m/s to km/h
                 iconBinding.speedTv.text = (speed * 3.6).roundToInt().toString()
-                iconBinding.nameTv.text = name
+                iconBinding.nameTv.text = viewModel.dementiaName.value
                 locationOverlay.icon = OverlayImage.fromView(icon)
                 circleRadius = 0
                 position = coord
@@ -322,14 +320,6 @@ class NokHomeFragment : BaseFragment<kr.ac.tukorea.whereareu.databinding.Fragmen
             }
         }
     }
-
-    private fun updateDementiaName(){
-        val spf = requireActivity().getSharedPreferences("OtherUser", MODE_PRIVATE)
-        dementiaName = spf.getString("name", "")
-        if (!dementiaName.isNullOrBlank()){
-            binding.dementiaNameTv.text = dementiaName
-        }
-    }
     private fun initMap() {
         val fm = childFragmentManager
         val mapFragment = fm.findFragmentById(R.id.map_fragment) as MapFragment?
@@ -375,8 +365,6 @@ class NokHomeFragment : BaseFragment<kr.ac.tukorea.whereareu.databinding.Fragmen
 
     override fun onResume() {
         super.onResume()
-        val nokKey = requireActivity().getSharedPreferences("User", MODE_PRIVATE)
-            .getString("key", "") ?: ""
         viewModel.fetchUserInfo()
         Log.d("resume", "resume")
     }

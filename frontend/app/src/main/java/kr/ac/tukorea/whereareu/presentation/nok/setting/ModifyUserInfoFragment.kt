@@ -16,6 +16,7 @@ import kr.ac.tukorea.whereareu.util.extension.EditTextUtil.hideKeyboard
 import kr.ac.tukorea.whereareu.util.extension.EditTextUtil.setOnEditorActionListener
 import kr.ac.tukorea.whereareu.util.extension.repeatOnStarted
 import kr.ac.tukorea.whereareu.util.extension.showToastOnView
+import kr.ac.tukorea.whereareu.util.extension.showToastShort
 import kr.ac.tukorea.whereareu.util.extension.statusBarHeight
 
 @AndroidEntryPoint
@@ -30,7 +31,7 @@ class ModifyUserInfoFragment :
         binding.viewModel = viewModel
 
         repeatOnStarted {
-            viewModel.toastEvent.collect{
+            viewModel.toastEvent.collect {
                 if (navigator.currentDestination?.id == R.id.modifyUserInfoFragment) {
                     navigator.popBackStack()
                 }
@@ -40,7 +41,7 @@ class ModifyUserInfoFragment :
     }
 
     override fun initView() {
-        binding.layout.setPadding(0,requireActivity().statusBarHeight() ,0, 0)
+        binding.layout.setPadding(0, requireActivity().statusBarHeight(), 0, 0)
         binding.view = this
         binding.userPhoneEt.addTextChangedListener(PhoneNumberFormattingTextWatcher())
 
@@ -75,6 +76,16 @@ class ModifyUserInfoFragment :
                 apply()
             }
             val key = nokSpf.getString("key", "")
+
+            val currentName = viewModel.userInfo.value.nokInfoRecord.nokName
+            val currentPhoneNumber = viewModel.userInfo.value.nokInfoRecord.nokPhoneNumber
+
+            if (binding.userNameEt.text.toString() == currentName &&
+                binding.userPhoneEt.text.toString() == currentPhoneNumber) {
+                requireActivity().showToastShort(requireContext(),
+                    "개인 정보 변경 후 변경 완료 버튼을 눌러주세요")
+                return@setOnClickListener
+            }
 
             viewModel.sendUpdateUserInfo(
                 ModifyUserInfoRequest(

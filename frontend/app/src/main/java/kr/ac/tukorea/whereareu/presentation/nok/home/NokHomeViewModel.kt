@@ -105,7 +105,7 @@ class NokHomeViewModel @Inject constructor(
     fun fetchUserInfo(){
         viewModelScope.launch {
             nokHomeRepository.getUserInfo(_nokKey.value).onSuccess {
-                _dementiaName.emit(it.nokInfoRecord.nokName)
+                _dementiaName.emit(it.dementiaInfoRecord.dementiaName)
             }
         }
     }
