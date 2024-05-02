@@ -45,7 +45,7 @@
                     android:elevation="10dp"
                     android:orientation="horizontal"
                     android:padding="4dp"
-                    android:visibility="@{viewModel.isPredicted ? View.GONE : View.VISIBLE}"
+                    android:visibility="visible"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent">
@@ -58,7 +58,6 @@
                         android:backgroundTint="@color/white"
                         android:paddingHorizontal="12dp"
                         android:paddingVertical="8dp"
-                        android:visibility='@{viewModel.navigateEvent.equals("Home") ? View.VISIBLE : View.GONE}'
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
@@ -200,6 +199,46 @@
 
                     </androidx.constraintlayout.widget.ConstraintLayout>
                 </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <TextView
+                    android:id="@+id/predict_tv"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginBottom="16dp"
+                    android:background="@drawable/oval"
+                    android:elevation="8dp"
+                    android:fontFamily="@font/suite_extrabold"
+                    android:gravity="center"
+
+                    android:text="위치\n예측"
+                    android:textSize="16sp"
+                    android:visibility="@{viewModel.isPredicted ? View.GONE : View.VISIBLE}"
+                    app:layout_constraintBottom_toTopOf="@id/emergency_tv"
+                    app:layout_constraintEnd_toEndOf="parent" />
+
+                <TextView
+                    android:id="@+id/emergency_tv"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginBottom="16dp"
+                    android:background="@drawable/oval"
+                    android:backgroundTint="@color/red"
+                    android:elevation="8dp"
+                    android:fontFamily="@font/suite_extrabold"
+                    android:gravity="center"
+                    android:text="긴급\n도움"
+                    android:textSize="16sp"
+                    android:visibility="@{viewModel.isPredicted ? View.GONE : View.VISIBLE}"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent" />
+
+                <androidx.constraintlayout.widget.Group
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:visibility='@{viewModel.navigateEvent.equals("Home") ? View.VISIBLE : View.GONE}'
+                    app:constraint_referenced_ids="predict_tv, emergency_tv, user_info_layout"/>
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <androidx.constraintlayout.widget.ConstraintLayout

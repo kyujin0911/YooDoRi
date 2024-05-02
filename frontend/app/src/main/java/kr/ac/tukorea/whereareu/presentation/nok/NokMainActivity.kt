@@ -40,8 +40,6 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
         //상태바 투명 설정
         binding.viewModel = homeViewModel
         initMap()
-        //this.setStatusBarTransparent()
-        //binding.layout.setPadding(0, 0, 0, this.navigationHeight())
         initNavigator()
         homeViewModel.fetchUserInfo()
         behavior = BottomSheetBehavior.from(binding.bottomSheet)
