@@ -6,6 +6,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kr.ac.tukorea.whereareu.data.model.nok.history.LocationHistory
 import kr.ac.tukorea.whereareu.data.model.nok.history.LocationHistoryRequest
@@ -20,9 +21,11 @@ class LocationHistoryViewModel @Inject constructor(
     private val repository: LocationHistoryRepositoryImpl
 ): ViewModel() {
 
-    private val _locationHistory = MutableStateFlow<LocationHistoryResponse>(LocationHistoryResponse(
-    ))
-    val locationHistory = _locationHistory.asSharedFlow()
+    private val _locationHistory = MutableStateFlow<LocationHistoryResponse>(
+        LocationHistoryResponse(
+    )
+    )
+    val locationHistory = _locationHistory.asStateFlow()
     fun fetchLocationHistory(date: String, dementiaKey: String){
         viewModelScope.launch {
             repository.fetchLocationHistory(date, dementiaKey).onSuccess { response ->
