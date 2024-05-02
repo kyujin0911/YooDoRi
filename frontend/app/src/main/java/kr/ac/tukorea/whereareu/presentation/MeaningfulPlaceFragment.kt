@@ -19,11 +19,9 @@ import kr.ac.tukorea.whereareu.util.extension.repeatOnStarted
 class MeaningfulPlaceFragment :
     BaseFragment<FragmentMeaningfulPlaceBinding>(R.layout.fragment_meaningful_place) {
     private val viewModel: NokHomeViewModel by activityViewModels()
+    private lateinit var  userMeaningfulListRVA: UserMeaningfulListRVA
 
     //    private var naverMap: NaverMap? = null
-    private val userMeaningfulListRVA by lazy {
-        UserMeaningfulListRVA()
-    }
 
     override fun initObserver() {
         repeatOnStarted {
@@ -36,16 +34,8 @@ class MeaningfulPlaceFragment :
 
     override fun initView() {
         Log.d("Presentation","MeaningfulPlaceFragment")
-        binding.bottomSheetLayout.innerRv.apply {
-            layoutManager = LinearLayoutManager(context)
-            adapter = UserMeaningfulListRVA()
-            addItemDecoration(
-                DividerItemDecoration(
-                    requireContext(),
-                    LinearLayoutManager.VERTICAL
-                )
-            )
-        }
+//        binding.bottomSheetLayout.innerRv.layoutManager = LinearLayoutManager(context)
+        userMeaningfulListRVA = UserMeaningfulListRVA()
     }
 
     private fun getMeaningfulPlace(event: NokHomeViewModel.PredictEvent) {
@@ -57,6 +47,7 @@ class MeaningfulPlaceFragment :
 
             is NokHomeViewModel.PredictEvent.MeaningFulPlaceEvent -> {
                 userMeaningfulListRVA.submitList(event.meaningfulPlaceForList)
+                binding.root
 
                 event.meaningfulPlaceForList.forEach { meaningfulPlace ->
                     val latitude = meaningfulPlace.latitude
@@ -84,5 +75,6 @@ class MeaningfulPlaceFragment :
                     requireContext(),
                     LinearLayoutManager.VERTICAL
                 ))}
+
     }
 }

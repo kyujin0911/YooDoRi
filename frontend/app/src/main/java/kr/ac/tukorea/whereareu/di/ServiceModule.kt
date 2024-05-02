@@ -9,6 +9,7 @@ import kr.ac.tukorea.whereareu.data.api.LoginService
 import kr.ac.tukorea.whereareu.data.api.NaverService
 import kr.ac.tukorea.whereareu.data.api.dementia.DementiaHomeService
 import kr.ac.tukorea.whereareu.data.api.nok.NokHomeService
+import kr.ac.tukorea.whereareu.data.api.nok.NokMeaningfulPlaceService
 import retrofit2.Retrofit
 import javax.inject.Singleton
 
@@ -46,6 +47,12 @@ object ServiceModule {
     @Provides
     @Singleton
     fun provideKakaoApi(@NetworkModule.KaKaoRetrofit retrofit: Retrofit): KakaoService {
+        return retrofit.buildService()
+    }
+
+    @Provides
+    @Singleton
+    fun proviceNokMeaningfulPlaceApi(@NetworkModule.BaseRetrofit retrofit: Retrofit): NokMeaningfulPlaceService{
         return retrofit.buildService()
     }
 }
