@@ -11,6 +11,7 @@ import kr.ac.tukorea.whereareu.data.api.LoginService
 import kr.ac.tukorea.whereareu.data.api.NaverService
 import kr.ac.tukorea.whereareu.data.api.nok.NokHomeService
 import kr.ac.tukorea.whereareu.data.api.SettingService
+import kr.ac.tukorea.whereareu.data.api.nok.LocationHistoryService
 import kr.ac.tukorea.whereareu.data.repository.dementia.home.DementiaHomeRepository
 import kr.ac.tukorea.whereareu.data.repository.dementia.home.DementiaHomeRepositoryImpl
 import kr.ac.tukorea.whereareu.data.repository.kakao.KakaoRepository
@@ -19,6 +20,8 @@ import kr.ac.tukorea.whereareu.data.repository.login.LoginRepository
 import kr.ac.tukorea.whereareu.data.repository.login.LoginRepositoryImpl
 import kr.ac.tukorea.whereareu.data.repository.naver.NaverRepository
 import kr.ac.tukorea.whereareu.data.repository.naver.NaverRepositoryImpl
+import kr.ac.tukorea.whereareu.data.repository.nok.history.LocationHistoryRepository
+import kr.ac.tukorea.whereareu.data.repository.nok.history.LocationHistoryRepositoryImpl
 import kr.ac.tukorea.whereareu.data.repository.nok.home.NokHomeRepository
 import kr.ac.tukorea.whereareu.data.repository.nok.home.NokHomeRepositoryImpl
 import kr.ac.tukorea.whereareu.data.repository.setting.SettingRepository
@@ -63,5 +66,11 @@ object RepositoryModule {
     fun providesSettingRepository(
         settingService: SettingService
     ): SettingRepository = SettingRepositoryImpl(settingService)
+
+    @ViewModelScoped
+    @Provides
+    fun providesLocationHistoryRepository(
+        locationHistoryService: LocationHistoryService
+    ): LocationHistoryRepository = LocationHistoryRepositoryImpl(locationHistoryService)
 
 }
