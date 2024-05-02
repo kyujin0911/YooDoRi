@@ -49,7 +49,6 @@ class ReceiveDementiaInfoResponse(BaseModel):
     message: str = Field("메~시~지~")
     result: dementiaResult
 
-
 class connectionResult(BaseModel):
     nokInfoRecord: nokInfoRecord
 
@@ -98,18 +97,11 @@ class GetLocationResponse(BaseModel):
     result: LastLoc
 
 class ModifyUserInfoRequest(BaseModel):
-    key : int = Field(examples=["123456"])
-    isDementia : int = Field(examples=["1"], description="1 : 보호대상자, 0 : 보호자")
     name : str = Field(examples=["김이름"])
     phoneNumber : str = Field(examples=["010-1234-5678"])
 
 class ModifyUserUpdateRateRequest(BaseModel):
-    key : int = Field(examples=["123456"])
-    isDementia : int = Field(examples=["1"])
     updateRate : int = Field(examples=["15"], description="초 단위")
-
-class AverageWalkingSpeedRequest(BaseModel):
-    dementiaKey : int = Field(examples=["123456"])
 
 class AverageAndLastLoc(BaseModel):
     averageSpeed : float = Field(examples=["2.0"])
