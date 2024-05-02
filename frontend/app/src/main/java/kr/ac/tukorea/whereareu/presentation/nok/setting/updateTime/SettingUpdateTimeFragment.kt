@@ -5,9 +5,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.collect
 import kr.ac.tukorea.whereareu.R
-import kr.ac.tukorea.whereareu.data.model.setting.UpdateRateRequest
 import kr.ac.tukorea.whereareu.databinding.FragmentSettingUpdateTimeBinding
 import kr.ac.tukorea.whereareu.presentation.nok.setting.SettingViewModel
 import kr.ac.tukorea.whereareu.presentation.base.BaseFragment
@@ -51,7 +49,7 @@ class SettingUpdateTimeFragment() :
     }
 
     private fun initializeViews() {
-        var position = invertTime(viewModel.settingTime.value.toInt())
+        var position = invertTime(viewModel.updateRate.value.toInt())
         binding.updateTimeList.layoutManager = LinearLayoutManager(context)
 
         timeAdapter = TimeAdapter(timeList, position)
@@ -59,7 +57,7 @@ class SettingUpdateTimeFragment() :
         timeAdapter.submitList(timeList.toMutableList()) // ListAdapter를 사용하기 위해 작성
         timeAdapter.setOnItemClickListener(object : TimeAdapter.OnItemClickListener {
             override fun onItemClick(item: TimeData, position: Int) {
-                viewModel.setSettingTime(positionToTime(position))
+                viewModel.setUpdateRate(positionToTime(position))
                 /*viewModel.sendUpdateTime(
                     UpdateRateRequest(key, 0, item.title.toInt() * 60)
                 )*/

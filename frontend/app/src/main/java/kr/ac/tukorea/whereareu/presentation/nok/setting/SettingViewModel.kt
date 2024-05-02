@@ -11,7 +11,6 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kr.ac.tukorea.whereareu.data.model.setting.ModifyUserInfoRequest
-import kr.ac.tukorea.whereareu.data.model.setting.StateResponse
 import kr.ac.tukorea.whereareu.data.model.setting.UpdateRateRequest
 import kr.ac.tukorea.whereareu.data.repository.setting.SettingRepositoryImpl
 import kr.ac.tukorea.whereareu.data.model.setting.GetUserInfoResponse
@@ -29,15 +28,15 @@ class SettingViewModel @Inject constructor(
     private val _userInfo = MutableSharedFlow<GetUserInfoResponse>()
     val userInfo =  _userInfo.asSharedFlow()
 
-    private val _settingTime = MutableStateFlow<String>("1")
-    val settingTime = _settingTime.asStateFlow()
+    private val _updateRate = MutableStateFlow<String>("1")
+    val updateRate = _updateRate.asStateFlow()
     // MutableSharedFlow()를 사용하면 bindind이 안됨 -> dataBinding을 하기위해서는 MutableStateFlow를 사용해야함
 
     private val _toastEvent = MutableSharedFlow<String>()
     val toastEvent = _toastEvent.asSharedFlow()
 
-    fun setSettingTime(time:String){
-        _settingTime.value = time
+    fun setUpdateRate(time:String){
+        _updateRate.value = time
     }
 
     fun sendUpdateUserInfo(request: ModifyUserInfoRequest) {
@@ -75,7 +74,7 @@ class SettingViewModel @Inject constructor(
     fun sendUpdateTime(key: String, isDementia: Int){
         viewModelScope.launch(Dispatchers.IO){
             repository.sendUpdateRate(
-                UpdateRateRequest(key, isDementia, _settingTime.value.toInt() * 60)
+                UpdateRateRequest(key, isDementia, _updateRate.value.toInt() * 60)
             ).onSuccess {
                 _toastEvent.emit("정보가 변경되었습니다.")
                 Log.d("UpdateRate", "UpdateRateChanged")

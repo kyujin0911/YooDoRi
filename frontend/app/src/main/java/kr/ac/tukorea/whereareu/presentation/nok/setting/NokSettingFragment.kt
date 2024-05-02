@@ -62,14 +62,16 @@ class NokSettingFragment : BaseFragment<FragmentNokSettingBinding>(R.layout.frag
                     val nokPhone = it.nokInfoRecord.nokPhoneNumber
                     val dementiaName = it.dementiaInfoRecord.dementiaName
                     val dementiaPhone = it.dementiaInfoRecord.dementiaPhoneNumber
+                    val updateRate = it.nokInfoRecord.updateRate
 
                     saveUserInfo(nokName, nokPhone, dementiaName, dementiaPhone)
+                    settingViewModel.setUpdateRate(updateRate.div(60).toString())
 
                     binding.userNameTv.text = nokName
                     binding.userPhoneNumberTv.text = nokPhone
                     binding.otherNameTv.text = dementiaName
                     binding.otherPhoneTv.text = dementiaPhone
-                    binding.updateTimeTv.text = "${it.nokInfoRecord.updateRate.div(60)}분"
+                    binding.updateTimeTv.text = "${updateRate.div(60)}분"
                 }
             }
         }

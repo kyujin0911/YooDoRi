@@ -4,14 +4,11 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.os.Bundle
 import android.util.Log
 import android.view.View
 import androidx.activity.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import androidx.navigation.NavController
-import androidx.navigation.NavDestination
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import dagger.hilt.android.AndroidEntryPoint
@@ -23,14 +20,15 @@ import kr.ac.tukorea.whereareu.R
 import kr.ac.tukorea.whereareu.databinding.ActivityNokMainBinding
 import kr.ac.tukorea.whereareu.presentation.base.BaseActivity
 import kr.ac.tukorea.whereareu.presentation.nok.home.NokHomeViewModel
+import kr.ac.tukorea.whereareu.presentation.nok.setting.SettingViewModel
 import kr.ac.tukorea.whereareu.util.extension.navigationHeight
 import kr.ac.tukorea.whereareu.util.extension.repeatOnStarted
 import kr.ac.tukorea.whereareu.util.extension.setStatusBarTransparent
-import kr.ac.tukorea.whereareu.util.extension.statusBarHeight
 
 @AndroidEntryPoint
 class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_nok_main) {
-    private val viewModel: NokHomeViewModel by viewModels()
+    private val homeViewModel: NokHomeViewModel by viewModels()
+    private val settingViewModel: SettingViewModel by viewModels()
     private var updateLocationJob: Job? = null
     override fun initView() {
         //상태바 투명 설정
@@ -60,20 +58,20 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
         val spf = getSharedPreferences("OtherUser", MODE_PRIVATE)
         val dementiaKey = spf.getString("key", "")
         if (!dementiaKey.isNullOrEmpty()) {
-            viewModel.saveDementiaKey(dementiaKey)
+            homeViewModel.saveDementiaKey(dementiaKey)
 
             // 실행중인 coroutine이 없으면 새로운 job을 생성해서 실행
             repeatOnStarted {
-                viewModel.updateDuration.collect { duration ->
+                settingViewModel.updateRate.collect { duration ->
                     Log.d("duration", duration.toString())
                     updateLocationJob = if (updateLocationJob == null) {
-                        makeUpdateLocationJob(duration)
+                        makeUpdateLocationJob(duration.toLong().times(60*1000))
                     }
 
                     // 실행중인 coroutine이 있으면 job을 취소하고 duration에 맞게 재시작
                     else {
                         updateLocationJob?.cancelAndJoin()
-                        makeUpdateLocationJob(duration)
+                        makeUpdateLocationJob(duration.toLong().times(60*1000))
                     }
                 }
             }
@@ -83,7 +81,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
     private fun makeUpdateLocationJob(duration: Long): Job{
         return lifecycleScope.launch {
             while (true){
-                viewModel.getDementiaLocation()
+                homeViewModel.getDementiaLocation()
                 delay(duration)
             }
         }
@@ -101,7 +99,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
         )
 
         repeatOnStarted {
-            viewModel.isPredicted.collect { isPredicted ->
+            homeViewModel.isPredicted.collect { isPredicted ->
                 if (!isPredicted) {
                     Log.d("NokMainActivity", isPredicted.toString())
                     getDementiaLocation()
