@@ -7,7 +7,7 @@
         <import type="android.view.View"/>
         <variable
             name="model"
-            type="kr.ac.tukorea.whereareu.presentation.nok.setting.updateTime.TimeData" />
+            type="kr.ac.tukorea.whereareu.domain.setting.UpdateRate" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

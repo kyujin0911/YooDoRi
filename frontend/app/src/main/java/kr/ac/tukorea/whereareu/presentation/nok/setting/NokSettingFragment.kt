@@ -14,13 +14,6 @@ import kr.ac.tukorea.whereareu.util.network.NetworkManager
 @AndroidEntryPoint
 class NokSettingFragment : BaseFragment<FragmentNokSettingBinding>(R.layout.fragment_nok_setting) {
     private val viewModel: SettingViewModel by activityViewModels()
-    private val nokSpf by lazy {
-        requireContext().getSharedPreferences("User", MODE_PRIVATE)
-    }
-    private val dementiaSpf by lazy {
-        requireContext().getSharedPreferences("OtherUser", MODE_PRIVATE)
-    }
-
     override fun initObserver() {
     }
 
@@ -31,8 +24,7 @@ class NokSettingFragment : BaseFragment<FragmentNokSettingBinding>(R.layout.frag
 
     override fun onResume() {
         super.onResume()
-        val key = nokSpf.getString("key", "") ?: ""
-        viewModel.getUserInfo(key)
+        viewModel.getUserInfo()
     }
 
 

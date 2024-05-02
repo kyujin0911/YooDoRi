@@ -46,14 +46,14 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
     }
 
     private fun saveUserKeys() {
-        val nokSpf = getSharedPreferences("OtherUser", MODE_PRIVATE)
-        val dementiaKey = nokSpf.getString("key", "")
+        val dementiaKey = getSharedPreferences("OtherUser", MODE_PRIVATE)
+            .getString("key", "")
         if (!dementiaKey.isNullOrEmpty()) {
             homeViewModel.setDementiaKey(dementiaKey)
         }
 
-        val spf = getSharedPreferences("User", MODE_PRIVATE)
-        val nokKey = spf.getString("key", "")
+        val nokKey = getSharedPreferences("User", MODE_PRIVATE)
+            .getString("key", "")
         if (!nokKey.isNullOrEmpty()) {
             homeViewModel.setNokKey(nokKey)
             settingViewModel.setNokKey(nokKey)

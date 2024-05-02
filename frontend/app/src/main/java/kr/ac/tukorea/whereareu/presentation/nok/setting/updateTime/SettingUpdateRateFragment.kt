@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import dagger.hilt.android.AndroidEntryPoint
 import kr.ac.tukorea.whereareu.R
 import kr.ac.tukorea.whereareu.databinding.FragmentSettingUpdateTimeBinding
+import kr.ac.tukorea.whereareu.domain.setting.UpdateRate
 import kr.ac.tukorea.whereareu.presentation.nok.setting.SettingViewModel
 import kr.ac.tukorea.whereareu.presentation.base.BaseFragment
 import kr.ac.tukorea.whereareu.util.extension.repeatOnStarted
@@ -14,25 +15,25 @@ import kr.ac.tukorea.whereareu.util.extension.showToastShort
 import kr.ac.tukorea.whereareu.util.extension.statusBarHeight
 
 @AndroidEntryPoint
-class SettingUpdateTimeFragment() :
+class SettingUpdateRateFragment() :
     BaseFragment<FragmentSettingUpdateTimeBinding>(R.layout.fragment_setting_update_time) {
     private val viewModel: SettingViewModel by activityViewModels()
-    private val timeList = arrayListOf<TimeData>(
-        TimeData("1", true),
-        TimeData("3", false),
-        TimeData("5", false),
-        TimeData("10", false),
-        TimeData("15", false),
-        TimeData("20", false),
-        TimeData("30", false),
-        TimeData("45", false),
-        TimeData("60", false)
+    private val timeList = arrayListOf<UpdateRate>(
+        UpdateRate("1", true),
+        UpdateRate("3", false),
+        UpdateRate("5", false),
+        UpdateRate("10", false),
+        UpdateRate("15", false),
+        UpdateRate("20", false),
+        UpdateRate("30", false),
+        UpdateRate("45", false),
+        UpdateRate("60", false)
     )
-    private lateinit var timeAdapter: TimeAdapter
+    private lateinit var updateRateRVA: UpdateRateRVA
 
     override fun initView() {
         binding.layout.setPadding(0, requireActivity().statusBarHeight(), 0, 0)
-        initializeViews()
+        initTimeRVA()
 
         binding.backBtn.setOnClickListener {
             onClickBackBtn()
@@ -48,19 +49,16 @@ class SettingUpdateTimeFragment() :
         }
     }
 
-    private fun initializeViews() {
+    private fun initTimeRVA() {
         var position = invertTime(viewModel.updateRate.value.toInt())
         binding.updateTimeList.layoutManager = LinearLayoutManager(context)
 
-        timeAdapter = TimeAdapter(timeList, position)
-        binding.updateTimeList.adapter = timeAdapter
-        timeAdapter.submitList(timeList.toMutableList()) // ListAdapter를 사용하기 위해 작성
-        timeAdapter.setOnItemClickListener(object : TimeAdapter.OnItemClickListener {
-            override fun onItemClick(item: TimeData, position: Int) {
+        updateRateRVA = UpdateRateRVA(timeList, position)
+        binding.updateTimeList.adapter = updateRateRVA
+        updateRateRVA.submitList(timeList.toMutableList()) // ListAdapter를 사용하기 위해 작성
+        updateRateRVA.setOnItemClickListener(object : UpdateRateRVA.OnItemClickListener {
+            override fun onItemClick(item: UpdateRate, position: Int) {
                 viewModel.setUpdateRate(positionToTime(position))
-                /*viewModel.sendUpdateTime(
-                    UpdateRateRequest(key, 0, item.title.toInt() * 60)
-                )*/
             }
         })
     }
@@ -98,6 +96,6 @@ class SettingUpdateTimeFragment() :
     private fun onClickBackBtn() {
         val key =
             requireActivity().getSharedPreferences("User", MODE_PRIVATE).getString("key", "") ?: ""
-        viewModel.sendUpdateTime(key, 0)
+        viewModel.sendUpdateTime(0)
     }
 }

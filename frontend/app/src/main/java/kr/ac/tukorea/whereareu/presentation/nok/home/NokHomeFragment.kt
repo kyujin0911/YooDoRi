@@ -377,7 +377,7 @@ class NokHomeFragment : BaseFragment<kr.ac.tukorea.whereareu.databinding.Fragmen
         super.onResume()
         val nokKey = requireActivity().getSharedPreferences("User", MODE_PRIVATE)
             .getString("key", "") ?: ""
-        viewModel.fetchUserInfo(nokKey)
+        viewModel.fetchUserInfo()
         Log.d("resume", "resume")
     }
 
