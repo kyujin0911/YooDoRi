@@ -49,7 +49,7 @@ class PoliceStationRVA() :
                 }
 
                 copyRoadAddressBtn.setOnClickListener {
-                    policeStationRVAClickListener?.onClickCopyAddress(policeStationInfo.roadAddressName)
+                    policeStationRVAClickListener?.onClickCopyAddress(policeStationInfo.policeAddress)
                 }
             }
         }

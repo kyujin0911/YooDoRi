@@ -9,7 +9,7 @@ import kr.ac.tukorea.whereareu.util.network.NetworkResult
 interface SettingRepository {
     suspend fun sendModifyUserInfo(request:ModifyUserInfoRequest): NetworkResult<StateResponse>
 
-    suspend fun getUserInfo(nokKey: String): NetworkResult<GetUserInfoResponse>
+    suspend fun fetchUserInfo(nokKey: String): NetworkResult<GetUserInfoResponse>
 
     suspend fun sendUpdateRate(request: UpdateRateRequest): NetworkResult<StateResponse>
 }

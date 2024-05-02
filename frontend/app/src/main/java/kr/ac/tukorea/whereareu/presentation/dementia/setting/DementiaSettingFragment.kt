@@ -78,7 +78,8 @@ class DementiaSettingFragment : BaseFragment<FragmentDementiaSettingBinding>(R.l
         val nokSpf = requireActivity().getSharedPreferences("OtherUser", MODE_PRIVATE)
         val nokKey: String = nokSpf.getString("key", "") as String
 
-        settingViewModel.getUserInfo(nokKey)
+        //나중에 보호대상자 키로 수정해야됨
+        settingViewModel.fetchUserInfo()
 
         repeatOnStarted {
             settingViewModel.userInfo.collect{

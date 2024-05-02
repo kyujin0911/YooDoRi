@@ -6,7 +6,8 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import kr.ac.tukorea.whereareu.databinding.SettingUpdateTimeOptionItemBinding
+import kr.ac.tukorea.whereareu.databinding.ItemUpdateRateBinding
+
 import kr.ac.tukorea.whereareu.domain.setting.UpdateRate
 
 class UpdateRateRVA(
@@ -14,7 +15,6 @@ class UpdateRateRVA(
     private var selectedPosition: Int
 ) : ListAdapter<UpdateRate, UpdateRateRVA.TimeViewHolder>(diffUtil) {
 
-    lateinit var binding: SettingUpdateTimeOptionItemBinding
     private var onItemClickListener: OnItemClickListener? = null
 
     interface OnItemClickListener {
@@ -26,7 +26,7 @@ class UpdateRateRVA(
     }
 
     inner class TimeViewHolder(
-        private val binding: SettingUpdateTimeOptionItemBinding
+        private val binding: ItemUpdateRateBinding
     ) : RecyclerView.ViewHolder(binding.root) {
         fun bind(item: UpdateRate) {
             binding.model = item
@@ -54,7 +54,7 @@ class UpdateRateRVA(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TimeViewHolder {
         return TimeViewHolder(
-            SettingUpdateTimeOptionItemBinding.inflate(
+            ItemUpdateRateBinding.inflate(
                 LayoutInflater.from(parent.context),
                 parent,
                 false
@@ -77,10 +77,10 @@ class UpdateRateRVA(
             }
         }
     }
-    private fun SettingUpdateTimeOptionItemBinding.setChecked() {
+    private fun ItemUpdateRateBinding.setChecked() {
         checkIv.visibility = View.VISIBLE
     }
-    private fun SettingUpdateTimeOptionItemBinding.setUnchecked() {
+    private fun ItemUpdateRateBinding.setUnchecked() {
         checkIv.visibility = View.GONE
     }
 }

@@ -66,9 +66,10 @@ class SettingViewModel @Inject constructor(
             }
         }
     }
-    fun getUserInfo(){
+    fun fetchUserInfo(){
         viewModelScope.launch{
-            repository.getUserInfo(_nokKey.value).onSuccess {
+            //나중에 보호대상자 키로도 할 수 있도록 수정해야됨
+            repository.fetchUserInfo(_nokKey.value).onSuccess {
                 _userInfo.value = it
                 //_name.value = it.nokInfoRecord.nokName
                 Log.d("SettingViewModel", "getUserInfo Success")
