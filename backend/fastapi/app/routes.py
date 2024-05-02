@@ -1,7 +1,6 @@
 from fastapi import APIRouter, HTTPException, status, Depends
-from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer, APIKeyHeader
+from fastapi.security import OAuth2PasswordRequestForm, APIKeyHeader
 
-from jose import jwt, JWTError
 from passlib.context import CryptContext
 
 from . import models
@@ -10,16 +9,11 @@ from .update_user_status import UpdateUserStatus
 from .LocationAnalyzer import LocationAnalyzer
 from .database import Database
 from .bodymodel import *
-from .config import Config
+from .util import *
 
 from PyKakao import Local
 from apscheduler.schedulers.background import BackgroundScheduler
-from datetime import timedelta, datetime
 
-
-
-import json
-import datetime
 
 router = APIRouter()
 db = Database()
@@ -41,67 +35,17 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 정의되지 않은 오류 = 500
 '''
 
-def make_token(name: str, key: str):
-    data = {
-        "name": name,
-        "key": key,
-        "exp": datetime.datetime.utcnow() + timedelta(minutes = Config.ACCESS_TOKEN_EXPIRE_MINUTES)
-    }
 
-    access_token = jwt.encode(data, Config.SECRET_KEY, Config.ALGORITHM)
 
-    return access_token
-
-def get_user(userName, key):
-    try:
-
-        userInfo = session.query(models.nok_info).filter_by(nok_name = userName, nok_key = key).first()
-        if userInfo:
-            return userInfo, 0
-        else:
-            userInfo = session.query(models.dementia_info).filter_by(dementia_name = userName, dementia_key = key).first()
-            if userInfo:
-                return userInfo, 1
-            else:
-                return None
-    except Exception as e:
-        print(f"[ERROR] User information not found")
-        raise HTTPException(status_code=404, detail="User information not found")
-    finally:
-        session.close()
-
-def get_current_user(token: str = Depends(OAuth2PasswordBearer(tokenUrl="/login"))):
-    credentials_exception = HTTPException(
-        status_code=401,
-        detail="Could not validate credentials",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
-    try:
-        payload = jwt.decode(token, Config.SECRET_KEY, algorithms=[Config.ALGORITHM])
-
-        username: str = payload.get("name")
-
-        if username is None:
-            raise credentials_exception
-        
-        user, user_type = get_user(username, payload.get("key"))
-
-        if user is None:
-            raise credentials_exception
-        
-    except JWTError:
-        raise credentials_exception
-    
-    return user, user_type
 
 @router.get("/test", responses = {200 : {"model" : CommonResponse, "description" : "테스트 성공" }}, description="토큰을 사용했을 때 유저 정보가 반환되면 성공(앞으로 이렇게 바뀔 예정)")
 async def protected_route(current_user= Depends(APIKeyHeader(name="Authorization"))):
-    return get_current_user(current_user)
+    return get_current_user(current_user, session)
 
 @router.post("/test/login", responses = {200 : {"model" : TokenResponse, "description" : "로그인 성공" }, 400: {"model": ErrorResponse, "description": "로그인 실패"}}, description="로그인 테스트(앞으로 이렇게 바뀔예정) | username : 이름, password : key -> 이 두개만 채워서 보내면 됨")
 async def test_login(from_data: OAuth2PasswordRequestForm = Depends()):
     try:
-        user = get_user(from_data.username, from_data.password)
+        user = get_user(from_data.username, from_data.password, session)
         if not user:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
@@ -313,7 +257,7 @@ async def receive_user_login(request: loginRequest):
 @router.post("/locations/dementias", responses = {200 : {"model" : TempResponse, "description" : "위치 정보 전송 성공" }, 404: {"model": ErrorResponse, "description": "보호 대상자 키 조회 실패"}}, description="보호 대상자의 위치 정보를 전송 | isRingstoneOn : 0(무음), 1(진동), 2(벨소리)")
 async def receive_location_info(request: ReceiveLocationRequest, user_info: int = Depends(APIKeyHeader(name = "Authorization"))):
     try:
-        _dementia_key = get_current_user(user_info)[0].dementia_key
+        _dementia_key = get_current_user(user_info, session)[0].dementia_key
 
         existing_dementia = session.query(models.dementia_info).filter_by(dementia_key = _dementia_key).first()
 
@@ -414,7 +358,7 @@ async def modify_user_info(request: ModifyUserInfoRequest, user_info : int = Dep
     _new_phonenumber = request.phoneNumber
 
     try:
-        user = get_current_user(user_info)
+        user = get_current_user(user_info, session)
 
         if user[1] == 0: #보호자
             existing_nok = session.query(models.nok_info).filter_by(nok_key = user[0].nok_key).first()
@@ -455,7 +399,7 @@ async def modify_updatint_rate(request: ModifyUserUpdateRateRequest, user_info :
 
     #보호자와 보호대상자 모두 업데이트
     try:
-        user = get_current_user(user_info)
+        user = get_current_user(user_info, session)
         if user[1] == 0: #보호자
             existing_nok = session.query(models.nok_info).filter_by(nok_key = user[0].nok_key).first()
 
@@ -494,7 +438,7 @@ async def modify_updatint_rate(request: ModifyUserUpdateRateRequest, user_info :
 @router.post("/dementias/averageWalkingSpeed", responses = {200 : {"model" : AverageWalkingSpeedResponse, "description" : "평균 걷기 속도 계산 성공" }, 404: {"model": ErrorResponse, "description": "보호 대상자 키 조회 실패 or 위치 정보 부족"}}, description="보호 대상자의 평균 걷기 속도를 계산 및 마지막 정보 전송")
 async def caculate_dementia_average_walking_speed(user_info : int = Depends(APIKeyHeader(name = "Authorization"))): 
     try:
-        _dementia_key = get_current_user(user_info)[0].dementia_key
+        _dementia_key = get_current_user(user_info, session)[0].dementia_key
 
         #최근 10개의 정보를 가져와 평균 속도 계산(임시)
         location_info_list = session.query(models.location_info).filter_by(dementia_key = _dementia_key).order_by(models.location_info.num.desc()).limit(10).all()
@@ -539,7 +483,7 @@ async def caculate_dementia_average_walking_speed(user_info : int = Depends(APIK
 @router.get("/users/info", responses = {200 : {"model" : GetUserInfoResponse, "description" : "유저 정보 전송 성공" }, 404: {"model": ErrorResponse, "description": "유저 정보 없음"}}, description="보호자와 보호 대상자 정보 전달(쿼리 스트링)")
 async def get_user_info(user_info : int = Depends(APIKeyHeader(name = "Authorization"))):
     try:
-        user = get_current_user(user_info)
+        user = get_current_user(user_info, session)
 
         nok_info_record = session.query(models.nok_info).filter_by(nok_key = user[0].nok_key).first()
         
@@ -588,7 +532,7 @@ async def get_user_info(user_info : int = Depends(APIKeyHeader(name = "Authoriza
 async def send_meaningful_location_info(user_info : int = Depends(APIKeyHeader(name = "Authorization"))):
 
     try:
-        _key = get_current_user(user_info)[0].dementia_info_key
+        _key = get_current_user(user_info, session)[0].dementia_info_key
 
         meaningful_location_list = session.query(models.meaningful_location_info).filter_by(dementia_key=_key).all()
 
@@ -651,7 +595,7 @@ async def send_meaningful_location_info(user_info : int = Depends(APIKeyHeader(n
 @router.get("/locations/history", responses = {200 : {"model" : LocHistoryResponse, "description" : "위치 이력 전송 성공" }, 404: {"model": ErrorResponse, "description": "위치 이력 없음"}}, description="보호 대상자의 위치 이력 정보 전달(쿼리 스트링) | date : YYYY-MM-DD")
 async def send_location_history(_date : str, user_info : int = Depends(APIKeyHeader(name = "Authorization"))):
     try:
-        _key = get_current_user(user_info)[0].dementia_info_key
+        _key = get_current_user(user_info, session)[0].dementia_info_key
 
         location_list = session.query(models.location_info).filter_by(dementia_key = _key, date = _date).all()
 
