@@ -34,7 +34,7 @@
             android:gravity="start"
             app:layout_constraintTop_toTopOf="@id/icon_iv"
             app:layout_constraintBottom_toBottomOf="@id/icon_iv"
-            app:layout_constraintStart_toEndOf="@id/icon_iv"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"/>
 
         <androidx.recyclerview.widget.RecyclerView

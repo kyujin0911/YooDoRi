@@ -69,6 +69,7 @@ class NokHomeViewModel @Inject constructor(
 
         data class StopPredictEvent(val isPredicted: Boolean): PredictEvent()
     }
+    private val userMeaningfulPlace = mutableListOf<MeaningfulPlaceInfo>()
 
     private fun eventPredict(event: PredictEvent) {
         viewModelScope.launch {

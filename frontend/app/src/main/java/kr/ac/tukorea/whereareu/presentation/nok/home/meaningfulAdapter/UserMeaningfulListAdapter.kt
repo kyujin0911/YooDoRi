@@ -1,5 +1,6 @@
 package kr.ac.tukorea.whereareu.presentation.nok.home.meaningfulAdapter
 
+import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.AdapterView.OnItemClickListener
 import androidx.recyclerview.widget.DiffUtil
@@ -13,27 +14,22 @@ import kr.ac.tukorea.whereareu.domain.home.MeaningfulPlaceInfo
 import kr.ac.tukorea.whereareu.domain.home.PoliceStationInfo
 
 class UserMeaningfulListAdapter() :
-    ListAdapter<MeaningfulPlace, UserMeaningfulListAdapter.UserMeaningfulListViewHolder>(diffUtil) {
+    ListAdapter<MeaningfulPlaceInfo, UserMeaningfulListAdapter.UserMeaningfulListViewHolder>(diffUtil) {
     private val onItemClickListener : OnItemClickListener? =  null
+    lateinit var binding: ItemMeaningfulPlaceBottomSheetBinding
 
     inner class UserMeaningfulListViewHolder(
         private val binding: ItemMeaningfulPlaceBottomSheetBinding
     ) : RecyclerView.ViewHolder(binding.root){
-        fun bind(meaningfulPlace: MeaningfulPlaceInfo){
+        fun bind(meaningfulPlaceInfo: MeaningfulPlaceInfo){
             with(binding) {
-                val listInfo =
-                    meaningfulPlace.meaningfulPlaceListInfo.mapIndexed { index, meaningfulPlaceListInfo ->
-                        val date = convertDayOfWeekInKorean(meaningfulPlaceListInfo.date)
-                        val time = "${meaningfulPlaceListInfo.time.substring(0 until 2)}시~${
-                            meaningfulPlaceListInfo.time.substring(2 until 4)
-                        }"
-                    }
-                mapViewBtn.setOnClickListener {
-                    onItemClickListener?.onClickMoreView(meaningfulPlace)
-                }
-                copyRoadAddressBtn.setOnClickListener {
-                    onItemClickListener?.onClickCopyAddress()
-                }
+//                val listInfo =
+//                    meaningfulPlace.meaningfulPlaceListInfo.mapIndexed { index, meaningfulPlaceListInfo ->
+//                        val date = convertDayOfWeekInKorean(meaningfulPlaceListInfo.date)
+//                        val time = "${meaningfulPlaceListInfo.time.substring(0 until 2)}시~${
+//                            meaningfulPlaceListInfo.time.substring(2 until 4)
+//                        }"
+//                    }
             }
         }
     }
@@ -41,28 +37,32 @@ class UserMeaningfulListAdapter() :
         parent: ViewGroup,
         viewType: Int
     ): UserMeaningfulListAdapter.UserMeaningfulListViewHolder {
-        TODO("Not yet implemented")
+        return UserMeaningfulListViewHolder(
+            ItemMeaningfulPlaceBottomSheetBinding.inflate(
+                LayoutInflater.from(parent.context), parent, false
+            )
+        )
     }
 
     override fun onBindViewHolder(
         holder: UserMeaningfulListAdapter.UserMeaningfulListViewHolder,
         position: Int
     ) {
-        TODO("Not yet implemented")
+        holder.bind(currentList[position])
     }
 
     companion object {
-        val diffUtil = object : DiffUtil.ItemCallback<MeaningfulPlace>() {
+        val diffUtil = object : DiffUtil.ItemCallback<MeaningfulPlaceInfo>() {
             override fun areItemsTheSame(
-                oldItem: MeaningfulPlace,
-                newItem: MeaningfulPlace
+                oldItem: MeaningfulPlaceInfo,
+                newItem: MeaningfulPlaceInfo
             ): Boolean {
                 return oldItem === newItem
             }
 
             override fun areContentsTheSame(
-                oldItem: MeaningfulPlace,
-                newItem: MeaningfulPlace
+                oldItem: MeaningfulPlaceInfo,
+                newItem: MeaningfulPlaceInfo
             ): Boolean {
                 return oldItem == newItem
             }
