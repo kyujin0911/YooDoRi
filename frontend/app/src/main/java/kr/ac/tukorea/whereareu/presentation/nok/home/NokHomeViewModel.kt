@@ -54,6 +54,8 @@ class NokHomeViewModel @Inject constructor(
     private val _dementiaName = MutableStateFlow("")
     val dementiaName = _dementiaName.asStateFlow()
 
+    private val _navigateEvent = MutableStateFlow(NavigateEvent.Home.toString())
+    val navigateEvent = _navigateEvent.asStateFlow()
     sealed class PredictEvent {
         data class StartPredict(val isPredicted: Boolean) : PredictEvent()
         data class MeaningFulPlaceEvent(
@@ -69,6 +71,20 @@ class NokHomeViewModel @Inject constructor(
             PredictEvent()
 
         data class StopPredict(val isPredicted: Boolean) : PredictEvent()
+    }
+
+    sealed interface NavigateEvent{
+        data object Home: NavigateEvent
+        data object Setting: NavigateEvent
+        data object MeaningfulPlace: NavigateEvent
+        data object LocationHistory: NavigateEvent
+        data object SafeArea: NavigateEvent
+    }
+
+    fun eventNavigate(event: NavigateEvent){
+        viewModelScope.launch {
+            _navigateEvent.value = event.toString()
+        }
     }
 
     private fun eventPredict(event: PredictEvent) {

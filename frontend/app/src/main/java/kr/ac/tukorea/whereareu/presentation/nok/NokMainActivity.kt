@@ -6,10 +6,16 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.util.Log
 import androidx.activity.viewModels
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.naver.maps.map.MapFragment
+import com.naver.maps.map.NaverMap
+import com.naver.maps.map.OnMapReadyCallback
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancelAndJoin
@@ -20,21 +26,39 @@ import kr.ac.tukorea.whereareu.databinding.ActivityNokMainBinding
 import kr.ac.tukorea.whereareu.presentation.base.BaseActivity
 import kr.ac.tukorea.whereareu.presentation.nok.home.NokHomeViewModel
 import kr.ac.tukorea.whereareu.presentation.nok.setting.SettingViewModel
-import kr.ac.tukorea.whereareu.util.extension.navigationHeight
 import kr.ac.tukorea.whereareu.util.extension.repeatOnStarted
-import kr.ac.tukorea.whereareu.util.extension.setStatusBarTransparent
 
 @AndroidEntryPoint
-class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_nok_main) {
+class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_nok_main),
+    OnMapReadyCallback {
     private val homeViewModel: NokHomeViewModel by viewModels()
     private val settingViewModel: SettingViewModel by viewModels()
     private var updateLocationJob: Job? = null
+    private var naverMap: NaverMap? = null
+    private lateinit var behavior: BottomSheetBehavior<ConstraintLayout>
     override fun initView() {
         //상태바 투명 설정
-        this.setStatusBarTransparent()
-        binding.layout.setPadding(0, 0, 0, this.navigationHeight())
+        binding.viewModel = homeViewModel
+        initMap()
+        //this.setStatusBarTransparent()
+        //binding.layout.setPadding(0, 0, 0, this.navigationHeight())
         initNavigator()
         homeViewModel.fetchUserInfo()
+        behavior = BottomSheetBehavior.from(binding.bottomSheet)
+        behavior.state = BottomSheetBehavior.STATE_COLLAPSED
+        behavior.peekHeight = 20
+        behavior.isFitToContents = false
+    }
+
+    private fun initMap() {
+        val fm = supportFragmentManager
+        val mapFragment = fm.findFragmentById(R.id.map_fragment) as MapFragment?
+            ?: MapFragment.newInstance().also {
+                fm.beginTransaction().add(R.id.map_fragment, it).commit()
+            }
+        mapFragment.getMapAsync { map ->
+            naverMap = map
+        }
     }
 
     private fun initNavigator() {
@@ -43,6 +67,36 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
         val navController = navHostFragment.navController
 
         binding.bottomNav.setupWithNavController(navController)
+        navController.addOnDestinationChangedListener { controller, destination, arguments ->
+            Log.d("current destination", R.id.settingTab.toString())
+            Log.d("destination", destination.id.toString())
+            var event: NokHomeViewModel.NavigateEvent? = null
+            when (destination.id) {
+                R.id.nokHomeFragment -> {
+                    event = NokHomeViewModel.NavigateEvent.Home
+                }
+
+                R.id.nokSettingFragment -> {
+                    behavior.isDraggable = false
+                    behavior.state = BottomSheetBehavior.STATE_EXPANDED
+                    event = NokHomeViewModel.NavigateEvent.Setting
+                }
+
+                R.id.safeAreaFragment -> {
+                   event = NokHomeViewModel.NavigateEvent.SafeArea
+                }
+
+                R.id.meaningfulPlaceFragment -> {
+                    event = NokHomeViewModel.NavigateEvent.MeaningfulPlace
+                }
+
+                R.id.locationHistoryFragment -> {
+                    event = NokHomeViewModel.NavigateEvent.LocationHistory
+                }
+                else -> event = NokHomeViewModel.NavigateEvent.Home
+            }
+            homeViewModel.eventNavigate(event)
+        }
     }
 
     private fun saveUserKeys() {
@@ -122,5 +176,9 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
             Log.d("location log", "${location?.get(0)}, ${location?.get(1)}")
             // Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
         }
+    }
+
+    override fun onMapReady(p0: NaverMap) {
+
     }
 }
