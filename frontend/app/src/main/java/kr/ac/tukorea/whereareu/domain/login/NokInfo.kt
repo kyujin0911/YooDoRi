@@ -5,4 +5,6 @@ data class NokInfo(
     val nokName : String,
     val nokPhoneNumber : String,
     val updateRate : Int = 60
-)
+) {
+    constructor(): this("", "", "", 0)
+}

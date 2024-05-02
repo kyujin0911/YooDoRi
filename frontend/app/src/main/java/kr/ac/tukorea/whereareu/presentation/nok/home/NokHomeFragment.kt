@@ -64,6 +64,15 @@ class NokHomeFragment : BaseFragment<kr.ac.tukorea.whereareu.databinding.Fragmen
                 handlePredictEvent(predictEvent)
             }
         }
+        repeatOnStarted {
+            delay(500)
+            viewModel.dementiaLocation.collect{ response ->
+                Log.d("response", response.toString())
+                updateDementiaStatus(response)
+                val coord = LatLng(response.latitude, response.longitude)
+                trackingDementiaLocation(coord, response.bearing, dementiaName ?: "", response.currentSpeed)
+            }
+        }
     }
 
     private fun handlePredictEvent(event: NokHomeViewModel.PredictEvent){
@@ -225,7 +234,7 @@ class NokHomeFragment : BaseFragment<kr.ac.tukorea.whereareu.databinding.Fragmen
         binding.view = this
         binding.viewModel = viewModel
         checkLocationPermission()
-        updateDementiaName()
+        //updateDementiaName()
         initMap()
     }
 
@@ -366,16 +375,10 @@ class NokHomeFragment : BaseFragment<kr.ac.tukorea.whereareu.databinding.Fragmen
 
     override fun onResume() {
         super.onResume()
+        val nokKey = requireActivity().getSharedPreferences("User", MODE_PRIVATE)
+            .getString("key", "") ?: ""
+        viewModel.fetchUserInfo(nokKey)
         Log.d("resume", "resume")
-        repeatOnStarted {
-            delay(500)
-            viewModel.dementiaLocation.collect{ response ->
-                Log.d("response", response.toString())
-                updateDementiaStatus(response)
-                val coord = LatLng(response.latitude, response.longitude)
-                trackingDementiaLocation(coord, response.bearing, dementiaName ?: "", response.currentSpeed)
-            }
-        }
     }
 
     override fun onMapReady(p0: NaverMap) {

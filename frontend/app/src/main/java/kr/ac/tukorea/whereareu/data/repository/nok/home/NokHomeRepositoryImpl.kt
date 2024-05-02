@@ -6,6 +6,7 @@ import kr.ac.tukorea.whereareu.data.model.ResponseBody
 import kr.ac.tukorea.whereareu.data.model.nok.home.DementiaLastInfoResponse
 import kr.ac.tukorea.whereareu.data.model.nok.home.LocationInfoResponse
 import kr.ac.tukorea.whereareu.data.model.nok.home.MeaningfulPlaceResponse
+import kr.ac.tukorea.whereareu.data.model.setting.GetUserInfoResponse
 import kr.ac.tukorea.whereareu.util.network.NetworkResult
 import kr.ac.tukorea.whereareu.util.network.handleApi
 import javax.inject.Inject
@@ -23,6 +24,10 @@ class NokHomeRepositoryImpl @Inject constructor(
 
     override suspend fun getDementiaLastInfo(request: DementiaKeyRequest): NetworkResult<DementiaLastInfoResponse> {
         return handleApi({api.getDementiaLastInfo(request)}) { response: ResponseBody<DementiaLastInfoResponse> -> response.result}
+    }
+
+    override suspend fun getUserInfo(nokKey: String): NetworkResult<GetUserInfoResponse> {
+        return handleApi({api.getUserInfo(nokKey)}) {response: ResponseBody<GetUserInfoResponse> -> response.result}
     }
 
 }

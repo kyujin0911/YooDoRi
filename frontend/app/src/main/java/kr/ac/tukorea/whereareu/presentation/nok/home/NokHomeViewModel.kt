@@ -41,8 +41,8 @@ class NokHomeViewModel @Inject constructor(
     val isInternetOn = MutableStateFlow(true)
     val isGpsOn = MutableStateFlow(true)
 
-    private val _updateDuration = MutableStateFlow<Long>(300000 * 1000)
-    val updateDuration = _updateDuration.asStateFlow()
+    private val _updateRate = MutableStateFlow<Long>(300000 * 1000)
+    val updateRate = _updateRate.asStateFlow()
 
     private val _isPredicted = MutableStateFlow(false)
     val isPredicted = _isPredicted.asStateFlow()
@@ -51,6 +51,9 @@ class NokHomeViewModel @Inject constructor(
 
     private val _predictEvent = MutableSharedFlow<PredictEvent>()
     val predictEvent = _predictEvent.asSharedFlow()
+
+    private val _dementiaName = MutableStateFlow("")
+    val dementiaName = _dementiaName.asStateFlow()
 
     sealed class PredictEvent {
         data class StartPredict(val isPredicted: Boolean) : PredictEvent()
@@ -92,7 +95,15 @@ class NokHomeViewModel @Inject constructor(
 
     fun setUpdateDuration(duration: Long) {
         viewModelScope.launch {
-            _updateDuration.emit(duration * 60 * 1000)
+            _updateRate.emit(duration * 60 * 1000)
+        }
+    }
+
+    fun fetchUserInfo(nokKey: String){
+        viewModelScope.launch {
+            nokHomeRepository.getUserInfo(nokKey).onSuccess {
+                _dementiaName.emit(it.nokInfoRecord.nokName)
+            }
         }
     }
 

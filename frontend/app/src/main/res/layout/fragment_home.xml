@@ -80,7 +80,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="20dp"
-                        android:text="보호대상자"
+                        android:text="@{viewModel.dementiaName}"
                         android:textAppearance="@style/TextAppearance.App.18sp.ExtraBold"
                         app:layout_constraintStart_toEndOf="@+id/oval_v"
                         app:layout_constraintTop_toTopOf="parent"

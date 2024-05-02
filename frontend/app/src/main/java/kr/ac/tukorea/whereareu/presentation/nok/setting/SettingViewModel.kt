@@ -25,12 +25,14 @@ class SettingViewModel @Inject constructor(
     private val repository: SettingRepositoryImpl
 ) : ViewModel() {
 
-    private val _userInfo = MutableSharedFlow<GetUserInfoResponse>()
-    val userInfo =  _userInfo.asSharedFlow()
+    private val _userInfo = MutableStateFlow<GetUserInfoResponse>(GetUserInfoResponse())
+    val userInfo = _userInfo.asStateFlow()
+
+    private val _name = MutableStateFlow("")
+    val name = _name.asStateFlow()
 
     private val _updateRate = MutableStateFlow<String>("1")
     val updateRate = _updateRate.asStateFlow()
-    // MutableSharedFlow()를 사용하면 bindind이 안됨 -> dataBinding을 하기위해서는 MutableStateFlow를 사용해야함
 
     private val _toastEvent = MutableSharedFlow<String>()
     val toastEvent = _toastEvent.asSharedFlow()
@@ -59,7 +61,8 @@ class SettingViewModel @Inject constructor(
     fun getUserInfo(nokKey: String){
         viewModelScope.launch{
             repository.getUserInfo(nokKey).onSuccess {
-                _userInfo.emit(it)
+                _userInfo.value = it
+                //_name.value = it.nokInfoRecord.nokName
                 Log.d("SettingViewModel", "getUserInfo Success")
             }.onError {
                 Log.d("error in SettingVIewModel", it.toString())
@@ -74,7 +77,7 @@ class SettingViewModel @Inject constructor(
     fun sendUpdateTime(key: String, isDementia: Int){
         viewModelScope.launch(Dispatchers.IO){
             repository.sendUpdateRate(
-                UpdateRateRequest(key, isDementia, _updateRate.value.toInt() * 60)
+                UpdateRateRequest(key, isDementia, _updateRate.value.toInt())
             ).onSuccess {
                 _toastEvent.emit("정보가 변경되었습니다.")
                 Log.d("UpdateRate", "UpdateRateChanged")

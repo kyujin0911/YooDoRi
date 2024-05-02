@@ -32,6 +32,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
     private var updateLocationJob: Job? = null
     override fun initView() {
         //상태바 투명 설정
+        
         this.setStatusBarTransparent()
         binding.layout.setPadding(0, 0, 0, this.navigationHeight())
         initNavigator()
@@ -59,22 +60,6 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
         val dementiaKey = spf.getString("key", "")
         if (!dementiaKey.isNullOrEmpty()) {
             homeViewModel.saveDementiaKey(dementiaKey)
-
-            // 실행중인 coroutine이 없으면 새로운 job을 생성해서 실행
-            repeatOnStarted {
-                settingViewModel.updateRate.collect { duration ->
-                    Log.d("duration", duration.toString())
-                    updateLocationJob = if (updateLocationJob == null) {
-                        makeUpdateLocationJob(duration.toLong().times(60*1000))
-                    }
-
-                    // 실행중인 coroutine이 있으면 job을 취소하고 duration에 맞게 재시작
-                    else {
-                        updateLocationJob?.cancelAndJoin()
-                        makeUpdateLocationJob(duration.toLong().times(60*1000))
-                    }
-                }
-            }
         }
     }
 
@@ -97,6 +82,25 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
         LocalBroadcastManager.getInstance(this).registerReceiver(
             mMessageReceiver, IntentFilter("gps")
         )
+
+        // 실행중인 coroutine이 없으면 새로운 job을 생성해서 실행
+        repeatOnStarted {
+            settingViewModel.updateRate.collect { duration ->
+                if (duration == "0"){
+                    return@collect
+                }
+                Log.d("duration", duration.toString())
+                updateLocationJob = if (updateLocationJob == null) {
+                    makeUpdateLocationJob(duration.toLong().times(60*1000))
+                }
+
+                // 실행중인 coroutine이 있으면 job을 취소하고 duration에 맞게 재시작
+                else {
+                    updateLocationJob?.cancelAndJoin()
+                    makeUpdateLocationJob(duration.toLong().times(60*1000))
+                }
+            }
+        }
 
         repeatOnStarted {
             homeViewModel.isPredicted.collect { isPredicted ->

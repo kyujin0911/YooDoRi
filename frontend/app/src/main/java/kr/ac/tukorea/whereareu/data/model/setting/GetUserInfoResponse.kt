@@ -6,4 +6,6 @@ import kr.ac.tukorea.whereareu.domain.login.NokInfo
 data class GetUserInfoResponse(
     val dementiaInfoRecord : DementiaInfo,
     val nokInfoRecord : NokInfo
-)
+){
+    constructor(): this(DementiaInfo(), NokInfo())
+}

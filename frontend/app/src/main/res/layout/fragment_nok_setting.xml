@@ -8,6 +8,10 @@
         <variable
             name="view"
             type="kr.ac.tukorea.whereareu.presentation.nok.setting.NokSettingFragment" />
+
+        <variable
+            name="viewModel"
+            type="kr.ac.tukorea.whereareu.presentation.nok.setting.SettingViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -57,7 +61,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
-                android:text=""
+                android:text="@{viewModel.userInfo.nokInfoRecord.nokName}"
                 android:textAppearance="@style/TextAppearance.App.24sp.Bold"
                 tools:text="박승호" />
 
@@ -68,7 +72,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
-            android:text=""
+            android:text="@{viewModel.userInfo.nokInfoRecord.nokPhoneNumber}"
             android:textAppearance="@style/TextAppearance.App.16sp.SemiBold"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -105,7 +109,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="5dp"
                 android:layout_marginTop="5dp"
-                android:text=""
+                android:text="@{viewModel.userInfo.dementiaInfoRecord.dementiaName}"
                 android:textAppearance="@style/TextAppearance.App.14sp.ExtraBold"
                 app:layout_constraintBaseline_toBaselineOf="@+id/other_user_type_tv"
                 app:layout_constraintStart_toEndOf="@+id/other_user_type_tv"
@@ -117,7 +121,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="7dp"
                 android:layout_marginTop="5dp"
-                android:text=""
+                android:text="@{viewModel.userInfo.dementiaInfoRecord.dementiaPhoneNumber}"
                 android:textAppearance="@style/TextAppearance.App.14sp.SemiBold"
                 app:layout_constraintBaseline_toBaselineOf="@+id/other_name_tv"
                 app:layout_constraintStart_toEndOf="@+id/other_name_tv"
@@ -211,7 +215,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="10dp"
-                    android:text="1분"
+                    android:text='@{viewModel.userInfo.nokInfoRecord.updateRate + "분" }'
                     android:textAppearance="@style/TextAppearance.App.14sp.SemiBold"
                     app:layout_constraintBaseline_toBaselineOf="@+id/update_time_title"
                     app:layout_constraintStart_toEndOf="@id/update_time_title"
