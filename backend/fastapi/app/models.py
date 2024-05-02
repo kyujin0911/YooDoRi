@@ -68,7 +68,6 @@ class police_info(Base):
     key = Column(String)
     policeName = Column(String)
     policeAddress = Column(String)
-    roadAddress = Column(String)
     policePhoneNumber = Column(String)
     distance = Column(Integer)
     latitude = Column(Double)
