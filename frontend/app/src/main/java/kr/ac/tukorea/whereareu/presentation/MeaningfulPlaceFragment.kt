@@ -1,20 +1,18 @@
 package kr.ac.tukorea.whereareu.presentation
 
+import android.util.Log
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import dagger.hilt.android.AndroidEntryPoint
 import kr.ac.tukorea.whereareu.R
-import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.naver.maps.geometry.LatLng
-import com.naver.maps.map.NaverMap
 import com.naver.maps.map.overlay.Marker
 import com.naver.maps.map.util.MarkerIcons
 import kr.ac.tukorea.whereareu.databinding.FragmentMeaningfulPlaceBinding
-import kr.ac.tukorea.whereareu.domain.home.MeaningfulPlace
 import kr.ac.tukorea.whereareu.presentation.base.BaseFragment
 import kr.ac.tukorea.whereareu.presentation.nok.home.NokHomeViewModel
-import kr.ac.tukorea.whereareu.presentation.nok.home.meaningfulAdapter.UserMeaningfulListAdapter
+import kr.ac.tukorea.whereareu.presentation.nok.home.meaningfulAdapter.UserMeaningfulListRVA
 import kr.ac.tukorea.whereareu.util.extension.repeatOnStarted
 
 @AndroidEntryPoint
@@ -23,8 +21,8 @@ class MeaningfulPlaceFragment :
     private val viewModel: NokHomeViewModel by activityViewModels()
 
     //    private var naverMap: NaverMap? = null
-    private val userMeaningfulListAdapter by lazy {
-        UserMeaningfulListAdapter()
+    private val userMeaningfulListRVA by lazy {
+        UserMeaningfulListRVA()
     }
 
     override fun initObserver() {
@@ -37,9 +35,10 @@ class MeaningfulPlaceFragment :
     }
 
     override fun initView() {
+        Log.d("Presentation","MeaningfulPlaceFragment")
         binding.bottomSheetLayout.innerRv.apply {
             layoutManager = LinearLayoutManager(context)
-            adapter = UserMeaningfulListAdapter()
+            adapter = UserMeaningfulListRVA()
             addItemDecoration(
                 DividerItemDecoration(
                     requireContext(),
@@ -57,7 +56,7 @@ class MeaningfulPlaceFragment :
             }
 
             is NokHomeViewModel.PredictEvent.MeaningFulPlaceEvent -> {
-                userMeaningfulListAdapter.submitList(event.meaningfulPlaceForList)
+                userMeaningfulListRVA.submitList(event.meaningfulPlaceForList)
 
                 event.meaningfulPlaceForList.forEach { meaningfulPlace ->
                     val latitude = meaningfulPlace.latitude
@@ -79,7 +78,7 @@ class MeaningfulPlaceFragment :
 
     private fun initUserMeaningfulPlaceAdapter(){
         binding.bottomSheetLayout.innerRv.apply {
-            adapter = userMeaningfulListAdapter
+            adapter = userMeaningfulListRVA
             addItemDecoration(
                 DividerItemDecoration(
                     requireContext(),

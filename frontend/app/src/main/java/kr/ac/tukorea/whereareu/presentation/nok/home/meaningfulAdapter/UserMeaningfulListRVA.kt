@@ -6,37 +6,35 @@ import android.widget.AdapterView.OnItemClickListener
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import kr.ac.tukorea.whereareu.databinding.ItemInnerMeaningfulListBottomSheetBinding
-import kr.ac.tukorea.whereareu.databinding.ItemMeaningfulListBinding
 import kr.ac.tukorea.whereareu.databinding.ItemMeaningfulPlaceBottomSheetBinding
-import kr.ac.tukorea.whereareu.domain.home.MeaningfulPlace
 import kr.ac.tukorea.whereareu.domain.home.MeaningfulPlaceInfo
-import kr.ac.tukorea.whereareu.domain.home.PoliceStationInfo
+import kr.ac.tukorea.whereareu.domain.home.MeaningfulPlaceListInfo
 
-class UserMeaningfulListAdapter() :
-    ListAdapter<MeaningfulPlaceInfo, UserMeaningfulListAdapter.UserMeaningfulListViewHolder>(diffUtil) {
+class UserMeaningfulListRVA() :
+    ListAdapter<MeaningfulPlaceInfo, UserMeaningfulListRVA.UserMeaningfulListViewHolder>(diffUtil) {
     private val onItemClickListener : OnItemClickListener? =  null
-    lateinit var binding: ItemMeaningfulPlaceBottomSheetBinding
 
     inner class UserMeaningfulListViewHolder(
         private val binding: ItemMeaningfulPlaceBottomSheetBinding
     ) : RecyclerView.ViewHolder(binding.root){
-        fun bind(meaningfulPlaceInfo: MeaningfulPlaceInfo){
+        fun bind(meaningfulPlace: MeaningfulPlaceInfo){
             with(binding) {
-//                val listInfo =
-//                    meaningfulPlace.meaningfulPlaceListInfo.mapIndexed { index, meaningfulPlaceListInfo ->
-//                        val date = convertDayOfWeekInKorean(meaningfulPlaceListInfo.date)
-//                        val time = "${meaningfulPlaceListInfo.time.substring(0 until 2)}시~${
-//                            meaningfulPlaceListInfo.time.substring(2 until 4)
-//                        }"
-//                    }
+                val listInfo =
+                    meaningfulPlace.meaningfulPlaceListInfo.mapIndexed { index, meaningfulPlaceListInfo ->
+                        val date = convertDayOfWeekInKorean(meaningfulPlaceListInfo.date)
+                        val time = "${meaningfulPlaceListInfo.time.substring(0 until 2)}시~${
+                            meaningfulPlaceListInfo.time.substring(2 until 4)
+                        }"
+                        MeaningfulPlaceListInfo(
+                            date, time)
+                    }
             }
         }
     }
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
-    ): UserMeaningfulListAdapter.UserMeaningfulListViewHolder {
+    ): UserMeaningfulListRVA.UserMeaningfulListViewHolder {
         return UserMeaningfulListViewHolder(
             ItemMeaningfulPlaceBottomSheetBinding.inflate(
                 LayoutInflater.from(parent.context), parent, false
@@ -45,7 +43,7 @@ class UserMeaningfulListAdapter() :
     }
 
     override fun onBindViewHolder(
-        holder: UserMeaningfulListAdapter.UserMeaningfulListViewHolder,
+        holder: UserMeaningfulListRVA.UserMeaningfulListViewHolder,
         position: Int
     ) {
         holder.bind(currentList[position])
