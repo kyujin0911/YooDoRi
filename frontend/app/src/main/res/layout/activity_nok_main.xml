@@ -4,7 +4,11 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
+        <variable
+            name="viewModel"
+            type="kr.ac.tukorea.whereareu.presentation.nok.home.NokHomeViewModel" />
 
+        <import type="android.view.View"/>
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -46,7 +50,8 @@
             app:itemTextColor="@drawable/bottom_color_selector"
             app:itemTextAppearanceInactive="@style/TextAppearance.App.14sp.SemiBold"
             app:itemTextAppearanceActive="@style/TextAppearance.App.14sp.SemiBold"
-            app:menu="@menu/nok_main_menu" />
+            app:menu="@menu/nok_main_menu"
+            android:visibility="@{viewModel.isPredicted ? View.GONE : View.VISIBLE}"/>
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

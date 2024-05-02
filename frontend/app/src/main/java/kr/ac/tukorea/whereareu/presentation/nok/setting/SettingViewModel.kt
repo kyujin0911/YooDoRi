@@ -37,9 +37,17 @@ class SettingViewModel @Inject constructor(
     private val _toastEvent = MutableSharedFlow<String>()
     val toastEvent = _toastEvent.asSharedFlow()
 
+    private val _nokKey = MutableStateFlow("")
+    private val _dementiaKey = MutableStateFlow("")
+
     fun setUpdateRate(time:String){
         _updateRate.value = time
     }
+
+    fun setNokKey(nokKey: String) {
+        _nokKey.value = nokKey
+    }
+
 
     fun sendUpdateUserInfo(request: ModifyUserInfoRequest) {
         viewModelScope.launch(Dispatchers.IO) {
@@ -58,9 +66,9 @@ class SettingViewModel @Inject constructor(
             }
         }
     }
-    fun getUserInfo(nokKey: String){
+    fun getUserInfo(){
         viewModelScope.launch{
-            repository.getUserInfo(nokKey).onSuccess {
+            repository.getUserInfo(_nokKey.value).onSuccess {
                 _userInfo.value = it
                 //_name.value = it.nokInfoRecord.nokName
                 Log.d("SettingViewModel", "getUserInfo Success")
@@ -74,8 +82,13 @@ class SettingViewModel @Inject constructor(
         }
     }
 
-    fun sendUpdateTime(key: String, isDementia: Int){
+    fun sendUpdateTime(isDementia: Int){
         viewModelScope.launch(Dispatchers.IO){
+            val key = if(isDementia == 0){
+                _nokKey.value
+            } else {
+                _dementiaKey.value
+            }
             repository.sendUpdateRate(
                 UpdateRateRequest(key, isDementia, _updateRate.value.toInt())
             ).onSuccess {

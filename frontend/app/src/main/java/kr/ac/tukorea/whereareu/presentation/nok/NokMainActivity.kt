@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.util.Log
-import android.view.View
 import androidx.activity.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
@@ -32,10 +31,10 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
     private var updateLocationJob: Job? = null
     override fun initView() {
         //상태바 투명 설정
-        
         this.setStatusBarTransparent()
         binding.layout.setPadding(0, 0, 0, this.navigationHeight())
         initNavigator()
+        homeViewModel.fetchUserInfo()
     }
 
     private fun initNavigator() {
@@ -44,22 +43,20 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
         val navController = navHostFragment.navController
 
         binding.bottomNav.setupWithNavController(navController)
-
-        // 위치 예측 화면 이동 시 bottom nav 가리기
-        /*navController.addOnDestinationChangedListener { controller, destination, arguments ->
-            if (destination.id == R.id.predictLocationFragment) {
-                binding.bottomNav.visibility = View.GONE
-            } else {
-                binding.bottomNav.visibility = View.VISIBLE
-            }
-        }*/
     }
 
-    private fun getDementiaLocation() {
-        val spf = getSharedPreferences("OtherUser", MODE_PRIVATE)
-        val dementiaKey = spf.getString("key", "")
+    private fun saveUserKeys() {
+        val nokSpf = getSharedPreferences("OtherUser", MODE_PRIVATE)
+        val dementiaKey = nokSpf.getString("key", "")
         if (!dementiaKey.isNullOrEmpty()) {
-            homeViewModel.saveDementiaKey(dementiaKey)
+            homeViewModel.setDementiaKey(dementiaKey)
+        }
+
+        val spf = getSharedPreferences("User", MODE_PRIVATE)
+        val nokKey = spf.getString("key", "")
+        if (!nokKey.isNullOrEmpty()) {
+            homeViewModel.setNokKey(nokKey)
+            settingViewModel.setNokKey(nokKey)
         }
     }
 
@@ -79,6 +76,8 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
     }
 
     override fun initObserver() {
+        saveUserKeys()
+
         LocalBroadcastManager.getInstance(this).registerReceiver(
             mMessageReceiver, IntentFilter("gps")
         )
@@ -104,13 +103,8 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
 
         repeatOnStarted {
             homeViewModel.isPredicted.collect { isPredicted ->
-                if (!isPredicted) {
-                    Log.d("NokMainActivity", isPredicted.toString())
-                    getDementiaLocation()
-                    binding.bottomNav.visibility = View.VISIBLE
-                } else {
+                if (isPredicted) {
                     stopGetDementiaLocation()
-                    binding.bottomNav.visibility = View.GONE
                 }
             }
         }

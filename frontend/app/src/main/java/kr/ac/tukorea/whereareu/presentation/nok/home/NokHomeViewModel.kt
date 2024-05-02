@@ -1,6 +1,5 @@
 package kr.ac.tukorea.whereareu.presentation.nok.home
 
-import android.provider.ContactsContract
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -13,7 +12,6 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kr.ac.tukorea.whereareu.data.model.DementiaKeyRequest
-import kr.ac.tukorea.whereareu.data.model.kakao.address.AddressResponse
 import kr.ac.tukorea.whereareu.data.model.nok.home.LocationInfoResponse
 import kr.ac.tukorea.whereareu.data.repository.kakao.KakaoRepositoryImpl
 import kr.ac.tukorea.whereareu.data.repository.naver.NaverRepositoryImpl
@@ -48,6 +46,7 @@ class NokHomeViewModel @Inject constructor(
     val isPredicted = _isPredicted.asStateFlow()
 
     private val _dementiaKey = MutableStateFlow("")
+    private val _nokKey = MutableStateFlow("")
 
     private val _predictEvent = MutableSharedFlow<PredictEvent>()
     val predictEvent = _predictEvent.asSharedFlow()
@@ -78,8 +77,12 @@ class NokHomeViewModel @Inject constructor(
         }
     }
 
-    fun saveDementiaKey(dementiaKey: String) {
+    fun setDementiaKey(dementiaKey: String) {
         _dementiaKey.value = dementiaKey
+    }
+
+    fun setNokKey(nokKey: String) {
+        _nokKey.value = nokKey
     }
 
     fun setIsPredicted(isPredicted: Boolean) {
@@ -99,9 +102,9 @@ class NokHomeViewModel @Inject constructor(
         }
     }
 
-    fun fetchUserInfo(nokKey: String){
+    fun fetchUserInfo(){
         viewModelScope.launch {
-            nokHomeRepository.getUserInfo(nokKey).onSuccess {
+            nokHomeRepository.getUserInfo(_nokKey.value).onSuccess {
                 _dementiaName.emit(it.nokInfoRecord.nokName)
             }
         }
