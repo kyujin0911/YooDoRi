@@ -6,29 +6,21 @@ import android.widget.AdapterView.OnItemClickListener
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import kr.ac.tukorea.whereareu.databinding.ItemMeaningfulPlaceBottomSheetBinding
+import kr.ac.tukorea.whereareu.databinding.ItemInnerMeaningfulListBottomSheetBinding
 import kr.ac.tukorea.whereareu.domain.home.MeaningfulPlaceInfo
-import kr.ac.tukorea.whereareu.domain.home.MeaningfulPlaceListInfo
+
 
 class UserMeaningfulListRVA() :
     ListAdapter<MeaningfulPlaceInfo, UserMeaningfulListRVA.UserMeaningfulListViewHolder>(diffUtil) {
     private val onItemClickListener : OnItemClickListener? =  null
 
     inner class UserMeaningfulListViewHolder(
-        private val binding: ItemMeaningfulPlaceBottomSheetBinding
+        private val binding: ItemInnerMeaningfulListBottomSheetBinding
     ) : RecyclerView.ViewHolder(binding.root){
         fun bind(meaningfulPlace: MeaningfulPlaceInfo){
-            with(binding) {
-                val listInfo =
-                    meaningfulPlace.meaningfulPlaceListInfo.mapIndexed { index, meaningfulPlaceListInfo ->
-                        val date = convertDayOfWeekInKorean(meaningfulPlaceListInfo.date)
-                        val time = "${meaningfulPlaceListInfo.time.substring(0 until 2)}시~${
-                            meaningfulPlaceListInfo.time.substring(2 until 4)
-                        }"
-                        MeaningfulPlaceListInfo(
-                            date, time)
-                    }
-            }
+            binding.nameTv.text = meaningfulPlace.address
+            binding.roadAddressTv.text = meaningfulPlace.address
+
         }
     }
     override fun onCreateViewHolder(
@@ -36,7 +28,7 @@ class UserMeaningfulListRVA() :
         viewType: Int
     ): UserMeaningfulListRVA.UserMeaningfulListViewHolder {
         return UserMeaningfulListViewHolder(
-            ItemMeaningfulPlaceBottomSheetBinding.inflate(
+            ItemInnerMeaningfulListBottomSheetBinding.inflate(
                 LayoutInflater.from(parent.context), parent, false
             )
         )
@@ -65,18 +57,6 @@ class UserMeaningfulListRVA() :
                 return oldItem == newItem
             }
 
-        }
-    }
-    private fun convertDayOfWeekInKorean(day: String): String {
-        return when (day) {
-            "Monday" -> "월요일"
-            "Tuesday" -> "화요일"
-            "Wednesday" -> "수요일"
-            "Thursday" -> "목요일"
-            "Friday" -> "금요일"
-            "Saturday" -> "토요일"
-            "Sunday" -> "일요일"
-            else -> "알 수 없음"
         }
     }
 }

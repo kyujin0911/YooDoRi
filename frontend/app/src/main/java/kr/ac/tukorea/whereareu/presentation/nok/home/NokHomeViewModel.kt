@@ -127,61 +127,125 @@ class NokHomeViewModel @Inject constructor(
         }
     }
 
-    fun test() {
-        viewModelScope.launch {
-            val time = measureTimeMillis {
-                val dementiaLastInfo = async { getDementiaLastInfo() }
-                //Log.d("lastInfo", dementiaLastInfo.toString())
-                val meaningfulPlaceList = async { getMeaningfulPlaces() }.await()
+//    private fun getDementiaLastInfo() {
+//        viewModelScope.launch {
+//            nokHomeRepository.getDementiaLastInfo(DementiaKeyRequest("253050"))
+//                .onSuccess { response ->
+//                    Log.d("last info", response.toString())
+//                    eventPredict(PredictEvent.DementiaLastInfoEvent(response))
+//                    getAddress(
+//                        response.lastLongitude.toString(),
+//                        response.lastLatitude.toString(),
+//                        true
+//                    )
+//                }.onException {
+//                    Log.d("error", it.toString())
+//                }
+//        }
+//    }
+//
+//    private fun getAddress(x: String, y: String, isLastAddress: Boolean) {
+//        viewModelScope.launch {
+//            kakaoRepository.getAddress(x, y).onSuccess {
+//                val address = convertResponseToAddress(it)
+//                if (isLastAddress) {
+//                    eventPredict(
+//                        PredictEvent.LastLocationEvent(
+//                            LastAddress(y.toDouble(), x.toDouble(), address)
+//                        )
+//                    )
+//                } else {
+//                    addressList.add(address)
+//                }
+//                Log.d("kakao api", it.toString())
+//            }.onError {
+//                Log.d("kakao api error", it.toString())
+//            }.onFail {
+//                Log.d("kakao api fail", it.toString())
+//            }.onException {
+//                Log.d("kakao api exception", it.toString())
+//            }
+//        }
+//    }
+//
+//    fun getMeaningfulPlace() {
+//        viewModelScope.launch {
+//            nokHomeRepository.getMeaningfulPlace("253050").onSuccess { response ->
+//                Log.d("getMeaningfulPlace", response.toString())
+//                response.meaningfulLocations.forEach {
+//                    getAddress(it.longitude.toString(), it.latitude.toString(), false)
+//                    delay(500)
+//                }
+//
+//                Log.d("meaningful address", addressList.toString())
+//
+//                val meaningfulPlaces = response.meaningfulLocations.zip(addressList)
+//                    .map {
+//                        MeaningfulPlace(
+//                            address = it.second, date = it.first.dayOfTheWeek, time = it.first.time,
+//                            latitude = it.first.latitude, longitude = it.first.longitude
+//                        )
+//                    }
+//                val meaningfulPlaceInfo = preprocessingList(meaningfulPlaces)
+//                eventPredict(PredictEvent.MeaningFulPlaceEvent(meaningfulPlaceInfo))
+//                getPoliceStationInfoNearby(meaningfulPlaceInfo)
+//                getDementiaLastInfo()
+//            }.onException {
+//                Log.d("error", it.toString())
+//            }
+//        }
+//    }
 
-                //val zippedMeaningfulPlaceList = zipMeaningfulPlaceListWithAddress(meaningfulPlaceList, addressList)
-                //val groupedMeaningfulPlaceList = preprocessingList(zippedMeaningfulPlaceList)
-
-                //getPoliceStationInfoNearby(groupedMeaningfulPlaceList)
-            }
-            Log.d("after refactor time", time.toString())
-        }
-    }
-
-    private suspend fun getDementiaLastInfo() {
-        nokHomeRepository.getDementiaLastInfo(DementiaKeyRequest("253050"))
-            .onSuccess { response ->
-                Log.d("last info", response.toString())
-                val latitude = response.lastLatitude
-                val longitude = response.lastLongitude
-                val averageSpeed = response.averageSpeed.div(3.6)
-                val coord = LatLng(latitude, longitude)
-
-                eventPredict(PredictEvent.DisplayDementiaLastInfo(averageSpeed, coord))
-
-                eventPredict(
-                    PredictEvent.DisplayDementiaLastLocation(
-                        LastLocation(latitude, longitude, response.addressName)
-                    )
-                )
-            }.onException {
-                Log.d("error", it.toString())
-            }
-    }
-    private suspend fun getMeaningfulPlaces() {
-        nokHomeRepository.getMeaningfulPlace("253050").onSuccess { response ->
-            Log.d("getMeaningfulPlace", response.toString())
-            val meaningfulPlaceInfo = response.meaningfulPlaces.map { meaningfulPlace ->
-                eventPredict(PredictEvent.SearchNearbyPoliceStation(meaningfulPlace.policeStationInfo))
-
-                MeaningfulPlaceInfo(
-                    meaningfulPlace.address,
-                    meaningfulPlace.timeInfo,
-                    meaningfulPlace.latitude,
-                    meaningfulPlace.longitude,
-                    false,
-                    meaningfulPlace.policeStationInfo
-                )
-            }
-
-            eventPredict(PredictEvent.MeaningFulPlaceEvent(meaningfulPlaceInfo))
-        }.onException {
-            Log.d("error", it.toString())
-        }
-    }
+//    private fun getPoliceStationInfoNearby(list: MutableList<MeaningfulPlaceInfo>){
+//        viewModelScope.launch {
+//            list.forEach { meaningfulPlaceInfo ->
+//                searchPoliceStationNearby(meaningfulPlaceInfo)
+//                delay(300)
+//            }
+//            Log.d("after police list", list.toString())
+//        }
+//    }
+//
+//    private fun searchPoliceStationNearby(meaningfulPlaceInfo: MeaningfulPlaceInfo){
+//        viewModelScope.launch {
+//            val x = meaningfulPlaceInfo.longitude.toString()
+//            val y = meaningfulPlaceInfo.latitude.toString()
+//            kakaoRepository.searchWithKeyword(x, y).onSuccess {
+//                Log.d("kakao keyword", it.toString())
+//                val policeList = it.documents.filter {document ->
+//                    document.roadAddressName.isNullOrEmpty().not() or document.phone.isNullOrEmpty().not() }
+//                    .map { document ->
+//                    PoliceStationInfo(document.placeName, document.distance, document.roadAddressName, document.phone,
+//                        document.x, document.y)
+//                }.take(3)
+//                meaningfulPlaceInfo.policeStationInfo = policeList
+//                eventPredict(PredictEvent.SearchPoliceStationNearbyEvent(policeList))
+//                Log.d("police list", policeStationInfoList.toString())
+//            }
+//        }
+//    }
+//
+//    private fun convertResponseToAddress(response: AddressResponse): String {
+//        val documents = response.documents[0]
+//        return if (documents.roadAddress == null)
+//            documents.address.addressName
+//        else {
+//            documents.roadAddress.addressName + " " + documents.roadAddress.buildingName
+//        }
+//    }
+//
+//    private fun preprocessingList(list: List<MeaningfulPlace>): MutableList<MeaningfulPlaceInfo> {
+//        val groupList = list.groupBy { it.address }
+//        val meaningfulPlaceInfoList = mutableListOf<MeaningfulPlaceInfo>()
+//        groupList.keys.forEach { key ->
+//            val list = groupList[key]
+//            val meaningfulPlaceListInfo =
+//                list?.map { MeaningfulPlaceListInfo(date = it.date, time = it.time) }
+//                    ?.sortedBy { it.time }
+//            meaningfulPlaceInfoList.add(MeaningfulPlaceInfo(key, meaningfulPlaceListInfo?.distinct()!!,
+//                list.first().latitude, list.first().longitude))
+//        }
+//        Log.d("tempList", meaningfulPlaceInfoList.toString())
+//        return meaningfulPlaceInfoList
+//    }
 }

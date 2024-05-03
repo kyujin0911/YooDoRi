@@ -1,6 +1,9 @@
 package kr.ac.tukorea.whereareu.presentation
 
+import android.content.Context.MODE_PRIVATE
+import android.media.MediaCodec.MetricsConstants.MODE
 import android.util.Log
+import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -19,56 +22,43 @@ import kr.ac.tukorea.whereareu.util.extension.repeatOnStarted
 class MeaningfulPlaceFragment :
     BaseFragment<FragmentMeaningfulPlaceBinding>(R.layout.fragment_meaningful_place) {
     private val viewModel: NokMeaningfulPlaceViewModel by activityViewModels()
-    private lateinit var  userMeaningfulListRVA: UserMeaningfulListRVA
+    private lateinit var userMeaningfulListRVA: UserMeaningfulListRVA
 
     //    private var naverMap: NaverMap? = null
 
     override fun initObserver() {
-
     }
 
     override fun initView() {
-        Log.d("Presentation","MeaningfulPlaceFragment")
-//        binding.bottomSheetLayout.innerRv.layoutManager = LinearLayoutManager(context)
+
+        Log.d("Presentation", "MeaningfulPlaceFragment")
+
+        binding.bottomSheetLayout.innerRv.layoutManager = LinearLayoutManager(context)
         userMeaningfulListRVA = UserMeaningfulListRVA()
-    }
 
-    private fun getMeaningfulPlace() {
+        binding.bottomSheetLayout.innerRv.adapter = userMeaningfulListRVA
+        userMeaningfulListRVA.submitList(userMeaningfulPlaceList.toString())
 
-        when (event) {
-            is NokHomeViewModel.PredictEvent.StartPredictEvent -> {
-                viewModel.getUserMeaningfulPlace()
-                initUserMeaningfulPlaceAdapter()
-            }
+        val otherSpf = requireActivity().getSharedPreferences("OtherUser", MODE_PRIVATE)
+        val key = otherSpf.getString("key", "")
 
-            is NokHomeViewModel.PredictEvent.MeaningFulPlaceEvent -> {
-                binding.root
+        repeatOnStarted {
+            viewModel.getMeaningfulPlaces("253050")
 
-                event.meaningfulPlaceForList.forEach { meaningfulPlace ->
-                    val latitude = meaningfulPlace.latitude
-                    val longitude = meaningfulPlace.longitude
-                    val marker = Marker()
-                    with(marker) {
-                        position = LatLng(latitude, longitude)
-                        icon = MarkerIcons.YELLOW
-                        captionText = meaningfulPlace.address
-                        captionRequestedWidth = 400
+            userMeaningfulListRVA.submitList(viewModel.userMeaningfulPlaceList)
+
+            viewModel.userMeaningfulPlaceList.forEach { userMeaningfulPlace ->
+                val latitude = userMeaningfulPlace.latitude
+                val longitude = userMeaningfulPlace.longitude
+
+//                val marker = Marker()
+//                with(marker) {
+//                    position = LatLng(latitude, longitude)
+//                    icon = MarkerIcons.YELLOW
+//                    captionText = userMeaningfulPlace.address
+//                    captionRequestedWidth = 400
 //                    map = naverMap
-                    }
-                }
-
             }
-            else -> {}
         }
-    }
-
-    private fun initUserMeaningfulPlaceAdapter(){
-        binding.bottomSheetLayout.innerRv.apply {
-            adapter = userMeaningfulListRVA
-            addItemDecoration(
-                DividerItemDecoration(
-                    requireContext(),
-                    LinearLayoutManager.VERTICAL
-                ))}
     }
 }
