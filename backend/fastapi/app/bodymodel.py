@@ -173,6 +173,7 @@ class TempResponse(BaseModel):
 
 class Token(BaseModel):
     accessToken: str = Field("ksjdnfjkdasnfljsknafljansdfjlsakn")
+    refreshToken: str = Field("ksjdnfjkdasnfljsknafljansdfjlsakn")
     tokenType: str = Field("bearer")
 
 class TokenResponse(BaseModel):
