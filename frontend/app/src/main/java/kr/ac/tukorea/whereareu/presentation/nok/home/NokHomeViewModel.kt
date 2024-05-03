@@ -33,8 +33,8 @@ class NokHomeViewModel @Inject constructor(
     private val kakaoRepository: KakaoRepositoryImpl
 ) : ViewModel() {
 
-    private val _dementiaLocation = MutableSharedFlow<LocationInfoResponse>(replay = 1)
-    val dementiaLocation = _dementiaLocation.asSharedFlow()
+    private val _dementiaLocationInfo = MutableStateFlow<LocationInfoResponse>(LocationInfoResponse())
+    val dementiaLocationInfo = _dementiaLocationInfo.asStateFlow()
 
     val isInternetOn = MutableStateFlow(true)
     val isGpsOn = MutableStateFlow(true)
@@ -56,6 +56,14 @@ class NokHomeViewModel @Inject constructor(
 
     private val _navigateEvent = MutableStateFlow(NavigateEvent.Home.toString())
     val navigateEvent = _navigateEvent.asStateFlow()
+
+    private val _ringtone = MutableStateFlow(0)
+    val ringtone = _ringtone.asStateFlow()
+
+    private val _movementStatus = MutableStateFlow(1)
+    val movementStatus = _movementStatus.asStateFlow()
+
+    private val _isSettingFragment = MutableStateFlow(false)
     sealed class PredictEvent {
         data class StartPredict(val isPredicted: Boolean) : PredictEvent()
         data class MeaningFulPlaceEvent(
@@ -129,9 +137,10 @@ class NokHomeViewModel @Inject constructor(
     fun getDementiaLocation() {
         viewModelScope.launch {
             nokHomeRepository.getDementiaLocationInfo(_dementiaKey.value).onSuccess {
-                _dementiaLocation.emit(it)
+                _dementiaLocationInfo.emit(it)
                 isInternetOn.value = it.isInternetOn
                 isGpsOn.value = it.isGpsOn
+                _movementStatus.value = it.isRingstoneOn
             }.onError {
                 Log.d("error", it.toString())
             }.onException {

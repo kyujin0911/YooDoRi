@@ -7,9 +7,9 @@ data class LocationInfoResponse(
     val isRingstoneOn: Int,
     val latitude: Double,
     val longitude: Double,
-    val message: String,
-    val status: String,
     val userStatus: Int,
     val bearing: Float,
     val currentSpeed: Float
-)
+){
+    constructor(): this(100, true, true, 0, 37.5666103, 126.9783882, 1, 0f, 0f)
+}

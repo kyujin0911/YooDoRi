@@ -7,7 +7,6 @@ import android.content.pm.PackageManager
 import android.graphics.PointF
 import android.os.Build
 import android.util.Log
-import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -18,7 +17,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.naver.maps.geometry.LatLng
 import com.naver.maps.map.CameraUpdate
-import com.naver.maps.map.MapFragment
 import com.naver.maps.map.NaverMap
 import com.naver.maps.map.OnMapReadyCallback
 import com.naver.maps.map.overlay.CircleOverlay
@@ -32,7 +30,6 @@ import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kr.ac.tukorea.whereareu.R
-import kr.ac.tukorea.whereareu.data.model.nok.home.LocationInfoResponse
 import kr.ac.tukorea.whereareu.databinding.IconLocationOverlayLayoutBinding
 import kr.ac.tukorea.whereareu.domain.home.PoliceStationInfo
 import kr.ac.tukorea.whereareu.presentation.base.BaseFragment
@@ -62,11 +59,10 @@ class NokHomeFragment : BaseFragment<kr.ac.tukorea.whereareu.databinding.Fragmen
                 handlePredictEvent(predictEvent)
             }
         }
+
         repeatOnStarted {
             delay(500)
-            viewModel.dementiaLocation.collect{ response ->
-                Log.d("response", response.toString())
-                updateDementiaStatus(response)
+            viewModel.dementiaLocationInfo.collect{ response ->
                 val coord = LatLng(response.latitude, response.longitude)
                 trackingDementiaLocation(coord, response.currentSpeed)
             }
@@ -79,7 +75,7 @@ class NokHomeFragment : BaseFragment<kr.ac.tukorea.whereareu.databinding.Fragmen
                 viewModel.test()
                 //viewModel.getMeaningfulPlace()
                 //viewModel.searchWithKeyword("x", "y")
-                initBottomSheet()
+                //initBottomSheet()
                 initMeaningfulListRVA()
                 showLoadingDialog(requireContext())
             }
@@ -87,7 +83,6 @@ class NokHomeFragment : BaseFragment<kr.ac.tukorea.whereareu.databinding.Fragmen
             is NokHomeViewModel.PredictEvent.DisplayDementiaLastInfo -> {
                 startCountDownJob(event.averageSpeed, event.coord)
 
-                binding.averageMovementSpeedTv.text = String.format("%.2fkm", event.averageSpeed)
                 naverMap?.locationOverlay?.isVisible = false
             }
 
@@ -134,7 +129,6 @@ class NokHomeFragment : BaseFragment<kr.ac.tukorea.whereareu.databinding.Fragmen
             }
 
             is NokHomeViewModel.PredictEvent.DisplayDementiaLastLocation -> {
-                binding.lastLocationTv.text = event.lastLocation.address
 
                 val latitude = event.lastLocation.latitude
                 val longitude = event.lastLocation.longitude
@@ -162,46 +156,7 @@ class NokHomeFragment : BaseFragment<kr.ac.tukorea.whereareu.databinding.Fragmen
                     countDownJob?.cancelAndJoin()
                     countDownJob = null
                     circleOverlay.isVisible = false
-                    binding.countDownT.text = "00:00"
                     lastLocationMarker.map = null
-                }
-            }
-        }
-    }
-
-    private fun updateDementiaMovementStatus(status: Int): String{
-        return when(status){
-            1 -> "정지"
-            2 -> "도보"
-            3 -> "차량"
-            4 -> "지하철"
-            else -> "알수없음"
-        }
-    }
-
-    private fun updateDementiaStatus(dementiaStatus: LocationInfoResponse){
-        with(binding){
-            stateTv.text = updateDementiaMovementStatus(dementiaStatus.userStatus)
-            batteryTv.text = "${dementiaStatus.battery}%"
-
-            when(dementiaStatus.isRingstoneOn){
-                0 -> {
-                    ringModeTv.text = "무음"
-                    ringModeIv.setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.ic_bell_off_24))
-                }
-
-                1 -> {
-                    ringModeTv.text = "진동"
-                    ringModeIv.setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.ic_vibrate_24))
-                }
-
-                2 -> {
-                    ringModeTv.text = "벨소리"
-                    ringModeIv.setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.ic_bell_24))
-                }
-
-                else -> {
-                    ringModeTv.text = "알수없음"
                 }
             }
         }
@@ -233,7 +188,7 @@ class NokHomeFragment : BaseFragment<kr.ac.tukorea.whereareu.databinding.Fragmen
         binding.viewModel = viewModel
         checkLocationPermission()
         //updateDementiaName()
-        initMap()
+
     }
 
     fun predict(){
@@ -256,7 +211,7 @@ class NokHomeFragment : BaseFragment<kr.ac.tukorea.whereareu.databinding.Fragmen
         meaningfulPlaceRVA.setRVAClickListener(this, this)
     }
 
-    private fun initBottomSheet(){
+    /*private fun initBottomSheet(){
         behavior = BottomSheetBehavior.from(binding.bottomSheet)
         behavior.state = BottomSheetBehavior.STATE_COLLAPSED
         behavior.peekHeight = 20
@@ -264,36 +219,36 @@ class NokHomeFragment : BaseFragment<kr.ac.tukorea.whereareu.databinding.Fragmen
         behavior.halfExpandedRatio = 0.3f
 
         //bottom sheet predict layout과 높이 맞추기
-        /*val viewTreeObserver: ViewTreeObserver = binding.predictLayout.viewTreeObserver
+        *//*val viewTreeObserver: ViewTreeObserver = binding.predictLayout.viewTreeObserver
         viewTreeObserver.addOnGlobalLayoutListener(object : OnGlobalLayoutListener {
             override fun onGlobalLayout() {
                 behavior.expandedOffset = binding.predictLayout.height + 35
                 binding.predictLayout.viewTreeObserver.removeOnGlobalLayoutListener(this)
             }
-        })*/
+        })*//*
 
         // half expanded state일 때 접기 제어
         behavior.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback(){
             var isHalfExpanded = false
             override fun onStateChanged(bottomSheet: View, newState: Int) {
-                /*when(newState){
+                *//*when(newState){
                     BottomSheetBehavior.STATE_HALF_EXPANDED -> {
                         isHalfExpanded = true
                     }
                     BottomSheetBehavior.STATE_COLLAPSED and BottomSheetBehavior.STATE_HALF_EXPANDED-> {
                         isHalfExpanded = false
                     }
-                }*/
+                }*//*
             }
 
             override fun onSlide(bottomSheet: View, slideOffset: Float) {
-                /*if(isHalfExpanded && slideOffset < 0.351f){
+                *//*if(isHalfExpanded && slideOffset < 0.351f){
                     behavior.state = BottomSheetBehavior.STATE_COLLAPSED
-                }*/
+                }*//*
             }
 
         })
-    }
+    }*/
 
     private fun startCountDownJob(averageSpeed: Double, coord: LatLng){
         with(circleOverlay){
@@ -315,21 +270,12 @@ class NokHomeFragment : BaseFragment<kr.ac.tukorea.whereareu.databinding.Fragmen
                     minute += 1
                     second = 0
                 }
-                binding.countDownT.text = String.format("%02d:%02d",minute, second)
+                //binding.countDownT.text = String.format("%02d:%02d",minute, second)
                 delay(1000L)
             }
         }
     }
-    private fun initMap() {
-        val fm = childFragmentManager
-        val mapFragment = fm.findFragmentById(R.id.map_fragment) as MapFragment?
-            ?: MapFragment.newInstance().also {
-                fm.beginTransaction().add(R.id.map_fragment, it).commit()
-            }
-        mapFragment.getMapAsync { map ->
-            naverMap = map
-        }
-    }
+
 
     private fun checkLocationPermission() {
         if (ActivityCompat.checkSelfPermission(
