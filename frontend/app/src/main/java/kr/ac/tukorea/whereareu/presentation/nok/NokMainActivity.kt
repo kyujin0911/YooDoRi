@@ -22,6 +22,7 @@ import com.naver.maps.map.CameraUpdate
 import com.naver.maps.map.MapFragment
 import com.naver.maps.map.NaverMap
 import com.naver.maps.map.OnMapReadyCallback
+import com.naver.maps.map.overlay.CircleOverlay
 import com.naver.maps.map.overlay.InfoWindow
 import com.naver.maps.map.overlay.Marker
 import com.naver.maps.map.overlay.OverlayImage
@@ -50,7 +51,10 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
     private val homeViewModel: NokHomeViewModel by viewModels()
     private val settingViewModel: SettingViewModel by viewModels()
     private var updateLocationJob: Job? = null
+    private var countDownJob: Job? = null
     private var naverMap: NaverMap? = null
+    private val lastLocationMarker = Marker()
+    private val circleOverlay = CircleOverlay()
     private lateinit var behavior: BottomSheetBehavior<ConstraintLayout>
     private fun saveUserKeys() {
         val dementiaKey = getUserKey("dementia")
@@ -98,23 +102,30 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
         }
 
         repeatOnStarted {
-            delay(500)
+            delay(100)
             homeViewModel.dementiaLocationInfo.collect { response ->
                 val coord = LatLng(response.latitude, response.longitude)
                 trackingDementiaLocation(coord, response.currentSpeed)
             }
         }
 
-        /*repeatOnStarted {
+        repeatOnStarted {
             homeViewModel.predictEvent.collect{ predictEvent ->
                 handlePredictEvent(predictEvent)
             }
-        }*/
+        }
+
+        repeatOnStarted {
+            homeViewModel.innerItemClickEvent.collect{ event ->
+                behavior.state = event.behavior
+                naverMap?.moveCamera(CameraUpdate.scrollTo(event.coord))
+            }
+        }
     }
-    /*private fun handlePredictEvent(event: NokHomeViewModel.PredictEvent){
+    private fun handlePredictEvent(event: NokHomeViewModel.PredictEvent){
         when(event){
             is NokHomeViewModel.PredictEvent.StartPredict -> {
-                homeViewModel.test()
+                homeViewModel.predict()
                 stopGetDementiaLocation()
                 binding.bottomSheet.visibility = View.VISIBLE
                 showLoadingDialog(this)
@@ -129,7 +140,6 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
 
             is NokHomeViewModel.PredictEvent.MeaningFulPlaceEvent -> {
                 Log.d("뭐고", event.meaningfulPlaceForList.toString())
-                meaningfulPlaceRVA.submitList(event.meaningfulPlaceForList)
 
                 event.meaningfulPlaceForList.forEach {meaningfulPlace ->
                     val latitude = meaningfulPlace.latitude
@@ -145,7 +155,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                     }
 
                     val infoWindow = InfoWindow()
-                    infoWindow.adapter = object : InfoWindow.DefaultTextAdapter(requireContext()) {
+                    infoWindow.adapter = object : InfoWindow.DefaultTextAdapter(this) {
                         override fun getText(infoWindow: InfoWindow): CharSequence {
                             return "예상 위치"
                         }
@@ -178,14 +188,14 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
 
                 with(lastLocationMarker){
                     position = LatLng(latitude, longitude)
-                    icon = com.naver.maps.map.util.MarkerIcons.RED
+                    icon = MarkerIcons.RED
                     captionText = event.lastLocation.address
                     captionRequestedWidth = 400
                     map = naverMap
                 }
 
                 val infoWindow = InfoWindow()
-                infoWindow.adapter = object : InfoWindow.DefaultTextAdapter(requireContext()) {
+                infoWindow.adapter = object : InfoWindow.DefaultTextAdapter(this) {
                     override fun getText(infoWindow: InfoWindow): CharSequence {
                         return "실종 직전 위치"
                     }
@@ -195,7 +205,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
 
             is NokHomeViewModel.PredictEvent.StopPredict -> {
                 binding.bottomSheet.visibility = View.GONE
-                viewLifecycleOwner.lifecycleScope.launch {
+                lifecycleScope.launch {
                     countDownJob?.cancelAndJoin()
                     countDownJob = null
                     circleOverlay.isVisible = false
@@ -204,7 +214,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                 }
             }
         }
-    }*/
+    }
 
     private fun trackingDementiaLocation(coord: LatLng, speed: Float) {
         naverMap?.let {
@@ -224,6 +234,32 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
             }
 
             it.moveCamera(CameraUpdate.scrollTo(coord))
+        }
+    }
+
+    private fun startCountDownJob(averageSpeed: Double, coord: LatLng){
+        with(circleOverlay){
+            center = coord
+            color = ContextCompat.getColor(this@NokMainActivity, R.color.purple)
+            outlineWidth = 5
+            outlineColor = ContextCompat.getColor(this@NokMainActivity, R.color.deep_purple)
+            radius = 0.0
+        }
+
+        countDownJob = lifecycleScope.launch {
+            var second = 0
+            var minute = 0
+            while (true) {
+                second+=1
+                circleOverlay.radius += averageSpeed
+                circleOverlay.map = naverMap
+                if(second % 60 == 0){
+                    minute += 1
+                    second = 0
+                }
+                binding.countDownT.text = String.format("%02d:%02d",minute, second)
+                delay(1000L)
+            }
         }
     }
 

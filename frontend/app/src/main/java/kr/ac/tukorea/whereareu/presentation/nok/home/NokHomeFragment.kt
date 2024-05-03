@@ -31,6 +31,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kr.ac.tukorea.whereareu.R
 import kr.ac.tukorea.whereareu.databinding.IconLocationOverlayLayoutBinding
+import kr.ac.tukorea.whereareu.domain.home.InnerItemClickEvent
 import kr.ac.tukorea.whereareu.domain.home.PoliceStationInfo
 import kr.ac.tukorea.whereareu.presentation.base.BaseFragment
 import kr.ac.tukorea.whereareu.presentation.nok.home.adapter.PoliceStationRVA
@@ -42,29 +43,16 @@ import kotlin.math.roundToInt
 
 @AndroidEntryPoint
 class NokHomeFragment : BaseFragment<kr.ac.tukorea.whereareu.databinding.FragmentHomeBinding>(R.layout.fragment_home),
-    OnMapReadyCallback, MeaningfulPlaceRVA.MeaningfulPlaceRVAClickListener, PoliceStationRVA.PoliceStationRVAClickListener {
+    MeaningfulPlaceRVA.MeaningfulPlaceRVAClickListener, PoliceStationRVA.PoliceStationRVAClickListener {
     private val viewModel: NokHomeViewModel by activityViewModels()
     private val LOCATION_PERMISSION_REQUEST_CODE = 1001
-    private var naverMap: NaverMap? = null
-    private val lastLocationMarker = Marker()
-    private val circleOverlay = CircleOverlay()
     private val meaningfulPlaceRVA by lazy {
         MeaningfulPlaceRVA()
     }
-    private lateinit var behavior: BottomSheetBehavior<ConstraintLayout>
-    private var countDownJob: Job? = null
     override fun initObserver() {
         repeatOnStarted {
             viewModel.predictEvent.collect{ predictEvent ->
                 handlePredictEvent(predictEvent)
-            }
-        }
-
-        repeatOnStarted {
-            delay(500)
-            viewModel.dementiaLocationInfo.collect{ response ->
-                val coord = LatLng(response.latitude, response.longitude)
-                trackingDementiaLocation(coord, response.currentSpeed)
             }
         }
     }
@@ -72,114 +60,15 @@ class NokHomeFragment : BaseFragment<kr.ac.tukorea.whereareu.databinding.Fragmen
     private fun handlePredictEvent(event: NokHomeViewModel.PredictEvent){
         when(event){
             is NokHomeViewModel.PredictEvent.StartPredict -> {
-                viewModel.test()
-                //viewModel.getMeaningfulPlace()
-                //viewModel.searchWithKeyword("x", "y")
-                //initBottomSheet()
                 initMeaningfulListRVA()
-                showLoadingDialog(requireContext())
-            }
-
-            is NokHomeViewModel.PredictEvent.DisplayDementiaLastInfo -> {
-                startCountDownJob(event.averageSpeed, event.coord)
-
-                naverMap?.locationOverlay?.isVisible = false
             }
 
             is NokHomeViewModel.PredictEvent.MeaningFulPlaceEvent -> {
                 Log.d("뭐고", event.meaningfulPlaceForList.toString())
                 meaningfulPlaceRVA.submitList(event.meaningfulPlaceForList)
-
-                event.meaningfulPlaceForList.forEach {meaningfulPlace ->
-                    val latitude = meaningfulPlace.latitude
-                    val longitude = meaningfulPlace.longitude
-
-                    val marker = Marker()
-                    with(marker){
-                        position = LatLng(latitude, longitude)
-                        icon = MarkerIcons.YELLOW
-                        captionText = meaningfulPlace.address
-                        captionRequestedWidth = 400
-                        map = naverMap
-                    }
-
-                    val infoWindow = InfoWindow()
-                    infoWindow.adapter = object : InfoWindow.DefaultTextAdapter(requireContext()) {
-                        override fun getText(infoWindow: InfoWindow): CharSequence {
-                            return "예상 위치"
-                        }
-                    }
-                    infoWindow.open(marker)
-                }
             }
 
-            is NokHomeViewModel.PredictEvent.SearchNearbyPoliceStation -> {
-                event.policeStationList.forEach {policeStation ->
-                    val marker = Marker()
-                    with(marker){
-                        position = LatLng(policeStation.latitude.toDouble(), policeStation.longitude.toDouble())
-                        icon = MarkerIcons.BLUE
-                        captionText = policeStation.policeName
-                        captionRequestedWidth = 400
-                        map = naverMap
-                    }
-                }
-
-                dismissLoadingDialog()
-            }
-
-            is NokHomeViewModel.PredictEvent.DisplayDementiaLastLocation -> {
-
-                val latitude = event.lastLocation.latitude
-                val longitude = event.lastLocation.longitude
-                naverMap?.moveCamera(CameraUpdate.scrollTo(LatLng(latitude, longitude)))
-
-                with(lastLocationMarker){
-                    position = LatLng(latitude, longitude)
-                    icon = MarkerIcons.RED
-                    captionText = event.lastLocation.address
-                    captionRequestedWidth = 400
-                    map = naverMap
-                }
-
-                val infoWindow = InfoWindow()
-                infoWindow.adapter = object : InfoWindow.DefaultTextAdapter(requireContext()) {
-                    override fun getText(infoWindow: InfoWindow): CharSequence {
-                        return "실종 직전 위치"
-                    }
-                }
-                infoWindow.open(lastLocationMarker)
-            }
-
-            is NokHomeViewModel.PredictEvent.StopPredict -> {
-                viewLifecycleOwner.lifecycleScope.launch {
-                    countDownJob?.cancelAndJoin()
-                    countDownJob = null
-                    circleOverlay.isVisible = false
-                    lastLocationMarker.map = null
-                }
-            }
-        }
-    }
-
-    private fun trackingDementiaLocation(coord: LatLng, speed: Float){
-        naverMap?.let {
-            val locationOverlay = it.locationOverlay
-            val iconBinding = IconLocationOverlayLayoutBinding.inflate(layoutInflater)
-            val icon = iconBinding.layout
-
-            with(locationOverlay){
-                isVisible = true
-                // m/s to km/h
-                iconBinding.speedTv.text = (speed * 3.6).roundToInt().toString()
-                iconBinding.nameTv.text = viewModel.dementiaName.value
-                locationOverlay.icon = OverlayImage.fromView(icon)
-                circleRadius = 0
-                position = coord
-                anchor = PointF(0.5f, 1f)
-            }
-
-            it.moveCamera(CameraUpdate.scrollTo(coord))
+            else -> {}
         }
     }
 
@@ -187,16 +76,6 @@ class NokHomeFragment : BaseFragment<kr.ac.tukorea.whereareu.databinding.Fragmen
         binding.view = this
         binding.viewModel = viewModel
         checkLocationPermission()
-        //updateDementiaName()
-
-    }
-
-    fun predict(){
-        viewModel.setIsPredicted(true)
-    }
-
-    fun stopPredict(){
-        viewModel.setIsPredicted(false)
     }
 
     private fun initMeaningfulListRVA(){
@@ -250,33 +129,6 @@ class NokHomeFragment : BaseFragment<kr.ac.tukorea.whereareu.databinding.Fragmen
         })
     }*/
 
-    private fun startCountDownJob(averageSpeed: Double, coord: LatLng){
-        with(circleOverlay){
-            center = coord
-            color = ContextCompat.getColor(requireContext(), R.color.purple)
-            outlineWidth = 5
-            outlineColor = ContextCompat.getColor(requireContext(), R.color.deep_purple)
-            radius = 0.0
-        }
-
-        countDownJob = lifecycleScope.launch {
-            var second = 0
-            var minute = 0
-            while (true) {
-                second+=1
-                circleOverlay.radius += averageSpeed
-                circleOverlay.map = naverMap
-                if(second % 60 == 0){
-                    minute += 1
-                    second = 0
-                }
-                //binding.countDownT.text = String.format("%02d:%02d",minute, second)
-                delay(1000L)
-            }
-        }
-    }
-
-
     private fun checkLocationPermission() {
         if (ActivityCompat.checkSelfPermission(
                 requireActivity(),
@@ -309,21 +161,11 @@ class NokHomeFragment : BaseFragment<kr.ac.tukorea.whereareu.databinding.Fragmen
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-        viewModel.fetchUserInfo()
-        Log.d("resume", "resume")
-    }
-
-    override fun onMapReady(p0: NaverMap) {
-    }
-
 
     // inner RVA 클릭 이벤트
     override fun onClickMoreView(policeStationInfo: PoliceStationInfo) {
-        behavior.state = BottomSheetBehavior.STATE_COLLAPSED
         val coord = LatLng(policeStationInfo.latitude.toDouble(), policeStationInfo.longitude.toDouble())
-        naverMap?.moveCamera(CameraUpdate.scrollTo(coord))
+        viewModel.eventInnerItemClick(InnerItemClickEvent(BottomSheetBehavior.STATE_COLLAPSED, coord))
     }
 
     override fun onClickCopyPhoneNumber(phoneNumber: String) {
@@ -343,8 +185,7 @@ class NokHomeFragment : BaseFragment<kr.ac.tukorea.whereareu.databinding.Fragmen
     }
 
     override fun onClickMapView(latitude: Double, longitude: Double) {
-        behavior.state = BottomSheetBehavior.STATE_COLLAPSED
         val coord = LatLng(latitude, longitude)
-        naverMap?.moveCamera(CameraUpdate.scrollTo(coord))
+        viewModel.eventInnerItemClick(InnerItemClickEvent(BottomSheetBehavior.STATE_COLLAPSED, coord))
     }
 }

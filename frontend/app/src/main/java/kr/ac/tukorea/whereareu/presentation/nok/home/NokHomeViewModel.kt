@@ -16,6 +16,7 @@ import kr.ac.tukorea.whereareu.data.model.nok.home.LocationInfoResponse
 import kr.ac.tukorea.whereareu.data.repository.kakao.KakaoRepositoryImpl
 import kr.ac.tukorea.whereareu.data.repository.naver.NaverRepositoryImpl
 import kr.ac.tukorea.whereareu.data.repository.nok.home.NokHomeRepositoryImpl
+import kr.ac.tukorea.whereareu.domain.home.InnerItemClickEvent
 import kr.ac.tukorea.whereareu.domain.home.LastLocation
 import kr.ac.tukorea.whereareu.domain.home.MeaningfulPlaceInfo
 import kr.ac.tukorea.whereareu.domain.home.PoliceStationInfo
@@ -36,9 +37,6 @@ class NokHomeViewModel @Inject constructor(
     private val _dementiaLocationInfo = MutableStateFlow<LocationInfoResponse>(LocationInfoResponse())
     val dementiaLocationInfo = _dementiaLocationInfo.asStateFlow()
 
-    val isInternetOn = MutableStateFlow(true)
-    val isGpsOn = MutableStateFlow(true)
-
     private val _updateRate = MutableStateFlow<Long>(300000 * 1000)
     val updateRate = _updateRate.asStateFlow()
 
@@ -57,13 +55,9 @@ class NokHomeViewModel @Inject constructor(
     private val _navigateEvent = MutableStateFlow(NavigateEvent.Home.toString())
     val navigateEvent = _navigateEvent.asStateFlow()
 
-    private val _ringtone = MutableStateFlow(0)
-    val ringtone = _ringtone.asStateFlow()
+    private val _innerItemClickEvent = MutableSharedFlow<InnerItemClickEvent>()
+    val innerItemClickEvent = _innerItemClickEvent.asSharedFlow()
 
-    private val _movementStatus = MutableStateFlow(1)
-    val movementStatus = _movementStatus.asStateFlow()
-
-    private val _isSettingFragment = MutableStateFlow(false)
     sealed class PredictEvent {
         data class StartPredict(val isPredicted: Boolean) : PredictEvent()
         data class MeaningFulPlaceEvent(
@@ -101,6 +95,12 @@ class NokHomeViewModel @Inject constructor(
         }
     }
 
+    fun eventInnerItemClick(event: InnerItemClickEvent){
+        viewModelScope.launch {
+            _innerItemClickEvent.emit(event)
+        }
+    }
+
     fun setDementiaKey(dementiaKey: String) {
         _dementiaKey.value = dementiaKey
     }
@@ -120,12 +120,6 @@ class NokHomeViewModel @Inject constructor(
         }
     }
 
-    fun setUpdateDuration(duration: Long) {
-        viewModelScope.launch {
-            _updateRate.emit(duration * 60 * 1000)
-        }
-    }
-
     fun fetchUserInfo(){
         viewModelScope.launch {
             nokHomeRepository.getUserInfo(_nokKey.value).onSuccess {
@@ -138,9 +132,6 @@ class NokHomeViewModel @Inject constructor(
         viewModelScope.launch {
             nokHomeRepository.getDementiaLocationInfo(_dementiaKey.value).onSuccess {
                 _dementiaLocationInfo.emit(it)
-                isInternetOn.value = it.isInternetOn
-                isGpsOn.value = it.isGpsOn
-                _movementStatus.value = it.isRingstoneOn
             }.onError {
                 Log.d("error", it.toString())
             }.onException {
@@ -151,17 +142,12 @@ class NokHomeViewModel @Inject constructor(
         }
     }
 
-    fun test() {
+    fun predict() {
         viewModelScope.launch {
             val time = measureTimeMillis {
                 val dementiaLastInfo = async { getDementiaLastInfo() }
                 //Log.d("lastInfo", dementiaLastInfo.toString())
                 val meaningfulPlaceList = async { getMeaningfulPlaces() }.await()
-
-                //val zippedMeaningfulPlaceList = zipMeaningfulPlaceListWithAddress(meaningfulPlaceList, addressList)
-                //val groupedMeaningfulPlaceList = preprocessingList(zippedMeaningfulPlaceList)
-
-                //getPoliceStationInfoNearby(groupedMeaningfulPlaceList)
             }
             Log.d("after refactor time", time.toString())
         }

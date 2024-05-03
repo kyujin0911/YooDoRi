@@ -45,7 +45,7 @@ class PoliceStationRVA() :
                 }
 
                 copyPhoneNumberBtn.setOnClickListener {
-                    policeStationRVAClickListener?.onClickCopyPhoneNumber(policeStationInfo.phone)
+                    policeStationRVAClickListener?.onClickCopyPhoneNumber(policeStationInfo.policePhoneNumber)
                 }
 
                 copyRoadAddressBtn.setOnClickListener {
