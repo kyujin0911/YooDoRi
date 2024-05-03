@@ -10,7 +10,7 @@ import javax.inject.Inject
 class NokMeaningfulPlaceRepositoryImpl @Inject constructor(
     private val api: NokMeaningfulPlaceService
 ) : NokMeaningfulPlaceRepository{
-    override suspend fun getMeaningfulPlace(dementiaKey: String): NetworkResult<MeaningfulPlaceResponse> {
-        return handleApi({api.getMeaningfulPlace(dementiaKey)}) {response: ResponseBody<MeaningfulPlaceResponse> -> response.result}
+    override suspend fun getUserMeaningfulPlace(dementiaKey: String): NetworkResult<MeaningfulPlaceResponse> {
+        return handleApi({api.getUserMeaningfulPlace(dementiaKey)}) {response: ResponseBody<MeaningfulPlaceResponse> -> response.result}
     }
 }

@@ -18,17 +18,12 @@ import kr.ac.tukorea.whereareu.util.extension.repeatOnStarted
 @AndroidEntryPoint
 class MeaningfulPlaceFragment :
     BaseFragment<FragmentMeaningfulPlaceBinding>(R.layout.fragment_meaningful_place) {
-    private val viewModel: NokHomeViewModel by activityViewModels()
+    private val viewModel: NokMeaningfulPlaceViewModel by activityViewModels()
     private lateinit var  userMeaningfulListRVA: UserMeaningfulListRVA
 
     //    private var naverMap: NaverMap? = null
 
     override fun initObserver() {
-        repeatOnStarted {
-            viewModel.predictEvent.collect {
-                getMeaningfulPlace(it)
-            }
-        }
 
     }
 
@@ -38,15 +33,15 @@ class MeaningfulPlaceFragment :
         userMeaningfulListRVA = UserMeaningfulListRVA()
     }
 
-    private fun getMeaningfulPlace(event: NokHomeViewModel.PredictEvent) {
+    private fun getMeaningfulPlace() {
+
         when (event) {
             is NokHomeViewModel.PredictEvent.StartPredictEvent -> {
-                viewModel.getMeaningfulPlace()
+                viewModel.getUserMeaningfulPlace()
                 initUserMeaningfulPlaceAdapter()
             }
 
             is NokHomeViewModel.PredictEvent.MeaningFulPlaceEvent -> {
-                userMeaningfulListRVA.submitList(event.meaningfulPlaceForList)
                 binding.root
 
                 event.meaningfulPlaceForList.forEach { meaningfulPlace ->
@@ -75,6 +70,5 @@ class MeaningfulPlaceFragment :
                     requireContext(),
                     LinearLayoutManager.VERTICAL
                 ))}
-
     }
 }

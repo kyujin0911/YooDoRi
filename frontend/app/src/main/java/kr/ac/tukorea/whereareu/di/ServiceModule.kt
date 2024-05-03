@@ -52,7 +52,7 @@ object ServiceModule {
 
     @Provides
     @Singleton
-    fun proviceNokMeaningfulPlaceApi(@NetworkModule.BaseRetrofit retrofit: Retrofit): NokMeaningfulPlaceService{
+    fun provideNokMeaningfulPlaceApi(@NetworkModule.BaseRetrofit retrofit: Retrofit): NokMeaningfulPlaceService{
         return retrofit.buildService()
     }
 }
