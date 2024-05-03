@@ -22,6 +22,12 @@ class dementia_info(Base):
     dementia_phonenumber = Column(String)
     update_rate = Column(String)
 
+class refresh_token_info(Base):
+    __tablename__ = 'refresh_token_info'
+
+    key = Column(String, primary_key=True)
+    refresh_token = Column(String)
+
 class location_info(Base):
     __tablename__ = 'location_info'
 
