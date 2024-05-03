@@ -1,4 +1,4 @@
-package kr.ac.tukorea.whereareu.presentation.nok.setting.updateTime
+package kr.ac.tukorea.whereareu.presentation.nok.setting.updatetime
 
 import android.content.Context.MODE_PRIVATE
 import androidx.fragment.app.activityViewModels

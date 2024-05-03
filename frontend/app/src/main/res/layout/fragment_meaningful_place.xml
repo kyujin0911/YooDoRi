@@ -14,9 +14,7 @@
 
         <include
             android:id="@+id/bottomSheetLayout"
-            layout="@layout/item_meaningful_place_bottom_sheet"
-            app:layout_constraintEnd_toEndOf="parent"
-            tools:layout_editor_absoluteY="293dp" />
+            layout="@layout/item_meaningful_place_bottom_sheet" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

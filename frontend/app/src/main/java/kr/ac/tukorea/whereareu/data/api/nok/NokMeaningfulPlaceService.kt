@@ -8,6 +8,6 @@ import retrofit2.http.GET
 import retrofit2.http.Query
 
 interface NokMeaningfulPlaceService {
-    @GET("locations/meaningful")
+    @GET("locatoins/meaningful")
     suspend fun getUserMeaningfulPlace(@Query("dementiaKey") dementiaKey:String): Response<ResponseBody<MeaningfulPlaceResponse>>
 }

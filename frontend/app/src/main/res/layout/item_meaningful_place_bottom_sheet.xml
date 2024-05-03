@@ -60,7 +60,6 @@
             android:layout_height="wrap_content"
             android:nestedScrollingEnabled="false"
             android:overScrollMode="never"
-            android:visibility="@{model.isExpanded ? View.VISIBLE : View.GONE}"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             android:layout_marginTop="8dp"
             android:layout_marginStart="8dp"

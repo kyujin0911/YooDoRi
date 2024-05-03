@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/meaningfulPlaceFragment"
-        android:name="kr.ac.tukorea.whereareu.presentation.MeaningfulPlaceFragment"
+        android:name="kr.ac.tukorea.whereareu.presentation.nok.meaningfulplace.MeaningfulPlaceFragment"
         android:label="MeaningfulPlaceFragment" />
     <fragment
         android:id="@+id/safeAreaFragment"
@@ -45,7 +45,7 @@
         </fragment>
         <fragment
             android:id="@+id/settingUpdateTimeFragment"
-            android:name="kr.ac.tukorea.whereareu.presentation.nok.setting.updateTime.SettingUpdateRateFragment"
+            android:name="kr.ac.tukorea.whereareu.presentation.nok.setting.updatetime.SettingUpdateRateFragment"
             android:label="fragment_setting_update_time"
             tools:layout="@layout/fragment_setting_update_time">
             <action
