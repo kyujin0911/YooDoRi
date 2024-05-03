@@ -13,7 +13,24 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:paddingVertical="12dp">
+        android:paddingVertical="12dp"
+        app:behavior_expandedOffset="100dp"
+        app:behavior_fitToContents="false"
+        app:behavior_hideable="false"
+        app:behavior_peekHeight="100dp"
+        app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
+        >
+
+        <View
+            android:id="@+id/head_v"
+            android:layout_width="30dp"
+            android:layout_height="2dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginTop="15dp"
+            android:background="@color/gray"
+            />
 
 <!--        <ImageView-->
 <!--            android:id="@+id/icon_iv"-->
@@ -32,7 +49,8 @@
             android:layout_marginStart="12dp"
             android:textAppearance="@style/TextAppearance.App.16sp.ExtraBold"
             android:gravity="start"
-            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginTop="15dp"
+            app:layout_constraintTop_toBottomOf="@+id/head_v"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"/>
 
