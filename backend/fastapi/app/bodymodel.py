@@ -25,6 +25,7 @@ class UserRecord(BaseModel):
 class nokResult(BaseModel):
     dementiaInfoRecord: dementiaInfoRecord
     nokKey: str = Field(examples=["123456"])
+    token: str = Field(examples=["ksjdnfjkdasnfljsknafljansdfjlsakn"])
 
 class ReceiveNokInfoRequest(BaseModel):
     keyFromDementia : int = Field(examples=["123456"])
@@ -172,6 +173,7 @@ class TempResponse(BaseModel):
 
 class Token(BaseModel):
     accessToken: str = Field("ksjdnfjkdasnfljsknafljansdfjlsakn")
+    refreshToken: str = Field("ksjdnfjkdasnfljsknafljansdfjlsakn")
     tokenType: str = Field("bearer")
 
 class TokenResponse(BaseModel):

@@ -9,7 +9,8 @@ from .update_user_status import UpdateUserStatus
 from .LocationAnalyzer import LocationAnalyzer
 from .database import Database
 from .bodymodel import *
-from .util import *
+from .util import JWTService
+from .config import Config
 
 from PyKakao import Local
 from apscheduler.schedulers.background import BackgroundScheduler
@@ -21,6 +22,7 @@ session = next(db.get_session())
 sched = BackgroundScheduler(timezone="Asia/Seoul")
 kakao = Local(service_key=Config.service_key)
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+jwt = JWTService()
 
 
 
@@ -40,29 +42,40 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 @router.get("/test", responses = {200 : {"model" : CommonResponse, "description" : "테스트 성공" }}, description="토큰을 사용했을 때 유저 정보가 반환되면 성공(앞으로 이렇게 바뀔 예정)")
 async def protected_route(current_user= Depends(APIKeyHeader(name="Authorization"))):
-    return get_current_user(current_user, session)
+    return jwt.get_current_user(current_user, session)
 
 @router.post("/test/login", responses = {200 : {"model" : TokenResponse, "description" : "로그인 성공" }, 400: {"model": ErrorResponse, "description": "로그인 실패"}}, description="로그인 테스트(앞으로 이렇게 바뀔예정) | username : 이름, password : key -> 이 두개만 채워서 보내면 됨")
 async def test_login(from_data: OAuth2PasswordRequestForm = Depends()):
     try:
-        user = get_user(from_data.username, from_data.password, session)
+        user = jwt.get_user(from_data.username, from_data.password, session)
         if not user:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Incorrect key",
                 headers={"WWW-Authenticate": "Bearer"},
             )
+        # Dict 형태로 반환
+        '''def create_access_token(self, data: dict) -> str:
+                return self._create_token(data, self.access_token_expire_time)'''
+        
         if user[1] == 0:
-            key = user[0].nok_key
-            name = user[0].nok_name
-        else:
-            key = user[0].dementia_key
-            name = user[0].dementia_name
+            access_token = jwt.create_access_token(user[0].nok_name, user[0].nok_key)
+            refresh_token = jwt.create_refresh_token(user[0].nok_name, user[0].nok_key)
+            #refresh_token_info 테이블 디비에 저장
+            new_token = models.refresh_token_info(key=user[0].nok_key, refresh_token=refresh_token)
 
-        access_token = make_token(name, key)
+        else:
+            access_token = jwt.create_access_token(user[0].dementia_name, user[0].dementia_key)
+            refresh_token = jwt.create_refresh_token(user[0].dementia_name, user[0].dementia_key)
+            #refresh_token 디비에 저장
+            new_token = models.refresh_token_info(key=user[0].dementia_key, refresh_token=refresh_token)
+        
+        session.add(new_token)
+        session.commit()
 
         result = {
             'accessToken': access_token,
+            'refreshToken': refresh_token,
             'tokenType': 'bearer'
         }
 
@@ -110,13 +123,16 @@ async def receive_nok_info(request: ReceiveNokInfoRequest):
                 session.add(new_nok)
                 session.commit()
 
+            token = make_token(_nok_name, _key)
+
             result = {
                 'dementiaInfoRecord' : {
                         'dementiaKey' : existing_dementia.dementia_key,
                         'dementiaName': existing_dementia.dementia_name,
                         'dementiaPhoneNumber': existing_dementia.dementia_phonenumber
                 },
-                'nokKey': _key
+                'nokKey': _key,
+                'token': token
             }
 
             print(f"[INFO] NOK information received from {existing_dementia.dementia_name}({existing_dementia.dementia_key})")
@@ -528,7 +544,7 @@ async def get_user_info(user_info : int = Depends(APIKeyHeader(name = "Authoriza
     finally:
         session.close()
 
-@router.get("/locatoins/meaningful", responses = {200 : {"model" : MeaningfulLocResponse, "description" : "의미장소 전송 성공" }, 404: {"model": ErrorResponse, "description": "의미 장소 없음"}}, description="보호 대상자의 의미 장소 정보 및 주변 경찰서 정보 전달(쿼리 스트링)")
+@router.get("/locations/meaningful", responses = {200 : {"model" : MeaningfulLocResponse, "description" : "의미장소 전송 성공" }, 404: {"model": ErrorResponse, "description": "의미 장소 없음"}}, description="보호 대상자의 의미 장소 정보 및 주변 경찰서 정보 전달(쿼리 스트링)")
 async def send_meaningful_location_info(user_info : int = Depends(APIKeyHeader(name = "Authorization"))):
 
     try:
@@ -639,7 +655,7 @@ async def send_location_history(_date : str, user_info : int = Depends(APIKeyHea
 
 
 #스케줄러 비활성화
-"""@sched.scheduled_job('cron', hour=14, minute=21, id = 'geocoding')
+"""@sched.scheduled_job('cron', hour=0, minute=30, id = 'geocoding')
 def kakao_api():
     try:
         print(f"[INFO] Start geocoding")
