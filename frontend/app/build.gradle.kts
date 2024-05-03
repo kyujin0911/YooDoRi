@@ -63,7 +63,7 @@ dependencies {
 
     implementation("androidx.core:core-ktx:1.8.0")
     implementation("androidx.appcompat:appcompat:1.6.1")
-    implementation("com.google.android.material:material:1.5.0")
+    implementation("com.google.android.material:material:1.7.0")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation("androidx.work:work-runtime-ktx:2.9.0")
     testImplementation("junit:junit:4.13.2")
@@ -117,9 +117,6 @@ dependencies {
 
     //로딩화면
     implementation ("com.airbnb.android:lottie:5.0.2")
-
-    //kakao map
-    implementation ("com.kakao.maps.open:android:2.9.5")
 }
 kapt {
     correctErrorTypes = true

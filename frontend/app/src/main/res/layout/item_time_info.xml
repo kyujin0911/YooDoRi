@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="model"
+            type="kr.ac.tukorea.whereareu.data.model.nok.home.TimeInfo" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp">
+
+        <TextView
+            android:id="@+id/day_of_the_week_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@{model.dayOfTheWeek}"
+            tools:text="요일"
+            android:textAppearance="@style/TextAppearance.App.12sp.SemiBold"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"/>
+
+        <TextView
+            android:id="@+id/time_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="@{model.time}"
+            tools:text="시간"
+            android:layout_marginStart="6dp"
+            android:textAppearance="@style/TextAppearance.App.12sp.regular"
+            app:layout_constraintBaseline_toBaselineOf="@id/day_of_the_week_tv"
+            app:layout_constraintStart_toEndOf="@id/day_of_the_week_tv"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

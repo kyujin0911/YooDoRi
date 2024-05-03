@@ -5,11 +5,11 @@ import kr.ac.tukorea.whereareu.data.model.ResponseBody
 import kr.ac.tukorea.whereareu.data.model.nok.home.DementiaLastInfoResponse
 import kr.ac.tukorea.whereareu.data.model.nok.home.LocationInfoResponse
 import kr.ac.tukorea.whereareu.data.model.nok.home.MeaningfulPlaceResponse
+import kr.ac.tukorea.whereareu.data.model.setting.GetUserInfoResponse
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
-import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface NokHomeService {
@@ -21,4 +21,7 @@ interface NokHomeService {
 
     @POST("dementias/averageWalkingSpeed")
     suspend fun getDementiaLastInfo(@Body request: DementiaKeyRequest): Response<ResponseBody<DementiaLastInfoResponse>>
+
+    @GET("users/info")
+    suspend fun getUserInfo(@Query("nokKey") nokKey: String): Response<ResponseBody<GetUserInfoResponse>>
 }

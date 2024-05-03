@@ -4,14 +4,10 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.os.Bundle
 import android.util.Log
-import android.view.View
 import androidx.activity.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import androidx.navigation.NavController
-import androidx.navigation.NavDestination
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import dagger.hilt.android.AndroidEntryPoint
@@ -23,19 +19,22 @@ import kr.ac.tukorea.whereareu.R
 import kr.ac.tukorea.whereareu.databinding.ActivityNokMainBinding
 import kr.ac.tukorea.whereareu.presentation.base.BaseActivity
 import kr.ac.tukorea.whereareu.presentation.nok.home.NokHomeViewModel
+import kr.ac.tukorea.whereareu.presentation.nok.setting.SettingViewModel
 import kr.ac.tukorea.whereareu.util.extension.navigationHeight
 import kr.ac.tukorea.whereareu.util.extension.repeatOnStarted
 import kr.ac.tukorea.whereareu.util.extension.setStatusBarTransparent
 
 @AndroidEntryPoint
 class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_nok_main) {
-    private val viewModel: NokHomeViewModel by viewModels()
+    private val homeViewModel: NokHomeViewModel by viewModels()
+    private val settingViewModel: SettingViewModel by viewModels()
     private var updateLocationJob: Job? = null
     override fun initView() {
         //상태바 투명 설정
         this.setStatusBarTransparent()
         binding.layout.setPadding(0, 0, 0, this.navigationHeight())
         initNavigator()
+        homeViewModel.fetchUserInfo()
     }
 
     private fun initNavigator() {
@@ -44,45 +43,27 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
         val navController = navHostFragment.navController
 
         binding.bottomNav.setupWithNavController(navController)
-
-        // 위치 예측 화면 이동 시 bottom nav 가리기
-        /*navController.addOnDestinationChangedListener { controller, destination, arguments ->
-            if (destination.id == R.id.predictLocationFragment) {
-                binding.bottomNav.visibility = View.GONE
-            } else {
-                binding.bottomNav.visibility = View.VISIBLE
-            }
-        }*/
     }
 
-    private fun getDementiaLocation() {
-        val spf = getSharedPreferences("OtherUser", MODE_PRIVATE)
-        val dementiaKey = spf.getString("key", "")
+    private fun saveUserKeys() {
+        val dementiaKey = getSharedPreferences("OtherUser", MODE_PRIVATE)
+            .getString("key", "")
         if (!dementiaKey.isNullOrEmpty()) {
-            viewModel.saveDementiaKey(dementiaKey)
+            homeViewModel.setDementiaKey(dementiaKey)
+        }
 
-            // 실행중인 coroutine이 없으면 새로운 job을 생성해서 실행
-            repeatOnStarted {
-                viewModel.updateDuration.collect { duration ->
-                    Log.d("duration", duration.toString())
-                    updateLocationJob = if (updateLocationJob == null) {
-                        makeUpdateLocationJob(duration)
-                    }
-
-                    // 실행중인 coroutine이 있으면 job을 취소하고 duration에 맞게 재시작
-                    else {
-                        updateLocationJob?.cancelAndJoin()
-                        makeUpdateLocationJob(duration)
-                    }
-                }
-            }
+        val nokKey = getSharedPreferences("User", MODE_PRIVATE)
+            .getString("key", "")
+        if (!nokKey.isNullOrEmpty()) {
+            homeViewModel.setNokKey(nokKey)
+            settingViewModel.setNokKey(nokKey)
         }
     }
 
     private fun makeUpdateLocationJob(duration: Long): Job{
         return lifecycleScope.launch {
             while (true){
-                viewModel.getDementiaLocation()
+                homeViewModel.getDementiaLocation()
                 delay(duration)
             }
         }
@@ -95,19 +76,35 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
     }
 
     override fun initObserver() {
+        saveUserKeys()
+
         LocalBroadcastManager.getInstance(this).registerReceiver(
             mMessageReceiver, IntentFilter("gps")
         )
 
+        // 실행중인 coroutine이 없으면 새로운 job을 생성해서 실행
         repeatOnStarted {
-            viewModel.isPredicted.collect { isPredicted ->
-                if (!isPredicted) {
-                    Log.d("NokMainActivity", isPredicted.toString())
-                    getDementiaLocation()
-                    binding.bottomNav.visibility = View.VISIBLE
-                } else {
+            settingViewModel.updateRate.collect { duration ->
+                if (duration == "0"){
+                    return@collect
+                }
+                Log.d("duration", duration.toString())
+                updateLocationJob = if (updateLocationJob == null) {
+                    makeUpdateLocationJob(duration.toLong().times(60*1000))
+                }
+
+                // 실행중인 coroutine이 있으면 job을 취소하고 duration에 맞게 재시작
+                else {
+                    updateLocationJob?.cancelAndJoin()
+                    makeUpdateLocationJob(duration.toLong().times(60*1000))
+                }
+            }
+        }
+
+        repeatOnStarted {
+            homeViewModel.isPredicted.collect { isPredicted ->
+                if (isPredicted) {
                     stopGetDementiaLocation()
-                    binding.bottomNav.visibility = View.GONE
                 }
             }
         }

@@ -8,42 +8,56 @@ import android.os.Looper
 import android.view.WindowManager
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kr.ac.tukorea.whereareu.R
+import kr.ac.tukorea.whereareu.data.model.login.request.UserLoginRequest
 import kr.ac.tukorea.whereareu.presentation.dementia.DementiaMainActivity
 import kr.ac.tukorea.whereareu.presentation.nok.NokMainActivity
+import kr.ac.tukorea.whereareu.util.extension.repeatOnStarted
 
 @AndroidEntryPoint
 class SplashActivity : AppCompatActivity() {
 
+    private val viewModel: LoginViewModel by viewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
+
         val spf: SharedPreferences = getSharedPreferences("User", MODE_PRIVATE)
+        val key = spf.getString("key", "") as String
         val isDementia = spf.getBoolean("isDementia", true)
-        val isNok = spf.getBoolean("isNok", true)
 
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_splash)
+
         window.setFlags(
             WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
             WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
         )
 
-        val intent = if (spf.getString("name", "").isNullOrBlank()) {
-            Intent(this, LoginActivity::class.java)
+        if (isDementia) {
+            viewModel.sendUserLogin(UserLoginRequest(key, "1"))
         } else {
-            if (isDementia) {
-                Intent(this, DementiaMainActivity::class.java)
-            } else {
-                Intent(this, NokMainActivity::class.java)
-            }
+            viewModel.sendUserLogin(UserLoginRequest(key, "0"))
         }
-        lifecycleScope.launch {
-            delay(1000)
-            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-            startActivity(intent)
+
+        repeatOnStarted {
+            viewModel.userLoginSuccess.collect { success ->
+                val intent = if (success) {
+                    if (isDementia) {
+                        Intent(this@SplashActivity, DementiaMainActivity::class.java)
+                    } else {
+                        Intent(this@SplashActivity, NokMainActivity::class.java)
+                    }
+                } else {
+                    Intent(this@SplashActivity, LoginActivity::class.java)
+                }
+                delay(1000)
+                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                startActivity(intent)
+            }
         }
     }
 }

@@ -9,6 +9,7 @@ import kr.ac.tukorea.whereareu.R
 import kr.ac.tukorea.whereareu.WhereAreUApplication
 import kr.ac.tukorea.whereareu.data.api.dementia.DementiaHomeService
 import kr.ac.tukorea.whereareu.data.api.LoginService
+import kr.ac.tukorea.whereareu.data.api.SettingService
 import kr.ac.tukorea.whereareu.data.api.nok.NokHomeService
 import kr.ac.tukorea.whereareu.util.location.LocationService
 import kr.ac.tukorea.whereareu.util.network.KakaoInterceptor
@@ -60,9 +61,9 @@ object NetworkModule {
         }
 
         return OkHttpClient.Builder()
-            .connectTimeout(10, TimeUnit.SECONDS)
-            .readTimeout(10, TimeUnit.SECONDS)
-            .writeTimeout(5, TimeUnit.SECONDS)
+            .connectTimeout(40, TimeUnit.SECONDS)
+            .readTimeout(40, TimeUnit.SECONDS)
+            .writeTimeout(40, TimeUnit.SECONDS)
             .addInterceptor(interceptor)
             .addNetworkInterceptor(closeInterceptor)
             .retryOnConnectionFailure(false)
@@ -157,10 +158,8 @@ object NetworkModule {
             .addConverterFactory(GsonConverterFactory.create())
             .build()
     }
-
-    @Provides
-    @Singleton
-    fun provideLocationService(): LocationService{
-        return LocationService()
+    
+    private inline fun <reified T> Retrofit.buildService(): T {
+        return this.create(T::class.java)
     }
 }

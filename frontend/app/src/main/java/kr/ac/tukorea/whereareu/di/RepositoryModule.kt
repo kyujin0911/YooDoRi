@@ -10,7 +10,7 @@ import kr.ac.tukorea.whereareu.data.api.dementia.DementiaHomeService
 import kr.ac.tukorea.whereareu.data.api.LoginService
 import kr.ac.tukorea.whereareu.data.api.NaverService
 import kr.ac.tukorea.whereareu.data.api.nok.NokHomeService
-import kr.ac.tukorea.whereareu.data.api.nok.NokMeaningfulPlaceService
+import kr.ac.tukorea.whereareu.data.api.SettingService
 import kr.ac.tukorea.whereareu.data.repository.dementia.home.DementiaHomeRepository
 import kr.ac.tukorea.whereareu.data.repository.dementia.home.DementiaHomeRepositoryImpl
 import kr.ac.tukorea.whereareu.data.repository.kakao.KakaoRepository
@@ -21,8 +21,6 @@ import kr.ac.tukorea.whereareu.data.repository.naver.NaverRepository
 import kr.ac.tukorea.whereareu.data.repository.naver.NaverRepositoryImpl
 import kr.ac.tukorea.whereareu.data.repository.nok.home.NokHomeRepository
 import kr.ac.tukorea.whereareu.data.repository.nok.home.NokHomeRepositoryImpl
-import kr.ac.tukorea.whereareu.data.repository.nok.meaningfulPlace.NokMeaningfulPlaceRepository
-import kr.ac.tukorea.whereareu.data.repository.nok.meaningfulPlace.NokMeaningfulPlaceRepositoryImpl
 
 @Module
 @InstallIn(ViewModelComponent::class)
@@ -57,6 +55,13 @@ object RepositoryModule {
     fun provideKakaoRepository(
         kakaoService: KakaoService
     ): KakaoRepository = KakaoRepositoryImpl(kakaoService)
+
+    @ViewModelScoped
+    @Provides
+    fun providesSettingRepository(
+        settingService: SettingService
+    ): SettingRepository = SettingRepositoryImpl(settingService)
+
 
     @ViewModelScoped
     @Provides

@@ -47,8 +47,6 @@ class PatientOtpFragment : BaseFragment<FragmentPatientOtpBinding>(R.layout.frag
                     putString("key", it.nokKey)
                     commit()
                 }
-
-
                 if (navigator.currentDestination?.id == R.id.patientOtpFragment) {
                     navigator.navigate(R.id.action_patientOtpFragment_to_dementiaAuthorityPageFragment)
                 }

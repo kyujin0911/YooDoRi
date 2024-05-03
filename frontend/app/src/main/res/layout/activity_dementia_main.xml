@@ -8,9 +8,10 @@
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/layout"
+        android:backgroundTint="@color/white"
         tools:context=".presentation.dementia.DementiaMainActivity">
 
         <androidx.fragment.app.FragmentContainerView
@@ -30,22 +31,22 @@
             style="@style/Widget.MyApp.BottomNavigationView.Material2"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:clipToOutline="true"
             android:background="@drawable/bg_bottom_navigation"
             android:backgroundTint="@android:color/transparent"
-            app:itemIconTint="@drawable/bottom_color_selector"
-            app:itemRippleColor="@null"
-            app:labelVisibilityMode="labeled"
-            app:itemIconSize="32dp"
+            android:clipToOutline="true"
             android:paddingVertical="16dp"
-            app:itemPaddingTop="2dp"
+            app:itemIconSize="32dp"
+            app:itemIconTint="@drawable/bottom_color_selector"
             app:itemPaddingBottom="0dp"
+            app:itemPaddingTop="2dp"
+            app:itemRippleColor="@null"
+            app:itemTextAppearanceActive="@style/TextAppearance.App.14sp.SemiBold"
+            app:itemTextAppearanceInactive="@style/TextAppearance.App.14sp.SemiBold"
+            app:itemTextColor="@drawable/bottom_color_selector"
+            app:labelVisibilityMode="labeled"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:itemTextColor="@drawable/bottom_color_selector"
-            app:itemTextAppearanceInactive="@style/TextAppearance.App.14sp.SemiBold"
-            app:itemTextAppearanceActive="@style/TextAppearance.App.14sp.SemiBold"
             app:menu="@menu/dementia_main_menu" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

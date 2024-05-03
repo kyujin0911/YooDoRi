@@ -24,7 +24,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kr.ac.tukorea.whereareu.R
-import kr.ac.tukorea.whereareu.data.model.dementia.home.LocationInfo
+import kr.ac.tukorea.whereareu.data.model.dementia.home.PostLocationInfoRequest
 import kr.ac.tukorea.whereareu.data.repository.dementia.home.DementiaHomeRepositoryImpl
 import kr.ac.tukorea.whereareu.util.network.onException
 import kr.ac.tukorea.whereareu.util.network.onSuccess
@@ -103,12 +103,12 @@ class LocationService: Service() {
                     val currentTime = getCurrentTime()
                     var userState = 0
                     var isSuccess = false
-                    val info = LocationInfo(dementiaKey, locationInfo[LATITUDE], locationInfo[LONGITUDE],
+                    val info = PostLocationInfoRequest(dementiaKey, locationInfo[LATITUDE], locationInfo[LONGITUDE],
                         currentTime[TIME].trim(), currentTime[DATE], locationExtraInfo[SPEED],
-                        accelerationsensor = sensorValueList[ACCELEROMETER_SENSOR],
-                        gyrosensor = sensorValueList[GYRO_SENSOR],
-                        directionsensor = sensorValueList[MAGNETIC_SENSOR],
-                        lightsensor = sensorValueList[LIGHT_SENSOR],
+                        accelerationSensor = sensorValueList[ACCELEROMETER_SENSOR],
+                        gyroSensor = sensorValueList[GYRO_SENSOR],
+                        directionSensor = sensorValueList[MAGNETIC_SENSOR],
+                        lightSensor = sensorValueList[LIGHT_SENSOR],
                         battery = getBatteryPercent()!!, bearing = locationExtraInfo[BEARING],
                         isGpsOn = locationClient.getGpsStatus(), isInternetOn = true, isRingstoneOn = getRingMode()
                     )
@@ -123,7 +123,7 @@ class LocationService: Service() {
                     }
                     // AI 정보 수집을 위한 함수
                     saveFile(currentTime[DATE], currentTime[TIME].trim(), userState.toString(), isSuccess.toString())
-                    delay(10000)
+                    delay(1000 * 30)
                 }
             }
         }
@@ -206,9 +206,9 @@ class LocationService: Service() {
         startForeground(1, notification.build())
     }
 
-    private fun sendLocation(locationInfo: LocationInfo){
+    private fun sendLocation(postLocationInfoRequest: PostLocationInfoRequest){
         val intent = Intent("gps")
-        intent.putExtra("postInfo", locationInfo)
+        intent.putExtra("postInfo", postLocationInfoRequest)
         //intent.putExtra("long", long)
         localBroadcastManager.sendBroadcast(intent)
     }
