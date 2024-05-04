@@ -85,7 +85,8 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
         // 실행중인 coroutine이 없으면 새로운 job을 생성해서 실행
         repeatOnStarted {
             settingViewModel.updateRate.collect { duration ->
-                if (duration == "0") {
+                if (duration == "0" || homeViewModel.isPredicted.value) {
+                    Log.d("isPredict", homeViewModel.isPredicted.value.toString())
                     return@collect
                 }
                 Log.d("duration", duration.toString())
@@ -104,6 +105,10 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
         repeatOnStarted {
             delay(100)
             homeViewModel.dementiaLocationInfo.collect { response ->
+                //예측 기능 사용시 보호대상자 위치 UI 업데이트 X
+                if(homeViewModel.isPredicted.value){
+                    return@collect
+                }
                 val coord = LatLng(response.latitude, response.longitude)
                 trackingDementiaLocation(coord, response.currentSpeed)
             }
@@ -265,6 +270,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
 
     private fun stopGetDementiaLocation() {
         lifecycleScope.launch {
+            Log.d("NokMainActivity", "stopGetDementiaLocation")
             updateLocationJob?.cancelAndJoin()
         }
     }
