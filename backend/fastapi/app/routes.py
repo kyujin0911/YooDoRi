@@ -60,17 +60,27 @@ async def test_login(from_data: OAuth2PasswordRequestForm = Depends()):
         
         if user[1] == 0:
             access_token = jwt.create_access_token(user[0].nok_name, user[0].nok_key)
-            refresh_token = jwt.create_refresh_token(user[0].nok_name, user[0].nok_key)
+            
             #refresh_token_info 테이블 디비에 저장
-            new_token = models.refresh_token_info(key=user[0].nok_key, refresh_token=refresh_token)
+            if not session.query(models.refresh_token_info).filter_by(key=user[0].nok_key).first():
+                refresh_token = jwt.create_refresh_token(user[0].nok_name, user[0].nok_key)
+                new_token = models.refresh_token_info(key=user[0].nok_key, refresh_token=refresh_token)
+                session.add(new_token)
+            else: 
+                refresh_token = None
+
 
         else:
             access_token = jwt.create_access_token(user[0].dementia_name, user[0].dementia_key)
-            refresh_token = jwt.create_refresh_token(user[0].dementia_name, user[0].dementia_key)
+            
             #refresh_token 디비에 저장
-            new_token = models.refresh_token_info(key=user[0].dementia_key, refresh_token=refresh_token)
-        
-        session.add(new_token)
+            if not session.query(models.refresh_token_info).filter_by(key=user[0].dementia_key).first():
+                refresh_token = jwt.create_refresh_token(user[0].dementia_name, user[0].dementia_key)
+                new_token = models.refresh_token_info(key=user[0].dementia_key, refresh_token=refresh_token)
+                session.add(new_token)
+            else:
+                refresh_token = None
+
         session.commit()
 
         result = {
@@ -287,7 +297,7 @@ async def receive_user_login(request: loginRequest):
 @router.post("/locations/dementias", responses = {200 : {"model" : TempResponse, "description" : "위치 정보 전송 성공" }, 404: {"model": ErrorResponse, "description": "보호 대상자 키 조회 실패"}}, description="보호 대상자의 위치 정보를 전송 | isRingstoneOn : 0(무음), 1(진동), 2(벨소리)")
 async def receive_location_info(request: ReceiveLocationRequest, user_info: int = Depends(APIKeyHeader(name = "Authorization"))):
     try:
-        _dementia_key = get_current_user(user_info, session)[0].dementia_key
+        _dementia_key = jwt.get_current_user(user_info, session)[0].dementia_key
 
         existing_dementia = session.query(models.dementia_info).filter_by(dementia_key = _dementia_key).first()
 
@@ -336,10 +346,6 @@ async def receive_location_info(request: ReceiveLocationRequest, user_info: int 
         }
 
         return response
-    
-    except  Exception as e:
-        print(f"[ERROR] Location data not received from Dementia key({_dementia_key})")
-        raise HTTPException(status_code=404, detail="Dementia key not found")
         
     finally:
         session.close()

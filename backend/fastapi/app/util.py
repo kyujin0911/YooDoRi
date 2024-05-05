@@ -77,27 +77,20 @@ class JWTService:
                 raise HTTPException(
                     status_code=401,
                     detail="Expired token",
-                    headers={"WWW-Authenticate": "Bearer"},
-                    code="EXPIRED_TOKEN"
+                    headers={"WWW-Authenticate": "Bearer"}
                 )
             else:
                 pass
+
+            if session.query(models.refresh_token_info).filter_by(refresh_token = token).first():
+                new_token = self.create_access_token(username, key)
+            else:
+                new_token = None
 
             payload = self.decoder(token, self.secret_key, self.algorithm)
 
             username: str = payload.get("name")
             key : str = payload.get("key")
-
-            # db의 refresh_token과 비교
-            if not session.query(models.refresh_token_info).filter_by(refresh_token = token).first():
-                raise HTTPException(
-                    status_code=401,
-                    detail="Invalid token",
-                    headers={"WWW-Authenticate": "Bearer"},
-                    code="INVALID_TOKEN"
-                )
-            else:
-                new_token = self.create_access_token(username, key)
 
             if username is None:
                 raise HTTPException(status_code=401, detail="asdasd")
