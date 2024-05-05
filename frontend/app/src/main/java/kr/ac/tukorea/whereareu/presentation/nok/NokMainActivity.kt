@@ -60,7 +60,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
         homeViewModel.setNokKey(nokKey)
         settingViewModel.setNokKey(nokKey)
     }
-
+    
     private fun getUpdateLocationJob(duration: Long): Job {
         return lifecycleScope.launch {
             while (true) {
@@ -77,24 +77,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
             mMessageReceiver, IntentFilter("gps")
         )
 
-        // 앱 처음 실행 시, 보호대상자 위치를 갖고 오는 job이 없으면 새로운 job을 생성해서 실행
-        repeatOnStarted {
-            settingViewModel.updateRate.collect { updateRate ->
-                Log.d("setting updatteRate", updateRate.toString())
-                if (updateRate == "0" || homeViewModel.isPredicted.value) {
-                    return@collect
-                }
-
-                // 위치 업데이트 주기 변경 시 기존 job을 취소하고 updateRate에 맞게 재시작
-                if (updateLocationJob != null){
-                    Log.d("job seting cancel", "cc")
-                    updateLocationJob?.cancelAndJoin()
-                    updateLocationJob = getUpdateLocationJob(updateRate.toLong().times(60 * 1000))
-                }
-            }
-        }
-
-        
+        // 앱 처음 실행, 예측 중지 시 보호대상자 위치를 갖고 오는 job이 없으면 새로운 job을 생성해서 실행
         repeatOnStarted {
             homeViewModel.updateRate.collect{updateRate ->
                 Log.d("home updatteRate", updateRate.toString())
@@ -102,6 +85,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                     return@collect
                 }
 
+                // 위치 업데이트 주기 변경 시 기존 job을 취소하고 updateRate에 맞게 재시작
                 if (updateLocationJob != null){
                     Log.d("job home cancel", "cc")
                     updateLocationJob?.cancelAndJoin()
@@ -116,6 +100,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
             }
         }
 
+        // 보호 대상자 위치 UI 업데이트
         repeatOnStarted {
             delay(100)
             homeViewModel.dementiaLocationInfo.collect { response ->
@@ -129,12 +114,15 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
             }
         }
 
+        // 예측 기능 실행
         repeatOnStarted {
             homeViewModel.predictEvent.collect { predictEvent ->
                 handlePredictEvent(predictEvent)
             }
         }
 
+
+        // 리사이클러뷰 아이템 클릭 이벤트에 따른 bottomSheet, Naver Map 제어
         repeatOnStarted {
             homeViewModel.innerItemClickEvent.collect { event ->
                 behavior.state = event.behavior
