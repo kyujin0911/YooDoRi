@@ -354,7 +354,7 @@ async def receive_location_info(request: ReceiveLocationRequest, user_info: int 
 async def send_live_location_info(user_info: int = Depends(APIKeyHeader(name = "Authorization"))):
 
     try:
-        _dementia_key = get_current_user(user_info)[0].dementia_info_key
+        _dementia_key = jwt.get_current_user(user_info, session)[0].dementia_info_key
 
         latest_location = session.query(models.location_info).filter_by(dementia_key = _dementia_key).order_by(models.location_info.num.desc()).first()
 
@@ -394,7 +394,7 @@ async def modify_user_info(request: ModifyUserInfoRequest, user_info : int = Dep
     _new_phonenumber = request.phoneNumber
 
     try:
-        user = get_current_user(user_info, session)
+        user = jwt.get_current_user(user_info, session)
 
         if user[1] == 0: #보호자
             existing_nok = session.query(models.nok_info).filter_by(nok_key = user[0].nok_key).first()
@@ -406,6 +406,8 @@ async def modify_user_info(request: ModifyUserInfoRequest, user_info : int = Dep
 
             print(f"[INFO] User information modified by {existing_nok.nok_name}({existing_nok.nok_key})")
 
+            new_token = jwt.create_access_token(existing_nok.nok_name, existing_nok.nok_key)
+
         elif user[1] == 1: #보호대상자
             existing_dementia = session.query(models.dementia_info).filter_by(dementia_key = user[0].dementia_key).first()
 
@@ -416,12 +418,20 @@ async def modify_user_info(request: ModifyUserInfoRequest, user_info : int = Dep
 
             print(f"[INFO] User information modified by {existing_dementia.dementia_name}({existing_dementia.dementia_key})")
 
+            new_token = jwt.create_access_token(existing_dementia.dementia_name, existing_dementia.dementia_key)
+
+        result = {
+            'accessToken': new_token
+        }
+
         response = {
             'status': 'success',
-            'message': 'User information modified'
+            'message': 'User information modified',
+            'result': result
         }
 
         session.commit()
+
 
         return response
     
@@ -435,7 +445,7 @@ async def modify_updatint_rate(request: ModifyUserUpdateRateRequest, user_info :
 
     #보호자와 보호대상자 모두 업데이트
     try:
-        user = get_current_user(user_info, session)
+        user = jwt.get_current_user(user_info, session)
         if user[1] == 0: #보호자
             existing_nok = session.query(models.nok_info).filter_by(nok_key = user[0].nok_key).first()
 
@@ -474,7 +484,7 @@ async def modify_updatint_rate(request: ModifyUserUpdateRateRequest, user_info :
 @router.post("/dementias/averageWalkingSpeed", responses = {200 : {"model" : AverageWalkingSpeedResponse, "description" : "평균 걷기 속도 계산 성공" }, 404: {"model": ErrorResponse, "description": "보호 대상자 키 조회 실패 or 위치 정보 부족"}}, description="보호 대상자의 평균 걷기 속도를 계산 및 마지막 정보 전송")
 async def caculate_dementia_average_walking_speed(user_info : int = Depends(APIKeyHeader(name = "Authorization"))): 
     try:
-        _dementia_key = get_current_user(user_info, session)[0].dementia_key
+        _dementia_key = jwt.get_current_user(user_info, session)[0].dementia_info_key
 
         #최근 10개의 정보를 가져와 평균 속도 계산(임시)
         location_info_list = session.query(models.location_info).filter_by(dementia_key = _dementia_key).order_by(models.location_info.num.desc()).limit(10).all()
@@ -519,7 +529,7 @@ async def caculate_dementia_average_walking_speed(user_info : int = Depends(APIK
 @router.get("/users/info", responses = {200 : {"model" : GetUserInfoResponse, "description" : "유저 정보 전송 성공" }, 404: {"model": ErrorResponse, "description": "유저 정보 없음"}}, description="보호자와 보호 대상자 정보 전달(쿼리 스트링)")
 async def get_user_info(user_info : int = Depends(APIKeyHeader(name = "Authorization"))):
     try:
-        user = get_current_user(user_info, session)
+        user = jwt.get_current_user(user_info, session)
 
         nok_info_record = session.query(models.nok_info).filter_by(nok_key = user[0].nok_key).first()
         
@@ -568,7 +578,7 @@ async def get_user_info(user_info : int = Depends(APIKeyHeader(name = "Authoriza
 async def send_meaningful_location_info(user_info : int = Depends(APIKeyHeader(name = "Authorization"))):
 
     try:
-        _key = get_current_user(user_info, session)[0].dementia_info_key
+        _key = jwt.get_current_user(user_info, session)[0].dementia_info_key
 
         meaningful_location_list = session.query(models.meaningful_location_info).filter_by(dementia_key=_key).all()
 
@@ -631,7 +641,7 @@ async def send_meaningful_location_info(user_info : int = Depends(APIKeyHeader(n
 @router.get("/locations/history", responses = {200 : {"model" : LocHistoryResponse, "description" : "위치 이력 전송 성공" }, 404: {"model": ErrorResponse, "description": "위치 이력 없음"}}, description="보호 대상자의 위치 이력 정보 전달(쿼리 스트링) | date : YYYY-MM-DD")
 async def send_location_history(_date : str, user_info : int = Depends(APIKeyHeader(name = "Authorization"))):
     try:
-        _key = get_current_user(user_info, session)[0].dementia_info_key
+        _key = jwt.get_current_user(user_info, session)[0].dementia_info_key
 
         location_list = session.query(models.location_info).filter_by(dementia_key = _key, date = _date).all()
 
