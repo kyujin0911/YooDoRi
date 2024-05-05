@@ -408,7 +408,8 @@
                 android:background="@drawable/rectangle_top_corner_20"
                 android:elevation="10dp"
                 android:minHeight="10dp"
-                android:visibility='@{viewModel.navigateEvent.equals("Home") ? View.GONE : View.VISIBLE}'
+                bind:isPredicted="@{viewModel.isPredicted}"
+                bind:navigateEvent="@{viewModel.navigateEvent}"
                 app:behavior_hideable="false"
                 app:behavior_peekHeight="10dp"
                 app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">

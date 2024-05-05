@@ -10,7 +10,6 @@ import android.view.View
 import androidx.activity.viewModels
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
-import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.navigation.fragment.NavHostFragment
@@ -33,7 +32,6 @@ import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kr.ac.tukorea.whereareu.R
-import kr.ac.tukorea.whereareu.data.model.nok.home.LocationInfoResponse
 import kr.ac.tukorea.whereareu.databinding.ActivityNokMainBinding
 import kr.ac.tukorea.whereareu.databinding.IconLocationOverlayLayoutBinding
 import kr.ac.tukorea.whereareu.presentation.base.BaseActivity
@@ -41,8 +39,6 @@ import kr.ac.tukorea.whereareu.presentation.nok.home.NokHomeViewModel
 import kr.ac.tukorea.whereareu.presentation.nok.setting.SettingViewModel
 import kr.ac.tukorea.whereareu.util.extension.getUserKey
 import kr.ac.tukorea.whereareu.util.extension.repeatOnStarted
-import kr.ac.tukorea.whereareu.util.extension.setRingtoneImage
-import kr.ac.tukorea.whereareu.util.extension.setRingtoneText
 import kotlin.math.roundToInt
 
 @AndroidEntryPoint
@@ -56,9 +52,6 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
     private val lastLocationMarker = Marker()
     private val circleOverlay = CircleOverlay()
     private lateinit var behavior: BottomSheetBehavior<ConstraintLayout>
-    private val locationOverlayBinding: IconLocationOverlayLayoutBinding by lazy {
-        IconLocationOverlayLayoutBinding.inflate(layoutInflater)
-    }
     private fun saveUserKeys() {
         val dementiaKey = getUserKey("dementia")
         homeViewModel.setDementiaKey(dementiaKey)
@@ -68,7 +61,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
         settingViewModel.setNokKey(nokKey)
     }
 
-    private fun makeUpdateLocationJob(duration: Long): Job {
+    private fun getUpdateLocationJob(duration: Long): Job {
         return lifecycleScope.launch {
             while (true) {
                 homeViewModel.getDementiaLocation()
@@ -84,42 +77,36 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
             mMessageReceiver, IntentFilter("gps")
         )
 
-        //
-        // 실행중인 coroutine이 없으면 새로운 job을 생성해서 실행
+        // 앱 처음 실행 시, 보호대상자 위치를 갖고 오는 job이 없으면 새로운 job을 생성해서 실행
         repeatOnStarted {
-            settingViewModel.updateRate.collect { duration ->
-                Log.d("isPredict", homeViewModel.isPredicted.value.toString())
-                Log.d("updateRate", duration)
-                if (duration == "0" || homeViewModel.isPredicted.value) {
+            settingViewModel.updateRate.collect { updateRate ->
+                Log.d("setting updatteRate", updateRate.toString())
+                if (updateRate == "0" || homeViewModel.isPredicted.value) {
                     return@collect
                 }
-                Log.d("duration", duration.toString())
-                updateLocationJob = if (updateLocationJob == null) {
-                    makeUpdateLocationJob(duration.toLong().times(60 * 1000))
-                }
 
-                // 실행중인 coroutine이 있으면 job을 취소하고 duration에 맞게 재시작
-                else {
+                // 위치 업데이트 주기 변경 시 기존 job을 취소하고 updateRate에 맞게 재시작
+                if (updateLocationJob != null){
+                    Log.d("job seting cancel", "cc")
                     updateLocationJob?.cancelAndJoin()
-                    makeUpdateLocationJob(duration.toLong().times(60 * 1000))
+                    updateLocationJob = getUpdateLocationJob(updateRate.toLong().times(60 * 1000))
                 }
             }
         }
 
+        
         repeatOnStarted {
             homeViewModel.updateRate.collect{updateRate ->
+                Log.d("home updatteRate", updateRate.toString())
                 if (updateRate == 0L){
                     return@collect
                 }
-                updateLocationJob = if (updateLocationJob == null) {
-                    makeUpdateLocationJob(updateRate.toLong().times(60 * 1000))
-                }
 
-                // 실행중인 coroutine이 있으면 job을 취소하고 duration에 맞게 재시작
-                else {
+                if (updateLocationJob != null){
+                    Log.d("job home cancel", "cc")
                     updateLocationJob?.cancelAndJoin()
-                    makeUpdateLocationJob(updateRate.toLong().times(60 * 1000))
                 }
+                updateLocationJob = getUpdateLocationJob(updateRate.times(60 * 1000))
             }
         }
 
@@ -138,7 +125,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                     return@collect
                 }
                 val coord = LatLng(response.latitude, response.longitude)
-                trackingDementiaLocation(coord, response.currentSpeed)
+                initLocationOverlay(coord, response.currentSpeed)
             }
         }
 
@@ -161,7 +148,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
             is NokHomeViewModel.PredictEvent.StartPredict -> {
                 homeViewModel.predict()
                 stopGetDementiaLocation()
-                binding.bottomSheet.visibility = View.VISIBLE
+                //binding.bottomSheet.visibility = View.VISIBLE
                 showLoadingDialog(this)
             }
 
@@ -172,7 +159,6 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
             }
 
             is NokHomeViewModel.PredictEvent.MeaningFulPlaceEvent -> {
-                Log.d("뭐고", event.meaningfulPlaceForList.toString())
 
                 event.meaningfulPlaceForList.forEach { meaningfulPlace ->
                     val latitude = meaningfulPlace.latitude
@@ -251,25 +237,22 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
         }
     }
 
-    private fun initLocationOverlay(){
-        val locationOverlay = locationOverlayBinding.layout
-        naverMap?.locationOverlay?.icon = OverlayImage.fromView(locationOverlay)
-    }
-
-    private fun trackingDementiaLocation(coord: LatLng, speed: Float) {
+    private fun initLocationOverlay(coord: LatLng, speed: Float) {
+        val binding = IconLocationOverlayLayoutBinding.inflate(layoutInflater)
+        val view = binding.layout
         naverMap?.let {
             val locationOverlay = it.locationOverlay
             with(locationOverlay) {
                 isVisible = true
+
                 // m/s to km/h
-                locationOverlayBinding.speedTv.text = (speed * 3.6).roundToInt().toString()
-                locationOverlayBinding.nameTv.text = homeViewModel.dementiaName.value
+                binding.speedTv.text = (speed * 3.6).roundToInt().toString()
+                binding.nameTv.text = homeViewModel.dementiaName.value
                 circleRadius = 0
                 position = coord
                 anchor = PointF(0.5f, 1f)
+                icon = OverlayImage.fromView(view)
             }
-            Log.d("overlay visible", naverMap?.locationOverlay?.isVisible.toString())
-            initLocationOverlay()
 
             it.moveCamera(CameraUpdate.scrollTo(coord))
         }
@@ -307,7 +290,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
             updateLocationJob?.cancelAndJoin()
         }
         naverMap?.locationOverlay?.isVisible = false
-        homeViewModel.setIsPredicted(false)
+        //homeViewModel.setIsPredicted(false)
         homeViewModel.setUpdateRate(0)
     }
 
@@ -354,8 +337,8 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
             }
 
             override fun onSlide(bottomSheet: View, slideOffset: Float) {
-                Log.d("slideOffset", slideOffset.toString())
-                Log.d("state", behavior.state.toString())
+          /*      Log.d("slideOffset", slideOffset.toString())
+                Log.d("state", behavior.state.toString())*/
             }
         })
     }

@@ -25,6 +25,7 @@ import kr.ac.tukorea.whereareu.util.network.onException
 import kr.ac.tukorea.whereareu.util.network.onFail
 import kr.ac.tukorea.whereareu.util.network.onSuccess
 import javax.inject.Inject
+import kotlin.math.roundToInt
 import kotlin.system.measureTimeMillis
 
 @HiltViewModel
@@ -37,7 +38,7 @@ class NokHomeViewModel @Inject constructor(
     private val _dementiaLocationInfo = MutableStateFlow<LocationInfoResponse>(LocationInfoResponse())
     val dementiaLocationInfo = _dementiaLocationInfo.asStateFlow()
 
-    private val _updateRate = MutableStateFlow<Long>(300000 * 1000)
+    private val _updateRate = MutableStateFlow<Long>(0L)
     val updateRate = _updateRate.asStateFlow()
 
     private val _isPredicted = MutableStateFlow(false)
@@ -57,6 +58,9 @@ class NokHomeViewModel @Inject constructor(
 
     private val _innerItemClickEvent = MutableSharedFlow<InnerItemClickEvent>()
     val innerItemClickEvent = _innerItemClickEvent.asSharedFlow()
+
+    private val _currentSpeed = MutableStateFlow("")
+    val currentSpeed = _currentSpeed.asStateFlow()
 
     sealed class PredictEvent {
         data class StartPredict(val isPredicted: Boolean) : PredictEvent()
@@ -137,11 +141,8 @@ class NokHomeViewModel @Inject constructor(
     fun getDementiaLocation() {
         viewModelScope.launch {
             nokHomeRepository.getDementiaLocationInfo(_dementiaKey.value).onSuccess {
-                if(it == _dementiaLocationInfo.value){
-                    _dementiaLocationInfo.emit(it.copy(battery = 86))
-                } else {
-                    _dementiaLocationInfo.emit(it)
-                }
+                _dementiaLocationInfo.emit(it)
+                _currentSpeed.value = (it.currentSpeed*3.6).roundToInt().toString()
             }.onError {
                 Log.d("error", it.toString())
             }.onException {

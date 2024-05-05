@@ -3,7 +3,9 @@ package kr.ac.tukorea.whereareu.presentation
 import android.content.Context
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
 import androidx.databinding.BindingAdapter
 import com.bumptech.glide.Glide
 import kr.ac.tukorea.whereareu.R
@@ -45,5 +47,15 @@ object BindingAdapter {
             else -> "알수없음"
         }
         view.text=movementStatus
+    }
+
+    @BindingAdapter("bind:navigateEvent", "bind:isPredicted")
+    @JvmStatic
+    fun setBottomSheetVisible(view: ConstraintLayout, navigateEvent: String, isPredicted: Boolean) {
+        view.isVisible = if (navigateEvent == "Home" && !isPredicted) {
+            false
+        } else {
+            true
+        }
     }
 }
