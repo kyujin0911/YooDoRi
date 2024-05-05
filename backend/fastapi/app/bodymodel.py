@@ -53,6 +53,8 @@ class ReceiveDementiaInfoResponse(BaseModel):
 
 class connectionResult(BaseModel):
     nokInfoRecord: nokInfoRecord
+    accessToken: str = Field(examples=["ksjdnfjkdasnfljsknafljansdfjlsakn"])
+    refreshToken: str = Field(examples=["ksjdnfjkdasnfljsknafljansdfjlsakn"])
 
 class ConnectionRequest(BaseModel):
     dementiaKey : int = Field(examples=["123456"])

@@ -209,12 +209,22 @@ async def is_connected(request: ConnectionRequest):
     try:
         existing_nok = session.query(models.nok_info).filter_by(dementia_info_key = _dementia_key).first()
         if existing_nok:
+            dementia_info = session.query(models.dementia_info).filter_by(dementia_key = _dementia_key).first()
+            access_token = jwt.create_access_token(dementia_info.dementia_name, dementia_info.dementia_key)
+            refresh_token = jwt.create_refresh_token(dementia_info.dementia_name, dementia_info.dementia_key)
+
+            new_token = models.refresh_token_info(key=dementia_info.dementia_key, refresh_token=refresh_token)
+
+            session.add(new_token)
+            session.commit()
             result = {
                 'nokInfoRecord':{
                     'nokKey': existing_nok.nok_key,
                     'nokName': existing_nok.nok_name,
                     'nokPhoneNumber': existing_nok.nok_phonenumber
-                }
+                },
+                'accessToken': access_token,
+                'refreshToken': refresh_token
             }
             response = {
                 'status': 'success',
