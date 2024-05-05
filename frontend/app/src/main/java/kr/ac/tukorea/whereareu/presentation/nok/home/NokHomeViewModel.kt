@@ -109,6 +109,10 @@ class NokHomeViewModel @Inject constructor(
         _nokKey.value = nokKey
     }
 
+    fun setUpdateRate(updateRate: Long){
+        _updateRate.value = updateRate
+    }
+
     fun setIsPredicted(isPredicted: Boolean) {
         viewModelScope.launch {
             _isPredicted.emit(isPredicted)
@@ -124,6 +128,8 @@ class NokHomeViewModel @Inject constructor(
         viewModelScope.launch {
             nokHomeRepository.getUserInfo(_nokKey.value).onSuccess {
                 _dementiaName.emit(it.dementiaInfoRecord.dementiaName)
+                _updateRate.value = it.nokInfoRecord.updateRate.toLong()
+                Log.d("fetchUserInfo", _updateRate.value.toString())
             }
         }
     }
@@ -131,7 +137,11 @@ class NokHomeViewModel @Inject constructor(
     fun getDementiaLocation() {
         viewModelScope.launch {
             nokHomeRepository.getDementiaLocationInfo(_dementiaKey.value).onSuccess {
-                _dementiaLocationInfo.emit(it)
+                if(it == _dementiaLocationInfo.value){
+                    _dementiaLocationInfo.emit(it.copy(battery = 86))
+                } else {
+                    _dementiaLocationInfo.emit(it)
+                }
             }.onError {
                 Log.d("error", it.toString())
             }.onException {
