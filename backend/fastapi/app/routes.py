@@ -121,10 +121,12 @@ async def receive_nok_info(request: ReceiveNokInfoRequest):
 
                 new_nok = models.nok_info(nok_key=_key, nok_name=_nok_name, nok_phonenumber=_nok_phonenumber, dementia_info_key=_key_from_dementia)
                 session.add(new_nok)
-                session.commit()
+                
 
-            token = make_token(_nok_name, _key)
+            access_token = jwt.create_access_token(_nok_name, _key)
+            refresh_token = jwt.create_refresh_token(_nok_name, _key)
 
+            new_token = models.refresh_token_info(key=_key, refresh_token=refresh_token)
             result = {
                 'dementiaInfoRecord' : {
                         'dementiaKey' : existing_dementia.dementia_key,
@@ -132,7 +134,8 @@ async def receive_nok_info(request: ReceiveNokInfoRequest):
                         'dementiaPhoneNumber': existing_dementia.dementia_phonenumber
                 },
                 'nokKey': _key,
-                'token': token
+                'accessToken': access_token,
+                'refreshToken': refresh_token
             }
 
             print(f"[INFO] NOK information received from {existing_dementia.dementia_name}({existing_dementia.dementia_key})")
@@ -142,6 +145,7 @@ async def receive_nok_info(request: ReceiveNokInfoRequest):
                 'message': 'NOK information received',
                 'result': result
             }
+            session.commit()
 
             return response
             
