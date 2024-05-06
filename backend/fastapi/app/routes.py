@@ -44,61 +44,45 @@ jwt = JWTService()
 async def protected_route(current_user= Depends(APIKeyHeader(name="Authorization"))):
     return jwt.get_current_user(current_user, session)
 
-@router.post("/test/login", responses = {200 : {"model" : TokenResponse, "description" : "로그인 성공" }, 400: {"model": ErrorResponse, "description": "로그인 실패"}}, description="로그인 테스트(앞으로 이렇게 바뀔예정) | username : 이름, password : key -> 이 두개만 채워서 보내면 됨")
+"""@router.post("/test/login", responses = {200 : {"model" : TokenResponse, "description" : "로그인 성공" }, 400: {"model": ErrorResponse, "description": "로그인 실패"}}, description="로그인 테스트(앞으로 이렇게 바뀔예정) | username : 이름, password : key -> 이 두개만 채워서 보내면 됨")
 async def test_login(from_data: OAuth2PasswordRequestForm = Depends()):
+        _key = request.key
+    _isdementia = request.isDementia
     try:
-        user = jwt.get_user(from_data.username, from_data.password, session)
-        if not user:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Incorrect key",
-                headers={"WWW-Authenticate": "Bearer"},
-            )
-        # Dict 형태로 반환
-        '''def create_access_token(self, data: dict) -> str:
-                return self._create_token(data, self.access_token_expire_time)'''
-        
-        if user[1] == 0:
-            access_token = jwt.create_access_token(user[0].nok_name, user[0].nok_key)
-            
-            #refresh_token_info 테이블 디비에 저장
-            if not session.query(models.refresh_token_info).filter_by(key=user[0].nok_key).first():
-                refresh_token = jwt.create_refresh_token(user[0].nok_name, user[0].nok_key)
-                new_token = models.refresh_token_info(key=user[0].nok_key, refresh_token=refresh_token)
-                session.add(new_token)
-            else: 
-                refresh_token = None
+        if _isdementia == 0: # 보호자인 경우
+            existing_nok = session.query(models.nok_info).filter_by(nok_key = _key).first()
 
+            if existing_nok:
+                response = {
+                    'status': 'success',
+                    'message': 'User login success',
+                }
+                print(f"[INFO] User login from {existing_nok.nok_name}({existing_nok.nok_key})")
 
-        else:
-            access_token = jwt.create_access_token(user[0].dementia_name, user[0].dementia_key)
-            
-            #refresh_token 디비에 저장
-            if not session.query(models.refresh_token_info).filter_by(key=user[0].dementia_key).first():
-                refresh_token = jwt.create_refresh_token(user[0].dementia_name, user[0].dementia_key)
-                new_token = models.refresh_token_info(key=user[0].dementia_key, refresh_token=refresh_token)
-                session.add(new_token)
             else:
-                refresh_token = None
+                print(f"[ERROR] User login failed from NOK key({_key})")
 
-        session.commit()
+                raise HTTPException(status_code=400, detail="User login failed")
+        
+        elif _isdementia == 1: # 보호 대상자인 경우
+            existing_dementia = session.query(models.dementia_info).filter_by(dementia_key = _key).first()
 
-        result = {
-            'accessToken': access_token,
-            'refreshToken': refresh_token,
-            'tokenType': 'bearer'
-        }
+            if existing_dementia:
+                response = {
+                    'status': 'success',
+                    'message': 'User login success',
+                }
+                print(f"[INFO] User login from {existing_dementia.dementia_name}({existing_dementia.dementia_key})")
 
-        response = {
-            'status': 'success',
-            'message': 'Login success',
-            'result': result
-        }
+            else:
+                print(f"[ERROR] User login failed from Dementia key({_key})")
+
+                raise HTTPException(status_code=400, detail="User login failed")
 
         return response
-            
+        
     finally:
-        session.close()
+        session.close()"""
 
 
 
@@ -254,43 +238,59 @@ async def is_connected(request: ConnectionRequest):
     finally:
         session.close()
 
-@router.post("/login", responses = {200 : {"model" : CommonResponse, "description" : "로그인 성공" }, 400: {"model": ErrorResponse, "description": "로그인 실패"}}, description="보호자와 보호 대상자의 로그인 | isDementia : 0(보호자), 1(보호 대상자)")
-async def receive_user_login(request: loginRequest):
-    _key = request.key
-    _isdementia = request.isDementia
+@router.post("/login", responses = {200 : {"model" : TokenResponse, "description" : "로그인 성공" }, 400: {"model": ErrorResponse, "description": "로그인 실패"}}, description="보호자와 보호 대상자의 로그인 | username : 이름, password : key -> 이 두개만 채워서 보내면 됨")
+async def receive_user_login(from_data: OAuth2PasswordRequestForm = Depends()):
     try:
-        if _isdementia == 0: # 보호자인 경우
-            existing_nok = session.query(models.nok_info).filter_by(nok_key = _key).first()
-
-            if existing_nok:
-                response = {
-                    'status': 'success',
-                    'message': 'User login success',
-                }
-                print(f"[INFO] User login from {existing_nok.nok_name}({existing_nok.nok_key})")
-
-            else:
-                print(f"[ERROR] User login failed from NOK key({_key})")
-
-                raise HTTPException(status_code=400, detail="User login failed")
+        user = jwt.get_user(from_data.username, from_data.password, session)
+        if not user:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Incorrect key",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
+        # Dict 형태로 반환
+        '''def create_access_token(self, data: dict) -> str:
+                return self._create_token(data, self.access_token_expire_time)'''
         
-        elif _isdementia == 1: # 보호 대상자인 경우
-            existing_dementia = session.query(models.dementia_info).filter_by(dementia_key = _key).first()
+        if user[1] == 0:
+            access_token = jwt.create_access_token(user[0].nok_name, user[0].nok_key)
+            
+            #refresh_token_info 테이블 디비에 저장
+            if not session.query(models.refresh_token_info).filter_by(key=user[0].nok_key).first():
+                refresh_token = jwt.create_refresh_token(user[0].nok_name, user[0].nok_key)
+                new_token = models.refresh_token_info(key=user[0].nok_key, refresh_token=refresh_token)
+                session.add(new_token)
+            else: 
+                refresh_token = None
 
-            if existing_dementia:
-                response = {
-                    'status': 'success',
-                    'message': 'User login success',
-                }
-                print(f"[INFO] User login from {existing_dementia.dementia_name}({existing_dementia.dementia_key})")
 
+        else:
+            access_token = jwt.create_access_token(user[0].dementia_name, user[0].dementia_key)
+            
+            #refresh_token 디비에 저장
+            if not session.query(models.refresh_token_info).filter_by(key=user[0].dementia_key).first():
+                refresh_token = jwt.create_refresh_token(user[0].dementia_name, user[0].dementia_key)
+                new_token = models.refresh_token_info(key=user[0].dementia_key, refresh_token=refresh_token)
+                session.add(new_token)
             else:
-                print(f"[ERROR] User login failed from Dementia key({_key})")
+                refresh_token = None
 
-                raise HTTPException(status_code=400, detail="User login failed")
+        session.commit()
+
+        result = {
+            'accessToken': access_token,
+            'refreshToken': refresh_token,
+            'tokenType': 'bearer'
+        }
+
+        response = {
+            'status': 'success',
+            'message': 'Login success',
+            'result': result
+        }
 
         return response
-        
+            
     finally:
         session.close()
 
@@ -387,7 +387,7 @@ async def send_live_location_info(user_info: int = Depends(APIKeyHeader(name = "
     finally:
         session.close()
 
-@router.post("/users/modification/userInfo", responses = {200 : {"model" : CommonResponse, "description" : "유저 정보 수정 성공" }, 404: {"model": ErrorResponse, "description": "유저 키 조회 실패"}}, description="보호자와 보호대상자의 정보를 수정 | isDementia : 0(보호자), 1(보호대상자) | 변경하지 않는 값은 기존의 값을 그대로 수신할 것")
+@router.post("/users/modification/userInfo", responses = {200 : {"model" : TokenResponse, "description" : "유저 정보 수정 성공" }, 404: {"model": ErrorResponse, "description": "유저 키 조회 실패"}}, description="보호자와 보호대상자의 정보를 수정 | 정보 수정 시 새로운 토큰 전송 | 변경하지 않는 값은 기존의 값을 그대로 수신할 것")
 async def modify_user_info(request: ModifyUserInfoRequest, user_info : int = Depends(APIKeyHeader(name = "Authorization"))):
 
     _new_name = request.name
@@ -406,7 +406,12 @@ async def modify_user_info(request: ModifyUserInfoRequest, user_info : int = Dep
 
             print(f"[INFO] User information modified by {existing_nok.nok_name}({existing_nok.nok_key})")
 
-            new_token = jwt.create_access_token(existing_nok.nok_name, existing_nok.nok_key)
+            new_access_token = jwt.create_access_token(existing_nok.nok_name, existing_nok.nok_key)
+            new_refresh_token = jwt.create_refresh_token(existing_nok.nok_name, existing_nok.nok_key)
+
+            update_refresh_token = models.refresh_token_info(key=existing_nok.nok_key, refresh_token=new_refresh_token)
+            session.add(update_refresh_token)
+
 
         elif user[1] == 1: #보호대상자
             existing_dementia = session.query(models.dementia_info).filter_by(dementia_key = user[0].dementia_key).first()
@@ -418,10 +423,17 @@ async def modify_user_info(request: ModifyUserInfoRequest, user_info : int = Dep
 
             print(f"[INFO] User information modified by {existing_dementia.dementia_name}({existing_dementia.dementia_key})")
 
-            new_token = jwt.create_access_token(existing_dementia.dementia_name, existing_dementia.dementia_key)
+            new_access_token = jwt.create_access_token(existing_dementia.dementia_name, existing_dementia.dementia_key)
+            new_refresh_token = jwt.create_refresh_token(existing_dementia.dementia_name, existing_dementia.dementia_key)
+
+            update_refresh_token = models.refresh_token_info(key=existing_dementia.dementia_key, refresh_token=new_refresh_token)
+            session.add(update_refresh_token)
+
+
 
         result = {
-            'accessToken': new_token
+            'accessToken': new_access_token,
+            'refreshToken': new_refresh_token
         }
 
         response = {
@@ -438,7 +450,7 @@ async def modify_user_info(request: ModifyUserInfoRequest, user_info : int = Dep
     finally:
         session.close()
 
-@router.post("/users/modification/updateRate", responses = {200 : {"model" : CommonResponse, "description" : "업데이트 주기 수정 성공" }, 404: {"model": ErrorResponse, "description": "유저 키 조회 실패"}}, description="보호자와 보호대상자의 업데이트 주기를 수정 | isDementia : 0(보호자), 1(보호대상자)")
+@router.post("/users/modification/updateRate", responses = {200 : {"model" : CommonResponse, "description" : "업데이트 주기 수정 성공" }, 404: {"model": ErrorResponse, "description": "유저 키 조회 실패"}}, description="보호자와 보호대상자의 업데이트 주기를 수정")
 async def modify_updatint_rate(request: ModifyUserUpdateRateRequest, user_info : int = Depends(APIKeyHeader(name = "Authorization"))):
 
     _update_rate = request.updateRate
