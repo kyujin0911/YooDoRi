@@ -2,9 +2,13 @@ from pydantic import BaseModel, Field
 from typing import List, Dict
 
 # Define request and response models
+class accessToken(BaseModel):
+    accessToken: str = Field(examples=["ksjdnfjkdasnfljsknafljansdfjlsakn"])
+
 class CommonResponse(BaseModel):
     status: str = Field("success")
     message: str = Field("메~시~지~")
+    result : accessToken
 
 class dementiaInfoRecord(BaseModel):
     dementiaKey : str = Field(examples=["123456"])
