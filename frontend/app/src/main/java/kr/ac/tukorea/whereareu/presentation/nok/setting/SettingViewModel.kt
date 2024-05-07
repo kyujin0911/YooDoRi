@@ -31,7 +31,7 @@ class SettingViewModel @Inject constructor(
     private val _name = MutableStateFlow("")
     val name = _name.asStateFlow()
 
-    private val _updateRate = MutableStateFlow<String>("1")
+    private val _updateRate = MutableStateFlow<String>("0")
     val updateRate = _updateRate.asStateFlow()
 
     private val _toastEvent = MutableSharedFlow<String>()
@@ -71,6 +71,7 @@ class SettingViewModel @Inject constructor(
             //나중에 보호대상자 키로도 할 수 있도록 수정해야됨
             repository.fetchUserInfo(_nokKey.value).onSuccess {
                 _userInfo.value = it
+                _updateRate.value = it.nokInfoRecord.updateRate.toString()
                 //_name.value = it.nokInfoRecord.nokName
                 Log.d("SettingViewModel", "getUserInfo Success")
             }.onError {

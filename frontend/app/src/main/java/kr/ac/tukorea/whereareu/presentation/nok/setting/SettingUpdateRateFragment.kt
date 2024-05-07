@@ -1,4 +1,4 @@
-package kr.ac.tukorea.whereareu.presentation.nok.setting.updateTime
+package kr.ac.tukorea.whereareu.presentation.nok.setting
 
 import android.content.Context.MODE_PRIVATE
 import androidx.fragment.app.activityViewModels
@@ -8,8 +8,8 @@ import dagger.hilt.android.AndroidEntryPoint
 import kr.ac.tukorea.whereareu.R
 import kr.ac.tukorea.whereareu.databinding.FragmentSettingUpdateTimeBinding
 import kr.ac.tukorea.whereareu.domain.setting.UpdateRate
-import kr.ac.tukorea.whereareu.presentation.nok.setting.SettingViewModel
 import kr.ac.tukorea.whereareu.presentation.base.BaseFragment
+import kr.ac.tukorea.whereareu.presentation.nok.setting.adapter.UpdateRateRVA
 import kr.ac.tukorea.whereareu.util.extension.repeatOnStarted
 import kr.ac.tukorea.whereareu.util.extension.showToastShort
 import kr.ac.tukorea.whereareu.util.extension.statusBarHeight

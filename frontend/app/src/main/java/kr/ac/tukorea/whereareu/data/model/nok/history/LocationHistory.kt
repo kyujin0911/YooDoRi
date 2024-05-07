@@ -4,4 +4,6 @@ data class LocationHistory(
     val latitude: Double,
     val longitude: Double,
     val time: String
-)
+){
+    constructor(): this(0.0, 0.0, "")
+}

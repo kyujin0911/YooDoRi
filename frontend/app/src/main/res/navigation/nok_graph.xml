@@ -45,7 +45,7 @@
         </fragment>
         <fragment
             android:id="@+id/settingUpdateTimeFragment"
-            android:name="kr.ac.tukorea.whereareu.presentation.nok.setting.updateTime.SettingUpdateRateFragment"
+            android:name="kr.ac.tukorea.whereareu.presentation.nok.setting.SettingUpdateRateFragment"
             android:label="fragment_setting_update_time"
             tools:layout="@layout/fragment_setting_update_time">
             <action

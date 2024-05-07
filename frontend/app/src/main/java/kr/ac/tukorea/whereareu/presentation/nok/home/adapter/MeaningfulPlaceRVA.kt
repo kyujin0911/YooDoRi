@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.naver.maps.geometry.LatLng
 import kr.ac.tukorea.whereareu.databinding.ItemMeaningfulPlaceBinding
 import kr.ac.tukorea.whereareu.domain.home.GroupedTimeInfo
 import kr.ac.tukorea.whereareu.domain.home.MeaningfulPlaceInfo
@@ -51,7 +52,7 @@ class MeaningfulPlaceRVA :
                 }
 
                 mapViewBtn.setOnClickListener {
-                    meaningfulPlaceRVAClickListener?.onClickMapView(meaningfulPlace.latitude, meaningfulPlace.longitude)
+                    meaningfulPlaceRVAClickListener?.onClickMapView(meaningfulPlace.latLng)
                 }
 
                 val policeStationRVA = PoliceStationRVA()
@@ -119,6 +120,6 @@ class MeaningfulPlaceRVA :
     }
 
     interface MeaningfulPlaceRVAClickListener{
-        fun onClickMapView(latitude: Double, longitude: Double)
+        fun onClickMapView(latLng: LatLng)
     }
 }

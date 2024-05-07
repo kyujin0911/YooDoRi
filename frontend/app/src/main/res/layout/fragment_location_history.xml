@@ -3,7 +3,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
-
+        <variable
+            name="viewModel"
+            type="kr.ac.tukorea.whereareu.presentation.nok.history.LocationHistoryViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -11,14 +13,12 @@
         android:layout_height="match_parent"
         android:background="@color/white">
 
-        <TextView
-            android:layout_width="wrap_content"
+
+        <SeekBar
+            android:id="@+id/seek_bar"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="location history"
-            android:textSize="20sp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
+            android:max="@{viewModel.locationHistory.locationHistory.size-1}"
             app:layout_constraintBottom_toBottomOf="parent"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
