@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import kr.ac.tukorea.whereareu.databinding.ItemPoliceStationBinding
+import kr.ac.tukorea.whereareu.data.model.nok.home.PoliceStationInfoResponse
 import kr.ac.tukorea.whereareu.domain.home.PoliceStationInfo
 
 class PoliceStationRVA() :

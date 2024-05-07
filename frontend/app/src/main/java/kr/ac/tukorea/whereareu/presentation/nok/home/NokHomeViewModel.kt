@@ -19,6 +19,7 @@ import kr.ac.tukorea.whereareu.data.repository.nok.home.NokHomeRepositoryImpl
 import kr.ac.tukorea.whereareu.domain.home.InnerItemClickEvent
 import kr.ac.tukorea.whereareu.domain.home.LastLocation
 import kr.ac.tukorea.whereareu.domain.home.MeaningfulPlaceInfo
+import kr.ac.tukorea.whereareu.data.model.nok.home.PoliceStationInfoResponse
 import kr.ac.tukorea.whereareu.domain.home.PoliceStationInfo
 import kr.ac.tukorea.whereareu.util.network.onError
 import kr.ac.tukorea.whereareu.util.network.onException
@@ -58,9 +59,6 @@ class NokHomeViewModel @Inject constructor(
 
     private val _innerItemClickEvent = MutableSharedFlow<InnerItemClickEvent>()
     val innerItemClickEvent = _innerItemClickEvent.asSharedFlow()
-
-    private val _currentSpeed = MutableStateFlow("")
-    val currentSpeed = _currentSpeed.asStateFlow()
 
     sealed class PredictEvent {
         data class StartPredict(val isPredicted: Boolean) : PredictEvent()
@@ -142,7 +140,6 @@ class NokHomeViewModel @Inject constructor(
         viewModelScope.launch {
             nokHomeRepository.getDementiaLocationInfo(_dementiaKey.value).onSuccess {
                 _dementiaLocationInfo.emit(it)
-                _currentSpeed.value = (it.currentSpeed*3.6).roundToInt().toString()
             }.onError {
                 Log.d("error", it.toString())
             }.onException {
@@ -168,16 +165,14 @@ class NokHomeViewModel @Inject constructor(
         nokHomeRepository.getDementiaLastInfo(DementiaKeyRequest("253050"))
             .onSuccess { response ->
                 Log.d("last info", response.toString())
-                val latitude = response.lastLatitude
-                val longitude = response.lastLongitude
                 val averageSpeed = response.averageSpeed.div(3.6)
-                val coord = LatLng(latitude, longitude)
+                val latLng = LatLng(response.lastLatitude, response.lastLongitude)
 
-                eventPredict(PredictEvent.DisplayDementiaLastInfo(averageSpeed, coord))
+                eventPredict(PredictEvent.DisplayDementiaLastInfo(averageSpeed, latLng))
 
                 eventPredict(
                     PredictEvent.DisplayDementiaLastLocation(
-                        LastLocation(latitude, longitude, response.addressName)
+                        LastLocation(latLng, response.addressName)
                     )
                 )
             }.onException {
@@ -188,16 +183,11 @@ class NokHomeViewModel @Inject constructor(
         nokHomeRepository.getMeaningfulPlace("253050").onSuccess { response ->
             Log.d("getMeaningfulPlace", response.toString())
             val meaningfulPlaceInfo = response.meaningfulPlaces.map { meaningfulPlace ->
-                eventPredict(PredictEvent.SearchNearbyPoliceStation(meaningfulPlace.policeStationInfo))
-
-                MeaningfulPlaceInfo(
-                    meaningfulPlace.address,
-                    meaningfulPlace.timeInfo,
-                    meaningfulPlace.latitude,
-                    meaningfulPlace.longitude,
-                    false,
-                    meaningfulPlace.policeStationInfo
-                )
+                val policeStationInfo = meaningfulPlace.policeStationInfo.map {policeStation ->
+                    policeStation.toModel()
+                }
+                eventPredict(PredictEvent.SearchNearbyPoliceStation(policeStationInfo))
+                meaningfulPlace.toModel(policeStationInfo)
             }
 
             eventPredict(PredictEvent.MeaningFulPlaceEvent(meaningfulPlaceInfo))

@@ -16,7 +16,7 @@ interface NokHomeService {
     @GET("locations/noks")
     suspend fun getDementiaLocationInfo(@Query("dementiaKey") dementiaKey: String): Response<ResponseBody<LocationInfoResponse>>
 
-    @GET("locatoins/meaningful")
+    @GET("locations/meaningful")
     suspend fun getMeaningfulPlace(@Query("dementiaKey") dementiaKey: String): Response<ResponseBody<MeaningfulPlaceResponse>>
 
     @POST("dementias/averageWalkingSpeed")

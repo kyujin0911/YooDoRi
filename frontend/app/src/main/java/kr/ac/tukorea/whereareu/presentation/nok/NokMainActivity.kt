@@ -7,15 +7,9 @@ import android.content.IntentFilter
 import android.graphics.PointF
 import android.util.Log
 import android.view.View
-import android.view.ViewGroup
-import android.widget.LinearLayout
 import androidx.activity.viewModels
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.ContextCompat
-import androidx.core.view.ViewCompat
-import androidx.core.view.marginBottom
-import androidx.core.view.setMargins
 import androidx.lifecycle.lifecycleScope
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.navigation.NavController
@@ -41,18 +35,19 @@ import kotlinx.coroutines.launch
 import kr.ac.tukorea.whereareu.R
 import kr.ac.tukorea.whereareu.databinding.ActivityNokMainBinding
 import kr.ac.tukorea.whereareu.databinding.IconLocationOverlayLayoutBinding
-import kr.ac.tukorea.whereareu.domain.home.PoliceStationInfo
 import kr.ac.tukorea.whereareu.presentation.base.BaseActivity
 import kr.ac.tukorea.whereareu.presentation.nok.home.NokHomeViewModel
-import kr.ac.tukorea.whereareu.presentation.nok.home.adapter.PoliceStationRVA
 import kr.ac.tukorea.whereareu.presentation.nok.setting.SettingViewModel
 import kr.ac.tukorea.whereareu.util.extension.getUserKey
 import kr.ac.tukorea.whereareu.util.extension.repeatOnStarted
+import kr.ac.tukorea.whereareu.util.extension.setAdapter
+import kr.ac.tukorea.whereareu.util.extension.setMarker
+import kr.ac.tukorea.whereareu.util.extension.setMarkerWithInfoWindow
 import kotlin.math.roundToInt
 
 @AndroidEntryPoint
 class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_nok_main),
-    OnMapReadyCallback, PoliceStationRVA.PoliceStationRVAClickListener {
+    OnMapReadyCallback {
     private val homeViewModel: NokHomeViewModel by viewModels()
     private val settingViewModel: SettingViewModel by viewModels()
     private var updateLocationJob: Job? = null
@@ -104,12 +99,6 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
             }
         }
 
-        repeatOnStarted {
-            homeViewModel.isPredicted.collect {
-                Log.d("homeViewModel", it.toString())
-            }
-        }
-
         // 보호 대상자 위치 UI 업데이트
         repeatOnStarted {
             delay(100)
@@ -144,12 +133,14 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
 
     private fun handlePredictEvent(event: NokHomeViewModel.PredictEvent) {
         when (event) {
+            // 예측 시작 -> 보호대상자 마지막 정보, 의미 장소 api 호출, 보호대상자 위치 업데이트 api 정지, 로딩화면 표시
             is NokHomeViewModel.PredictEvent.StartPredict -> {
                 homeViewModel.predict()
                 stopGetDementiaLocation()
                 showLoadingDialog(this)
             }
 
+            // 보호대상자 마지막 정보 UI 업데이트, 실종 시각 카운트다운 시작
             is NokHomeViewModel.PredictEvent.DisplayDementiaLastInfo -> {
                 startCountDownJob(event.averageSpeed, event.coord)
 
@@ -161,73 +152,47 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                     binding.coordinatorLayout.height - binding.predictLayout.bottom
             }
 
+            // 의미장소 마커 지도에 표시
             is NokHomeViewModel.PredictEvent.MeaningFulPlaceEvent -> {
-
                 event.meaningfulPlaceForList.forEach { meaningfulPlace ->
-                    val latitude = meaningfulPlace.latitude
-                    val longitude = meaningfulPlace.longitude
-
-                    val marker = Marker()
-                    with(marker) {
-                        position = LatLng(latitude, longitude)
-                        icon = MarkerIcons.YELLOW
-                        captionText = meaningfulPlace.address
-                        captionRequestedWidth = 400
-                        map = naverMap
-                    }
-
-                    val infoWindow = InfoWindow()
-                    infoWindow.adapter = object : InfoWindow.DefaultTextAdapter(this) {
-                        override fun getText(infoWindow: InfoWindow): CharSequence {
-                            return "예상 위치"
-                        }
-                    }
-                    infoWindow.open(marker)
+                    Marker().setMarkerWithInfoWindow(context = this,
+                        latLng = meaningfulPlace.latLng,
+                        markerIconColor = MarkerIcons.YELLOW,
+                        markerText = meaningfulPlace.address,
+                        naverMap = naverMap,
+                        infoText = "예상 위치"
+                    )
                 }
             }
 
+            // 의미장소 주변 경찰서 마커 지도에 표시
             is NokHomeViewModel.PredictEvent.SearchNearbyPoliceStation -> {
                 event.policeStationList.forEach { policeStation ->
-                    val marker = Marker()
-                    with(marker) {
-                        position = LatLng(
-                            policeStation.latitude.toDouble(),
-                            policeStation.longitude.toDouble()
-                        )
-                        icon = MarkerIcons.BLUE
-                        captionText = policeStation.policeName
-                        captionRequestedWidth = 400
-                        map = naverMap
-                    }
+                    Marker().setMarker(
+                        latLng = policeStation.latLng, MarkerIcons.BLUE, policeStation.policeName, naverMap
+                    )
                 }
 
                 dismissLoadingDialog()
             }
 
+            // 보호대상자 마지막 위치 마커 지도에 표시
             is NokHomeViewModel.PredictEvent.DisplayDementiaLastLocation -> {
                 binding.lastLocationTv.text = event.lastLocation.address
 
-                val latitude = event.lastLocation.latitude
-                val longitude = event.lastLocation.longitude
-                naverMap?.moveCamera(CameraUpdate.scrollTo(LatLng(latitude, longitude)))
+                naverMap?.moveCamera(CameraUpdate.scrollTo(event.lastLocation.latLng))
 
-                with(lastLocationMarker) {
-                    position = LatLng(latitude, longitude)
-                    icon = MarkerIcons.RED
-                    captionText = event.lastLocation.address
-                    captionRequestedWidth = 400
-                    map = naverMap
-                }
-
-                val infoWindow = InfoWindow()
-                infoWindow.adapter = object : InfoWindow.DefaultTextAdapter(this) {
-                    override fun getText(infoWindow: InfoWindow): CharSequence {
-                        return "실종 직전 위치"
-                    }
-                }
-                infoWindow.open(lastLocationMarker)
+                lastLocationMarker.setMarkerWithInfoWindow(
+                    context = this,
+                    latLng = event.lastLocation.latLng,
+                    markerIconColor = MarkerIcons.RED,
+                    markerText = event.lastLocation.address,
+                    naverMap = naverMap,
+                    infoText = "실종 직전 위치"
+                )
             }
 
+            // 예측 중지, 실종 시각 카운트다운 중지
             is NokHomeViewModel.PredictEvent.StopPredict -> {
                 lifecycleScope.launch {
                     countDownJob?.cancelAndJoin()
@@ -305,7 +270,6 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
     }
 
     override fun initView() {
-        //상태바 투명 설정
         binding.view = this
         binding.viewModel = homeViewModel
         initMap()
@@ -322,15 +286,11 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
         mapFragment.getMapAsync { map ->
             naverMap = map
         }
-
     }
 
     private fun initBottomSheet() {
         behavior = BottomSheetBehavior.from(binding.bottomSheet)
         behavior.state = BottomSheetBehavior.STATE_COLLAPSED
-        //behavior.peekHeight = 10
-        //behavior.peekHeight = binding.
-        //behavior.halfExpandedRatio = 0.3f
         behavior.isFitToContents = false
         behavior.addBottomSheetCallback(object : BottomSheetCallback() {
             override fun onStateChanged(bottomSheet: View, newState: Int) {
@@ -354,9 +314,8 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
         binding.bottomNav.setupWithNavController(navController)
 
         navController.addOnDestinationChangedListener { controller, destination, arguments ->
-            Log.d("current destination", R.id.settingUpdateTimeFragment.toString())
-            Log.d("destination", destination.id.toString())
             var event: NokHomeViewModel.NavigateEvent = NokHomeViewModel.NavigateEvent.Home
+
             if (destination.id != R.id.nokHomeFragment) {
                 stopGetDementiaLocation()
                 homeViewModel.setIsPredicted(false)
@@ -366,9 +325,9 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                 behavior.isDraggable = true
                 behavior.state = BottomSheetBehavior.STATE_COLLAPSED
             }
+
             when (destination.id) {
                 R.id.nokHomeFragment -> {
-                    behavior.isDraggable = true
                     event = NokHomeViewModel.NavigateEvent.Home
                     homeViewModel.fetchUserInfo()
                 }
@@ -404,19 +363,5 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
         }
     }
 
-    override fun onMapReady(p0: NaverMap) {
-
-    }
-
-    override fun onClickMoreView(policeStationInfo: PoliceStationInfo) {
-        Log.d("d", "d")
-    }
-
-    override fun onClickCopyPhoneNumber(phoneNumber: String) {
-
-    }
-
-    override fun onClickCopyAddress(address: String) {
-
-    }
+    override fun onMapReady(p0: NaverMap) {}
 }
