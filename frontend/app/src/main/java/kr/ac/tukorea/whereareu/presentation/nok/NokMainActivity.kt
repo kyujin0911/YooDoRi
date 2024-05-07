@@ -141,12 +141,12 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
         }
     }
 
+
     private fun handlePredictEvent(event: NokHomeViewModel.PredictEvent) {
         when (event) {
             is NokHomeViewModel.PredictEvent.StartPredict -> {
                 homeViewModel.predict()
                 stopGetDementiaLocation()
-                //binding.bottomSheet.visibility = View.VISIBLE
                 showLoadingDialog(this)
             }
 
@@ -154,11 +154,13 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                 startCountDownJob(event.averageSpeed, event.coord)
 
                 binding.averageMovementSpeedTv.text = String.format("%.2fkm", event.averageSpeed)
-                Log.d("predictLayout", binding.predictLayout.bottom.toString())
-                //binding.bottomSheet.layoutParams = CoordinatorLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, binding.bottomSheet.height - binding.predictLayout.bottom + 20)
+
+                // bottom sheet expanded offset 지정 및 높이 지정
                 behavior.expandedOffset = binding.predictLayout.bottom + 20
-                binding.bottomSheet.layoutParams.height = binding.coordinatorLayout.height - binding.predictLayout.bottom
+                binding.bottomSheet.layoutParams.height =
+                    binding.coordinatorLayout.height - binding.predictLayout.bottom
             }
+
             is NokHomeViewModel.PredictEvent.MeaningFulPlaceEvent -> {
 
                 event.meaningfulPlaceForList.forEach { meaningfulPlace ->
@@ -291,7 +293,6 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
             updateLocationJob?.cancelAndJoin()
         }
         naverMap?.locationOverlay?.isVisible = false
-        //homeViewModel.setIsPredicted(false)
         homeViewModel.setUpdateRate(0)
     }
 
@@ -338,7 +339,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
 
             override fun onSlide(bottomSheet: View, slideOffset: Float) {
 
-                if(slideOffset <= 0.3f) {
+                if (slideOffset <= 0.3f) {
                     binding.layout.translationY = -slideOffset * bottomSheet.height
                 }
             }
@@ -356,41 +357,37 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
             Log.d("current destination", R.id.settingUpdateTimeFragment.toString())
             Log.d("destination", destination.id.toString())
             var event: NokHomeViewModel.NavigateEvent = NokHomeViewModel.NavigateEvent.Home
+            if (destination.id != R.id.nokHomeFragment) {
+                stopGetDementiaLocation()
+                homeViewModel.setIsPredicted(false)
+            }
+
+            if (destination.id != R.id.nokSettingFragment or R.id.modifyUserInfoFragment or R.id.settingUpdateTimeFragment) {
+                behavior.isDraggable = true
+                behavior.state = BottomSheetBehavior.STATE_COLLAPSED
+            }
             when (destination.id) {
                 R.id.nokHomeFragment -> {
                     behavior.isDraggable = true
-                    behavior.state = BottomSheetBehavior.STATE_COLLAPSED
                     event = NokHomeViewModel.NavigateEvent.Home
                     homeViewModel.fetchUserInfo()
                 }
 
                 R.id.nokSettingFragment, R.id.modifyUserInfoFragment, R.id.settingUpdateTimeFragment -> {
-                    Log.d("in setting tab", "dd")
-
                     behavior.isDraggable = false
                     behavior.state = BottomSheetBehavior.STATE_EXPANDED
-                    stopGetDementiaLocation()
                     event = NokHomeViewModel.NavigateEvent.Setting
                 }
 
                 R.id.safeAreaFragment -> {
-                    behavior.isDraggable = true
-                    behavior.state = BottomSheetBehavior.STATE_COLLAPSED
-                    stopGetDementiaLocation()
                     event = NokHomeViewModel.NavigateEvent.SafeArea
                 }
 
                 R.id.meaningfulPlaceFragment -> {
-                    behavior.isDraggable = true
-                    behavior.state = BottomSheetBehavior.STATE_COLLAPSED
-                    stopGetDementiaLocation()
                     event = NokHomeViewModel.NavigateEvent.MeaningfulPlace
                 }
 
                 R.id.locationHistoryFragment -> {
-                    behavior.isDraggable = true
-                    behavior.state = BottomSheetBehavior.STATE_COLLAPSED
-                    stopGetDementiaLocation()
                     event = NokHomeViewModel.NavigateEvent.LocationHistory
                 }
             }
@@ -412,7 +409,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
     }
 
     override fun onClickMoreView(policeStationInfo: PoliceStationInfo) {
-        Log.d("d","d")
+        Log.d("d", "d")
     }
 
     override fun onClickCopyPhoneNumber(phoneNumber: String) {
