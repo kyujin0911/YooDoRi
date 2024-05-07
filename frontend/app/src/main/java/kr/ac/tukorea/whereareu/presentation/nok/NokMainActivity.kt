@@ -23,7 +23,6 @@ import com.naver.maps.map.MapFragment
 import com.naver.maps.map.NaverMap
 import com.naver.maps.map.OnMapReadyCallback
 import com.naver.maps.map.overlay.CircleOverlay
-import com.naver.maps.map.overlay.InfoWindow
 import com.naver.maps.map.overlay.Marker
 import com.naver.maps.map.overlay.OverlayImage
 import com.naver.maps.map.util.MarkerIcons
@@ -40,7 +39,6 @@ import kr.ac.tukorea.whereareu.presentation.nok.home.NokHomeViewModel
 import kr.ac.tukorea.whereareu.presentation.nok.setting.SettingViewModel
 import kr.ac.tukorea.whereareu.util.extension.getUserKey
 import kr.ac.tukorea.whereareu.util.extension.repeatOnStarted
-import kr.ac.tukorea.whereareu.util.extension.setAdapter
 import kr.ac.tukorea.whereareu.util.extension.setMarker
 import kr.ac.tukorea.whereareu.util.extension.setMarkerWithInfoWindow
 import kotlin.math.roundToInt
@@ -53,10 +51,10 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
     private var updateLocationJob: Job? = null
     private var countDownJob: Job? = null
     private var naverMap: NaverMap? = null
-    private val lastLocationMarker = Marker()
     private val circleOverlay = CircleOverlay()
     private lateinit var behavior: BottomSheetBehavior<ConstraintLayout>
     private lateinit var navController: NavController
+    private val predictMarkers = mutableListOf<Marker>()
     private fun saveUserKeys() {
         val dementiaKey = getUserKey("dementia")
         homeViewModel.setDementiaKey(dementiaKey)
@@ -155,22 +153,33 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
             // 의미장소 마커 지도에 표시
             is NokHomeViewModel.PredictEvent.MeaningFulPlaceEvent -> {
                 event.meaningfulPlaceForList.forEach { meaningfulPlace ->
-                    Marker().setMarkerWithInfoWindow(context = this,
-                        latLng = meaningfulPlace.latLng,
-                        markerIconColor = MarkerIcons.YELLOW,
-                        markerText = meaningfulPlace.address,
-                        naverMap = naverMap,
-                        infoText = "예상 위치"
+                    predictMarkers.add(
+                        Marker().apply {
+                            setMarkerWithInfoWindow(
+                                context = this@NokMainActivity,
+                                latLng = meaningfulPlace.latLng,
+                                markerIconColor = MarkerIcons.YELLOW,
+                                markerText = meaningfulPlace.address,
+                                naverMap = naverMap,
+                                infoText = "예상 위치"
+                            )
+                        }
                     )
+                    Log.d("markers 2", predictMarkers.toString())
                 }
             }
 
             // 의미장소 주변 경찰서 마커 지도에 표시
             is NokHomeViewModel.PredictEvent.SearchNearbyPoliceStation -> {
                 event.policeStationList.forEach { policeStation ->
-                    Marker().setMarker(
-                        latLng = policeStation.latLng, MarkerIcons.BLUE, policeStation.policeName, naverMap
-                    )
+                    predictMarkers.add(Marker().apply {
+                        setMarker(
+                            latLng = policeStation.latLng,
+                            MarkerIcons.BLUE,
+                            policeStation.policeName,
+                            naverMap
+                        )
+                    })
                 }
 
                 dismissLoadingDialog()
@@ -182,14 +191,16 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
 
                 naverMap?.moveCamera(CameraUpdate.scrollTo(event.lastLocation.latLng))
 
-                lastLocationMarker.setMarkerWithInfoWindow(
-                    context = this,
-                    latLng = event.lastLocation.latLng,
-                    markerIconColor = MarkerIcons.RED,
-                    markerText = event.lastLocation.address,
-                    naverMap = naverMap,
-                    infoText = "실종 직전 위치"
-                )
+                predictMarkers.add(LAST_LOCATION, Marker().apply {
+                    setMarkerWithInfoWindow(
+                        context = this@NokMainActivity,
+                        latLng = event.lastLocation.latLng,
+                        markerIconColor = MarkerIcons.RED,
+                        markerText = event.lastLocation.address,
+                        naverMap = naverMap,
+                        infoText = "실종 직전 위치"
+                    )
+                })
             }
 
             // 예측 중지, 실종 시각 카운트다운 중지
@@ -199,7 +210,9 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                     countDownJob = null
                     circleOverlay.isVisible = false
                     binding.countDownT.text = "00:00"
-                    lastLocationMarker.map = null
+                }
+                predictMarkers.forEach { marker ->
+                    marker.map = null
                 }
             }
         }
@@ -364,4 +377,8 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
     }
 
     override fun onMapReady(p0: NaverMap) {}
+
+    companion object {
+        const val LAST_LOCATION = 0
+    }
 }
