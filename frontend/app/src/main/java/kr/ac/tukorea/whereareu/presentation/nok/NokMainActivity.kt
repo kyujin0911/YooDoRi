@@ -7,11 +7,18 @@ import android.content.IntentFilter
 import android.graphics.PointF
 import android.util.Log
 import android.view.View
+import android.view.ViewGroup
+import android.widget.LinearLayout
 import androidx.activity.viewModels
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.ContextCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.marginBottom
+import androidx.core.view.setMargins
 import androidx.lifecycle.lifecycleScope
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -34,8 +41,10 @@ import kotlinx.coroutines.launch
 import kr.ac.tukorea.whereareu.R
 import kr.ac.tukorea.whereareu.databinding.ActivityNokMainBinding
 import kr.ac.tukorea.whereareu.databinding.IconLocationOverlayLayoutBinding
+import kr.ac.tukorea.whereareu.domain.home.PoliceStationInfo
 import kr.ac.tukorea.whereareu.presentation.base.BaseActivity
 import kr.ac.tukorea.whereareu.presentation.nok.home.NokHomeViewModel
+import kr.ac.tukorea.whereareu.presentation.nok.home.adapter.PoliceStationRVA
 import kr.ac.tukorea.whereareu.presentation.nok.setting.SettingViewModel
 import kr.ac.tukorea.whereareu.util.extension.getUserKey
 import kr.ac.tukorea.whereareu.util.extension.repeatOnStarted
@@ -43,7 +52,7 @@ import kotlin.math.roundToInt
 
 @AndroidEntryPoint
 class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_nok_main),
-    OnMapReadyCallback {
+    OnMapReadyCallback, PoliceStationRVA.PoliceStationRVAClickListener {
     private val homeViewModel: NokHomeViewModel by viewModels()
     private val settingViewModel: SettingViewModel by viewModels()
     private var updateLocationJob: Job? = null
@@ -52,6 +61,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
     private val lastLocationMarker = Marker()
     private val circleOverlay = CircleOverlay()
     private lateinit var behavior: BottomSheetBehavior<ConstraintLayout>
+    private lateinit var navController: NavController
     private fun saveUserKeys() {
         val dementiaKey = getUserKey("dementia")
         homeViewModel.setDementiaKey(dementiaKey)
@@ -60,7 +70,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
         homeViewModel.setNokKey(nokKey)
         settingViewModel.setNokKey(nokKey)
     }
-    
+
     private fun getUpdateLocationJob(duration: Long): Job {
         return lifecycleScope.launch {
             while (true) {
@@ -79,14 +89,14 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
 
         // 앱 처음 실행, 예측 중지 시 보호대상자 위치를 갖고 오는 job이 없으면 새로운 job을 생성해서 실행
         repeatOnStarted {
-            homeViewModel.updateRate.collect{updateRate ->
+            homeViewModel.updateRate.collect { updateRate ->
                 Log.d("home updatteRate", updateRate.toString())
-                if (updateRate == 0L){
+                if (updateRate == 0L) {
                     return@collect
                 }
 
                 // 위치 업데이트 주기 변경 시 기존 job을 취소하고 updateRate에 맞게 재시작
-                if (updateLocationJob != null){
+                if (updateLocationJob != null) {
                     Log.d("job home cancel", "cc")
                     updateLocationJob?.cancelAndJoin()
                 }
@@ -95,7 +105,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
         }
 
         repeatOnStarted {
-            homeViewModel.isPredicted.collect{
+            homeViewModel.isPredicted.collect {
                 Log.d("homeViewModel", it.toString())
             }
         }
@@ -106,7 +116,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
             homeViewModel.dementiaLocationInfo.collect { response ->
                 Log.d("dementiaLocation response", response.toString())
                 //예측 기능 사용시 보호대상자 위치 UI 업데이트 X
-                if (homeViewModel.isPredicted.value) {
+                if (homeViewModel.isPredicted.value || navController.currentDestination?.id != R.id.nokHomeFragment) {
                     return@collect
                 }
                 val coord = LatLng(response.latitude, response.longitude)
@@ -144,8 +154,11 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                 startCountDownJob(event.averageSpeed, event.coord)
 
                 binding.averageMovementSpeedTv.text = String.format("%.2fkm", event.averageSpeed)
+                Log.d("predictLayout", binding.predictLayout.bottom.toString())
+                //binding.bottomSheet.layoutParams = CoordinatorLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, binding.bottomSheet.height - binding.predictLayout.bottom + 20)
+                behavior.expandedOffset = binding.predictLayout.bottom + 20
+                binding.bottomSheet.layoutParams.height = binding.coordinatorLayout.height - binding.predictLayout.bottom
             }
-
             is NokHomeViewModel.PredictEvent.MeaningFulPlaceEvent -> {
 
                 event.meaningfulPlaceForList.forEach { meaningfulPlace ->
@@ -315,25 +328,27 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
         behavior = BottomSheetBehavior.from(binding.bottomSheet)
         behavior.state = BottomSheetBehavior.STATE_COLLAPSED
         //behavior.peekHeight = 10
-        behavior.halfExpandedRatio = 0.3f
+        //behavior.peekHeight = binding.
+        //behavior.halfExpandedRatio = 0.3f
         behavior.isFitToContents = false
         behavior.addBottomSheetCallback(object : BottomSheetCallback() {
             override fun onStateChanged(bottomSheet: View, newState: Int) {
-                when (newState) {
-                    BottomSheetBehavior.STATE_COLLAPSED -> {}
-                }
+
             }
 
             override fun onSlide(bottomSheet: View, slideOffset: Float) {
-          /*      Log.d("slideOffset", slideOffset.toString())
-                Log.d("state", behavior.state.toString())*/
+
+                if(slideOffset <= 0.3f) {
+                    binding.layout.translationY = -slideOffset * bottomSheet.height
+                }
             }
         })
     }
+
     private fun initNavigator() {
         val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.fragmentContainer) as NavHostFragment
-        val navController = navHostFragment.navController
+        navController = navHostFragment.navController
 
         binding.bottomNav.setupWithNavController(navController)
 
@@ -393,6 +408,18 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
     }
 
     override fun onMapReady(p0: NaverMap) {
+
+    }
+
+    override fun onClickMoreView(policeStationInfo: PoliceStationInfo) {
+        Log.d("d","d")
+    }
+
+    override fun onClickCopyPhoneNumber(phoneNumber: String) {
+
+    }
+
+    override fun onClickCopyAddress(address: String) {
 
     }
 }

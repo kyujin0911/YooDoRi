@@ -2,6 +2,7 @@ package kr.ac.tukorea.whereareu.presentation
 
 import android.content.Context
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
