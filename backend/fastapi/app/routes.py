@@ -11,18 +11,23 @@ from .database import Database
 from .bodymodel import *
 from .util import JWTService
 from .config import Config
+from .schedularFunc import SchedulerFunc
 
-from PyKakao import Local
 from apscheduler.schedulers.background import BackgroundScheduler
+
+import asyncio
+import datetime
 
 
 router = APIRouter()
 db = Database()
 session = next(db.get_session())
-sched = BackgroundScheduler(timezone="Asia/Seoul")
-kakao = Local(service_key=Config.service_key)
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 jwt = JWTService()
+schedFunc = SchedulerFunc()
+sched = BackgroundScheduler(timezone="Asia/Seoul", daemon=True)
+
+
 
 
 
@@ -693,134 +698,13 @@ async def send_location_history(_date : str, user_info : int = Depends(APIKeyHea
 
 
 
+'''#스케줄러 비활성화
+@sched.scheduled_job('cron', hour=1, minute=0, id = 'geocoding')
+def geocoding():
+    asyncio.run(schedFunc.load_kakao_api(session))
+
+@sched.scheduled_job('cron', hour=0, minute=0, id = 'analyze_location_data')
+def analyzing_location_data():
+    asyncio.run(schedFunc.load_analyze_location_data(session))'''
 
 
-
-#스케줄러 비활성화
-"""@sched.scheduled_job('cron', hour=0, minute=30, id = 'geocoding')
-def kakao_api():
-    try:
-        print(f"[INFO] Start geocoding")
-        # db 에서 의미장소 정보 가져오기
-        meaningful_location_list = session.query(models.meaningful_location_info).all()
-
-        # dementia_key 별로 분류
-        dementia_keys = set([location.dementia_key for location in meaningful_location_list])
-
-        rng = RandomNumberGenerator()
-
-        # dementia_key별 의미장소 위경도 값으로 주소 변환 후 의미 장소 테이블에 address란에 추가
-        address_list = []
-        key_dict = {}
-        for key in dementia_keys:
-            key_location_list = [location for location in meaningful_location_list if location.dementia_key == key]
-            for location in key_location_list:
-                geo = kakao.geo_coord2address(location.longitude, location.latitude)
-                if not geo['documents'][0]['road_address'] == None:
-                    xy2addr = geo['documents'][0]['road_address']['address_name'] + " " + geo['documents'][0]['road_address']['building_name']
-                    
-                else:
-                    xy2addr = geo['documents'][0]['address']['address_name']
-                
-                location.address = xy2addr
-
-                if xy2addr not in address_list:
-                    address_list.append(xy2addr)
-                    new_key = rng.generate_unique_random_number(100000, 999999)
-                    key_dict[xy2addr] = str(new_key)
-                    location.key = str(new_key)
-                    police = kakao.search_keyword("경찰서", x = location.longitude, y = location.latitude, sort = 'distance')
-
-                    police_list = []
-                    if police['meta']['total_count'] == 0:
-                        print(f"[INFO] No police station found near {xy2addr}")
-                    else:
-                        for pol in police['documents']:
-                            if not pol['road_address_name'] == None:
-                                poladdr = pol['address_name'] + " " + pol['place_name']
-                    
-                            else:
-                                poladdr = pol['road_address_name'] + " " + pol['place_name']
-
-                            if not pol['phone'] == '':
-                                new_police = models.police_info(
-                                    policeName =  pol['place_name'],
-                                    policeAddress = poladdr,
-                                    policePhoneNumber = pol['phone'],
-                                    distance = pol['distance'],
-                                    latitude = pol['y'],
-                                    longitude = pol['x'],
-                                    key = str(new_key)
-                                )
-                                police_list.append(new_police)
-                            else:
-                                pass
-                    
-                    session.add_all(police_list)
-                else:
-                    location.key = key_dict[xy2addr]
-
-        session.commit()
-        print(f"[INFO] Geocoding completed")
-    
-    finally:
-        session.close()"""
-
-#스케줄러 비활성화
-"""@sched.scheduled_job('cron', hour=0, minute=0, id = 'analyze_location_data')
-def analyze_location_data():
-    today = datetime.datetime.now()
-    today = today - datetime.timedelta(days=1) # 어제 날짜의 위치 정보를 분석
-
-    today = today.strftime('%Y-%m-%d')
-
-    print(f"[INFO] Start analyzing location data at {today}")
-
-    try:
-        location_list = session.query(models.location_info).filter(models.location_info.date == today).all()
-
-        print(f"[INFO] {len(location_list)} location data found")
-
-        errfile = f'error_{today}.txt'
-        if location_list:
-            dementia_keys = set([location.dementia_key for location in location_list])
-            for key in dementia_keys:
-                key_location_list = [location for location in location_list if location.dementia_key == key]
-
-                if len(key_location_list) <= 100:
-                    with open(errfile, 'a') as file:
-                        file.write(f'{key} dementia location data not enough\n')
-                    continue
-
-                filename = f'location_data_for_dementia_key_{key}_{today}.txt'
-                with open(filename, 'w') as file:
-                    for location in key_location_list:
-                        file.write(f'{location.latitude},{location.longitude},{location.date},{location.time}\n')
-                    
-                LA = LocationAnalyzer(filename)
-                prediction = LA.gmeansFunc()
-
-                meaningful_location_list = []
-                for i in range(len(prediction) - 1):
-                    new_meaningful_location = models.meaningful_location_info(
-                        dementia_key=key,
-                        latitude = prediction[i][0][0],
-                        longitude = prediction[i][0][1],
-                        time = prediction[i][2],
-                        day_of_the_week = prediction[i][3]
-                    )
-                    meaningful_location_list.append(new_meaningful_location)
-
-                session.add_all(meaningful_location_list)
-
-                print(f"[INFO] Meaningful location data saved for {key}")
-            
-        else:
-            print("[ERROR] Location data not found")
-            pass
-
-        session.commit()
-        print(f"[INFO] Location data analysis completed at {today}")
-
-    finally:
-        session.close()"""
