@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.graphics.Color
 import android.graphics.PointF
 import android.util.Log
 import android.view.View
@@ -21,13 +22,16 @@ import com.naver.maps.geometry.LatLng
 import com.naver.maps.map.CameraUpdate
 import com.naver.maps.map.MapFragment
 import com.naver.maps.map.NaverMap
+import com.naver.maps.map.NaverMap.OnCameraChangeListener
 import com.naver.maps.map.OnMapReadyCallback
 import com.naver.maps.map.overlay.CircleOverlay
 import com.naver.maps.map.overlay.Marker
 import com.naver.maps.map.overlay.OverlayImage
+import com.naver.maps.map.overlay.PathOverlay
 import com.naver.maps.map.util.MarkerIcons
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -35,12 +39,14 @@ import kr.ac.tukorea.whereareu.R
 import kr.ac.tukorea.whereareu.databinding.ActivityNokMainBinding
 import kr.ac.tukorea.whereareu.databinding.IconLocationOverlayLayoutBinding
 import kr.ac.tukorea.whereareu.presentation.base.BaseActivity
+import kr.ac.tukorea.whereareu.presentation.nok.history.LocationHistoryViewModel
 import kr.ac.tukorea.whereareu.presentation.nok.home.NokHomeViewModel
 import kr.ac.tukorea.whereareu.presentation.nok.setting.SettingViewModel
 import kr.ac.tukorea.whereareu.util.extension.getUserKey
 import kr.ac.tukorea.whereareu.util.extension.repeatOnStarted
 import kr.ac.tukorea.whereareu.util.extension.setMarker
 import kr.ac.tukorea.whereareu.util.extension.setMarkerWithInfoWindow
+import java.lang.IndexOutOfBoundsException
 import kotlin.math.roundToInt
 
 @AndroidEntryPoint
@@ -48,13 +54,17 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
     OnMapReadyCallback {
     private val homeViewModel: NokHomeViewModel by viewModels()
     private val settingViewModel: SettingViewModel by viewModels()
+    private val locationHistoryViewModel: LocationHistoryViewModel by viewModels()
     private var updateLocationJob: Job? = null
     private var countDownJob: Job? = null
     private var naverMap: NaverMap? = null
     private val circleOverlay = CircleOverlay()
+    private val path = PathOverlay()
     private lateinit var behavior: BottomSheetBehavior<ConstraintLayout>
     private lateinit var navController: NavController
     private val predictMarkers = mutableListOf<Marker>()
+    private var zoom = 14.0
+    private var currentProgress = 0
     private fun saveUserKeys() {
         val dementiaKey = getUserKey("dementia")
         homeViewModel.setDementiaKey(dementiaKey)
@@ -124,6 +134,63 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
             homeViewModel.innerItemClickEvent.collect { event ->
                 behavior.state = event.behavior
                 naverMap?.moveCamera(CameraUpdate.scrollTo(event.coord))
+            }
+        }
+
+        repeatOnStarted {
+            locationHistoryViewModel.locationHistory.collect {
+                Log.d("history", it.toString())
+                if (it.isEmpty()) {
+                    return@collect
+                }
+                val latLngList = it.map { LatLng(it.latitude, it.longitude) }
+                async {
+                    with(path) {
+                        coords = latLngList
+                        width = 30
+                        color = ContextCompat.getColor(this@NokMainActivity, R.color.yellow)
+                        patternImage = OverlayImage.fromResource(R.drawable.ic_arrow_right_24)
+                        patternInterval = 50
+                        outlineColor = Color.WHITE
+                        map = naverMap
+                    }
+                }.await()
+                locationHistoryViewModel.setIsLoading(false)
+            }
+        }
+        repeatOnStarted {
+            locationHistoryViewModel.progress.collect { progress ->
+                Log.d("progress collect", progress.toString())
+                if (progress == -1) {
+                    return@collect
+                }
+                try {
+                    val latLng = path.coords[progress]
+                    val distance =
+                        if (currentProgress - progress <= 0) naverMap?.cameraPosition?.target?.distanceTo(path.coords[progress+1])
+                    else naverMap?.cameraPosition?.target?.distanceTo(path.coords[progress-1])
+                    if (distance != null){
+                        when(distance){
+                            in 0.0..0.1 -> {
+                                zoom = 17.0
+                            }
+
+                            in 100.0..Double.MAX_VALUE -> {
+                                zoom = 14.0
+                            }
+
+                            else -> {
+                                zoom -= -0.1
+                            }
+                        }
+                        naverMap?.moveCamera(CameraUpdate.scrollAndZoomTo(latLng, zoom))
+                    }
+                    Log.d("distance", distance.toString())
+                    //naverMap?.moveCamera(CameraUpdate.scrollAndZoomTo(latLng, 18.0))
+                } catch (e: IndexOutOfBoundsException){
+                    Log.d("IndexOutOfBoundsException", e.toString())
+                }
+                currentProgress = progress
             }
         }
     }

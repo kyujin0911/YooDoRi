@@ -19,17 +19,34 @@ import javax.inject.Inject
 @HiltViewModel
 class LocationHistoryViewModel @Inject constructor(
     private val repository: LocationHistoryRepositoryImpl
-): ViewModel() {
+) : ViewModel() {
 
-    private val _locationHistory = MutableStateFlow<LocationHistoryResponse>(
-        LocationHistoryResponse(
-    )
+    private val _locationHistory = MutableStateFlow<List<LocationHistory>>(
+        emptyList()
     )
     val locationHistory = _locationHistory.asStateFlow()
-    fun fetchLocationHistory(date: String, dementiaKey: String){
+
+    private val _progress = MutableStateFlow(-1)
+    val progress = _progress.asStateFlow()
+
+    private val _isLoading = MutableStateFlow(true)
+    val isLoading = _isLoading.asStateFlow()
+
+    fun setProgress(progress: Int) {
+        if (!_isLoading.value) {
+            _progress.value = progress
+        }
+    }
+
+    fun setIsLoading(isLoading: Boolean){
+        _isLoading.value = isLoading
+    }
+
+    fun fetchLocationHistory(date: String, dementiaKey: String) {
         viewModelScope.launch {
             repository.fetchLocationHistory(date, dementiaKey).onSuccess { response ->
-                _locationHistory.emit(response)
+                val list = response.locationHistory.asSequence().withIndex().filter { it.index % 3 == 0 }.map { it.value }
+                _locationHistory.emit(list.toList())
             }
         }
     }
