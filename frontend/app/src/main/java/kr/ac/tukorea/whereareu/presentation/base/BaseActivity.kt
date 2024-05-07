@@ -2,6 +2,7 @@ package kr.ac.tukorea.whereareu.presentation.base
 
 import android.content.Context
 import android.os.Bundle
+import androidx.activity.enableEdgeToEdge
 import androidx.annotation.LayoutRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
@@ -22,6 +23,7 @@ abstract class BaseActivity<V : ViewDataBinding>(@LayoutRes val layoutResource: 
         super.onCreate(savedInstanceState)
         _binding = DataBindingUtil.setContentView(this, layoutResource)
         binding.lifecycleOwner = this
+        enableEdgeToEdge()
         setContentView(binding.root)
         initObserver()
         initView()

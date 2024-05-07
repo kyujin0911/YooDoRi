@@ -31,7 +31,7 @@ class LocationHistoryFragment :
 
     override fun initView() {
         binding.viewModel = viewModel
-       
+
         viewModel.fetchLocationHistory("2024-03-19", "253050")
     }
 
