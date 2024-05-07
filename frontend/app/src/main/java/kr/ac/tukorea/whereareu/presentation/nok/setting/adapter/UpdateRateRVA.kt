@@ -1,4 +1,4 @@
-package kr.ac.tukorea.whereareu.presentation.nok.setting.updateTime
+package kr.ac.tukorea.whereareu.presentation.nok.setting.adapter
 
 import android.view.LayoutInflater
 import android.view.View
