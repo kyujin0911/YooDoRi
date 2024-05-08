@@ -119,7 +119,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginStart="5dp"
                             android:layout_marginTop="14dp"
-                            bind:movementStatus="@{viewModel.dementiaLocationInfo.userStatus}"
+                            bind:movementStatus="@{viewModel.dementiaStatusInfo.userStatus}"
                             android:textAppearance="@style/TextAppearance.App.18sp.Regular"
                             app:layout_constraintBaseline_toBaselineOf="@id/dementia_name_tv"
                             app:layout_constraintStart_toEndOf="@+id/state"
@@ -142,7 +142,7 @@
                             android:layout_height="25dp"
                             android:layout_marginStart="20dp"
                             android:layout_marginTop="5dp"
-                            android:src="@{viewModel.dementiaLocationInfo.isInternetOn ? @drawable/ic_wifi_on : @drawable/ic_wifi_off}"
+                            android:src="@{viewModel.dementiaStatusInfo.isInternetOn ? @drawable/ic_wifi_on : @drawable/ic_wifi_off}"
                             app:layout_constraintStart_toEndOf="@+id/oval_v"
                             app:layout_constraintTop_toBottomOf="@+id/line_v" />
 
@@ -151,7 +151,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="5dp"
-                            android:text='@{viewModel.dementiaLocationInfo.isInternetOn ? "on" : "off"}'
+                            android:text='@{viewModel.dementiaStatusInfo.isInternetOn ? "on" : "off"}'
                             android:textAppearance="@style/TextAppearance.App.16sp.SemiBold"
                             app:layout_constraintBottom_toBottomOf="@+id/wifi_iv"
                             app:layout_constraintStart_toEndOf="@+id/wifi_iv"
@@ -162,7 +162,7 @@
                             android:layout_width="25dp"
                             android:layout_height="25dp"
                             android:layout_marginStart="15dp"
-                            android:src="@{viewModel.dementiaLocationInfo.isGpsOn ? @drawable/ic_gps_on : @drawable/ic_gps_off}"
+                            android:src="@{viewModel.dementiaStatusInfo.isGpsOn ? @drawable/ic_gps_on : @drawable/ic_gps_off}"
                             app:layout_constraintBottom_toBottomOf="@+id/wifi_iv"
                             app:layout_constraintStart_toEndOf="@+id/internet_status_tv" />
 
@@ -171,7 +171,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="5dp"
-                            android:text='@{viewModel.dementiaLocationInfo.isGpsOn ? "on" : "off"}'
+                            android:text='@{viewModel.dementiaStatusInfo.isGpsOn ? "on" : "off"}'
                             android:textAppearance="@style/TextAppearance.App.16sp.SemiBold"
                             app:layout_constraintBottom_toBottomOf="@+id/wifi_iv"
                             app:layout_constraintStart_toEndOf="@+id/gps_iv"
@@ -182,7 +182,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="15dp"
-                            bind:ringtoneImage="@{viewModel.dementiaLocationInfo.isRingstoneOn}"
+                            bind:ringtoneImage="@{viewModel.dementiaStatusInfo.isRingstoneOn}"
                             app:layout_constraintBottom_toBottomOf="@id/wifi_iv"
                             app:layout_constraintStart_toEndOf="@id/gps_status_tv" />
 
@@ -194,7 +194,7 @@
                             android:textAppearance="@style/TextAppearance.App.16sp.SemiBold"
                             app:layout_constraintBottom_toBottomOf="@id/ring_mode_iv"
                             app:layout_constraintStart_toEndOf="@id/ring_mode_iv"
-                            bind:ringtoneText="@{viewModel.dementiaLocationInfo.isRingstoneOn}"
+                            bind:ringtoneText="@{viewModel.dementiaStatusInfo.isRingstoneOn}"
                             tools:text="벨소리" />
 
                         <ImageView
@@ -212,7 +212,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="5dp"
-                            android:text='@{String.valueOf(viewModel.dementiaLocationInfo.battery) + "%"}'
+                            android:text='@{String.valueOf(viewModel.dementiaStatusInfo.battery) + "%"}'
                             android:textAppearance="@style/TextAppearance.App.16sp.SemiBold"
                             app:layout_constraintBaseline_toBaselineOf="@id/dementia_name_tv"
                             app:layout_constraintStart_toEndOf="@id/battery_iv"

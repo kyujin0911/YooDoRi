@@ -20,6 +20,7 @@ import kr.ac.tukorea.whereareu.domain.home.InnerItemClickEvent
 import kr.ac.tukorea.whereareu.domain.home.LastLocation
 import kr.ac.tukorea.whereareu.domain.home.MeaningfulPlaceInfo
 import kr.ac.tukorea.whereareu.data.model.nok.home.PoliceStationInfoResponse
+import kr.ac.tukorea.whereareu.domain.home.DementiaStatusInfo
 import kr.ac.tukorea.whereareu.domain.home.PoliceStationInfo
 import kr.ac.tukorea.whereareu.util.network.onError
 import kr.ac.tukorea.whereareu.util.network.onException
@@ -36,8 +37,10 @@ class NokHomeViewModel @Inject constructor(
     private val kakaoRepository: KakaoRepositoryImpl
 ) : ViewModel() {
 
-    private val _dementiaLocationInfo = MutableStateFlow<LocationInfoResponse>(LocationInfoResponse())
-    val dementiaLocationInfo = _dementiaLocationInfo.asStateFlow()
+    private val _dementiaLocationInfo = MutableSharedFlow<LocationInfoResponse>()
+    val dementiaLocationInfo = _dementiaLocationInfo.asSharedFlow()
+
+    val dementiaStatusInfo = MutableStateFlow(DementiaStatusInfo())
 
     private val _updateRate = MutableStateFlow<Long>(0L)
     val updateRate = _updateRate.asStateFlow()
@@ -140,6 +143,9 @@ class NokHomeViewModel @Inject constructor(
         viewModelScope.launch {
             nokHomeRepository.getDementiaLocationInfo(_dementiaKey.value).onSuccess {
                 _dementiaLocationInfo.emit(it)
+                dementiaStatusInfo.value = DementiaStatusInfo(
+                    it.userStatus, it.battery, it.isGpsOn, it.isInternetOn, it.isRingstoneOn
+                )
             }.onError {
                 Log.d("error", it.toString())
             }.onException {

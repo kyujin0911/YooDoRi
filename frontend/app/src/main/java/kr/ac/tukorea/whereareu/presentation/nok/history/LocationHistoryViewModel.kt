@@ -33,9 +33,7 @@ class LocationHistoryViewModel @Inject constructor(
     val maxProgress = _maxProgress.asStateFlow()
 
     fun setProgress(progress: Int) {
-
-            _progress.value = progress
-
+        _progress.value = progress
     }
 
     fun fetchLocationHistory(date: String, dementiaKey: String) {
