@@ -6,7 +6,6 @@ from passlib.context import CryptContext
 from . import models
 from .random_generator import RandomNumberGenerator
 from .update_user_status import UpdateUserStatus
-from .LocationAnalyzer import LocationAnalyzer
 from .database import Database
 from .bodymodel import *
 from .util import JWTService
@@ -666,11 +665,23 @@ async def send_location_history(_date : str, user_info : int = Depends(APIKeyHea
             locHistory = []
 
             for location in location_list:
-                locHistory.append({
-                    'latitude': location.latitude,
-                    'longitude': location.longitude,
-                    'time': location.time
-                })
+                if not locHistory:
+                    locHistory.append({
+                        'latitude': location.latitude,
+                        'longitude': location.longitude,
+                        'time': location.time,
+                        'userStatus': location.user_status
+                    })
+                else:
+                    if location.user_status == 1 and locHistory[-1]['userStatus'] == 1:
+                        locHistory[-1]['time'] = locHistory[-1]['time'][0:8] + ',' + location.time
+                    else:
+                        locHistory.append({
+                            'latitude': location.latitude,
+                            'longitude': location.longitude,
+                            'time': location.time,
+                            'userStatus': location.user_status
+                        })
 
             result = {
                 'locationHistory': locHistory,
