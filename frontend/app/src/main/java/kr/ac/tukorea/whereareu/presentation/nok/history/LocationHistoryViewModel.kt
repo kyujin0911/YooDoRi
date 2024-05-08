@@ -21,32 +21,29 @@ class LocationHistoryViewModel @Inject constructor(
     private val repository: LocationHistoryRepositoryImpl
 ) : ViewModel() {
 
-    private val _locationHistory = MutableStateFlow<List<LocationHistory>>(
-        emptyList()
-    )
-    val locationHistory = _locationHistory.asStateFlow()
+    private val _locationHistory = MutableSharedFlow<List<LocationHistory>>(
 
-    private val _progress = MutableStateFlow(-1)
+    )
+    val locationHistory = _locationHistory.asSharedFlow()
+
+    private val _progress = MutableStateFlow(0)
     val progress = _progress.asStateFlow()
 
-    private val _isLoading = MutableStateFlow(true)
-    val isLoading = _isLoading.asStateFlow()
+    private val _maxProgress = MutableStateFlow(0)
+    val maxProgress = _maxProgress.asStateFlow()
 
     fun setProgress(progress: Int) {
-        if (!_isLoading.value) {
-            _progress.value = progress
-        }
-    }
 
-    fun setIsLoading(isLoading: Boolean){
-        _isLoading.value = isLoading
+            _progress.value = progress
+
     }
 
     fun fetchLocationHistory(date: String, dementiaKey: String) {
         viewModelScope.launch {
             repository.fetchLocationHistory(date, dementiaKey).onSuccess { response ->
-                val list = response.locationHistory.asSequence().withIndex().filter { it.index % 3 == 0 }.map { it.value }
-                _locationHistory.emit(list.toList())
+                val list = response.locationHistory.asSequence().withIndex().filter { it.index % 3 == 0 }.map { it.value }.toList()
+                _locationHistory.emit(list)
+                _maxProgress.value = list.indices.last
             }
         }
     }

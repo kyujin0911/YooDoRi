@@ -18,7 +18,7 @@
             android:id="@+id/seek_bar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:max="@{viewModel.locationHistory.size-1}"
+            android:max="@{viewModel.maxProgress}"
             app:layout_constraintTop_toTopOf="parent"/>
         <ImageView
             android:id="@+id/next"
