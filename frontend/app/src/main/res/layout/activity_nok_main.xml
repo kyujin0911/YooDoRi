@@ -45,9 +45,7 @@
                     android:id="@+id/map_fragment"
                     android:name="com.naver.maps.map.MapFragment"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    tools:layout_editor_absoluteX="-16dp"
-                    tools:layout_editor_absoluteY="116dp" />
+                    android:layout_height="match_parent" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -425,7 +423,6 @@
                 app:behavior_hideable="false"
                 android:orientation="vertical"
                 android:paddingBottom="10dp"
-                app:behavior_peekHeight="10dp"
                 app:behavior_halfExpandedRatio="0.3"
                 app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
 
