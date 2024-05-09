@@ -38,7 +38,7 @@ class location_info(Base):
     latitude = Column(Double)
     longitude = Column(Double)
     bearing = Column(Float)
-    user_status = Column(Integer)
+    user_status = Column(String)
     accelerationsensor_x = Column(Float)
     accelerationsensor_y = Column(Float)
     accelerationsensor_z = Column(Float)
