@@ -2,6 +2,7 @@ from fastapi import APIRouter, HTTPException, status, Depends
 from fastapi.security import OAuth2PasswordRequestForm, APIKeyHeader
 
 from passlib.context import CryptContext
+from haversine import haversine
 
 from . import models
 from .random_generator import RandomNumberGenerator
@@ -313,6 +314,15 @@ async def receive_location_info(request: ReceiveLocationRequest, user_info: int 
 
         prediction = user_status_updater.predict(accel, gyro, direction)
 
+        if int(prediction[0]) == 1:
+            userStat = "정지"
+        elif int(prediction[0]) == 2:
+            userStat = "도보"
+        elif int(prediction[0]) == 3:
+            userStat = "차량"
+        elif int(prediction[0]) == 4:
+            userStat = "지하철"
+
         new_location = models.location_info(
             dementia_key = _dementia_key,
             date = request.date,
@@ -320,7 +330,7 @@ async def receive_location_info(request: ReceiveLocationRequest, user_info: int 
             latitude = request.latitude,
             longitude = request.longitude,
             bearing = request.bearing,
-            user_status = int(prediction[0]),
+            user_status = userStat,
             accelerationsensor_x = accel[0],
             accelerationsensor_y = accel[1],
             accelerationsensor_z = accel[2],
@@ -656,54 +666,54 @@ async def send_meaningful_location_info(user_info : int = Depends(APIKeyHeader(n
 
 @router.get("/locations/history", responses = {200 : {"model" : LocHistoryResponse, "description" : "위치 이력 전송 성공" }, 404: {"model": ErrorResponse, "description": "위치 이력 없음"}}, description="보호 대상자의 위치 이력 정보 전달(쿼리 스트링) | date : YYYY-MM-DD")
 async def send_location_history(_date : str, user_info : int = Depends(APIKeyHeader(name = "Authorization"))):
+    _key = jwt.get_current_user(user_info, session)[0].dementia_key
     try:
-        _key = jwt.get_current_user(user_info, session)[0].dementia_info_key
+        location_list = session.query(models.location_info).filter_by(dementia_key=_key, date=_date).all()
 
-        location_list = session.query(models.location_info).filter_by(dementia_key = _key, date = _date).all()
-
-        if location_list:
-            locHistory = []
-
-            for location in location_list:
-                if not locHistory:
-                    locHistory.append({
-                        'latitude': location.latitude,
-                        'longitude': location.longitude,
-                        'time': location.time,
-                        'userStatus': location.user_status
-                    })
-                else:
-                    if location.user_status == 1 and locHistory[-1]['userStatus'] == 1:
-                        locHistory[-1]['time'] = locHistory[-1]['time'][0:8] + ',' + location.time
-                    else:
-                        locHistory.append({
-                            'latitude': location.latitude,
-                            'longitude': location.longitude,
-                            'time': location.time,
-                            'userStatus': location.user_status
-                        })
-
-            result = {
-                'locationHistory': locHistory,
-            }
-
-            response = {
-                'status': 'success',
-                'message': 'Location history data sent',
-                'result': result
-            }
-
-            print(f"[INFO] Location history data sent to {_key}")
-
-        else:
+        if not location_list:
             print(f"[ERROR] Location history data not found for {_key}")
-
             raise HTTPException(status_code=404, detail="Location history data not found")
 
-        return response
+        locHistory = []
+        prev_location = None
+
+        for location in location_list:
+            current_location = (location.latitude, location.longitude)
+            distance = 0
+
+            if prev_location:
+                distance = round(haversine(current_location, prev_location, unit='m'), 2)
+
+            if not locHistory or location.user_status != "정지" or locHistory[-1]['userStatus'] != "정지":
+                locHistory.append({
+                    'latitude': location.latitude,
+                    'longitude': location.longitude,
+                    'time': location.time,
+                    'userStatus': location.user_status,
+                    'distance': distance
+                })
+            else:
+                locHistory[-1]['time'] = locHistory[-1]['time'][:8] + ',' + location.time
+
+            prev_location = current_location
+
+        result = {
+        'locationHistory': locHistory,
+        }
+
+        response = {
+            'status': 'success',
+            'message': 'Location history data sent',
+            'result': result
+        }
+        
+
+        print(f"[INFO] Location history data sent to {_key}")
     
     finally:
         session.close()
+
+        return response
 
 
 
