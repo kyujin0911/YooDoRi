@@ -11,6 +11,10 @@
     <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION"/>
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
+<!--    FCM -->
+    <uses-permission android:name="android.permission.VIBRATE"/>
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
+
     <application
         android:name=".WhereAreUApplication"
         android:allowBackup="true"
@@ -50,7 +54,7 @@
             android:theme="@style/Theme.WhereAreU">
         </activity>
         <activity android:name="kr.ac.tukorea.whereareu.presentation.dementia.DementiaMainActivity" />
-        <activity android:name="kr.ac.tukorea.whereareu.presentation.KotlinActivity"
+        <activity android:name="kr.ac.tukorea.whereareu.presentation.nok.NokMainActivity"
             android:exported="true"/>
 
         <service

@@ -123,6 +123,7 @@ dependencies {
 
     // Firebase 추가
     implementation(platform("com.google.firebase:firebase-bom:33.0.0"))
+    implementation("com.google.firebase:firebase-messaging-ktx")
 }
 kapt {
     correctErrorTypes = true

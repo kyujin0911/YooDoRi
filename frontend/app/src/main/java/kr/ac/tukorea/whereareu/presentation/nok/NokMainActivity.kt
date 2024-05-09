@@ -1,21 +1,29 @@
 package kr.ac.tukorea.whereareu.presentation.nok
 
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.os.Build
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.viewModels
+import androidx.annotation.RequiresApi
 import androidx.lifecycle.lifecycleScope
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
+import com.google.android.gms.tasks.OnCompleteListener
+import com.google.firebase.messaging.FirebaseMessaging
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kr.ac.tukorea.whereareu.R
+import kr.ac.tukorea.whereareu.data.api.nok.MyFirebaseMessagingService
 import kr.ac.tukorea.whereareu.databinding.ActivityNokMainBinding
 import kr.ac.tukorea.whereareu.presentation.base.BaseActivity
 import kr.ac.tukorea.whereareu.presentation.nok.home.NokHomeViewModel
@@ -35,6 +43,8 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
         binding.layout.setPadding(0, 0, 0, this.navigationHeight())
         initNavigator()
         homeViewModel.fetchUserInfo()
+        initFirebase()
+        createNotificationChannel()
     }
 
     private fun initNavigator() {
@@ -122,5 +132,37 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
             Log.d("location log", "${location?.get(0)}, ${location?.get(1)}")
             // Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
         }
+    }
+
+    // token발급
+    private fun initFirebase() {
+        FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
+            if (!task.isSuccessful) {
+                Log.d("MainActivity_initFCMToken", "토큰 재등록 실패 ${task.exception}")
+            }
+            val token = task.result
+            // 재등록 토큰 새로 발급
+            Log.d("MainActivity_initFCMToken", token)
+            Toast.makeText(baseContext, token, Toast.LENGTH_SHORT).show()
+        }
+
+        MyFirebaseMessagingService()
+    }
+    @RequiresApi(24)
+    private fun createNotificationChannel(){
+        // 알림을 보낼 채널 생성
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            val channel = NotificationChannel(CHANNEL_ID, CHANNEL_NAME, NotificationManager.IMPORTANCE_DEFAULT)
+            channel.description = CHANNEL_DESCRIPTION
+
+            val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+            notificationManager.createNotificationChannel(channel)
+        }
+    }
+
+    companion object{
+        private const val CHANNEL_NAME = "Where are U Test"
+        private const val CHANNEL_DESCRIPTION = "어디U 테스트 채널"
+        private const val CHANNEL_ID = "채널 ID"
     }
 }
