@@ -119,7 +119,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginStart="5dp"
                             android:layout_marginTop="14dp"
-                            bind:movementStatus="@{viewModel.dementiaStatusInfo.userStatus}"
+                            android:text="@{viewModel.dementiaStatusInfo.userStatus}"
                             android:textAppearance="@style/TextAppearance.App.18sp.Regular"
                             app:layout_constraintBaseline_toBaselineOf="@id/dementia_name_tv"
                             app:layout_constraintStart_toEndOf="@+id/state"
