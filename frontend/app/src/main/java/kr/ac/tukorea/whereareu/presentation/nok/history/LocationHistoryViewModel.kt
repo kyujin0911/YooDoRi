@@ -1,5 +1,6 @@
 package kr.ac.tukorea.whereareu.presentation.nok.history
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -13,6 +14,7 @@ import kr.ac.tukorea.whereareu.data.model.nok.history.LocationHistoryRequest
 import kr.ac.tukorea.whereareu.data.model.nok.history.LocationHistoryResponse
 import kr.ac.tukorea.whereareu.data.repository.nok.history.LocationHistoryRepository
 import kr.ac.tukorea.whereareu.data.repository.nok.history.LocationHistoryRepositoryImpl
+import kr.ac.tukorea.whereareu.util.network.onException
 import kr.ac.tukorea.whereareu.util.network.onSuccess
 import javax.inject.Inject
 
@@ -39,9 +41,12 @@ class LocationHistoryViewModel @Inject constructor(
     fun fetchLocationHistory(date: String, dementiaKey: String) {
         viewModelScope.launch {
             repository.fetchLocationHistory(date, dementiaKey).onSuccess { response ->
-                val list = response.locationHistory.asSequence().withIndex().filter { it.index % 3 == 0 }.map { it.value }.toList()
+                //val list = response.locationHistory.asSequence().withIndex().filter { it.index % 3 == 0 }.map { it.value }.toList()
+                val list = response.locationHistory
                 _locationHistory.emit(list)
                 _maxProgress.value = list.indices.last
+            }.onException {
+                Log.d("errir", it.toString())
             }
         }
     }

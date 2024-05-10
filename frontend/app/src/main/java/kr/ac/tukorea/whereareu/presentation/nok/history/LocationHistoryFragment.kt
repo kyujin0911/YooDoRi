@@ -5,6 +5,9 @@ import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView.OnScrollListener
 import com.naver.maps.map.MapFragment
 import com.naver.maps.map.NaverMap
 import com.naver.maps.map.OnMapReadyCallback
@@ -15,23 +18,30 @@ import kr.ac.tukorea.whereareu.data.model.nok.history.LocationHistory
 import kr.ac.tukorea.whereareu.data.model.nok.history.LocationHistoryRequest
 import kr.ac.tukorea.whereareu.databinding.FragmentLocationHistoryBinding
 import kr.ac.tukorea.whereareu.presentation.base.BaseFragment
+import kr.ac.tukorea.whereareu.presentation.nok.history.adapter.LocationHistoryRVA
 import kr.ac.tukorea.whereareu.util.extension.repeatOnStarted
 import java.lang.IndexOutOfBoundsException
 
 @AndroidEntryPoint
 class LocationHistoryFragment :
-    BaseFragment<FragmentLocationHistoryBinding>(R.layout.fragment_location_history){
+    BaseFragment<FragmentLocationHistoryBinding>(R.layout.fragment_location_history) {
     private val viewModel: LocationHistoryViewModel by activityViewModels()
+    private val locationHistoryRVA by lazy {
+        LocationHistoryRVA()
+    }
+
     override fun initObserver() {
         repeatOnStarted {
             viewModel.locationHistory.collect { list ->
                 syncSeekBarWithLocationHistory(list)
+                locationHistoryRVA.submitList(list)
             }
         }
     }
 
     override fun initView() {
         binding.viewModel = viewModel
+        initLocationHistoryRVA()
 
         viewModel.fetchLocationHistory("2024-03-19", "253050")
         binding.next.setOnClickListener {
@@ -52,7 +62,8 @@ class LocationHistoryFragment :
                     val locationInfo = locationHistoryList[progress]
                     Log.d("seek bar location info", locationInfo.toString())
                     viewModel.setProgress(progress)
-                } catch (e: IndexOutOfBoundsException){
+                    binding.rv.scrollToPosition(progress)
+                } catch (e: IndexOutOfBoundsException) {
                     Log.d("IndexOutOfBoundsException", e.toString())
                 }
             }
@@ -68,4 +79,15 @@ class LocationHistoryFragment :
 
     }
 
+    private fun initLocationHistoryRVA() {
+        binding.rv.apply {
+            adapter = locationHistoryRVA
+            addItemDecoration(
+                DividerItemDecoration(
+                    requireContext(),
+                    LinearLayoutManager.HORIZONTAL
+                )
+            )
+        }
+    }
 }
