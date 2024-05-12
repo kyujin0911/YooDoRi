@@ -246,42 +246,36 @@ async def is_connected(request: ConnectionRequest):
 @router.post("/login", responses = {200 : {"model" : TokenResponse, "description" : "로그인 성공" }, 400: {"model": ErrorResponse, "description": "로그인 실패"}}, description="보호자와 보호 대상자의 로그인 | username : 이름, password : key -> 이 두개만 채워서 보내면 됨")
 async def receive_user_login(from_data: OAuth2PasswordRequestForm = Depends()):
     try:
+        # 사용자 확인
         user = jwt.get_user(from_data.username, from_data.password, session)
+        
         if not user:
+            # 인증 실패 시 예외 발생
             raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Incorrect key",
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid username or password",
                 headers={"WWW-Authenticate": "Bearer"},
             )
-        # Dict 형태로 반환
-        '''def create_access_token(self, data: dict) -> str:
-                return self._create_token(data, self.access_token_expire_time)'''
-        
-        if user[1] == 0:
+
+        # 사용자의 권한에 따라 액세스 토큰 및 리프레시 토큰 생성
+        if user[1] == "nok": # 보호자
             access_token = jwt.create_access_token(user[0].nok_name, user[0].nok_key)
-            
-            #refresh_token_info 테이블 디비에 저장
+            refresh_token = jwt.create_refresh_token(user[0].nok_name, user[0].nok_key)
             if not session.query(models.refresh_token_info).filter_by(key=user[0].nok_key).first():
-                refresh_token = jwt.create_refresh_token(user[0].nok_name, user[0].nok_key)
                 new_token = models.refresh_token_info(key=user[0].nok_key, refresh_token=refresh_token)
                 session.add(new_token)
-            else: 
-                refresh_token = None
-
-
-        else:
+        elif user[1] == "dementia": # 보호 대상자
             access_token = jwt.create_access_token(user[0].dementia_name, user[0].dementia_key)
-            
-            #refresh_token 디비에 저장
+            refresh_token = jwt.create_refresh_token(user[0].dementia_name, user[0].dementia_key)
             if not session.query(models.refresh_token_info).filter_by(key=user[0].dementia_key).first():
-                refresh_token = jwt.create_refresh_token(user[0].dementia_name, user[0].dementia_key)
                 new_token = models.refresh_token_info(key=user[0].dementia_key, refresh_token=refresh_token)
                 session.add(new_token)
-            else:
-                refresh_token = None
 
+
+        # 트랜잭션 커밋
         session.commit()
 
+        # 응답 구성
         result = {
             'accessToken': access_token,
             'refreshToken': refresh_token,
@@ -296,7 +290,15 @@ async def receive_user_login(from_data: OAuth2PasswordRequestForm = Depends()):
 
         return response
             
+    except Exception as e:
+        # 예외 발생 시 롤백 후 에러 메시지 반환
+        session.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="An error occurred while processing the request",
+        )
     finally:
+        # 세션 닫기
         session.close()
 
 @router.post("/locations/dementias", responses = {200 : {"model" : TempResponse, "description" : "위치 정보 전송 성공" }, 404: {"model": ErrorResponse, "description": "보호 대상자 키 조회 실패"}}, description="보호 대상자의 위치 정보를 전송 | isRingstoneOn : 0(무음), 1(진동), 2(벨소리)")
