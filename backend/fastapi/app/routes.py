@@ -215,11 +215,14 @@ async def is_connected(request: ConnectionRequest):
         if existing_nok:
             dementia_info = session.query(models.dementia_info).filter_by(dementia_key = _dementia_key).first()
             access_token = jwt.create_access_token(dementia_info.dementia_name, dementia_info.dementia_key)
-            refresh_token = jwt.create_refresh_token(dementia_info.dementia_name, dementia_info.dementia_key)
+            if not session.query(models.refresh_token_info).filter_by(key=dementia_info.dementia_key).first():
+                refresh_token = jwt.create_refresh_token(dementia_info.dementia_name, dementia_info.dementia_key)
+                new_token = models.refresh_token_info(key=dementia_info.dementia_key, refresh_token=refresh_token)
+                session.add(new_token)
 
-            new_token = models.refresh_token_info(key=dementia_info.dementia_key, refresh_token=refresh_token)
+            else:
+                refresh_token = None
 
-            session.add(new_token)
             session.commit()
             result = {
                 'nokInfoRecord':{
