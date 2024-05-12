@@ -117,15 +117,20 @@ async def receive_nok_info(request: ReceiveNokInfoRequest):
                     unique_key = rng.generate_unique_random_number(100000, 999999)
                 
                 _key = str(unique_key)
+                print(_key)
 
-                new_nok = models.nok_info(nok_key=_key, nok_name=_nok_name, nok_phonenumber=_nok_phonenumber, dementia_info_key=_key_from_dementia)
+                new_nok = models.nok_info(nok_key=_key, nok_name=_nok_name, nok_phonenumber=_nok_phonenumber, dementia_info_key=_key_from_dementia, update_rate=1)
                 session.add(new_nok)
                 
 
             access_token = jwt.create_access_token(_nok_name, _key)
-            refresh_token = jwt.create_refresh_token(_nok_name, _key)
+            if not session.query(models.refresh_token_info).filter_by(key=_key).first():
+                refresh_token = jwt.create_refresh_token(_nok_name, _key)
+                new_token = models.refresh_token_info(key=_key, refresh_token=refresh_token)
+                session.add(new_token)
+            else:
+                refresh_token = None
 
-            new_token = models.refresh_token_info(key=_key, refresh_token=refresh_token)
             result = {
                 'dementiaInfoRecord' : {
                         'dementiaKey' : existing_dementia.dementia_key,
@@ -179,7 +184,7 @@ async def receive_dementia_info(request: ReceiveDementiaInfoRequest):
 
             #_key = pwd_context.hash(unique_key)
 
-            new_dementia = models.dementia_info(dementia_key=_key, dementia_name=_dementia_name, dementia_phonenumber=_dementia_phonenumber)
+            new_dementia = models.dementia_info(dementia_key=_key, dementia_name=_dementia_name, dementia_phonenumber=_dementia_phonenumber, update_rate = 1)
             session.add(new_dementia)
             session.commit()
 
@@ -412,7 +417,7 @@ async def modify_user_info(request: ModifyUserInfoRequest, user_info : int = Dep
     try:
         user = jwt.get_current_user(user_info, session)
 
-        if user[1] == 0: #보호자
+        if user[1] == 'nok': #보호자
             existing_nok = session.query(models.nok_info).filter_by(nok_key = user[0].nok_key).first()
 
             if not existing_nok.nok_name == _new_name:
@@ -429,7 +434,7 @@ async def modify_user_info(request: ModifyUserInfoRequest, user_info : int = Dep
             session.add(update_refresh_token)
 
 
-        elif user[1] == 1: #보호대상자
+        elif user[1] == 'dementia': #보호대상자
             existing_dementia = session.query(models.dementia_info).filter_by(dementia_key = user[0].dementia_key).first()
 
             if not existing_dementia.dementia_name == _new_name:
@@ -474,7 +479,7 @@ async def modify_updatint_rate(request: ModifyUserUpdateRateRequest, user_info :
     #보호자와 보호대상자 모두 업데이트
     try:
         user = jwt.get_current_user(user_info, session)
-        if user[1] == 0: #보호자
+        if user[1] == 'nok': #보호자
             existing_nok = session.query(models.nok_info).filter_by(nok_key = user[0].nok_key).first()
 
             connected_dementia = session.query(models.dementia_info).filter_by(dementia_key = existing_nok.dementia_info_key).first()
@@ -488,7 +493,7 @@ async def modify_updatint_rate(request: ModifyUserUpdateRateRequest, user_info :
                 'message': 'User update rate modified'
             }
 
-        elif user[1] == 1:
+        elif user[1] == 'dementia':
             existing_dementia = session.query(models.dementia_info).filter_by(dementia_key = user[0].dementia_key).first()
 
             connected_nok = session.query(models.nok_info).filter_by(dementia_info_key = existing_dementia.dementia_key).first()
