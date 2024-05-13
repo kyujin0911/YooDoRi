@@ -12,6 +12,7 @@ from .bodymodel import *
 from .util import JWTService
 from .config import Config
 from .schedularFunc import SchedulerFunc
+from .fcm_notification import send_push_notification
 
 from apscheduler.schedulers.background import BackgroundScheduler
 
@@ -94,7 +95,7 @@ async def test_login(from_data: OAuth2PasswordRequestForm = Depends()):
     finally:
         session.close()"""
 
-@router.get("/login/google")
+'''@router.get("/login/google")
 async def google_login():
     return {
         "url": f"https://accounts.google.com/o/oauth2/auth?response_type=code&client_id={Config.GOOGLE_CLIENT_ID}&redirect_uri={Config.GOOGLE_REDIRECT_URI}&scope=openid%20profile%20email&access_type=offline"
@@ -114,11 +115,12 @@ async def auth_google(code: str):
     response = requests.post(token_url, data=data)
     access_token = response.json().get("access_token")
     user_info = requests.get("https://www.googleapis.com/oauth2/v1/userinfo", headers={"Authorization": f"Bearer {access_token}"})
+    people = people_service.people().connections().list('people/me', personFields='names,emailAddresses')
     return user_info.json()
 
 @router.get("/token")
 async def get_token(token: str = Depends(oauth2_scheme)):
-    return jwt.decode(token, Config.GOOGLE_CLIENT_SECRET, algorithms=["HS256"])
+    return jwt.decode(token, Config.GOOGLE_CLIENT_SECRET, algorithms=["HS256"])'''
 
 
 
@@ -755,8 +757,15 @@ async def send_location_history(_date : str, user_info : int = Depends(APIKeyHea
 
         return response
 
+@router.post("/test/fcm")
+async def send_fcm(title: str, body: str, token: str):
 
+    send_push_notification(token, body, title)
 
+    return {
+        'status': 'success',
+        'message': 'FCM sent'
+    }
 
 
 '''#스케줄러 비활성화
