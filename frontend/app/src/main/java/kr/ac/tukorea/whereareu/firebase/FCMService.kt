@@ -1,4 +1,4 @@
-package kr.ac.tukorea.whereareu.data.api.nok
+package kr.ac.tukorea.whereareu.firebase
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -16,26 +16,13 @@ import com.google.firebase.messaging.RemoteMessage
 import kr.ac.tukorea.whereareu.R
 import kr.ac.tukorea.whereareu.presentation.nok.NokMainActivity
 
-class FCMService: FirebaseMessagingService() {
-    override fun onNewToken(token: String) {
-        super.onNewToken(token)
-        // token을 서버로 전송
-        Log.d("FCMService", "NewToken : $token")
-    }
-
-    override fun onMessageReceived(remoteMessage: RemoteMessage) {
-        super.onMessageReceived(remoteMessage)
-    }
-}
-
-class MyFirebaseMessagingService : FirebaseMessagingService() {
-    /** 푸시 알림으로 보낼 수 있는 메세지는 2가지
-     * 1. Notification: 앱이 실행중(포그라운드)일 떄만 푸시 알림이 옴
-     * 2. Data: 실행중이거나 백그라운드(앱이 실행중이지 않을때) 알림이 옴 -> TODO: 대부분 사용하는 방식 */
+class FCMService : FirebaseMessagingService() {
+//    푸시 알림으로 보낼 수 있는 메세지는 2가지
+//    1. Notification: 앱이 실행중(포그라운드)일 떄만 푸시 알림이 옴
+//    2. Data: 실행중이거나 백그라운드(앱이 실행중이지 않을때) 알림이 옴
 
     private val TAG = "FirebaseService"
 
-    /** Token 생성 메서드(FirebaseInstanceIdService 사라짐) */
     override fun onNewToken(token: String) {
         Log.d(TAG, "new Token: $token")
 
@@ -47,7 +34,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
         Log.i(TAG, "성공적으로 토큰을 저장함")
     }
 
-    /** 메시지 수신 메서드(포그라운드) */
+    // 포그라운드
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         Log.d(TAG, "From: " + remoteMessage!!.from)
 
@@ -72,9 +59,9 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
     /** 알림 생성 메서드 */
     private fun sendNotification(remoteMessage: RemoteMessage) {
         //channel 설정
-        val channelId = "channelId -- 앱 마다 설정" // 알림 채널 이름
-        val channelName = "channelName -- 앱 마다 설정"
-        val channelDescription = "channelDescription -- 앱 마다 설정"
+        val channelId = "WhereAreU" // 알림 채널 이름
+        val channelName = "어디U Cnannel"
+        val channelDescription = "어디U를 위한 채널"
         val soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION) // 알림 소리
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
@@ -86,8 +73,6 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
             }
             notificationManager.createNotificationChannel(channel)
         }
-
-
 
         // RequestCode, Id를 고유값으로 지정하여 알림이 개별 표시
         val uniId: Int = (System.currentTimeMillis() / 7).toInt()
@@ -111,7 +96,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
         // 알림에 대한 UI 정보, 작업
         val notificationBuilder = NotificationCompat.Builder(this, channelId)
             .setPriority(NotificationCompat.PRIORITY_HIGH) // 중요도 (HIGH: 상단바 표시 가능)
-            .setSmallIcon(R.mipmap.ic_launcher) // 아이콘 설정
+            .setSmallIcon(R.drawable.ic_launcher_foreground) // 아이콘 설정
             .setContentTitle(remoteMessage.data["title"].toString()) // 제목
             .setContentText(remoteMessage.data["body"].toString()) // 메시지 내용
             .setAutoCancel(true) // 알람클릭시 삭제여부
@@ -130,7 +115,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
         notificationManager.notify(uniId, notificationBuilder.build())
     }
 
-    /** Token 가져오기 */
+//  토큰 가져오는 함수
     fun getFirebaseToken() {
         //비동기 방식
         FirebaseMessaging.getInstance().token.addOnSuccessListener {
@@ -138,14 +123,14 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
         }
 
 		  //동기방식
-//        FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
-//                if (!task.isSuccessful) {
-//                    Log.d(TAG, "Fetching FCM registration token failed ${task.exception}")
-//                    return@OnCompleteListener
-//                }
-//                var deviceToken = task.result
-//                Log.e(TAG, "token=${deviceToken}")
-//            })
+        FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
+                if (!task.isSuccessful) {
+                    Log.d(TAG, "Fetching FCM registration token failed ${task.exception}")
+                    return@OnCompleteListener
+                }
+                var deviceToken = task.result
+                Log.e(TAG, "token=${deviceToken}")
+            })
     }
 }
 
@@ -155,7 +140,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
 //setContentTitle : 제목 (필수)
 //setContentText : 내용 (필수)
 //setColor : 알림내 앱 이름 색
-//setWhen : 받은 시간 커스텀 ( 기본 시스템에서 제공합니다 )
+//setWhen : 받은 시간 커스텀 ( 기본 시스템에서 제공 )
 //setShowWhen : 알림 수신 시간 ( default 값은 true, false시 숨길 수 있습니다 )
 //setOnlyAlertOnce : 알림 1회 수신 ( 동일 아이디의 알림을 처음 받았을때만 알린다, 상태바에 알림이 잔존하면 무음 )
 //setContentTitle : 제목

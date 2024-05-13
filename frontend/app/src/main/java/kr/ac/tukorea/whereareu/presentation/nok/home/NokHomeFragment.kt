@@ -22,20 +22,17 @@ import com.naver.maps.map.MapFragment
 import com.naver.maps.map.NaverMap
 import com.naver.maps.map.OnMapReadyCallback
 import com.naver.maps.map.overlay.CircleOverlay
-import com.naver.maps.map.overlay.InfoWindow
 import com.naver.maps.map.overlay.Marker
 import com.naver.maps.map.overlay.OverlayImage
-import com.naver.maps.map.util.MarkerIcons
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kr.ac.tukorea.whereareu.R
-import kr.ac.tukorea.whereareu.data.api.nok.MyFirebaseMessagingService
 import kr.ac.tukorea.whereareu.data.model.nok.home.LocationInfoResponse
 import kr.ac.tukorea.whereareu.databinding.IconLocationOverlayLayoutBinding
 import kr.ac.tukorea.whereareu.domain.home.PoliceStationInfo
+import kr.ac.tukorea.whereareu.firebase.FCMService
 import kr.ac.tukorea.whereareu.presentation.base.BaseFragment
 import kr.ac.tukorea.whereareu.presentation.nok.home.adapter.PoliceStationRVA
 import kr.ac.tukorea.whereareu.presentation.nok.home.adapter.MeaningfulPlaceRVA
@@ -236,7 +233,7 @@ class NokHomeFragment :
     }
 
     override fun initView() {
-        MyFirebaseMessagingService().getFirebaseToken()
+        FCMService().getFirebaseToken()
 
         binding.view = this
         binding.viewModel = viewModel

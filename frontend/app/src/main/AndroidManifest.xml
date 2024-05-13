@@ -54,17 +54,21 @@
             android:theme="@style/Theme.WhereAreU">
         </activity>
         <activity android:name="kr.ac.tukorea.whereareu.presentation.dementia.DementiaMainActivity" />
-        <activity android:name="kr.ac.tukorea.whereareu.presentation.nok.NokMainActivity"
-            android:exported="false"/>
 
         <service
-            android:name=".data.api.nok.MyFirebaseMessagingService"
+            android:name=".firebase.FCMService"
             android:enabled="true"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
+<!--        <meta-data-->
+<!--            android:name="com.google.firebase.messaging.default_notification_icon"-->
+<!--            android:resource="@drawable/ic_launcher_foreground" />-->
+<!--        <meta-data-->
+<!--            android:name="com.google.firebase.messaging.default_notification_color"-->
+<!--            android:resource="@color/yellow" />-->
     </application>
 
 </manifest>
