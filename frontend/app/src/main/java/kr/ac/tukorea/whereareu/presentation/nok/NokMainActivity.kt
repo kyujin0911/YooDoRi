@@ -153,7 +153,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                     coords = latLngList
                     width = 30
                     color = ContextCompat.getColor(this@NokMainActivity, R.color.yellow)
-                    patternImage = OverlayImage.fromResource(R.drawable.ic_arrow_up_24)
+                    patternImage = OverlayImage.fromResource(R.drawable.ic_arrow_up_white_24)
                     patternInterval = 50
                     outlineColor = Color.WHITE
                     map = naverMap
