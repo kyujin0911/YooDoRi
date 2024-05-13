@@ -143,6 +143,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
 
         repeatOnStarted {
             locationHistoryViewModel.locationHistory.collect {
+                //delay(100)
                 Log.d("history", it.toString())
                 if (it.isEmpty()) {
                     return@collect
@@ -152,7 +153,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                     coords = latLngList
                     width = 30
                     color = ContextCompat.getColor(this@NokMainActivity, R.color.yellow)
-                    patternImage = OverlayImage.fromResource(R.drawable.ic_arrow_right_24)
+                    patternImage = OverlayImage.fromResource(R.drawable.ic_arrow_up_24)
                     patternInterval = 50
                     outlineColor = Color.WHITE
                     map = naverMap
@@ -472,6 +473,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
             }
 
             if (destination.id != R.id.locationHistoryFragment) {
+                locationHistoryViewModel.setIstLoading(true)
                 path.map = null
                 historyMarker.map = null
             }

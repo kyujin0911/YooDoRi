@@ -4,42 +4,61 @@ import android.util.Log
 import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView.OnScrollListener
-import com.naver.maps.map.MapFragment
-import com.naver.maps.map.NaverMap
-import com.naver.maps.map.OnMapReadyCallback
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kr.ac.tukorea.whereareu.R
-import kr.ac.tukorea.whereareu.data.model.nok.history.LocationHistory
-import kr.ac.tukorea.whereareu.data.model.nok.history.LocationHistoryRequest
+import kr.ac.tukorea.whereareu.data.model.nok.history.LocationHistoryDto
 import kr.ac.tukorea.whereareu.databinding.FragmentLocationHistoryBinding
+import kr.ac.tukorea.whereareu.domain.history.LocationHistory
 import kr.ac.tukorea.whereareu.presentation.base.BaseFragment
 import kr.ac.tukorea.whereareu.presentation.nok.history.adapter.LocationHistoryRVA
 import kr.ac.tukorea.whereareu.util.extension.repeatOnStarted
 import java.lang.IndexOutOfBoundsException
+import java.util.logging.Handler
 
 @AndroidEntryPoint
 class LocationHistoryFragment :
-    BaseFragment<FragmentLocationHistoryBinding>(R.layout.fragment_location_history) {
+    BaseFragment<FragmentLocationHistoryBinding>(R.layout.fragment_location_history),
+    LocationHistoryRVA.OnLoadingListener{
     private val viewModel: LocationHistoryViewModel by activityViewModels()
     private val locationHistoryRVA by lazy {
-        LocationHistoryRVA()
+        LocationHistoryRVA().apply {
+            setOnLoadingListener(this@LocationHistoryFragment)
+        }
     }
+    //private var tempList = mutableListOf<List<LocationHistoryDto>>()
 
     override fun initObserver() {
         repeatOnStarted {
             viewModel.locationHistory.collect { list ->
                 syncSeekBarWithLocationHistory(list)
                 locationHistoryRVA.submitList(list)
+                /*val li = list.chunked(list.size/3)
+                li.forEach{
+                    tempList.add(it)
+                }
+                locationHistoryRVA.submitList(li[0])
+                tempList.drop(0)*/
+            }
+        }
+
+        repeatOnStarted {
+            viewModel.isLoading.collect{isLoading ->
+                if (isLoading){
+                    showLoadingDialog(requireContext())
+                } else {
+                    delay(200)
+                    dismissLoadingDialog()
+                }
             }
         }
     }
 
     override fun initView() {
+        //showLoadingDialog(requireContext())
         binding.viewModel = viewModel
         initLocationHistoryRVA()
 
@@ -88,6 +107,23 @@ class LocationHistoryFragment :
                     LinearLayoutManager.HORIZONTAL
                 )
             )
+            itemAnimator = null
         }
+
+        /*binding.rv.addOnScrollListener(object : OnScrollListener(){
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+                if(!binding.rv.canScrollHorizontally(1)){
+                    Log.d("dsd", "dsd")
+                    locationHistoryRVA.submitList(locationHistoryRVA.currentList.toMutableList().apply { addAll(tempList[0])})
+                    tempList.drop(0)
+                }
+            }
+        })*/
+    }
+
+    override fun onLoading() {
+        Log.d("set is loading", "sds")
+        viewModel.setIstLoading(false)
     }
 }

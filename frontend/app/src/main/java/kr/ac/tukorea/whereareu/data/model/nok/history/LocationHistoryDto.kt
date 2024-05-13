@@ -1,6 +1,6 @@
 package kr.ac.tukorea.whereareu.data.model.nok.history
 
-data class LocationHistory(
+data class LocationHistoryDto(
     val latitude: Double,
     val longitude: Double,
     val time: String,

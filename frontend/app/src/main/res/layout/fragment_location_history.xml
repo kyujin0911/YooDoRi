@@ -15,13 +15,17 @@
         android:layout_height="match_parent"
         android:background="@color/white">
 
-
         <SeekBar
             android:id="@+id/seek_bar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:max="@{viewModel.maxProgress}"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            android:splitTrack="false"
+            android:progressDrawable="@drawable/seekbar"
+            android:thumb="@drawable/seekbar_thumb"
+
+            />
 
         <ImageView
             android:id="@+id/next"

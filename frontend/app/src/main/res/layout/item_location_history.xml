@@ -5,7 +5,7 @@
     <data>
         <variable
             name="model"
-            type="kr.ac.tukorea.whereareu.data.model.nok.history.LocationHistory" />
+            type="kr.ac.tukorea.whereareu.domain.history.LocationHistory" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

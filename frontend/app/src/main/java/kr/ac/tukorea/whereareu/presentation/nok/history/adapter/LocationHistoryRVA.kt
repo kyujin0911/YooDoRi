@@ -6,11 +6,9 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import kr.ac.tukorea.whereareu.data.model.nok.history.LocationHistory
-import kr.ac.tukorea.whereareu.data.model.nok.home.TimeInfo
+import kr.ac.tukorea.whereareu.data.model.nok.history.LocationHistoryDto
 import kr.ac.tukorea.whereareu.databinding.ItemLocationHistoryBinding
-import kr.ac.tukorea.whereareu.databinding.ItemTimeInfoBinding
-import kr.ac.tukorea.whereareu.presentation.nok.home.adapter.TimeInfoRVA
+import kr.ac.tukorea.whereareu.domain.history.LocationHistory
 
 class LocationHistoryRVA(): ListAdapter<LocationHistory, LocationHistoryRVA.LocationHistoryViewHolder>(
     object :
@@ -30,12 +28,20 @@ class LocationHistoryRVA(): ListAdapter<LocationHistory, LocationHistoryRVA.Loca
         }
 
     }) {
+
+    private var onLoadingListener: OnLoadingListener? = null
+    fun setOnLoadingListener(listener: OnLoadingListener){
+        this.onLoadingListener = listener
+    }
     inner class LocationHistoryViewHolder(private val binding: ItemLocationHistoryBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(locationHistory: LocationHistory) {
             Log.d("location history info", locationHistory.toString())
             with(binding) {
                 model = locationHistory
+            }
+            if (locationHistory.isLast){
+                onLoadingListener?.onLoading()
             }
         }
     }
@@ -55,5 +61,9 @@ class LocationHistoryRVA(): ListAdapter<LocationHistory, LocationHistoryRVA.Loca
 
     override fun onBindViewHolder(holder: LocationHistoryViewHolder, position: Int) {
         holder.bind(currentList[position])
+    }
+
+    interface OnLoadingListener{
+        fun onLoading()
     }
 }
