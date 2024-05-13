@@ -23,6 +23,7 @@ import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kr.ac.tukorea.whereareu.R
+import kr.ac.tukorea.whereareu.data.api.nok.FCMService
 import kr.ac.tukorea.whereareu.data.api.nok.MyFirebaseMessagingService
 import kr.ac.tukorea.whereareu.databinding.ActivityNokMainBinding
 import kr.ac.tukorea.whereareu.presentation.base.BaseActivity
@@ -44,7 +45,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
         initNavigator()
         homeViewModel.fetchUserInfo()
         initFirebase()
-        createNotificationChannel()
+        //createNotificationChannel()
     }
 
     private fun initNavigator() {
@@ -145,20 +146,19 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
             Log.d("MainActivity_initFCMToken", token)
             Toast.makeText(baseContext, token, Toast.LENGTH_SHORT).show()
         }
-
-        MyFirebaseMessagingService()
+        FCMService()
     }
-    @RequiresApi(24)
-    private fun createNotificationChannel(){
-        // 알림을 보낼 채널 생성
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            val channel = NotificationChannel(CHANNEL_ID, CHANNEL_NAME, NotificationManager.IMPORTANCE_DEFAULT)
-            channel.description = CHANNEL_DESCRIPTION
-
-            val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
-            notificationManager.createNotificationChannel(channel)
-        }
-    }
+//    @RequiresApi(24)
+//    private fun createNotificationChannel(){
+//        // 알림을 보낼 채널 생성
+//        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+//            val channel = NotificationChannel(CHANNEL_ID, CHANNEL_NAME, NotificationManager.IMPORTANCE_DEFAULT)
+//            channel.description = CHANNEL_DESCRIPTION
+//
+//            val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+//            notificationManager.createNotificationChannel(channel)
+//        }
+//    }
 
     companion object{
         private const val CHANNEL_NAME = "Where are U Test"

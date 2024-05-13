@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "1024726186646",
-    "project_id": "dementialocationpredict-test",
-    "storage_bucket": "dementialocationpredict-test.appspot.com"
+    "project_number": "868133695627",
+    "project_id": "whereareu-c04f4",
+    "storage_bucket": "whereareu-c04f4.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:1024726186646:android:67c6ee3de711e62626e0b7",
+        "mobilesdk_app_id": "1:868133695627:android:f47027465cda9da89f648e",
         "android_client_info": {
           "package_name": "kr.ac.tukorea.whereareu"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyCZIj1bzbAlQcNjP9zC4A6wM9eozTDkQqE"
+          "current_key": "AIzaSyAdprYcs5O1eYS8Bawcp8_UAKkZVUboJec"
         }
       ],
       "services": {

@@ -32,6 +32,7 @@ import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kr.ac.tukorea.whereareu.R
+import kr.ac.tukorea.whereareu.data.api.nok.MyFirebaseMessagingService
 import kr.ac.tukorea.whereareu.data.model.nok.home.LocationInfoResponse
 import kr.ac.tukorea.whereareu.databinding.IconLocationOverlayLayoutBinding
 import kr.ac.tukorea.whereareu.domain.home.PoliceStationInfo
@@ -235,6 +236,8 @@ class NokHomeFragment :
     }
 
     override fun initView() {
+        MyFirebaseMessagingService().getFirebaseToken()
+
         binding.view = this
         binding.viewModel = viewModel
         checkLocationPermission()
