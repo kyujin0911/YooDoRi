@@ -7,7 +7,7 @@ data class LocationHistory(
     val userStatus: String,
     val distance: Float,
     val isLast: Boolean = false,
-    //val viewType: Int = OTHER_STATUS
+    val viewType: Int = OTHER_STATUS
 ) {
     constructor() : this(0.0, 0.0, "", "", 0f)
     companion object{

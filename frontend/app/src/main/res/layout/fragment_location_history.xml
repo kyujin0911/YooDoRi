@@ -20,6 +20,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
+            android:layout_marginHorizontal="4dp"
             android:max="@{viewModel.maxProgress}"
             android:progressDrawable="@drawable/seekbar"
             android:splitTrack="false"
@@ -52,21 +53,45 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="상세 이동"
+            android:layout_marginEnd="8dp"
             android:textAppearance="@style/TextAppearance.App.14sp.SemiBold"
             app:layout_constraintBottom_toBottomOf="@id/next"
             app:layout_constraintEnd_toStartOf="@id/previous"
             app:layout_constraintTop_toTopOf="@id/next" />
 
+        <TextView
+            android:id="@+id/timeInfo_title_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="시간"
+            android:layout_marginTop="8dp"
+            android:layout_marginStart="8dp"
+            android:textAppearance="@style/TextAppearance.App.12sp.SemiBold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/seek_bar"/>
+
+        <TextView
+            android:id="@+id/movement_title_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="이동상태"
+            android:layout_marginTop="8dp"
+            android:textAppearance="@style/TextAppearance.App.12sp.SemiBold"
+            app:layout_constraintStart_toStartOf="@id/timeInfo_title_tv"
+            app:layout_constraintTop_toBottomOf="@id/timeInfo_title_tv"/>
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:nestedScrollingEnabled="false"
             android:orientation="horizontal"
             android:layout_marginTop="8dp"
-            android:layout_marginHorizontal="16dp"
+            android:overScrollMode="never"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/seek_bar"
+            app:layout_constraintStart_toEndOf="@id/timeInfo_title_tv"
             tools:listitem="@layout/item_location_history" />
 
 

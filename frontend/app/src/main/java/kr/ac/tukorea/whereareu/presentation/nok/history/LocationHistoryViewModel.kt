@@ -75,20 +75,28 @@ class LocationHistoryViewModel @Inject constructor(
                     }*/
                     val tempList = response.locationHistory.withIndex()
                     val list = tempList.map{
+                        val viewType = if (it.value.userStatus == "정지"){
+                            LocationHistory.STOP_STATUS
+                        } else {
+                            LocationHistory.OTHER_STATUS
+                        }
+
                         if (it.index == tempList.last().index){
                             LocationHistory(it.value.latitude,
                                 it.value.longitude,
                                 it.value.time,
                                 it.value.userStatus,
                                 it.value.distance,
-                                true)
+                                true,
+                                viewType)
                         } else {
                             LocationHistory(it.value.latitude,
                                 it.value.longitude,
                                 it.value.time,
                                 it.value.userStatus,
                                 it.value.distance,
-                                false)
+                                false,
+                                viewType)
                         }
                     }
                     Log.d("list", list.toString())

@@ -79,6 +79,6 @@ object BindingAdapter {
     @BindingAdapter("bind:stopStatusPeriod")
     @JvmStatic
     fun setStopStatusPeriod(view: TextView, stopStatusPeriod: String){
-        val temp = stopStatusPeriod.split(',')
+        view.text = stopStatusPeriod.replace(",", " ~ ")
     }
 }

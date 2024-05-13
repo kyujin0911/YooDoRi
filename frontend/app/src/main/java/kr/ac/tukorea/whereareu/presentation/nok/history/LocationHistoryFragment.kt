@@ -1,20 +1,21 @@
 package kr.ac.tukorea.whereareu.presentation.nok.history
 
+import android.annotation.SuppressLint
 import android.util.Log
+import android.view.View.OnTouchListener
 import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.LinearSmoothScroller
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.delay
 import kr.ac.tukorea.whereareu.R
 import kr.ac.tukorea.whereareu.databinding.FragmentLocationHistoryBinding
 import kr.ac.tukorea.whereareu.domain.history.LocationHistory
 import kr.ac.tukorea.whereareu.presentation.base.BaseFragment
 import kr.ac.tukorea.whereareu.presentation.nok.history.adapter.LocationHistoryRVA
 import kr.ac.tukorea.whereareu.util.extension.repeatOnStarted
-import java.lang.IndexOutOfBoundsException
 
 @AndroidEntryPoint
 class LocationHistoryFragment :
@@ -73,6 +74,12 @@ class LocationHistoryFragment :
     }
 
     private fun syncSeekBarWithLocationHistory(locationHistoryList: List<LocationHistory>) {
+        val smoothScroller = object : LinearSmoothScroller(requireContext()) {
+            override fun getHorizontalSnapPreference(): Int {
+                return LinearSmoothScroller.SNAP_TO_START
+            }
+        }
+
         binding.seekBar.setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 Log.d("progress", progress.toString())
@@ -80,7 +87,10 @@ class LocationHistoryFragment :
                     val locationInfo = locationHistoryList[progress]
                     Log.d("seek bar location info", locationInfo.toString())
                     viewModel.setProgress(progress)
-                    binding.rv.scrollToPosition(progress)
+
+                    smoothScroller.targetPosition = progress
+                    binding.rv.layoutManager?.startSmoothScroll(smoothScroller)
+                    //binding.rv.scrollToPosition(progress)
                 } catch (e: IndexOutOfBoundsException) {
                     Log.d("IndexOutOfBoundsException", e.toString())
                 }
@@ -97,6 +107,7 @@ class LocationHistoryFragment :
 
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     private fun initLocationHistoryRVA() {
         binding.rv.apply {
             adapter = locationHistoryRVA
@@ -107,7 +118,9 @@ class LocationHistoryFragment :
                 )
             )
             itemAnimator = null
+            setOnTouchListener({ v, event -> true })
         }
+
 
         /*binding.rv.addOnScrollListener(object : OnScrollListener(){
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
