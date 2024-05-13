@@ -246,6 +246,17 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                 currentProgress = progress
             }
         }
+
+        repeatOnStarted {
+            locationHistoryViewModel.isLoadingComplete.collect{ isLoading ->
+                if (isLoading){
+                    showLoadingDialog(this@NokMainActivity)
+                } else {
+                    delay(200)
+                    dismissLoadingDialog()
+                }
+            }
+        }
     }
 
 
@@ -473,7 +484,6 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
             }
 
             if (destination.id != R.id.locationHistoryFragment) {
-                locationHistoryViewModel.setIstLoading(true)
                 path.map = null
                 historyMarker.map = null
             }
@@ -506,6 +516,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                 }
 
                 R.id.locationHistoryFragment -> {
+                    locationHistoryViewModel.setIstLoading(true)
                     event = NokHomeViewModel.NavigateEvent.LocationHistory
                 }
             }

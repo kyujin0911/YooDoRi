@@ -1,6 +1,7 @@
 package kr.ac.tukorea.whereareu.presentation
 
 import android.content.Context
+import android.view.View
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -10,6 +11,7 @@ import androidx.core.view.isVisible
 import androidx.databinding.BindingAdapter
 import com.bumptech.glide.Glide
 import kr.ac.tukorea.whereareu.R
+import kr.ac.tukorea.whereareu.presentation.nok.home.NokHomeViewModel
 import kr.ac.tukorea.whereareu.util.extension.setRingtoneImage
 
 object BindingAdapter {
@@ -58,5 +60,25 @@ object BindingAdapter {
         } else {
             true
         }
+    }
+
+    @BindingAdapter("bind:navigateEvent")
+    @JvmStatic
+    fun setBottomSheetIconVisible(view: ImageView, navigateEvent: String){
+        val color = when(navigateEvent){
+            NokHomeViewModel.NavigateEvent.Home.toString() -> R.color.gray40
+            NokHomeViewModel.NavigateEvent.LocationHistory.toString() -> R.color.white
+            NokHomeViewModel.NavigateEvent.MeaningfulPlace.toString() -> R.color.gray40
+            NokHomeViewModel.NavigateEvent.Setting.toString() -> R.color.white
+            NokHomeViewModel.NavigateEvent.SafeArea.toString() -> R.color.gray40
+            else -> R.color.white
+        }
+        view.setColorFilter(ContextCompat.getColor(view.context, color))
+    }
+
+    @BindingAdapter("bind:stopStatusPeriod")
+    @JvmStatic
+    fun setStopStatusPeriod(view: TextView, stopStatusPeriod: String){
+        val temp = stopStatusPeriod.split(',')
     }
 }

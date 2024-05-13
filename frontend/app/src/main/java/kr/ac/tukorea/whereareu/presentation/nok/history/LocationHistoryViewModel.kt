@@ -33,15 +33,17 @@ class LocationHistoryViewModel @Inject constructor(
     private val _maxProgress = MutableStateFlow(0)
     val maxProgress = _maxProgress.asStateFlow()
 
-    private val _isLoading = MutableStateFlow(true)
-    val isLoading = _isLoading.asStateFlow()
+    private val _isLoadingComplete = MutableSharedFlow<Boolean>()
+    val isLoadingComplete = _isLoadingComplete.asSharedFlow()
 
     fun setProgress(progress: Int) {
         _progress.value = progress
     }
 
     fun setIstLoading(isLoading: Boolean){
-        _isLoading.value = isLoading
+        viewModelScope.launch {
+            _isLoadingComplete.emit(isLoading)
+        }
     }
 
     fun fetchLocationHistory(date: String, dementiaKey: String) {

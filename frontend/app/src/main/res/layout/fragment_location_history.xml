@@ -19,40 +19,56 @@
             android:id="@+id/seek_bar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
             android:max="@{viewModel.maxProgress}"
-            app:layout_constraintTop_toTopOf="parent"
-            android:splitTrack="false"
             android:progressDrawable="@drawable/seekbar"
+            android:splitTrack="false"
             android:thumb="@drawable/seekbar_thumb"
-
-            />
+            app:layout_constraintTop_toBottomOf="@id/next" />
 
         <ImageView
             android:id="@+id/next"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_arrow_up_24"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/seek_bar" />
+            android:layout_marginEnd="16dp"
+            android:src="@drawable/ic_arrow_right_24"
+            app:layout_constraintEnd_toEndOf="@id/seek_bar"
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="@color/black" />
 
         <ImageView
             android:id="@+id/previous"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
-            android:src="@drawable/ic_arrow_down_24"
-            app:layout_constraintStart_toEndOf="@id/next"
-            app:layout_constraintTop_toBottomOf="@id/seek_bar" />
+            android:scaleX="-1"
+            android:src="@drawable/ic_arrow_right_24"
+            app:layout_constraintBottom_toBottomOf="@id/next"
+            app:layout_constraintEnd_toStartOf="@id/next"
+            app:layout_constraintTop_toTopOf="@id/next"
+            app:tint="@color/black" />
+
+        <TextView
+            android:id="@+id/movement_detail_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="상세 이동"
+            android:textAppearance="@style/TextAppearance.App.14sp.SemiBold"
+            app:layout_constraintBottom_toBottomOf="@id/next"
+            app:layout_constraintEnd_toStartOf="@id/previous"
+            app:layout_constraintTop_toTopOf="@id/next" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:nestedScrollingEnabled="false"
             android:orientation="horizontal"
+            android:layout_marginTop="8dp"
+            android:layout_marginHorizontal="16dp"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            app:layout_constraintTop_toBottomOf="@id/next"
-            tools:listitem="@layout/item_location_history"
-            />
+            app:layout_constraintTop_toBottomOf="@id/seek_bar"
+            tools:listitem="@layout/item_location_history" />
+
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

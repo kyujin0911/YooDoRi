@@ -8,16 +8,13 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import kr.ac.tukorea.whereareu.R
-import kr.ac.tukorea.whereareu.data.model.nok.history.LocationHistoryDto
 import kr.ac.tukorea.whereareu.databinding.FragmentLocationHistoryBinding
 import kr.ac.tukorea.whereareu.domain.history.LocationHistory
 import kr.ac.tukorea.whereareu.presentation.base.BaseFragment
 import kr.ac.tukorea.whereareu.presentation.nok.history.adapter.LocationHistoryRVA
 import kr.ac.tukorea.whereareu.util.extension.repeatOnStarted
 import java.lang.IndexOutOfBoundsException
-import java.util.logging.Handler
 
 @AndroidEntryPoint
 class LocationHistoryFragment :
@@ -35,7 +32,9 @@ class LocationHistoryFragment :
         repeatOnStarted {
             viewModel.locationHistory.collect { list ->
                 syncSeekBarWithLocationHistory(list)
-                locationHistoryRVA.submitList(list)
+                locationHistoryRVA.submitList(list, kotlinx.coroutines.Runnable {
+                    viewModel.setIstLoading(false)
+                })
                 /*val li = list.chunked(list.size/3)
                 li.forEach{
                     tempList.add(it)
@@ -45,8 +44,8 @@ class LocationHistoryFragment :
             }
         }
 
-        repeatOnStarted {
-            viewModel.isLoading.collect{isLoading ->
+        /*repeatOnStarted {
+            viewModel.isLoadingComplete.collect{ isLoading ->
                 if (isLoading){
                     showLoadingDialog(requireContext())
                 } else {
@@ -54,7 +53,7 @@ class LocationHistoryFragment :
                     dismissLoadingDialog()
                 }
             }
-        }
+        }*/
     }
 
     override fun initView() {
