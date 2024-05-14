@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="viewModel"
+            type="kr.ac.tukorea.whereareu.presentation.nok.history.CalendarDialogViewModel" />
+        <import type="android.view.View"/>
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/rectangle_corner_10_white">
+
+        <com.prolificinteractive.materialcalendarview.MaterialCalendarView
+            android:id="@+id/calendar_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingHorizontal="8dp"
+            android:layout_marginTop="12dp"
+            android:theme="@style/CalenderViewCustom"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:mcv_dateTextAppearance="@style/CalenderViewDateCustomText"
+            app:mcv_firstDayOfWeek="monday"
+            app:mcv_headerTextAppearance="@style/TextAppearance.App.20sp.ExtraBold"
+            app:mcv_leftArrow="@drawable/ic_arrow_left_24"
+            app:mcv_rightArrow="@drawable/ic_arrow_right_24"
+            app:mcv_selectionMode="multiple"
+            app:mcv_showOtherDates="none"
+            app:mcv_weekDayTextAppearance="@style/TextAppearance.App.16sp.ExtraBold" />
+
+        <View
+            android:id="@+id/line"
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginHorizontal="8dp"
+            android:background="@color/gray20"
+            app:layout_constraintEnd_toEndOf="@id/calendar_view"
+            app:layout_constraintStart_toStartOf="@id/calendar_view"
+            app:layout_constraintTop_toBottomOf="@id/calendar_view" />
+
+        <TextView
+            android:id="@+id/compare_location_history_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:text='@{viewModel.isMultipleSelected ? "위치기록 비교하기" : "날짜를 2개 선택하면 선택한 날짜들의 위치기록을\n비교할 수 있습니다."}'
+            android:textColor="@{viewModel.isMultipleSelected ? @color/black : @color/gray60}"
+            android:textAppearance="@style/TextAppearance.App.14sp.Bold"
+            app:layout_constraintStart_toStartOf="@id/calendar_view"
+            app:layout_constraintTop_toBottomOf="@id/line" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/compare_location_history_layout"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:visibility="@{viewModel.isMultipleSelected ? View.VISIBLE : View.GONE}"
+            app:layout_constraintEnd_toEndOf="@id/calendar_view"
+            app:layout_constraintStart_toStartOf="@id/calendar_view"
+            app:layout_constraintTop_toBottomOf="@id/compare_location_history_tv"
+            >
+
+            <TextView
+                android:id="@+id/selected_date_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/rectangle_corner_10_gray"
+                android:padding="8dp"
+                android:text="@{viewModel.selectedDate}"
+                android:textAppearance="@style/TextAppearance.App.12sp.SemiBold"
+                app:layout_constraintEnd_toStartOf="@id/selected_date_tv2"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="24-01-01" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="VS"
+                android:textAppearance="@style/TextAppearance.App.12sp.SemiBold"
+                app:layout_constraintBaseline_toBaselineOf="@id/selected_date_tv"
+                app:layout_constraintStart_toEndOf="@id/selected_date_tv"
+                app:layout_constraintEnd_toStartOf="@id/selected_date_tv2"/>
+
+            <TextView
+                android:id="@+id/selected_date_tv2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/rectangle_corner_10_gray"
+                android:padding="8dp"
+                android:text="@{viewModel.selectedDate2}"
+                android:textAppearance="@style/TextAppearance.App.12sp.SemiBold"
+                app:layout_constraintBaseline_toBaselineOf="@id/selected_date_tv"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/selected_date_tv"
+                tools:text="24-01-02" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <TextView
+            android:id="@+id/cancel_btn"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:background="@drawable/bg_dialog_cancel_btn"
+            android:gravity="center"
+            android:padding="10dp"
+            android:text="취소"
+            android:textAppearance="@style/TextAppearance.App.16sp.SemiBold"
+            app:layout_constraintEnd_toStartOf="@id/done_btn"
+            app:layout_constraintStart_toStartOf="@id/calendar_view"
+            app:layout_constraintTop_toBottomOf="@id/compare_location_history_layout" />
+
+        <TextView
+            android:id="@+id/done_btn"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_dialog_done_btn"
+            android:gravity="center"
+            android:padding="10dp"
+            android:text="선택완료"
+            android:textAppearance="@style/TextAppearance.App.16sp.SemiBold"
+            app:layout_constraintBottom_toBottomOf="@id/cancel_btn"
+            app:layout_constraintEnd_toEndOf="@id/calendar_view"
+            app:layout_constraintStart_toEndOf="@id/cancel_btn"
+            app:layout_constraintTop_toTopOf="@id/cancel_btn" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

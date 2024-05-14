@@ -1,8 +1,9 @@
 package kr.ac.tukorea.whereareu.presentation.nok.history
 
 import android.annotation.SuppressLint
+import android.content.Context
+import android.util.DisplayMetrics
 import android.util.Log
-import android.view.View.OnTouchListener
 import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
 import androidx.fragment.app.activityViewModels
@@ -32,6 +33,7 @@ class LocationHistoryFragment :
     override fun initObserver() {
         repeatOnStarted {
             viewModel.locationHistory.collect { list ->
+                Log.d("locationHistroy", "collect")
                 syncSeekBarWithLocationHistory(list)
                 locationHistoryRVA.submitList(list, kotlinx.coroutines.Runnable {
                     viewModel.setIstLoading(false)
@@ -59,6 +61,8 @@ class LocationHistoryFragment :
 
     override fun initView() {
         //showLoadingDialog(requireContext())
+        val dialog = CalendarDialogFragment()
+        dialog.show(childFragmentManager, dialog.tag)
         binding.viewModel = viewModel
         initLocationHistoryRVA()
 
@@ -79,6 +83,12 @@ class LocationHistoryFragment :
                 return LinearSmoothScroller.SNAP_TO_START
             }
         }
+        val display = this.requireContext().resources?.displayMetrics
+        val deviceWidth = display?.widthPixels
+        val deviceHeight = display?.heightPixels
+
+        Log.d("device width", deviceWidth!!.times(0.05).toString())
+        Log.d("time info x", binding.timeInfoTitleTv.right.toString())
 
         binding.seekBar.setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
@@ -87,11 +97,16 @@ class LocationHistoryFragment :
                     val locationInfo = locationHistoryList[progress]
                     Log.d("seek bar location info", locationInfo.toString())
                     viewModel.setProgress(progress)
-
-                    smoothScroller.targetPosition = progress
-                    binding.rv.layoutManager?.startSmoothScroll(smoothScroller)
-                    //binding.rv.scrollToPosition(progress)
-                } catch (e: IndexOutOfBoundsException) {
+                    //smoothScroller.targetPosition = progress
+                    /*binding.rv.layoutManager = LinearLayoutManager(requireContext()).apply {
+                        orientation = LinearLayoutManager.HORIZONTAL
+                    }*/
+                    //(binding.rv.layoutManager as LinearLayoutManager).scrollToPositionWithOffset(progress, binding.rv.get(progress).width)
+                    //binding.rv.layoutManager?.startSmoothScroll(smoothScroller)
+                    binding.rv.layoutManager?.scrollToPosition(progress)
+                    Log.d("layout position", binding.rv.findViewHolderForLayoutPosition(progress)?.itemView?.width.toString())
+                    Log.d("adapter position", binding.rv.computeHorizontalScrollOffset().toString())
+                } catch (e: Exception) {
                     Log.d("IndexOutOfBoundsException", e.toString())
                 }
             }
@@ -137,5 +152,9 @@ class LocationHistoryFragment :
     override fun onLoading() {
         Log.d("set is loading", "sds")
         viewModel.setIstLoading(false)
+    }
+
+    fun px2dp(px: Int, context: Context): Float {
+        return px / ((context.resources.displayMetrics.densityDpi.toFloat()) / DisplayMetrics.DENSITY_DEFAULT)
     }
 }

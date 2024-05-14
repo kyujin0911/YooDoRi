@@ -32,7 +32,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="16dp"
-            android:src="@drawable/ic_arrow_right_24"
+            android:src="@drawable/ic_arrow_right_white_24"
             app:layout_constraintEnd_toEndOf="@id/seek_bar"
             app:layout_constraintTop_toTopOf="parent"
             app:tint="@color/black" />
@@ -42,7 +42,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:scaleX="-1"
-            android:src="@drawable/ic_arrow_right_24"
+            android:src="@drawable/ic_arrow_right_white_24"
             app:layout_constraintBottom_toBottomOf="@id/next"
             app:layout_constraintEnd_toStartOf="@id/next"
             app:layout_constraintTop_toTopOf="@id/next"
@@ -65,9 +65,10 @@
             android:layout_height="wrap_content"
             android:text="시간"
             android:layout_marginTop="8dp"
-            android:layout_marginStart="8dp"
+            app:layout_constraintHorizontal_bias="0.05"
             android:textAppearance="@style/TextAppearance.App.12sp.SemiBold"
             app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/seek_bar"/>
 
         <TextView
@@ -91,7 +92,7 @@
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/seek_bar"
-            app:layout_constraintStart_toEndOf="@id/timeInfo_title_tv"
+            app:layout_constraintStart_toEndOf="@id/movement_title_tv"
             tools:listitem="@layout/item_location_history" />
 
 

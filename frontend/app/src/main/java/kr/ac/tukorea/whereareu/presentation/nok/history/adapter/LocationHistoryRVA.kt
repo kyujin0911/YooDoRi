@@ -37,12 +37,9 @@ class LocationHistoryRVA(): ListAdapter<LocationHistory, RecyclerView.ViewHolder
     inner class LocationHistoryViewHolder(private val binding: ItemLocationHistoryBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(locationHistory: LocationHistory) {
-            Log.d("location history info", locationHistory.toString())
+
             with(binding) {
                 model = locationHistory
-            }
-            if (locationHistory.isLast){
-                onLoadingListener?.onLoading()
             }
         }
     }
@@ -50,12 +47,8 @@ class LocationHistoryRVA(): ListAdapter<LocationHistory, RecyclerView.ViewHolder
     inner class LocationHistoryStopStatusViewHolder(private val binding: ItemLocationHistoryStopStatusBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(locationHistory: LocationHistory) {
-            Log.d("location history info", locationHistory.toString())
             with(binding) {
                 model = locationHistory
-            }
-            if (locationHistory.isLast){
-                onLoadingListener?.onLoading()
             }
         }
     }
