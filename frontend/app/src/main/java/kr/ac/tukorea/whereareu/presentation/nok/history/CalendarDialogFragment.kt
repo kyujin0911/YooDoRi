@@ -1,5 +1,7 @@
 package kr.ac.tukorea.whereareu.presentation.nok.history
 
+import android.icu.util.LocaleData
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import com.prolificinteractive.materialcalendarview.CalendarDay
 import com.prolificinteractive.materialcalendarview.format.ArrayWeekDayFormatter
@@ -11,11 +13,12 @@ import kr.ac.tukorea.whereareu.util.calendar.SaturdayDecorator
 import kr.ac.tukorea.whereareu.util.calendar.SelectedMonthDecorator
 import kr.ac.tukorea.whereareu.util.calendar.SundayDecorator
 import kr.ac.tukorea.whereareu.util.calendar.TodayDecorator
+import java.time.LocalDate
 
 class CalendarDialogFragment: BaseDialogFragment<DialogCalendarBinding>(R.layout.dialog_calendar) {
-    private val viewModel: CalendarDialogViewModel by viewModels()
+    private val viewModel: CalendarDialogViewModel by activityViewModels()
     private var onCalendarClickListener: OnCalendarClickListener? = null
-    private var selectedDates = mutableListOf<CalendarDay>()
+    private var selectedDates = listOf<org.threeten.bp.LocalDate>()
 
     fun setOnCalendarClickListener(listener: OnCalendarClickListener){
         this.onCalendarClickListener = listener
@@ -47,13 +50,17 @@ class CalendarDialogFragment: BaseDialogFragment<DialogCalendarBinding>(R.layout
         binding.calendarView.setWeekDayFormatter(ArrayWeekDayFormatter(resources.getTextArray(R.array.custom_weekdays)))
 
         binding.calendarView.setOnDateChangedListener { widget, date, selected ->
-            selectedDates = binding.calendarView.selectedDates
-            selectedDates = selectedDates.sortedBy { it.date }.toMutableList()
+            selectedDates = binding.calendarView.selectedDates.map { it.date }
+            if (selectedDates.isEmpty()){
+                return@setOnDateChangedListener
+            }
             if (selectedDates.size >= 2){
+                selectedDates = selectedDates.sortedBy { it }
                 viewModel.setIsMultipleSelected(true)
-                viewModel.setSelectedDate(selectedDates[0].date.toString())
-                viewModel.setSelectedDate2(selectedDates[1].date.toString())
+                viewModel.setSelectedDate(selectedDates[0].toString())
+                viewModel.setSelectedDate2(selectedDates[1].toString())
             } else{
+                viewModel.setSelectedDate(selectedDates[0].toString())
                 viewModel.setIsMultipleSelected(false)
             }
         }
@@ -77,7 +84,6 @@ class CalendarDialogFragment: BaseDialogFragment<DialogCalendarBinding>(R.layout
     }
 
     private fun dismissDialog(){
-        selectedDates.clear()
         viewModel.setIsMultipleSelected(false)
         dismiss()
     }

@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSmoothScroller
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collect
 import kr.ac.tukorea.whereareu.R
 import kr.ac.tukorea.whereareu.databinding.FragmentLocationHistoryBinding
 import kr.ac.tukorea.whereareu.domain.history.LocationHistory
@@ -23,6 +24,7 @@ class LocationHistoryFragment :
     BaseFragment<FragmentLocationHistoryBinding>(R.layout.fragment_location_history),
     LocationHistoryRVA.OnLoadingListener{
     private val viewModel: LocationHistoryViewModel by activityViewModels()
+    private val dialogViewModel: CalendarDialogViewModel by activityViewModels()
     private val locationHistoryRVA by lazy {
         LocationHistoryRVA().apply {
             setOnLoadingListener(this@LocationHistoryFragment)
@@ -46,6 +48,11 @@ class LocationHistoryFragment :
                 tempList.drop(0)*/
             }
         }
+        repeatOnStarted {
+            dialogViewModel.selectedDate.collect{
+                Log.d("selected date", it)
+            }
+        }
 
         /*repeatOnStarted {
             viewModel.isLoadingComplete.collect{ isLoading ->
@@ -66,7 +73,7 @@ class LocationHistoryFragment :
         binding.viewModel = viewModel
         initLocationHistoryRVA()
 
-        viewModel.fetchLocationHistory("2024-03-19", "253050")
+        //viewModel.fetchLocationHistory("2024-03-19", "253050")
         binding.next.setOnClickListener {
             binding.seekBar.progress += 1
             viewModel.setProgress(binding.seekBar.progress)

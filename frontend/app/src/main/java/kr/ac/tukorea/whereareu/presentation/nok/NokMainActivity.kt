@@ -11,6 +11,7 @@ import android.view.View
 import androidx.activity.viewModels
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.navigation.NavController
@@ -90,6 +91,11 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
         LocalBroadcastManager.getInstance(this).registerReceiver(
             mMessageReceiver, IntentFilter("gps")
         )
+        repeatOnStarted {
+            homeViewModel.navigateEvent.collect{
+                Log.d("navigateEvent", it)
+            }
+        }
 
         // 앱 처음 실행, 예측 중지 시 보호대상자 위치를 갖고 오는 job이 없으면 새로운 job을 생성해서 실행
         repeatOnStarted {
@@ -244,7 +250,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
             }
         }
 
-        repeatOnStarted {
+        /*repeatOnStarted {
             locationHistoryViewModel.isLoadingComplete.collect{ isLoading ->
                 if (isLoading){
                     showLoadingDialog(this@NokMainActivity)
@@ -253,7 +259,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                     dismissLoadingDialog()
                 }
             }
-        }
+        }*/
     }
 
 
@@ -421,8 +427,6 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
         initBottomSheet()
         initMap()
         initNavigator()
-        val dialog = CalendarDialogFragment()
-        dialog.show(supportFragmentManager, dialog.tag)
     }
 
     private fun initMap() {
@@ -511,6 +515,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                 }
 
                 R.id.meaningfulPlaceFragment -> {
+                    //binding.homeGroup.isVisible = false
                     event = NokHomeViewModel.NavigateEvent.MeaningfulPlace
                 }
 
