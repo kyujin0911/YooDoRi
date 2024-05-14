@@ -87,7 +87,7 @@ class LocationHistoryFragment :
                 //"2024-03-19"
 
                 viewModel.fetchLocationHistory(date.toString())
-                showLoadingDialog(requireContext())
+                showLoadingDialog(requireContext(), "위치 기록을 조회 중입니다...")
             }
         }
 

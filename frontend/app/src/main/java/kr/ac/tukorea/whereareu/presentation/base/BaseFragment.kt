@@ -36,9 +36,9 @@ abstract class BaseFragment<V : ViewDataBinding>(@LayoutRes val layoutResource: 
         return binding.root
     }
 
-    fun showLoadingDialog(context: Context) {
+    fun showLoadingDialog(context: Context, text: String) {
         if (!loadingState) {
-            loadingDialog = LoadingDialog(context)
+            loadingDialog = LoadingDialog(context, text)
             loadingDialog.show()
             loadingState = true
         }

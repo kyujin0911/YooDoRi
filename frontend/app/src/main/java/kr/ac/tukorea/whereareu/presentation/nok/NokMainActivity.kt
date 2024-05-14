@@ -278,7 +278,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
             is NokHomeViewModel.PredictEvent.StartPredict -> {
                 homeViewModel.predict()
                 stopGetDementiaLocation()
-                showLoadingDialog(this)
+                showLoadingDialog(this, "예측 장소를 추출중입니다...")
             }
 
             // 보호대상자 마지막 정보 UI 업데이트, 실종 시각 카운트다운 시작
