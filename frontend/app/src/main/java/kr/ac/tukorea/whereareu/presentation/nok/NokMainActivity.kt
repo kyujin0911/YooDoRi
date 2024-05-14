@@ -515,7 +515,6 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                 }
 
                 R.id.meaningfulPlaceFragment -> {
-                    //binding.homeGroup.isVisible = false
                     event = NokHomeViewModel.NavigateEvent.MeaningfulPlace
                 }
 

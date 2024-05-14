@@ -16,7 +16,7 @@ import kr.ac.tukorea.whereareu.util.calendar.TodayDecorator
 import java.time.LocalDate
 
 class CalendarDialogFragment: BaseDialogFragment<DialogCalendarBinding>(R.layout.dialog_calendar) {
-    private val viewModel: CalendarDialogViewModel by activityViewModels()
+    private val viewModel: CalendarDialogViewModel by viewModels(ownerProducer = {requireParentFragment()})
     private var onCalendarClickListener: OnCalendarClickListener? = null
     private var selectedDates = listOf<org.threeten.bp.LocalDate>()
 
@@ -57,10 +57,10 @@ class CalendarDialogFragment: BaseDialogFragment<DialogCalendarBinding>(R.layout
             if (selectedDates.size >= 2){
                 selectedDates = selectedDates.sortedBy { it }
                 viewModel.setIsMultipleSelected(true)
-                viewModel.setSelectedDate(selectedDates[0].toString())
-                viewModel.setSelectedDate2(selectedDates[1].toString())
+                viewModel.setSelectedDate(selectedDates[0])
+                viewModel.setSelectedDate2(selectedDates[1])
             } else{
-                viewModel.setSelectedDate(selectedDates[0].toString())
+                viewModel.setSelectedDate(selectedDates[0])
                 viewModel.setIsMultipleSelected(false)
             }
         }

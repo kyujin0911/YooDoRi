@@ -7,24 +7,27 @@ import android.util.Log
 import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSmoothScroller
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.collect
 import kr.ac.tukorea.whereareu.R
 import kr.ac.tukorea.whereareu.databinding.FragmentLocationHistoryBinding
 import kr.ac.tukorea.whereareu.domain.history.LocationHistory
 import kr.ac.tukorea.whereareu.presentation.base.BaseFragment
 import kr.ac.tukorea.whereareu.presentation.nok.history.adapter.LocationHistoryRVA
 import kr.ac.tukorea.whereareu.util.extension.repeatOnStarted
+import org.threeten.bp.DayOfWeek
+import org.threeten.bp.LocalDate
+import org.threeten.bp.Month
 
 @AndroidEntryPoint
 class LocationHistoryFragment :
     BaseFragment<FragmentLocationHistoryBinding>(R.layout.fragment_location_history),
     LocationHistoryRVA.OnLoadingListener{
     private val viewModel: LocationHistoryViewModel by activityViewModels()
-    private val dialogViewModel: CalendarDialogViewModel by activityViewModels()
+    private val dialogViewModel: CalendarDialogViewModel by viewModels()
     private val locationHistoryRVA by lazy {
         LocationHistoryRVA().apply {
             setOnLoadingListener(this@LocationHistoryFragment)
@@ -48,9 +51,19 @@ class LocationHistoryFragment :
                 tempList.drop(0)*/
             }
         }
+
         repeatOnStarted {
             dialogViewModel.selectedDate.collect{
-                Log.d("selected date", it)
+                if (it == LocalDate.MIN){
+                    binding.dateTv.text = "날짜를 선택해주세요."
+                    return@collect
+                }
+                val year = it.year
+                val month = it.month.value.toString()
+                val day = it.dayOfMonth
+                val dayOfWeek = translateDayOfWeekInKorean(it.dayOfWeek)
+                Log.d("dayofweek", dayOfWeek)
+                binding.dateTv.text = "${year}년 ${month}월 ${day}일, $dayOfWeek"
             }
         }
 
@@ -160,6 +173,22 @@ class LocationHistoryFragment :
         Log.d("set is loading", "sds")
         viewModel.setIstLoading(false)
     }
+
+    private fun translateDayOfWeekInKorean(dayOfWeek: DayOfWeek): String{
+        return when(dayOfWeek){
+            DayOfWeek.MONDAY -> "월요일"
+            DayOfWeek.TUESDAY -> "화요일"
+            DayOfWeek.WEDNESDAY -> "수요일"
+            DayOfWeek.THURSDAY -> "목요일"
+            DayOfWeek.FRIDAY -> "금요일"
+            DayOfWeek.SATURDAY -> "토요일"
+            DayOfWeek.SUNDAY -> "일요일"
+        }
+    }
+
+    /*private fun translateMonthInKorean(month: Month): String{
+        return when
+    }*/
 
     fun px2dp(px: Int, context: Context): Float {
         return px / ((context.resources.displayMetrics.densityDpi.toFloat()) / DisplayMetrics.DENSITY_DEFAULT)
