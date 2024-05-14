@@ -55,6 +55,10 @@ class LocationHistoryViewModel @Inject constructor(
         _progress.value = progress
     }
 
+    fun setMaxProgress(maxProgress: Int) {
+        _maxProgress.value = maxProgress
+    }
+
     fun setDementiaKey(dementiaKey: String) {
         _dementiaKey.value = dementiaKey
     }

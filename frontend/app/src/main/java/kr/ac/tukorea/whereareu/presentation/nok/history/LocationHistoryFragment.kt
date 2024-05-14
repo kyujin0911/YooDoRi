@@ -199,10 +199,11 @@ class LocationHistoryFragment :
         viewModel.setIstLoading(false)
     }
 
+
     override fun onStop() {
         super.onStop()
-        Log.d("스타ㅣㅂ", "스탑")
         dialogViewModel.setSelectedDate(LocalDate.MIN)
+        viewModel.setMaxProgress(0)
     }
 
     private fun translateDayOfWeekInKorean(dayOfWeek: DayOfWeek): String{

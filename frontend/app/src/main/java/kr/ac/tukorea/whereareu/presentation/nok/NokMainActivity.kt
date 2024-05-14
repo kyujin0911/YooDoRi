@@ -60,7 +60,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
     private var countDownJob: Job? = null
     private var naverMap: NaverMap? = null
     private val circleOverlay = CircleOverlay()
-    private val path = PathOverlay()
+    private var path: PathOverlay? = null
     private val historyMarker = Marker()
     private lateinit var behavior: BottomSheetBehavior<ConstraintLayout>
     private lateinit var navController: NavController
@@ -157,7 +157,8 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                             return@collect
                         }
                         val latLngList = event.locationHistory.map { LatLng(it.latitude, it.longitude) }
-                        with(path) {
+                        path = PathOverlay()
+                        with(path!!) {
                             coords = latLngList
                             width = 30
                             color = ContextCompat.getColor(this@NokMainActivity, R.color.yellow)
@@ -182,16 +183,16 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
         repeatOnStarted {
             locationHistoryViewModel.progress.collect { progress ->
                 Log.d("progress collect", progress.toString())
-                if (progress == -1) {
+                if (progress == -1 || path == null) {
                     return@collect
                 }
                 try {
-                    val latLng = path.coords[progress]
+                    val latLng = path!!.coords[progress]
                     val distance =
                         if (currentProgress - progress <= 0) naverMap?.cameraPosition?.target?.distanceTo(
-                            path.coords[progress + 1]
+                            path!!.coords[progress + 1]
                         )
-                        else naverMap?.cameraPosition?.target?.distanceTo(path.coords[progress - 1])
+                        else naverMap?.cameraPosition?.target?.distanceTo(path!!.coords[progress - 1])
 
                     var animation = CameraAnimation.Fly
                     var duration = 2000L
@@ -495,7 +496,8 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
             }
 
             if (destination.id != R.id.locationHistoryFragment) {
-                path.map = null
+                path?.map = null
+                path = null
                 historyMarker.map = null
             }
 
