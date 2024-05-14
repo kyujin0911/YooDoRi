@@ -12,6 +12,7 @@ import kotlinx.coroutines.launch
 import kr.ac.tukorea.whereareu.data.repository.nok.history.LocationHistoryRepositoryImpl
 import kr.ac.tukorea.whereareu.domain.history.LocationHistory
 import kr.ac.tukorea.whereareu.util.network.onException
+import kr.ac.tukorea.whereareu.util.network.onFail
 import kr.ac.tukorea.whereareu.util.network.onSuccess
 import javax.inject.Inject
 import kotlin.system.measureTimeMillis
@@ -21,10 +22,11 @@ class LocationHistoryViewModel @Inject constructor(
     private val repository: LocationHistoryRepositoryImpl
 ) : ViewModel() {
 
-    private val _locationHistory =
-        MutableSharedFlow<List<kr.ac.tukorea.whereareu.domain.history.LocationHistory>>(
+    private val _locationHistoryEvent = MutableSharedFlow<LocationHistoryEvent>()
+    val locationHistoryEvent = _locationHistoryEvent.asSharedFlow()
 
-        )
+    private val _locationHistory =
+        MutableSharedFlow<List<kr.ac.tukorea.whereareu.domain.history.LocationHistory>>()
     val locationHistory = _locationHistory.asSharedFlow()
 
     private val _progress = MutableStateFlow(0)
@@ -36,8 +38,25 @@ class LocationHistoryViewModel @Inject constructor(
     private val _isLoadingComplete = MutableSharedFlow<Boolean>()
     val isLoadingComplete = _isLoadingComplete.asSharedFlow()
 
+    private val _dementiaKey = MutableStateFlow("")
+
+    sealed class LocationHistoryEvent{
+        data class FetchSuccess(val locationHistory: List<LocationHistory>): LocationHistoryEvent()
+        data object FetchFail: LocationHistoryEvent()
+    }
+
+    private fun eventLocationHistory(event: LocationHistoryEvent){
+        viewModelScope.launch {
+            _locationHistoryEvent.emit(event)
+        }
+    }
+
     fun setProgress(progress: Int) {
         _progress.value = progress
+    }
+
+    fun setDementiaKey(dementiaKey: String) {
+        _dementiaKey.value = dementiaKey
     }
 
     fun setIstLoading(isLoading: Boolean){
@@ -46,9 +65,9 @@ class LocationHistoryViewModel @Inject constructor(
         }
     }
 
-    fun fetchLocationHistory(date: String, dementiaKey: String) {
+    fun fetchLocationHistory(date: String) {
         viewModelScope.launch {
-            repository.fetchLocationHistory(date, dementiaKey).onSuccess { response ->
+            repository.fetchLocationHistory(date, _dementiaKey.value).onSuccess { response ->
                 //val list = response.locationHistory.asSequence().withIndex().filter { it.index % 3 == 0 }.map { it.value }.toList()
                 _maxProgress.value = response.locationHistory.indices.last
                 val time = measureTimeMillis {
@@ -100,12 +119,15 @@ class LocationHistoryViewModel @Inject constructor(
                         }
                     }
                     Log.d("list", list.toString())
-                    _locationHistory.emit(list)
+                    eventLocationHistory(LocationHistoryEvent.FetchSuccess(list))
                     _maxProgress.value = list.indices.last
                 }
                 Log.d("time", time.toString())
             }.onException {
                 Log.d("errir", it.toString())
+            }.onFail {
+                eventLocationHistory(LocationHistoryEvent.FetchFail)
+                Log.d("fail", it.toString())
             }
         }
     }

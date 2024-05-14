@@ -70,6 +70,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
     private fun saveUserKeys() {
         val dementiaKey = getUserKey("dementia")
         homeViewModel.setDementiaKey(dementiaKey)
+        locationHistoryViewModel.setDementiaKey(dementiaKey)
 
         val nokKey = getUserKey("nok")
         homeViewModel.setNokKey(nokKey)
@@ -145,30 +146,37 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
         }
 
         repeatOnStarted {
-            locationHistoryViewModel.locationHistory.collect {
+            locationHistoryViewModel.locationHistoryEvent.collect {event ->
+                when(event){
+                    LocationHistoryViewModel.LocationHistoryEvent.FetchFail -> {
+
+                    }
+                    is LocationHistoryViewModel.LocationHistoryEvent.FetchSuccess -> {
+                        Log.d("history", event.locationHistory.toString())
+                        if (event.locationHistory.isEmpty()) {
+                            return@collect
+                        }
+                        val latLngList = event.locationHistory.map { LatLng(it.latitude, it.longitude) }
+                        with(path) {
+                            coords = latLngList
+                            width = 30
+                            color = ContextCompat.getColor(this@NokMainActivity, R.color.yellow)
+                            patternImage = OverlayImage.fromResource(R.drawable.ic_arrow_up_white_24)
+                            patternInterval = 50
+                            outlineColor = Color.WHITE
+                            map = naverMap
+                        }
+                        historyMarker.setMarkerWithInfoWindow(
+                            context = this@NokMainActivity,
+                            latLng = latLngList[0],
+                            markerIconColor = MarkerIcons.BLUE,
+                            "",
+                            naverMap,
+                            "현재 위치 기록"
+                        )
+                    }
+                }
                 //delay(100)
-                Log.d("history", it.toString())
-                if (it.isEmpty()) {
-                    return@collect
-                }
-                val latLngList = it.map { LatLng(it.latitude, it.longitude) }
-                with(path) {
-                    coords = latLngList
-                    width = 30
-                    color = ContextCompat.getColor(this@NokMainActivity, R.color.yellow)
-                    patternImage = OverlayImage.fromResource(R.drawable.ic_arrow_up_white_24)
-                    patternInterval = 50
-                    outlineColor = Color.WHITE
-                    map = naverMap
-                }
-                historyMarker.setMarkerWithInfoWindow(
-                    context = this@NokMainActivity,
-                    latLng = latLngList[0],
-                    markerIconColor = MarkerIcons.BLUE,
-                    "",
-                    naverMap,
-                    "현재 위치 기록"
-                )
             }
         }
         repeatOnStarted {

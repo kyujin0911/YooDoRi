@@ -57,10 +57,10 @@ class CalendarDialogFragment: BaseDialogFragment<DialogCalendarBinding>(R.layout
             if (selectedDates.size >= 2){
                 selectedDates = selectedDates.sortedBy { it }
                 viewModel.setIsMultipleSelected(true)
-                viewModel.setSelectedDate(selectedDates[0])
-                viewModel.setSelectedDate2(selectedDates[1])
+                binding.selectedDateTv.text = selectedDates[0].toString()
+                binding.selectedDateTv2.text = selectedDates[1].toString()
             } else{
-                viewModel.setSelectedDate(selectedDates[0])
+                binding.selectedDateTv.text = selectedDates[0].toString()
                 viewModel.setIsMultipleSelected(false)
             }
         }
@@ -75,6 +75,18 @@ class CalendarDialogFragment: BaseDialogFragment<DialogCalendarBinding>(R.layout
         }
 
         binding.doneBtn.setOnClickListener {
+            if (selectedDates.isEmpty()){
+                return@setOnClickListener
+            }
+            if (selectedDates.size >= 2){
+                selectedDates = selectedDates.sortedBy { it }
+                viewModel.setIsMultipleSelected(true)
+                viewModel.setSelectedDate(selectedDates[0])
+                viewModel.setSelectedDate2(selectedDates[1])
+            } else{
+                viewModel.setSelectedDate(selectedDates[0])
+                viewModel.setIsMultipleSelected(false)
+            }
             dismissDialog()
         }
 
@@ -86,6 +98,10 @@ class CalendarDialogFragment: BaseDialogFragment<DialogCalendarBinding>(R.layout
     private fun dismissDialog(){
         viewModel.setIsMultipleSelected(false)
         dismiss()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
     }
 
     interface OnCalendarClickListener{

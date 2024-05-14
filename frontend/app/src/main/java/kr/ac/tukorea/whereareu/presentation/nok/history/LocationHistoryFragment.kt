@@ -12,12 +12,14 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSmoothScroller
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.delay
 import kr.ac.tukorea.whereareu.R
 import kr.ac.tukorea.whereareu.databinding.FragmentLocationHistoryBinding
 import kr.ac.tukorea.whereareu.domain.history.LocationHistory
 import kr.ac.tukorea.whereareu.presentation.base.BaseFragment
 import kr.ac.tukorea.whereareu.presentation.nok.history.adapter.LocationHistoryRVA
 import kr.ac.tukorea.whereareu.util.extension.repeatOnStarted
+import kr.ac.tukorea.whereareu.util.extension.showToastShort
 import org.threeten.bp.DayOfWeek
 import org.threeten.bp.LocalDate
 import org.threeten.bp.Month
@@ -36,7 +38,7 @@ class LocationHistoryFragment :
     //private var tempList = mutableListOf<List<LocationHistoryDto>>()
 
     override fun initObserver() {
-        repeatOnStarted {
+        /*repeatOnStarted {
             viewModel.locationHistory.collect { list ->
                 Log.d("locationHistroy", "collect")
                 syncSeekBarWithLocationHistory(list)
@@ -50,50 +52,73 @@ class LocationHistoryFragment :
                 locationHistoryRVA.submitList(li[0])
                 tempList.drop(0)*/
             }
-        }
+        }*/
 
         repeatOnStarted {
-            dialogViewModel.selectedDate.collect{
-                if (it == LocalDate.MIN){
-                    binding.dateTv.text = "날짜를 선택해주세요."
-                    return@collect
+            viewModel.locationHistoryEvent.collect{event ->
+                when(event){
+                    LocationHistoryViewModel.LocationHistoryEvent.FetchFail -> {
+                        dismissLoadingDialog()
+                        requireActivity().showToastShort(requireContext(), "선택한 날짜에 해당하는 위치 기록이\n존재하지 않습니다.")
+                    }
+                    is LocationHistoryViewModel.LocationHistoryEvent.FetchSuccess -> {
+                        syncSeekBarWithLocationHistory(event.locationHistory)
+                        locationHistoryRVA.submitList(event.locationHistory, kotlinx.coroutines.Runnable {
+                            viewModel.setIstLoading(false)
+                        })
+                    }
                 }
-                val year = it.year
-                val month = it.month.value.toString()
-                val day = it.dayOfMonth
-                val dayOfWeek = translateDayOfWeekInKorean(it.dayOfWeek)
-                Log.d("dayofweek", dayOfWeek)
-                binding.dateTv.text = "${year}년 ${month}월 ${day}일, $dayOfWeek"
             }
         }
 
-        /*repeatOnStarted {
+        repeatOnStarted {
+            dialogViewModel.selectedDate.collect{date ->
+                if (date == LocalDate.MIN){
+                    binding.dateTv.text = "날짜를 선택해주세요."
+                    return@collect
+                }
+
+                val year = date.year
+                val month = date.month.value.toString()
+                val day = date.dayOfMonth
+                val dayOfWeek = translateDayOfWeekInKorean(date.dayOfWeek)
+                Log.d("dayofweek", dayOfWeek)
+                binding.dateTv.text = "${year}년 ${month}월 ${day}일, $dayOfWeek"
+                //"2024-03-19"
+
+                viewModel.fetchLocationHistory(date.toString())
+                showLoadingDialog(requireContext())
+            }
+        }
+
+        repeatOnStarted {
             viewModel.isLoadingComplete.collect{ isLoading ->
-                if (isLoading){
-                    showLoadingDialog(requireContext())
-                } else {
+                if (!isLoading){
                     delay(200)
                     dismissLoadingDialog()
                 }
             }
-        }*/
+        }
     }
 
     override fun initView() {
-        //showLoadingDialog(requireContext())
         val dialog = CalendarDialogFragment()
-        dialog.show(childFragmentManager, dialog.tag)
+        //dialog.show(childFragmentManager, dialog.tag)
         binding.viewModel = viewModel
         initLocationHistoryRVA()
 
-        //viewModel.fetchLocationHistory("2024-03-19", "253050")
         binding.next.setOnClickListener {
             binding.seekBar.progress += 1
             viewModel.setProgress(binding.seekBar.progress)
         }
+
         binding.previous.setOnClickListener {
             binding.seekBar.progress -= 1
             viewModel.setProgress(binding.seekBar.progress)
+        }
+
+        binding.calendarBtn.setOnClickListener {
+            dialog.show(childFragmentManager, dialog.tag)
         }
     }
 
@@ -174,6 +199,12 @@ class LocationHistoryFragment :
         viewModel.setIstLoading(false)
     }
 
+    override fun onStop() {
+        super.onStop()
+        Log.d("스타ㅣㅂ", "스탑")
+        dialogViewModel.setSelectedDate(LocalDate.MIN)
+    }
+
     private fun translateDayOfWeekInKorean(dayOfWeek: DayOfWeek): String{
         return when(dayOfWeek){
             DayOfWeek.MONDAY -> "월요일"
@@ -185,10 +216,6 @@ class LocationHistoryFragment :
             DayOfWeek.SUNDAY -> "일요일"
         }
     }
-
-    /*private fun translateMonthInKorean(month: Month): String{
-        return when
-    }*/
 
     fun px2dp(px: Int, context: Context): Float {
         return px / ((context.resources.displayMetrics.densityDpi.toFloat()) / DisplayMetrics.DENSITY_DEFAULT)
