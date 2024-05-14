@@ -1,20 +1,27 @@
 package kr.ac.tukorea.whereareu.firebase
 
+import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.drawable.BitmapDrawable
 import android.media.RingtoneManager
 import android.os.Build
 import android.util.Log
+import android.widget.RemoteViews
 import androidx.core.app.NotificationCompat
 import com.google.android.gms.tasks.OnCompleteListener
+import com.google.common.io.Resources.getResource
 import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import kr.ac.tukorea.whereareu.R
 import kr.ac.tukorea.whereareu.presentation.nok.NokMainActivity
+
 
 class FCMService : FirebaseMessagingService() {
 //    푸시 알림으로 보낼 수 있는 메세지는 2가지
@@ -22,6 +29,11 @@ class FCMService : FirebaseMessagingService() {
 //    2. Data: 실행중이거나 백그라운드(앱이 실행중이지 않을때) 알림이 옴
 
     private val TAG = "FirebaseService"
+
+    //channel 설정
+    private val channelId: String = "WhereAreU" // 알림 채널 이름
+    private val channelName = "어디U Cnannel"
+    private val channelDescription = "어디U를 위한 채널"
 
     override fun onNewToken(token: String) {
         Log.d(TAG, "new Token: $token")
@@ -46,6 +58,22 @@ class FCMService : FirebaseMessagingService() {
         Log.d(TAG, "Message data : ${remoteMessage.data}")
         Log.d(TAG, "Message noti : ${remoteMessage.notification}")
 
+        remoteMessage.notification?.apply {
+            val intent = Intent(this@FCMService, NokMainActivity::class.java).apply{
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            }
+            val pendingIntent = PendingIntent.getActivity(this@FCMService, 0, intent, PendingIntent.FLAG_IMMUTABLE)
+            val builder = NotificationCompat.Builder(this@FCMService, "WhereAreU")
+                .setSmallIcon(R.drawable.ic_logo_test)
+                .setContentTitle(title)
+                .setContentText(body)
+                .setContentIntent(pendingIntent)
+                .setAutoCancel(true)
+
+            val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+            notificationManager.notify(101, builder.build())
+        }
+
         if(remoteMessage.data.isNotEmpty()){
             //알림생성
             sendNotification(remoteMessage)
@@ -58,10 +86,6 @@ class FCMService : FirebaseMessagingService() {
 
     /** 알림 생성 메서드 */
     private fun sendNotification(remoteMessage: RemoteMessage) {
-        //channel 설정
-        val channelId = "WhereAreU" // 알림 채널 이름
-        val channelName = "어디U Cnannel"
-        val channelDescription = "어디U를 위한 채널"
         val soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION) // 알림 소리
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
@@ -96,10 +120,18 @@ class FCMService : FirebaseMessagingService() {
         // 알림에 대한 UI 정보, 작업
         val notificationBuilder = NotificationCompat.Builder(this, channelId)
             .setPriority(NotificationCompat.PRIORITY_HIGH) // 중요도 (HIGH: 상단바 표시 가능)
-            .setSmallIcon(R.drawable.ic_launcher_foreground) // 아이콘 설정
+            .setSmallIcon(R.drawable.ic_logo_test) // 아이콘 설정
             .setContentTitle(remoteMessage.data["title"].toString()) // 제목
             .setContentText(remoteMessage.data["body"].toString()) // 메시지 내용
-            .setAutoCancel(true) // 알람클릭시 삭제여부
+
+//            .setLargeIcon(BitmapFactory.decodeResource(resources, R.drawable.ic_launcher_foreground))
+            .setLargeIcon(convertBitmap())
+            .setStyle(NotificationCompat.BigPictureStyle()
+                .bigPicture(convertBitmap())
+                .bigLargeIcon(null))
+
+
+            .setAutoCancel(false) // 알람클릭시 삭제여부
             .setSound(soundUri)  // 알림 소리
             .setContentIntent(pendingIntent) // 알림 실행 시 Intent
 
@@ -111,8 +143,25 @@ class FCMService : FirebaseMessagingService() {
             notificationManager.createNotificationChannel(channel)
         }
 
+        // Head up 알람 설정
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            notificationBuilder.setCategory(NotificationCompat.CATEGORY_MESSAGE)
+                .setPriority(NotificationCompat.PRIORITY_MAX)
+                .setDefaults(Notification.DEFAULT_ALL)
+                .setFullScreenIntent(pendingIntent, true)
+        }
+
         // 알림 생성
         notificationManager.notify(uniId, notificationBuilder.build())
+
+    }
+    // 큰 아이콘 작성
+    private fun convertBitmap(): Bitmap{
+        val drawable = getDrawable(R.drawable.ic_logo_test)
+        val bitmapDrawable = drawable as BitmapDrawable
+        val bitmap = bitmapDrawable.bitmap
+
+        return bitmap
     }
 
 //  토큰 가져오는 함수
@@ -131,6 +180,13 @@ class FCMService : FirebaseMessagingService() {
                 var deviceToken = task.result
                 Log.e(TAG, "token=${deviceToken}")
             })
+    }
+    private fun getCustomDesign(title: String, message: String): RemoteViews {
+        val remoteViews = RemoteViews(applicationContext.packageName, R.layout.notification)
+        remoteViews.setTextViewText(R.id.notification_title_tv, title)
+        remoteViews.setTextViewText(R.id.notification_body_tv, message)
+        remoteViews.setImageViewResource(R.id.notification_iv, R.drawable.ic_launcher_foreground)
+        return remoteViews
     }
 }
 
