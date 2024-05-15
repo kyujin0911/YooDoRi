@@ -70,6 +70,7 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent">
 
+
                     <androidx.constraintlayout.widget.ConstraintLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
@@ -221,6 +222,15 @@
                     </androidx.constraintlayout.widget.ConstraintLayout>
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
+                <com.naver.maps.map.widget.ZoomControlView
+                    android:id="@+id/zoom"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"/>
+
                 <TextView
                     android:id="@+id/predict_tv"
                     android:layout_width="60dp"
@@ -335,7 +345,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
-                        android:text="보호대상자"
+                        android:text="@{viewModel.dementiaName}"
                         android:textAppearance="@style/TextAppearance.App.16sp.Medium"
                         app:layout_constraintStart_toEndOf="@id/dementia_name_title_tv"
                         app:layout_constraintTop_toTopOf="@id/count_down_tv" />

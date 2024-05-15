@@ -23,12 +23,14 @@ import com.naver.maps.map.CameraAnimation
 import com.naver.maps.map.CameraUpdate
 import com.naver.maps.map.MapFragment
 import com.naver.maps.map.NaverMap
+import com.naver.maps.map.NaverMapOptions
 import com.naver.maps.map.OnMapReadyCallback
 import com.naver.maps.map.overlay.CircleOverlay
 import com.naver.maps.map.overlay.Marker
 import com.naver.maps.map.overlay.OverlayImage
 import com.naver.maps.map.overlay.PathOverlay
 import com.naver.maps.map.util.MarkerIcons
+import com.naver.maps.map.widget.ZoomControlView
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancelAndJoin
@@ -147,24 +149,8 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
         repeatOnStarted {
             locationHistoryViewModel.locationHistoryEvent.collect { event ->
                 handleLocationHistoryEvent(event)
-                Log.d(
-                    "isMultip in nokmain",
-                    locationHistoryViewModel.isMultipleSelected.value.toString()
-                )
-                //delay(100)
             }
         }
-
-        /*repeatOnStarted {
-            locationHistoryViewModel.isLoadingComplete.collect{ isLoading ->
-                if (isLoading){
-                    showLoadingDialog(this@NokMainActivity)
-                } else {
-                    delay(200)
-                    dismissLoadingDialog()
-                }
-            }
-        }*/
     }
 
     private fun handleLocationHistoryEvent(event: LocationHistoryViewModel.LocationHistoryEvent) {
@@ -492,6 +478,9 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
             }
         mapFragment.getMapAsync { map ->
             map.uiSettings.setLogoMargin(20, 0, 0, 40)
+            map.uiSettings.isZoomControlEnabled = false
+            val zoomControlView = findViewById(R.id.zoom) as ZoomControlView
+            zoomControlView.map = map
             naverMap = map
         }
     }
