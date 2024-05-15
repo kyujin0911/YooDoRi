@@ -13,13 +13,13 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kr.ac.tukorea.whereareu.data.model.DementiaKeyRequest
 import kr.ac.tukorea.whereareu.data.model.nok.home.LocationInfoResponse
+import kr.ac.tukorea.whereareu.data.model.nok.home.PredictLocationInfo
 import kr.ac.tukorea.whereareu.data.repository.kakao.KakaoRepositoryImpl
 import kr.ac.tukorea.whereareu.data.repository.naver.NaverRepositoryImpl
 import kr.ac.tukorea.whereareu.data.repository.nok.home.NokHomeRepositoryImpl
 import kr.ac.tukorea.whereareu.domain.home.InnerItemClickEvent
 import kr.ac.tukorea.whereareu.domain.home.LastLocation
 import kr.ac.tukorea.whereareu.domain.home.MeaningfulPlaceInfo
-import kr.ac.tukorea.whereareu.data.model.nok.home.PoliceStationInfoResponse
 import kr.ac.tukorea.whereareu.domain.home.DementiaStatusInfo
 import kr.ac.tukorea.whereareu.domain.home.PoliceStationInfo
 import kr.ac.tukorea.whereareu.util.network.onError
@@ -27,7 +27,6 @@ import kr.ac.tukorea.whereareu.util.network.onException
 import kr.ac.tukorea.whereareu.util.network.onFail
 import kr.ac.tukorea.whereareu.util.network.onSuccess
 import javax.inject.Inject
-import kotlin.math.roundToInt
 import kotlin.system.measureTimeMillis
 
 @HiltViewModel
@@ -65,9 +64,13 @@ class NokHomeViewModel @Inject constructor(
 
     sealed class PredictEvent {
         data class StartPredict(val isPredicted: Boolean) : PredictEvent()
-        data class MeaningFulPlaceEvent(
+        data class MeaningFulPlace(
             val meaningfulPlaceForList: List<MeaningfulPlaceInfo>
         ) : PredictEvent()
+
+        data class PredictLocation(
+            val predictLocation: PredictLocationInfo
+        ): PredictEvent()
 
         data class DisplayDementiaLastInfo(val averageSpeed: Double, val coord: LatLng) :
             PredictEvent()
@@ -159,16 +162,18 @@ class NokHomeViewModel @Inject constructor(
     fun predict() {
         viewModelScope.launch {
             val time = measureTimeMillis {
-                val dementiaLastInfo = async { getDementiaLastInfo() }
+                val dementiaLastInfo = async { getDementiaLastInfo() }.await()
                 //Log.d("lastInfo", dementiaLastInfo.toString())
+                val predictLocation = async { fetchPredictInfo() }.await()
                 val meaningfulPlaceList = async { getMeaningfulPlaces() }.await()
+
             }
             Log.d("after refactor time", time.toString())
         }
     }
 
     private suspend fun getDementiaLastInfo() {
-        nokHomeRepository.getDementiaLastInfo(DementiaKeyRequest("253050"))
+        nokHomeRepository.getDementiaLastInfo(DementiaKeyRequest(_dementiaKey.value))
             .onSuccess { response ->
                 Log.d("last info", response.toString())
                 val averageSpeed = response.averageSpeed.div(3.6)
@@ -186,7 +191,7 @@ class NokHomeViewModel @Inject constructor(
             }
     }
     private suspend fun getMeaningfulPlaces() {
-        nokHomeRepository.getMeaningfulPlace("253050").onSuccess { response ->
+        nokHomeRepository.getMeaningfulPlace(_dementiaKey.value).onSuccess { response ->
             Log.d("getMeaningfulPlace", response.toString())
             val meaningfulPlaceInfo = response.meaningfulPlaces.map { meaningfulPlace ->
                 val policeStationInfo = meaningfulPlace.policeStationInfo.map {policeStation ->
@@ -196,9 +201,17 @@ class NokHomeViewModel @Inject constructor(
                 meaningfulPlace.toModel(policeStationInfo)
             }
 
-            eventPredict(PredictEvent.MeaningFulPlaceEvent(meaningfulPlaceInfo))
+            eventPredict(PredictEvent.MeaningFulPlace(meaningfulPlaceInfo))
         }.onException {
             Log.d("error", it.toString())
+        }
+    }
+
+    private suspend fun fetchPredictInfo(){
+        nokHomeRepository.fetchPredictInfo(_dementiaKey.value).onSuccess { response ->
+            eventPredict(PredictEvent.PredictLocation(response.predictLocation))
+        }.onException {
+            Log.d("predict exception", it.toString())
         }
     }
 }

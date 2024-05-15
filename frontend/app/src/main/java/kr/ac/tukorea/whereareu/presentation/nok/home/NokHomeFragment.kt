@@ -15,7 +15,6 @@ import com.naver.maps.geometry.LatLng
 import dagger.hilt.android.AndroidEntryPoint
 import kr.ac.tukorea.whereareu.R
 import kr.ac.tukorea.whereareu.domain.home.InnerItemClickEvent
-import kr.ac.tukorea.whereareu.data.model.nok.home.PoliceStationInfoResponse
 import kr.ac.tukorea.whereareu.domain.home.PoliceStationInfo
 import kr.ac.tukorea.whereareu.presentation.base.BaseFragment
 import kr.ac.tukorea.whereareu.presentation.nok.home.adapter.PoliceStationRVA
@@ -46,7 +45,7 @@ class NokHomeFragment : BaseFragment<kr.ac.tukorea.whereareu.databinding.Fragmen
                 initMeaningfulListRVA()
             }
 
-            is NokHomeViewModel.PredictEvent.MeaningFulPlaceEvent -> {
+            is NokHomeViewModel.PredictEvent.MeaningFulPlace -> {
                 Log.d("뭐고", event.meaningfulPlaceForList.toString())
                 meaningfulPlaceRVA.submitList(event.meaningfulPlaceForList)
             }

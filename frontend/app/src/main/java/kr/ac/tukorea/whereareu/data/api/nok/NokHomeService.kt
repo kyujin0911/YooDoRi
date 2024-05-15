@@ -5,6 +5,7 @@ import kr.ac.tukorea.whereareu.data.model.ResponseBody
 import kr.ac.tukorea.whereareu.data.model.nok.home.DementiaLastInfoResponse
 import kr.ac.tukorea.whereareu.data.model.nok.home.LocationInfoResponse
 import kr.ac.tukorea.whereareu.data.model.nok.home.MeaningfulPlaceResponse
+import kr.ac.tukorea.whereareu.data.model.nok.home.PredictResponse
 import kr.ac.tukorea.whereareu.data.model.setting.GetUserInfoResponse
 import retrofit2.Response
 import retrofit2.http.Body
@@ -24,4 +25,7 @@ interface NokHomeService {
 
     @GET("users/info")
     suspend fun getUserInfo(@Query("nokKey") nokKey: String): Response<ResponseBody<GetUserInfoResponse>>
+
+    @GET("locations/predict")
+    suspend fun fetchPredictInfo(@Query("dementiaKey") dementiaKey: String): Response<ResponseBody<PredictResponse>>
 }

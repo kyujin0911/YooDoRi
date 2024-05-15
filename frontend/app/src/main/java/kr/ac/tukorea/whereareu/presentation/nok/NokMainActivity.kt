@@ -329,7 +329,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
             }
 
             // 의미장소 마커 지도에 표시
-            is NokHomeViewModel.PredictEvent.MeaningFulPlaceEvent -> {
+            is NokHomeViewModel.PredictEvent.MeaningFulPlace -> {
                 event.meaningfulPlaceForList.forEach { meaningfulPlace ->
                     predictMarkers.add(
                         Marker().apply {
@@ -339,7 +339,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                                 markerIconColor = MarkerIcons.YELLOW,
                                 markerText = meaningfulPlace.address,
                                 naverMap = naverMap,
-                                infoText = "예상 위치"
+                                infoText = "의미 장소"
                             )
                         }
                     )
@@ -397,6 +397,17 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                 }
                 binding.predictTv.isVisible = true
                 binding.emergencyTv.isVisible = true
+            }
+
+            is NokHomeViewModel.PredictEvent.PredictLocation -> {
+                predictMarkers.add(Marker().apply {
+                    setMarkerWithInfoWindow(this@NokMainActivity,
+                    latLng = LatLng(event.predictLocation.latitude.toDouble(), event.predictLocation.longitude.toDouble()),
+                    markerIconColor = MarkerIcons.GREEN,
+                    markerText = event.predictLocation.address,
+                    naverMap = naverMap,
+                    infoText = "예상 위치")
+                })
             }
         }
     }
