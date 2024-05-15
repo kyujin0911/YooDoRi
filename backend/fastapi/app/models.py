@@ -22,12 +22,6 @@ class dementia_info(Base):
     dementia_phonenumber = Column(String)
     update_rate = Column(String)
 
-class refresh_token_info(Base):
-    __tablename__ = 'refresh_token_info'
-
-    key = Column(String, primary_key=True)
-    refresh_token = Column(String)
-
 class location_info(Base):
     __tablename__ = 'location_info'
 
@@ -60,6 +54,7 @@ class meaningful_location_info(Base):
 
     num = Column(Integer, index=True, primary_key=True)
     dementia_key = Column(String)
+    date = Column(String)
     day_of_the_week = Column(String)
     time = Column(String)
     latitude = Column(Double)
@@ -74,7 +69,14 @@ class police_info(Base):
     key = Column(String)
     policeName = Column(String)
     policeAddress = Column(String)
+    roadAddress = Column(String)
     policePhoneNumber = Column(String)
     distance = Column(Integer)
     latitude = Column(Double)
     longitude = Column(Double)
+
+class refresh_token_info(Base):
+    __tablename__ = 'refresh_token_info'
+
+    key = Column(String)
+    refresh_token = Column(String)
