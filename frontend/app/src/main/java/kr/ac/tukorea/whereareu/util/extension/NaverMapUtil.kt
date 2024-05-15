@@ -1,11 +1,15 @@
 package kr.ac.tukorea.whereareu.util.extension
 
 import android.content.Context
+import android.graphics.Color
+import androidx.core.content.ContextCompat
 import com.naver.maps.geometry.LatLng
 import com.naver.maps.map.NaverMap
 import com.naver.maps.map.overlay.InfoWindow
 import com.naver.maps.map.overlay.Marker
 import com.naver.maps.map.overlay.OverlayImage
+import com.naver.maps.map.overlay.PathOverlay
+import kr.ac.tukorea.whereareu.R
 
 fun Marker.setMarker(
     latLng: LatLng,
@@ -47,5 +51,17 @@ fun InfoWindow.setAdapter(context: Context, text: String) {
         override fun getText(infoWindow: InfoWindow): CharSequence {
             return text
         }
+    }
+}
+
+fun PathOverlay.setPath(context: Context, latLngList: List<LatLng>, pathColor: Int, naverMap: NaverMap?){
+    with(this){
+        coords = latLngList
+        width = 30
+        color = ContextCompat.getColor(context, pathColor)
+        patternImage = OverlayImage.fromResource(R.drawable.ic_arrow_up_white_24)
+        patternInterval = 50
+        outlineColor = Color.WHITE
+        map = naverMap
     }
 }

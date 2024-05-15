@@ -46,6 +46,7 @@ import kr.ac.tukorea.whereareu.util.extension.getUserKey
 import kr.ac.tukorea.whereareu.util.extension.repeatOnStarted
 import kr.ac.tukorea.whereareu.util.extension.setMarker
 import kr.ac.tukorea.whereareu.util.extension.setMarkerWithInfoWindow
+import kr.ac.tukorea.whereareu.util.extension.setPath
 import java.lang.IndexOutOfBoundsException
 import kotlin.math.roundToInt
 
@@ -59,8 +60,8 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
     private var countDownJob: Job? = null
     private var naverMap: NaverMap? = null
     private val circleOverlay = CircleOverlay()
-    private var path: PathOverlay? = null
-    private val historyMarker = Marker()
+    private var path = PathOverlay()
+    private val historyMarkers = listOf(Marker(), Marker())
     private lateinit var behavior: BottomSheetBehavior<ConstraintLayout>
     private lateinit var navController: NavController
     private val predictMarkers = mutableListOf<Marker>()
@@ -145,46 +146,12 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
         }
 
         repeatOnStarted {
-            locationHistoryViewModel.locationHistoryEvent.collect {event ->
-                Log.d("isMultip in nokmain", locationHistoryViewModel.isMultipleSelected.value.toString())
-                when(event){
-                    LocationHistoryViewModel.LocationHistoryEvent.FetchFail -> {
-
-                    }
-                    is LocationHistoryViewModel.LocationHistoryEvent.FetchSuccessSingle -> {
-                        Log.d("history", event.locationHistory.toString())
-                        if (event.locationHistory.isEmpty()) {
-                            return@collect
-                        }
-                        val latLngList = event.locationHistory.map { LatLng(it.latitude, it.longitude) }
-                        path = PathOverlay()
-                        with(path!!) {
-                            coords = latLngList
-                            width = 30
-                            color = ContextCompat.getColor(this@NokMainActivity, R.color.yellow)
-                            patternImage = OverlayImage.fromResource(R.drawable.ic_arrow_up_white_24)
-                            patternInterval = 50
-                            outlineColor = Color.WHITE
-                            map = naverMap
-                        }
-                        historyMarker.setMarkerWithInfoWindow(
-                            context = this@NokMainActivity,
-                            latLng = latLngList[0],
-                            markerIconColor = MarkerIcons.BLUE,
-                            "",
-                            naverMap,
-                            "현재 위치 기록"
-                        )
-
-                    }
-
-                    is LocationHistoryViewModel.LocationHistoryEvent.FetchSuccessMultiple -> {
-                        dismissLoadingDialog()
-                    }
-
-                    is LocationHistoryViewModel.LocationHistoryEvent.OnProgress2Changed -> TODO()
-                    is LocationHistoryViewModel.LocationHistoryEvent.OnProgressChanged -> TODO()
-                }
+            locationHistoryViewModel.locationHistoryEvent.collect { event ->
+                handleLocationHistoryEvent(event)
+                Log.d(
+                    "isMultip in nokmain",
+                    locationHistoryViewModel.isMultipleSelected.value.toString()
+                )
                 //delay(100)
             }
         }
@@ -204,7 +171,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
 
                     var animation = CameraAnimation.Fly
                     var duration = 2000L
-                    historyMarker.position = latLng
+                    historyMarkers[0].position = latLng
                     if (progress == 0) {
                         naverMap?.moveCamera(
                             CameraUpdate.scrollAndZoomTo(latLng, zoom)
@@ -277,6 +244,39 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                 }
             }
         }*/
+    }
+
+    private fun handleLocationHistoryEvent(event: LocationHistoryViewModel.LocationHistoryEvent){
+        when(event){
+            LocationHistoryViewModel.LocationHistoryEvent.FetchFail -> {
+
+            }
+            is LocationHistoryViewModel.LocationHistoryEvent.FetchSuccessSingle -> {
+                Log.d("history", event.locationHistory.toString())
+                val latLngList = event.locationHistory.map { LatLng(it.latitude, it.longitude) }
+                path = PathOverlay()
+                path?.setPath(this@NokMainActivity, latLngList, R.color.yellow, naverMap)
+
+                historyMarkers[0].setMarkerWithInfoWindow(
+                    context = this@NokMainActivity,
+                    latLng = latLngList[0],
+                    markerIconColor = MarkerIcons.BLUE,
+                    "",
+                    naverMap,
+                    "현재 위치 기록"
+                )
+
+            }
+
+            is LocationHistoryViewModel.LocationHistoryEvent.FetchSuccessMultiple -> {
+                val latLngList = event.locationHistory[0].map { LatLng(it.latitude, it.longitude) }
+                val latLngList2 = event.locationHistory[1].map { LatLng(it.latitude, it.longitude) }
+                dismissLoadingDialog()
+            }
+
+            is LocationHistoryViewModel.LocationHistoryEvent.OnProgress2Changed -> TODO()
+            is LocationHistoryViewModel.LocationHistoryEvent.OnProgressChanged -> TODO()
+        }
     }
 
 
@@ -509,8 +509,10 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
 
             if (destination.id != R.id.locationHistoryFragment) {
                 path?.map = null
-                path = null
-                historyMarker.map = null
+                //path = null
+                historyMarkers.forEach {
+                    it.map = null
+                }
             }
 
             if (destination.id != R.id.nokSettingFragment or R.id.modifyUserInfoFragment or R.id.settingUpdateTimeFragment) {
