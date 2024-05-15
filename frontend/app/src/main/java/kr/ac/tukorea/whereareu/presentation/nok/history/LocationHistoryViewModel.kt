@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -26,24 +27,32 @@ class LocationHistoryViewModel @Inject constructor(
     private val _locationHistoryEvent = MutableSharedFlow<LocationHistoryEvent>()
     val locationHistoryEvent = _locationHistoryEvent.asSharedFlow()
 
-    private val _locationHistory =
-        MutableSharedFlow<List<kr.ac.tukorea.whereareu.domain.history.LocationHistory>>()
-    val locationHistory = _locationHistory.asSharedFlow()
-
     private val _progress = MutableStateFlow(0)
     val progress = _progress.asStateFlow()
 
+    private val _progress2 = MutableStateFlow(0)
+    val progress2 = _progress2.asStateFlow()
+
     private val _maxProgress = MutableStateFlow(0)
     val maxProgress = _maxProgress.asStateFlow()
+
+    private val _maxProgress2 = MutableStateFlow(0)
+    val maxProgress2 = _maxProgress2.asStateFlow()
 
     private val _isLoadingComplete = MutableSharedFlow<Boolean>()
     val isLoadingComplete = _isLoadingComplete.asSharedFlow()
 
     private val _dementiaKey = MutableStateFlow("")
 
+    val isMultipleSelected = MutableStateFlow(false)
+
     sealed class LocationHistoryEvent {
-        data class FetchSuccess(val locationHistory: List<LocationHistory>) : LocationHistoryEvent()
+        data class FetchSuccessSingle(val locationHistory: List<LocationHistory>) : LocationHistoryEvent()
+        data class FetchSuccessMultiple(val locationHistory: List<List<LocationHistory>>) : LocationHistoryEvent()
         data object FetchFail : LocationHistoryEvent()
+
+        data class OnProgressChanged(val progress: Int): LocationHistoryEvent()
+        data class OnProgress2Changed(val progress: Int): LocationHistoryEvent()
     }
 
     private fun eventLocationHistory(event: LocationHistoryEvent) {
@@ -51,9 +60,16 @@ class LocationHistoryViewModel @Inject constructor(
             _locationHistoryEvent.emit(event)
         }
     }
+    fun setIsMultipleSelected(isMultipleSelected: Boolean){
+        this.isMultipleSelected.value = isMultipleSelected
+    }
 
     fun setProgress(progress: Int) {
         _progress.value = progress
+    }
+
+    fun setProgress2(progress: Int){
+        _progress2.value = progress
     }
 
     fun setMaxProgress(maxProgress: Int) {
@@ -64,7 +80,7 @@ class LocationHistoryViewModel @Inject constructor(
         _dementiaKey.value = dementiaKey
     }
 
-    fun setIstLoading(isLoading: Boolean) {
+    fun setIsLoading(isLoading: Boolean) {
         viewModelScope.launch {
             _isLoadingComplete.emit(isLoading)
         }
@@ -74,11 +90,21 @@ class LocationHistoryViewModel @Inject constructor(
         viewModelScope.launch {
             val list = async { fetchLocationHistory(date) }.await()
             Log.d("fetchSingleLocationHistory list", list.toString())
-            if (list.isEmpty()) {
-                eventLocationHistory(LocationHistoryEvent.FetchFail)
-            } else {
-                eventLocationHistory(LocationHistoryEvent.FetchSuccess(list))
+            if (list.isNotEmpty()) {
+                eventLocationHistory(LocationHistoryEvent.FetchSuccessSingle(list))
                 _maxProgress.value = list.indices.last
+            }
+        }
+    }
+
+    fun fetchMultipleLocationHistory(date1: String, date2: String){
+        viewModelScope.launch {
+            val list = listOf( async { fetchLocationHistory(date1) },
+            async { fetchLocationHistory(date2) }).awaitAll()
+            if (list.isNotEmpty()){
+                eventLocationHistory(LocationHistoryEvent.FetchSuccessMultiple(list))
+                _maxProgress.value = list[0].indices.last
+                _maxProgress2.value = list[1].indices.last
             }
         }
     }
@@ -131,7 +157,8 @@ class LocationHistoryViewModel @Inject constructor(
                             it.value.userStatus,
                             it.value.distance,
                             true,
-                            viewType
+                            viewType,
+                            date
                         )
                     } else {
                         LocationHistory(
@@ -141,7 +168,8 @@ class LocationHistoryViewModel @Inject constructor(
                             it.value.userStatus,
                             it.value.distance,
                             false,
-                            viewType
+                            viewType,
+                            date
                         )
                     }
                 }
@@ -153,7 +181,7 @@ class LocationHistoryViewModel @Inject constructor(
         }.onException {
             Log.d("errir", it.toString())
         }.onFail {
-            //eventLocationHistory(LocationHistoryEvent.FetchFail)
+            eventLocationHistory(LocationHistoryEvent.FetchFail)
             Log.d("fail", it.toString())
         }
         return result

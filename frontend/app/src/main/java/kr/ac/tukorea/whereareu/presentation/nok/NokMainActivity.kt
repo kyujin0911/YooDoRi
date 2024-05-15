@@ -39,7 +39,6 @@ import kr.ac.tukorea.whereareu.R
 import kr.ac.tukorea.whereareu.databinding.ActivityNokMainBinding
 import kr.ac.tukorea.whereareu.databinding.IconLocationOverlayLayoutBinding
 import kr.ac.tukorea.whereareu.presentation.base.BaseActivity
-import kr.ac.tukorea.whereareu.presentation.nok.history.CalendarDialogFragment
 import kr.ac.tukorea.whereareu.presentation.nok.history.LocationHistoryViewModel
 import kr.ac.tukorea.whereareu.presentation.nok.home.NokHomeViewModel
 import kr.ac.tukorea.whereareu.presentation.nok.setting.SettingViewModel
@@ -147,11 +146,12 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
 
         repeatOnStarted {
             locationHistoryViewModel.locationHistoryEvent.collect {event ->
+                Log.d("isMultip in nokmain", locationHistoryViewModel.isMultipleSelected.value.toString())
                 when(event){
                     LocationHistoryViewModel.LocationHistoryEvent.FetchFail -> {
 
                     }
-                    is LocationHistoryViewModel.LocationHistoryEvent.FetchSuccess -> {
+                    is LocationHistoryViewModel.LocationHistoryEvent.FetchSuccessSingle -> {
                         Log.d("history", event.locationHistory.toString())
                         if (event.locationHistory.isEmpty()) {
                             return@collect
@@ -177,6 +177,13 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                         )
 
                     }
+
+                    is LocationHistoryViewModel.LocationHistoryEvent.FetchSuccessMultiple -> {
+                        dismissLoadingDialog()
+                    }
+
+                    is LocationHistoryViewModel.LocationHistoryEvent.OnProgress2Changed -> TODO()
+                    is LocationHistoryViewModel.LocationHistoryEvent.OnProgressChanged -> TODO()
                 }
                 //delay(100)
             }
@@ -534,7 +541,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                 }
 
                 R.id.locationHistoryFragment -> {
-                    locationHistoryViewModel.setIstLoading(true)
+                    locationHistoryViewModel.setIsLoading(true)
                     event = NokHomeViewModel.NavigateEvent.LocationHistory
                 }
             }

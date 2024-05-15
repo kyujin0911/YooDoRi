@@ -22,12 +22,11 @@ import kr.ac.tukorea.whereareu.util.extension.repeatOnStarted
 import kr.ac.tukorea.whereareu.util.extension.showToastShort
 import org.threeten.bp.DayOfWeek
 import org.threeten.bp.LocalDate
-import org.threeten.bp.Month
 
 @AndroidEntryPoint
 class LocationHistoryFragment :
     BaseFragment<FragmentLocationHistoryBinding>(R.layout.fragment_location_history),
-    LocationHistoryRVA.OnLoadingListener{
+    LocationHistoryRVA.OnLoadingListener {
     private val viewModel: LocationHistoryViewModel by activityViewModels()
     private val dialogViewModel: CalendarDialogViewModel by viewModels()
     private val locationHistoryRVA by lazy {
@@ -35,9 +34,9 @@ class LocationHistoryFragment :
             setOnLoadingListener(this@LocationHistoryFragment)
         }
     }
-    private var isMultipleSelected = false
     //private var tempList = mutableListOf<List<LocationHistoryDto>>()
 
+    @SuppressLint("SetTextI18n")
     override fun initObserver() {
         /*repeatOnStarted {
             viewModel.locationHistory.collect { list ->
@@ -56,52 +55,61 @@ class LocationHistoryFragment :
         }*/
 
         repeatOnStarted {
-            dialogViewModel.isMultipleSelected.collect{
-                Log.d("isMutipleSelected", it.toString())
-                isMultipleSelected = it
-            }
-        }
-
-        repeatOnStarted {
-            viewModel.locationHistoryEvent.collect{event ->
-                when(event){
+            viewModel.locationHistoryEvent.collect { event ->
+                when (event) {
                     LocationHistoryViewModel.LocationHistoryEvent.FetchFail -> {
                         dismissLoadingDialog()
-                        requireActivity().showToastShort(requireContext(), "선택한 날짜에 해당하는 위치 기록이\n존재하지 않습니다.")
+                        requireActivity().showToastShort(
+                            requireContext(),
+                            "선택한 날짜에 해당하는 위치 기록이\n존재하지 않습니다."
+                        )
+                        viewModel.setIsMultipleSelected(false)
                     }
-                    is LocationHistoryViewModel.LocationHistoryEvent.FetchSuccess -> {
-                        syncSeekBarWithLocationHistory(event.locationHistory)
-                        locationHistoryRVA.submitList(event.locationHistory, kotlinx.coroutines.Runnable {
-                            viewModel.setIstLoading(false)
-                        })
+
+                    is LocationHistoryViewModel.LocationHistoryEvent.FetchSuccessSingle -> {
+                        syncSeekBarWithSingleLocationHistory(event.locationHistory)
+                        locationHistoryRVA.submitList(
+                            event.locationHistory,
+                            kotlinx.coroutines.Runnable {
+                                viewModel.setIsLoading(false)
+                            })
                     }
+
+                    is LocationHistoryViewModel.LocationHistoryEvent.FetchSuccessMultiple -> {
+                        syncSeekBarWithSingleLocationHistory(event.locationHistory[0], event.locationHistory[1])
+                    }
+                    else -> {}
                 }
             }
         }
 
         repeatOnStarted {
-            dialogViewModel.selectedDates.collect{dates ->
-                if (dates.isEmpty() || dates[0] == LocalDate.MIN){
+            dialogViewModel.selectedDates.collect { dates ->
+                Log.d("daes", dates.toString())
+                if (dates.isEmpty() || dates[0] == LocalDate.MIN) {
                     binding.dateTv.text = "날짜를 선택해주세요."
                     return@collect
                 }
 
-                if (dates.size < 2){
+                if (dates.size < 2) {
+                    viewModel.setIsMultipleSelected(false)
                     binding.dateTv.text = getDateText(dates[0])
                     //"2024-03-19"
-
                     viewModel.fetchSingleLocationHistory(dates[0].toString())
 
                 } else {
-                    binding.compareDateTv.text = "${getDateText(dates[0])} VS ${getDateText(dates[1])}"
+                    viewModel.setIsMultipleSelected(true)
+                    viewModel.fetchMultipleLocationHistory(dates[0].toString(), dates[1].toString())
+                    binding.dateInfoTv.text = dates[0].toString()
+                    binding.dateInfoTv2.text = dates[1].toString()
                 }
                 showLoadingDialog(requireContext(), "위치 기록을 조회 중입니다...")
             }
         }
 
         repeatOnStarted {
-            viewModel.isLoadingComplete.collect{ isLoading ->
-                if (!isLoading){
+            viewModel.isLoadingComplete.collect { isLoading ->
+                if (!isLoading) {
                     delay(200)
                     dismissLoadingDialog()
                 }
@@ -130,7 +138,7 @@ class LocationHistoryFragment :
         }
     }
 
-    private fun syncSeekBarWithLocationHistory(locationHistoryList: List<LocationHistory>) {
+    private fun syncSeekBarWithSingleLocationHistory(locationHistoryList: List<LocationHistory>) {
         val smoothScroller = object : LinearSmoothScroller(requireContext()) {
             override fun getHorizontalSnapPreference(): Int {
                 return LinearSmoothScroller.SNAP_TO_START
@@ -157,7 +165,10 @@ class LocationHistoryFragment :
                     //(binding.rv.layoutManager as LinearLayoutManager).scrollToPositionWithOffset(progress, binding.rv.get(progress).width)
                     //binding.rv.layoutManager?.startSmoothScroll(smoothScroller)
                     binding.rv.layoutManager?.scrollToPosition(progress)
-                    Log.d("layout position", binding.rv.findViewHolderForLayoutPosition(progress)?.itemView?.width.toString())
+                    Log.d(
+                        "layout position",
+                        binding.rv.findViewHolderForLayoutPosition(progress)?.itemView?.width.toString()
+                    )
                     Log.d("adapter position", binding.rv.computeHorizontalScrollOffset().toString())
                 } catch (e: Exception) {
                     Log.d("IndexOutOfBoundsException", e.toString())
@@ -173,6 +184,47 @@ class LocationHistoryFragment :
 
         })
 
+    }
+
+    private fun syncSeekBarWithSingleLocationHistory(
+        locationHistoryList: List<LocationHistory>,
+        locationHistoryList2: List<LocationHistory>
+    ) {
+        binding.seekBar.setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                Log.d("progress", progress.toString())
+                try {
+                    val locationInfo = locationHistoryList[progress]
+                    viewModel.setProgress(progress)
+                } catch (e: Exception) {
+                    Log.d("IndexOutOfBoundsException", e.toString())
+                }
+            }
+
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {
+            }
+
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {
+            }
+        })
+
+        binding.seekBar2.setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                Log.d("progress", progress.toString())
+                try {
+                    val locationInfo = locationHistoryList2[progress]
+                    viewModel.setProgress2(progress)
+                } catch (e: Exception) {
+                    Log.d("IndexOutOfBoundsException", e.toString())
+                }
+            }
+
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {
+            }
+
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {
+            }
+        })
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -204,7 +256,7 @@ class LocationHistoryFragment :
 
     override fun onLoading() {
         Log.d("set is loading", "sds")
-        viewModel.setIstLoading(false)
+        viewModel.setIsLoading(false)
     }
 
 
@@ -214,8 +266,8 @@ class LocationHistoryFragment :
         viewModel.setMaxProgress(0)
     }
 
-    private fun translateDayOfWeekInKorean(dayOfWeek: DayOfWeek): String{
-        return when(dayOfWeek){
+    private fun translateDayOfWeekInKorean(dayOfWeek: DayOfWeek): String {
+        return when (dayOfWeek) {
             DayOfWeek.MONDAY -> "월요일"
             DayOfWeek.TUESDAY -> "화요일"
             DayOfWeek.WEDNESDAY -> "수요일"
@@ -226,7 +278,7 @@ class LocationHistoryFragment :
         }
     }
 
-    private fun getDateText(date: LocalDate): String{
+    private fun getDateText(date: LocalDate): String {
         val year = date.year
         val month = date.month.value.toString()
         val day = date.dayOfMonth
