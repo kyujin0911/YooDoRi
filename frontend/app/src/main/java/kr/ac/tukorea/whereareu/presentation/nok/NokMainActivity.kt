@@ -279,6 +279,8 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                 homeViewModel.predict()
                 stopGetDementiaLocation()
                 showLoadingDialog(this, "예측 장소를 추출중입니다...")
+                binding.predictTv.isVisible = false
+                binding.emergencyTv.isVisible = false
             }
 
             // 보호대상자 마지막 정보 UI 업데이트, 실종 시각 카운트다운 시작
@@ -362,6 +364,8 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                 predictMarkers.forEach { marker ->
                     marker.map = null
                 }
+                binding.predictTv.isVisible = true
+                binding.emergencyTv.isVisible = true
             }
         }
     }

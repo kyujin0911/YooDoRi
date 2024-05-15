@@ -72,6 +72,10 @@ class LocationHistoryViewModel @Inject constructor(
     fun fetchLocationHistory(date: String) {
         viewModelScope.launch {
             repository.fetchLocationHistory(date, _dementiaKey.value).onSuccess { response ->
+                if(response.locationHistory.size < 2){
+                    eventLocationHistory(LocationHistoryEvent.FetchFail)
+                    return@launch
+                }
                 //val list = response.locationHistory.asSequence().withIndex().filter { it.index % 3 == 0 }.map { it.value }.toList()
                 _maxProgress.value = response.locationHistory.indices.last
                 val time = measureTimeMillis {

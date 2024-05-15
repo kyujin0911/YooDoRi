@@ -114,9 +114,7 @@ class MeaningfulPlaceRVA :
     }
 
     private fun convertTimeInKorean(time: String): String{
-        return "${time.substring(0 until 2)}시~${
-            time.substring(2 until 4)
-        }시"
+        return "${time.substring(0 until 2)}시~${time.substring(2 until 4)}시"
     }
 
     interface MeaningfulPlaceRVAClickListener{

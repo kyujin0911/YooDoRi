@@ -35,6 +35,7 @@ class LocationHistoryFragment :
             setOnLoadingListener(this@LocationHistoryFragment)
         }
     }
+    private var isMultipleSelected = false
     //private var tempList = mutableListOf<List<LocationHistoryDto>>()
 
     override fun initObserver() {
@@ -53,6 +54,12 @@ class LocationHistoryFragment :
                 tempList.drop(0)*/
             }
         }*/
+
+        repeatOnStarted {
+            dialogViewModel.isMultipleSelected.collect{
+                isMultipleSelected = it
+            }
+        }
 
         repeatOnStarted {
             viewModel.locationHistoryEvent.collect{event ->
