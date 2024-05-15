@@ -57,6 +57,7 @@ class LocationHistoryFragment :
 
         repeatOnStarted {
             dialogViewModel.isMultipleSelected.collect{
+                Log.d("isMutipleSelected", it.toString())
                 isMultipleSelected = it
             }
         }
@@ -79,21 +80,21 @@ class LocationHistoryFragment :
         }
 
         repeatOnStarted {
-            dialogViewModel.selectedDate.collect{date ->
-                if (date == LocalDate.MIN){
+            dialogViewModel.selectedDates.collect{dates ->
+                if (dates.isEmpty() || dates[0] == LocalDate.MIN){
                     binding.dateTv.text = "날짜를 선택해주세요."
                     return@collect
                 }
 
-                val year = date.year
-                val month = date.month.value.toString()
-                val day = date.dayOfMonth
-                val dayOfWeek = translateDayOfWeekInKorean(date.dayOfWeek)
-                Log.d("dayofweek", dayOfWeek)
-                binding.dateTv.text = "${year}년 ${month}월 ${day}일, $dayOfWeek"
-                //"2024-03-19"
+                if (dates.size < 2){
+                    binding.dateTv.text = getDateText(dates[0])
+                    //"2024-03-19"
 
-                viewModel.fetchLocationHistory(date.toString())
+                    viewModel.fetchSingleLocationHistory(dates[0].toString())
+
+                } else {
+                    binding.compareDateTv.text = "${getDateText(dates[0])} VS ${getDateText(dates[1])}"
+                }
                 showLoadingDialog(requireContext(), "위치 기록을 조회 중입니다...")
             }
         }
@@ -223,6 +224,15 @@ class LocationHistoryFragment :
             DayOfWeek.SATURDAY -> "토요일"
             DayOfWeek.SUNDAY -> "일요일"
         }
+    }
+
+    private fun getDateText(date: LocalDate): String{
+        val year = date.year
+        val month = date.month.value.toString()
+        val day = date.dayOfMonth
+        val dayOfWeek = translateDayOfWeekInKorean(date.dayOfWeek)
+
+        return "${year}년 ${month}월 ${day}일, $dayOfWeek"
     }
 
     fun px2dp(px: Int, context: Context): Float {

@@ -12,9 +12,16 @@ class CalendarDialogViewModel: ViewModel() {
     val selectedDate = MutableStateFlow(LocalDate.MIN)
     val selectedDate2 = MutableStateFlow(LocalDate.MIN)
 
+    val selectedDates = MutableStateFlow(listOf<LocalDate>())
+
     fun setIsMultipleSelected(isMultipleSelected: Boolean){
         _isMultipleSelected.value = isMultipleSelected
     }
+
+    fun setSelectedDates(dates: List<LocalDate>){
+        selectedDates.value = dates
+    }
+
 
     fun setSelectedDate(date: LocalDate){
         selectedDate.value = date

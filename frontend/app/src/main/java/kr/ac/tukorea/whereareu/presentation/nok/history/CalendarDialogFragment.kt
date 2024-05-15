@@ -81,12 +81,13 @@ class CalendarDialogFragment: BaseDialogFragment<DialogCalendarBinding>(R.layout
             if (selectedDates.size >= 2){
                 selectedDates = selectedDates.sortedBy { it }
                 viewModel.setIsMultipleSelected(true)
-                viewModel.setSelectedDate(selectedDates[0])
-                viewModel.setSelectedDate2(selectedDates[1])
+                /*viewModel.setSelectedDate(selectedDates[0])
+                viewModel.setSelectedDate2(selectedDates[1])*/
             } else{
-                viewModel.setSelectedDate(selectedDates[0])
+                //viewModel.setSelectedDate(selectedDates[0])
                 viewModel.setIsMultipleSelected(false)
             }
+            viewModel.setSelectedDates(selectedDates)
             dismissDialog()
         }
 

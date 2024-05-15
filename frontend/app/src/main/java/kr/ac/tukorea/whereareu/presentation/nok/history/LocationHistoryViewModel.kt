@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -40,12 +41,12 @@ class LocationHistoryViewModel @Inject constructor(
 
     private val _dementiaKey = MutableStateFlow("")
 
-    sealed class LocationHistoryEvent{
-        data class FetchSuccess(val locationHistory: List<LocationHistory>): LocationHistoryEvent()
-        data object FetchFail: LocationHistoryEvent()
+    sealed class LocationHistoryEvent {
+        data class FetchSuccess(val locationHistory: List<LocationHistory>) : LocationHistoryEvent()
+        data object FetchFail : LocationHistoryEvent()
     }
 
-    private fun eventLocationHistory(event: LocationHistoryEvent){
+    private fun eventLocationHistory(event: LocationHistoryEvent) {
         viewModelScope.launch {
             _locationHistoryEvent.emit(event)
         }
@@ -63,80 +64,98 @@ class LocationHistoryViewModel @Inject constructor(
         _dementiaKey.value = dementiaKey
     }
 
-    fun setIstLoading(isLoading: Boolean){
+    fun setIstLoading(isLoading: Boolean) {
         viewModelScope.launch {
             _isLoadingComplete.emit(isLoading)
         }
     }
 
-    fun fetchLocationHistory(date: String) {
+    fun fetchSingleLocationHistory(date: String) {
         viewModelScope.launch {
-            repository.fetchLocationHistory(date, _dementiaKey.value).onSuccess { response ->
-                if(response.locationHistory.size < 2){
-                    eventLocationHistory(LocationHistoryEvent.FetchFail)
-                    return@launch
-                }
-                //val list = response.locationHistory.asSequence().withIndex().filter { it.index % 3 == 0 }.map { it.value }.toList()
-                _maxProgress.value = response.locationHistory.indices.last
-                val time = measureTimeMillis {
-                    /*val list = response.locationHistoryDto.mapIndexed { index, locationHistory ->
-                        if (index != _maxProgress.value) {
-                            kr.ac.tukorea.whereareu.domain.history.LocationHistory(
-                                locationHistory.latitude,
-                                locationHistory.longitude,
-                                locationHistory.time,
-                                locationHistory.userStatus,
-                                locationHistory.distance,
-                                false
-                            )
-                        } else {
-                            kr.ac.tukorea.whereareu.domain.history.LocationHistory(
-                                locationHistory.latitude,
-                                locationHistory.longitude,
-                                locationHistory.time,
-                                locationHistory.userStatus,
-                                locationHistory.distance,
-                                true
-                            )
-                        }
-                    }*/
-                    val tempList = response.locationHistory.withIndex()
-                    val list = tempList.map{
-                        val viewType = if (it.value.userStatus == "정지"){
-                            LocationHistory.STOP_STATUS
-                        } else {
-                            LocationHistory.OTHER_STATUS
-                        }
-
-                        if (it.index == tempList.last().index){
-                            LocationHistory(it.value.latitude,
-                                it.value.longitude,
-                                it.value.time,
-                                it.value.userStatus,
-                                it.value.distance,
-                                true,
-                                viewType)
-                        } else {
-                            LocationHistory(it.value.latitude,
-                                it.value.longitude,
-                                it.value.time,
-                                it.value.userStatus,
-                                it.value.distance,
-                                false,
-                                viewType)
-                        }
-                    }
-                    Log.d("list", list.toString())
-                    eventLocationHistory(LocationHistoryEvent.FetchSuccess(list))
-                    _maxProgress.value = list.indices.last
-                }
-                Log.d("time", time.toString())
-            }.onException {
-                Log.d("errir", it.toString())
-            }.onFail {
+            val list = async { fetchLocationHistory(date) }.await()
+            Log.d("fetchSingleLocationHistory list", list.toString())
+            if (list.isEmpty()) {
                 eventLocationHistory(LocationHistoryEvent.FetchFail)
-                Log.d("fail", it.toString())
+            } else {
+                eventLocationHistory(LocationHistoryEvent.FetchSuccess(list))
+                _maxProgress.value = list.indices.last
             }
         }
+    }
+
+    private suspend fun fetchLocationHistory(date: String): List<LocationHistory> {
+        var result = emptyList<LocationHistory>()
+
+        repository.fetchLocationHistory(date, _dementiaKey.value).onSuccess { response ->
+            if (response.locationHistory.size < 2) {
+                eventLocationHistory(LocationHistoryEvent.FetchFail)
+                return emptyList()
+            }
+            //val list = response.locationHistory.asSequence().withIndex().filter { it.index % 3 == 0 }.map { it.value }.toList()
+            //_maxProgress.value = response.locationHistory.indices.last
+            val time = measureTimeMillis {
+                /*val list = response.locationHistoryDto.mapIndexed { index, locationHistory ->
+                    if (index != _maxProgress.value) {
+                        kr.ac.tukorea.whereareu.domain.history.LocationHistory(
+                            locationHistory.latitude,
+                            locationHistory.longitude,
+                            locationHistory.time,
+                            locationHistory.userStatus,
+                            locationHistory.distance,
+                            false
+                        )
+                    } else {
+                        kr.ac.tukorea.whereareu.domain.history.LocationHistory(
+                            locationHistory.latitude,
+                            locationHistory.longitude,
+                            locationHistory.time,
+                            locationHistory.userStatus,
+                            locationHistory.distance,
+                            true
+                        )
+                    }
+                }*/
+                val tempList = response.locationHistory.withIndex()
+                val list = tempList.map {
+                    val viewType = if (it.value.userStatus == "정지") {
+                        LocationHistory.STOP_STATUS
+                    } else {
+                        LocationHistory.OTHER_STATUS
+                    }
+
+                    if (it.index == tempList.last().index) {
+                        LocationHistory(
+                            it.value.latitude,
+                            it.value.longitude,
+                            it.value.time,
+                            it.value.userStatus,
+                            it.value.distance,
+                            true,
+                            viewType
+                        )
+                    } else {
+                        LocationHistory(
+                            it.value.latitude,
+                            it.value.longitude,
+                            it.value.time,
+                            it.value.userStatus,
+                            it.value.distance,
+                            false,
+                            viewType
+                        )
+                    }
+                }
+                result = list
+                //eventLocationHistory(LocationHistoryEvent.FetchSuccess(list))
+                //_maxProgress.value = list.indices.last
+            }
+            Log.d("time", time.toString())
+        }.onException {
+            Log.d("errir", it.toString())
+        }.onFail {
+            //eventLocationHistory(LocationHistoryEvent.FetchFail)
+            Log.d("fail", it.toString())
+        }
+        return result
     }
 }

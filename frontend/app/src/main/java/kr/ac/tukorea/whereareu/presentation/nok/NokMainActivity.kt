@@ -175,6 +175,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                             naverMap,
                             "현재 위치 기록"
                         )
+
                     }
                 }
                 //delay(100)
