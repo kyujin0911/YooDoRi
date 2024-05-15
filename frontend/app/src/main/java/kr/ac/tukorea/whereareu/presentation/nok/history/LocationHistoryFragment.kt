@@ -103,7 +103,7 @@ class LocationHistoryFragment :
                     binding.dateInfoTv.text = dates[0].toString()
                     binding.dateInfoTv2.text = dates[1].toString()
                 }
-                showLoadingDialog(requireContext(), "위치 기록을 조회 중입니다...")
+                showLoadingDialog(requireActivity(), "위치 기록을 조회 중입니다...")
             }
         }
 
@@ -133,6 +133,16 @@ class LocationHistoryFragment :
             viewModel.setProgress(binding.seekBar.progress)
         }
 
+        binding.next2.setOnClickListener {
+            binding.seekBar2.progress += 1
+            viewModel.setProgress2(binding.seekBar2.progress)
+        }
+
+        binding.previous2.setOnClickListener {
+            binding.seekBar2.progress -= 1
+            viewModel.setProgress2(binding.seekBar2.progress)
+        }
+
         binding.calendarBtn.setOnClickListener {
             dialog.show(childFragmentManager, dialog.tag)
         }
@@ -148,15 +158,15 @@ class LocationHistoryFragment :
         val deviceWidth = display?.widthPixels
         val deviceHeight = display?.heightPixels
 
-        Log.d("device width", deviceWidth!!.times(0.05).toString())
-        Log.d("time info x", binding.timeInfoTitleTv.right.toString())
+        //Log.d("device width", deviceWidth!!.times(0.05).toString())
+        //Log.d("time info x", binding.timeInfoTitleTv.right.toString())
 
         binding.seekBar.setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 Log.d("progress", progress.toString())
                 try {
                     val locationInfo = locationHistoryList[progress]
-                    Log.d("seek bar location info", locationInfo.toString())
+                    //Log.d("seek bar location info", locationInfo.toString())
                     viewModel.setProgress(progress)
                     //smoothScroller.targetPosition = progress
                     /*binding.rv.layoutManager = LinearLayoutManager(requireContext()).apply {
@@ -165,13 +175,10 @@ class LocationHistoryFragment :
                     //(binding.rv.layoutManager as LinearLayoutManager).scrollToPositionWithOffset(progress, binding.rv.get(progress).width)
                     //binding.rv.layoutManager?.startSmoothScroll(smoothScroller)
                     binding.rv.layoutManager?.scrollToPosition(progress)
-                    Log.d(
-                        "layout position",
-                        binding.rv.findViewHolderForLayoutPosition(progress)?.itemView?.width.toString()
-                    )
-                    Log.d("adapter position", binding.rv.computeHorizontalScrollOffset().toString())
+                    //Log.d( "layout position", binding.rv.findViewHolderForLayoutPosition(progress)?.itemView?.width.toString() )
+                    //Log.d("adapter position", binding.rv.computeHorizontalScrollOffset().toString())
                 } catch (e: Exception) {
-                    Log.d("IndexOutOfBoundsException", e.toString())
+                   // Log.d("IndexOutOfBoundsException", e.toString())
                 }
             }
 

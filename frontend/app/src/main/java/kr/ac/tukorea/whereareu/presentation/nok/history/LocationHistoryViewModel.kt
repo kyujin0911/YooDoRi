@@ -65,11 +65,13 @@ class LocationHistoryViewModel @Inject constructor(
     }
 
     fun setProgress(progress: Int) {
-        _progress.value = progress
+        eventLocationHistory(LocationHistoryEvent.OnProgressChanged(progress))
+        //_progress.value = progress
     }
 
     fun setProgress2(progress: Int){
-        _progress2.value = progress
+        eventLocationHistory(LocationHistoryEvent.OnProgress2Changed(progress))
+        //_progress2.value = progress
     }
 
     fun setMaxProgress(maxProgress: Int) {

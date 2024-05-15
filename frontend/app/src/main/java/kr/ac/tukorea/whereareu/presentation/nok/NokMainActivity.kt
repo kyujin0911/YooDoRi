@@ -4,7 +4,6 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.graphics.Color
 import android.graphics.PointF
 import android.util.Log
 import android.view.View
@@ -38,6 +37,8 @@ import kotlinx.coroutines.launch
 import kr.ac.tukorea.whereareu.R
 import kr.ac.tukorea.whereareu.databinding.ActivityNokMainBinding
 import kr.ac.tukorea.whereareu.databinding.IconLocationOverlayLayoutBinding
+import kr.ac.tukorea.whereareu.domain.history.LocationHistory
+import kr.ac.tukorea.whereareu.domain.history.LocationHistoryMetaData
 import kr.ac.tukorea.whereareu.presentation.base.BaseActivity
 import kr.ac.tukorea.whereareu.presentation.nok.history.LocationHistoryViewModel
 import kr.ac.tukorea.whereareu.presentation.nok.home.NokHomeViewModel
@@ -60,13 +61,11 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
     private var countDownJob: Job? = null
     private var naverMap: NaverMap? = null
     private val circleOverlay = CircleOverlay()
-    private var path = PathOverlay()
-    private val historyMarkers = listOf(Marker(), Marker())
     private lateinit var behavior: BottomSheetBehavior<ConstraintLayout>
     private lateinit var navController: NavController
     private val predictMarkers = mutableListOf<Marker>()
     private var zoom = 14.0
-    private var currentProgress = 0
+    private val locationHistoryMetaData = LocationHistoryMetaData()
     private fun saveUserKeys() {
         val dementiaKey = getUserKey("dementia")
         homeViewModel.setDementiaKey(dementiaKey)
@@ -93,7 +92,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
             mMessageReceiver, IntentFilter("gps")
         )
         repeatOnStarted {
-            homeViewModel.navigateEvent.collect{
+            homeViewModel.navigateEvent.collect {
                 Log.d("navigateEvent", it)
             }
         }
@@ -155,84 +154,6 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                 //delay(100)
             }
         }
-        repeatOnStarted {
-            locationHistoryViewModel.progress.collect { progress ->
-                Log.d("progress collect", progress.toString())
-                if (progress == -1 || path == null) {
-                    return@collect
-                }
-                try {
-                    val latLng = path!!.coords[progress]
-                    val distance =
-                        if (currentProgress - progress <= 0) naverMap?.cameraPosition?.target?.distanceTo(
-                            path!!.coords[progress + 1]
-                        )
-                        else naverMap?.cameraPosition?.target?.distanceTo(path!!.coords[progress - 1])
-
-                    var animation = CameraAnimation.Fly
-                    var duration = 2000L
-                    historyMarkers[0].position = latLng
-                    if (progress == 0) {
-                        naverMap?.moveCamera(
-                            CameraUpdate.scrollAndZoomTo(latLng, zoom)
-                                .animate(animation, duration)
-                        )
-                    } else {
-                        if (distance != null) {
-                            when (distance) {
-                                //이동 상태 정보도 받아와야 될듯
-                                /*
-                                거리에 따라 디테일 하게 줌 변경
-                                in 0.0..0.01 -> {
-                                    zoom = 19.0
-                                    animation = CameraAnimation.Easing
-                                    duration = 100L
-                                }
-
-                                in 400.0..Double.MAX_VALUE -> {
-                                    zoom = 15.0
-                                    animation = CameraAnimation.Easing
-                                    duration = 1500L
-                                }
-
-                                in 100.0..399.9 -> {
-                                    //zoom = 16.0
-                                    animation = CameraAnimation.Easing
-                                    duration = 500L
-                                }
-
-                                else -> {
-                                    //zoom = 17.0
-                                    animation = CameraAnimation.Easing
-                                    duration = 500L
-                                }*/
-                                in 0.0..0.01 -> {
-                                    zoom = 18.0
-                                    animation = CameraAnimation.Easing
-                                    duration = 100L
-                                }
-
-                                else -> {
-                                    zoom = 15.0
-                                    animation = CameraAnimation.Easing
-                                    duration = 1000L
-                                }
-                            }
-                            naverMap?.moveCamera(
-                                CameraUpdate.scrollAndZoomTo(latLng, zoom)
-                                    .animate(animation, duration)
-                            )
-                            Log.d("zoom", zoom.toString())
-                        }
-                        Log.d("distance", distance.toString())
-                    }
-                    //naverMap?.moveCamera(CameraUpdate.scrollAndZoomTo(latLng, 18.0))
-                } catch (e: IndexOutOfBoundsException) {
-                    Log.d("IndexOutOfBoundsException", e.toString())
-                }
-                currentProgress = progress
-            }
-        }
 
         /*repeatOnStarted {
             locationHistoryViewModel.isLoadingComplete.collect{ isLoading ->
@@ -246,36 +167,138 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
         }*/
     }
 
-    private fun handleLocationHistoryEvent(event: LocationHistoryViewModel.LocationHistoryEvent){
-        when(event){
+    private fun handleLocationHistoryEvent(event: LocationHistoryViewModel.LocationHistoryEvent) {
+        when (event) {
             LocationHistoryViewModel.LocationHistoryEvent.FetchFail -> {
 
             }
+
             is LocationHistoryViewModel.LocationHistoryEvent.FetchSuccessSingle -> {
                 Log.d("history", event.locationHistory.toString())
+                locationHistoryMetaData.locationHistory = event.locationHistory
                 val latLngList = event.locationHistory.map { LatLng(it.latitude, it.longitude) }
-                path = PathOverlay()
-                path?.setPath(this@NokMainActivity, latLngList, R.color.yellow, naverMap)
-
-                historyMarkers[0].setMarkerWithInfoWindow(
-                    context = this@NokMainActivity,
-                    latLng = latLngList[0],
-                    markerIconColor = MarkerIcons.BLUE,
-                    "",
-                    naverMap,
-                    "현재 위치 기록"
-                )
-
+                initLocationHistory(latLngList)
             }
 
             is LocationHistoryViewModel.LocationHistoryEvent.FetchSuccessMultiple -> {
-                val latLngList = event.locationHistory[0].map { LatLng(it.latitude, it.longitude) }
-                val latLngList2 = event.locationHistory[1].map { LatLng(it.latitude, it.longitude) }
-                dismissLoadingDialog()
+                Log.d("multipla success", "성공")
+                with(locationHistoryMetaData){
+                    locationHistory = event.locationHistory[0]
+                    locationHistory2 = event.locationHistory[1]
+                    val latLngList = locationHistory.map { LatLng(it.latitude, it.longitude) }
+                    val latLngList2 = locationHistory2.map { LatLng(it.latitude, it.longitude) }
+
+                    initLocationHistory(latLngList, infoText = locationHistory[0].date)
+                    initLocationHistory(
+                        latLngList2,
+                        paths[1],
+                        R.color.purple,
+                        markers[1],
+                        MarkerIcons.PINK,
+                        infoText = locationHistory2[0].date
+                    )
+                }
+                locationHistoryViewModel.setIsLoading(false)
             }
 
-            is LocationHistoryViewModel.LocationHistoryEvent.OnProgress2Changed -> TODO()
-            is LocationHistoryViewModel.LocationHistoryEvent.OnProgressChanged -> TODO()
+            is LocationHistoryViewModel.LocationHistoryEvent.OnProgress2Changed -> {
+                with(locationHistoryMetaData){
+                    moveCameraAlongLocationHistory(paths[1], markers[1], event.progress, locationHistory2)
+                }
+            }
+            is LocationHistoryViewModel.LocationHistoryEvent.OnProgressChanged -> {
+                with(locationHistoryMetaData){
+                    moveCameraAlongLocationHistory(paths[0], markers[0], event.progress, locationHistory)
+                }
+            }
+        }
+    }
+
+    private fun initLocationHistory(
+        coords: List<LatLng>,
+        path: PathOverlay = locationHistoryMetaData.paths[0],
+        pathColor: Int = R.color.yellow,
+        marker: Marker = locationHistoryMetaData.markers[0],
+        markerColor: OverlayImage = MarkerIcons.YELLOW,
+        infoText: String = "현재 위치 기록"
+    ) {
+        path.setPath(this@NokMainActivity, coords, pathColor, naverMap)
+
+        marker.setMarkerWithInfoWindow(
+            context = this@NokMainActivity,
+            latLng = coords[0],
+            markerIconColor = markerColor,
+            "",
+            naverMap,
+            infoText
+        )
+    }
+
+    private fun moveCameraAlongLocationHistory(path: PathOverlay, marker: Marker, progress: Int, list: List<LocationHistory>){
+        if (progress == -1) {
+            return
+        }
+        try {
+            val latLng = path.coords[progress]
+            var animation = CameraAnimation.Fly
+            val distance = list[progress].distance.toDouble()
+            var duration = 2000L
+            marker.position = latLng
+            if (progress == 0) {
+                naverMap?.moveCamera(
+                    CameraUpdate.scrollAndZoomTo(latLng, zoom)
+                        .animate(animation, duration)
+                )
+            } else {
+                    when (distance) {
+                        //이동 상태 정보도 받아와야 될듯
+                        /*
+                        거리에 따라 디테일 하게 줌 변경
+                        in 0.0..0.01 -> {
+                            zoom = 19.0
+                            animation = CameraAnimation.Easing
+                            duration = 100L
+                        }
+
+                        in 400.0..Double.MAX_VALUE -> {
+                            zoom = 15.0
+                            animation = CameraAnimation.Easing
+                            duration = 1500L
+                        }
+
+                        in 100.0..399.9 -> {
+                            //zoom = 16.0
+                            animation = CameraAnimation.Easing
+                            duration = 500L
+                        }
+
+                        else -> {
+                            //zoom = 17.0
+                            animation = CameraAnimation.Easing
+                            duration = 500L
+                        }*/
+                        in 0.0..0.01 -> {
+                            zoom = 18.0
+                            animation = CameraAnimation.Easing
+                            duration = 100L
+                        }
+
+                        else -> {
+                            zoom = 15.0
+                            animation = CameraAnimation.Easing
+                            duration = 1000L
+                        }
+                    }
+                    naverMap?.moveCamera(
+                        CameraUpdate.scrollAndZoomTo(latLng, zoom)
+                            .animate(animation, duration)
+                    )
+                    Log.d("zoom", zoom.toString())
+                Log.d("distance", distance.toString())
+            }
+            //naverMap?.moveCamera(CameraUpdate.scrollAndZoomTo(latLng, 18.0))
+        } catch (e: IndexOutOfBoundsException) {
+            Log.d("IndexOutOfBoundsException", e.toString())
         }
     }
 
@@ -508,10 +531,14 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
             }
 
             if (destination.id != R.id.locationHistoryFragment) {
-                path?.map = null
-                //path = null
-                historyMarkers.forEach {
-                    it.map = null
+                with(locationHistoryMetaData){
+                    paths.forEach {
+                        it.map = null
+                    }
+                    //path = null
+                    markers.forEach {
+                        it.map = null
+                    }
                 }
             }
 
