@@ -56,13 +56,13 @@ class FCMService : FirebaseMessagingService() {
         Log.d(TAG, "Message data : ${remoteMessage.data}")
         Log.d(TAG, "Message noti : ${remoteMessage.notification}")
 
+        // 포그라운으 알림 설정
         remoteMessage.notification?.apply {
             val intent = Intent(this@FCMService, NokMainActivity::class.java).apply{
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             }
             val pendingIntent = PendingIntent.getActivity(this@FCMService, 0, intent, PendingIntent.FLAG_IMMUTABLE)
             val builder = NotificationCompat.Builder(this@FCMService, "WhereAreU")
-                .setSmallIcon(R.drawable.ic_whereareu_logo)
                 .setContentTitle(title)
                 .setContentText(body)
                 .setContentIntent(pendingIntent)
@@ -71,18 +71,19 @@ class FCMService : FirebaseMessagingService() {
             val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
             notificationManager.notify(101, builder.build())
         }
+        // ----여기까지 포그라운드 알림
 
         if(remoteMessage.data.isNotEmpty()){
             //알림생성
             sendNotification(remoteMessage)
-//            Log.d(TAG, remoteMessage.data["title"].toString())
-//            Log.d(TAG, remoteMessage.data["body"].toString())
+            Log.d(TAG, remoteMessage.data["title"].toString())
+            Log.d(TAG, remoteMessage.data["body"].toString())
         }else {
             Log.e(TAG, "data가 비어있습니다. 메시지를 수신하지 못했습니다.")
         }
     }
 
-    /** 알림 생성 메서드 */
+    // 백그라운드 알림 설정
     private fun sendNotification(remoteMessage: RemoteMessage) {
         val soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION) // 알림 소리
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
@@ -109,7 +110,7 @@ class FCMService : FirebaseMessagingService() {
 
         //23.05.22 Android 최신버전 대응 (FLAG_MUTABLE, FLAG_IMMUTABLE)
         //PendingIntent.FLAG_MUTABLE은 PendingIntent의 내용을 변경할 수 있도록 허용, PendingIntent.FLAG_IMMUTABLE은 PendingIntent의 내용을 변경할 수 없음
-        //val pendingIntent = PendingIntent.getActivity(this, uniId, intent, PendingIntent.FLAG_ONE_SHOT)
+//        val pendingIntent = PendingIntent.getActivity(this, uniId, intent, PendingIntent.FLAG_ONE_SHOT)
         val pendingIntent = PendingIntent.getActivity(this, uniId, intent, PendingIntent.FLAG_ONE_SHOT or PendingIntent.FLAG_MUTABLE)
 
         // 알림 소리
@@ -122,18 +123,9 @@ class FCMService : FirebaseMessagingService() {
             .setContentTitle(remoteMessage.data["title"].toString()) // 제목
             .setContentText(remoteMessage.data["body"].toString()) // 메시지 내용
 
-//            .setLargeIcon(BitmapFactory.decodeResource(resources, R.drawable.ic_launcher_foreground))
-            .setLargeIcon(convertBitmap())
-            .setStyle(NotificationCompat.BigPictureStyle()
-                .bigPicture(convertBitmap())
-                .bigLargeIcon(null))
-
-
             .setAutoCancel(false) // 알람클릭시 삭제여부
             .setSound(soundUri)  // 알림 소리
             .setContentIntent(pendingIntent) // 알림 실행 시 Intent
-
-//        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
         // 오레오 버전 이후에는 채널이 필요
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -149,17 +141,9 @@ class FCMService : FirebaseMessagingService() {
                 .setFullScreenIntent(pendingIntent, true)
         }
 
-        // 알림 생성
+        // 백그라운드 알림 보냄
         notificationManager.notify(uniId, notificationBuilder.build())
 
-    }
-    // 큰 아이콘 작성
-    private fun convertBitmap(): Bitmap{
-        val drawable = getDrawable(R.drawable.ic_logo_test)
-        val bitmapDrawable = drawable as BitmapDrawable
-        val bitmap = bitmapDrawable.bitmap
-
-        return bitmap
     }
 
 //  토큰 가져오는 함수
@@ -179,34 +163,4 @@ class FCMService : FirebaseMessagingService() {
                 Log.e(TAG, "token=${deviceToken}")
             })
     }
-    private fun getCustomDesign(title: String, message: String): RemoteViews {
-        val remoteViews = RemoteViews(applicationContext.packageName, R.layout.notification)
-        remoteViews.setTextViewText(R.id.notification_title_tv, title)
-        remoteViews.setTextViewText(R.id.notification_body_tv, message)
-        remoteViews.setImageViewResource(R.id.notification_iv, R.drawable.ic_launcher_foreground)
-        return remoteViews
-    }
 }
-
-///**
-//"notificationBuilder" 알림 생성시 여러가지 옵션을 이용해 커스텀 가능.
-//setSmallIcon : 작은 아이콘 (필수)
-//setContentTitle : 제목 (필수)
-//setContentText : 내용 (필수)
-//setColor : 알림내 앱 이름 색
-//setWhen : 받은 시간 커스텀 ( 기본 시스템에서 제공 )
-//setShowWhen : 알림 수신 시간 ( default 값은 true, false시 숨길 수 있습니다 )
-//setOnlyAlertOnce : 알림 1회 수신 ( 동일 아이디의 알림을 처음 받았을때만 알린다, 상태바에 알림이 잔존하면 무음 )
-//setContentTitle : 제목
-//setContentText : 내용
-//setFullScreenIntent : 긴급 알림 ( 자세한 설명은 아래에서 설명합니다 )
-//setTimeoutAfter : 알림 자동 사라지기 ( 지정한 시간 후 수신된 알림이 사라집니다 )
-//setContentIntent : 알림 클릭시 이벤트 ( 지정하지 않으면 클릭했을때 아무 반응이 없고 setAutoCancel 또한 작동하지 않는다 )
-//setLargeIcon : 큰 아이콘 ( mipmap 에 있는 아이콘이 아닌 drawable 폴더에 있는 아이콘을 사용해야 합니다. )
-//setAutoCancel : 알림 클릭시 삭제 여부 ( true = 클릭시 삭제 , false = 클릭시 미삭제 )
-//setPriority : 알림의 중요도를 설정 ( 중요도에 따라 head up 알림으로 설정할 수 있는데 자세한 내용은 밑에서 설명하겠습니다. )
-//setVisibility : 잠금 화면내 알림 노출 여부
-//Notification.VISIBILITY_PRIVATE : 알림의 기본 정보만 노출 (제목, 타이틀 등등)
-//Notification.VISIBILITY_PUBLIC : 알림의 모든 정보 노출
-//Notification.VISIBILITY_SECRET : 알림의 모든 정보 비노출
-// */
