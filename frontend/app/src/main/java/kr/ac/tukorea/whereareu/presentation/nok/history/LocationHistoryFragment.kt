@@ -98,6 +98,7 @@ class LocationHistoryFragment :
                     viewModel.fetchSingleLocationHistory(dates[0].toString())
 
                 } else {
+                    binding.dateTv.text = "위치 기록 비교"
                     viewModel.setIsMultipleSelected(true)
                     viewModel.fetchMultipleLocationHistory(dates[0].toString(), dates[1].toString())
                     binding.dateInfoTv.text = dates[0].toString()
