@@ -65,11 +65,14 @@ class FCMService : FirebaseMessagingService() {
             }
             val pendingIntent = PendingIntent.getActivity(this@FCMService, 0, intent, PendingIntent.FLAG_IMMUTABLE)
             val builder = NotificationCompat.Builder(this@FCMService, "WhereAreU")
-                .setContentTitle(title)
-                .setContentText(body)
+
+                .setContentTitle(title.toString())
+                .setContentText(body.toString())
+
                 .setSmallIcon(R.drawable.ic_whereareu_logo)
                 .setContentIntent(pendingIntent)
                 .setAutoCancel(true)
+                .setShowWhen(true)      // 잠금화면에서 알림 보여줌
             Log.d(TAG, "using onMessageReceived_Background")
 
             val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
@@ -86,17 +89,7 @@ class FCMService : FirebaseMessagingService() {
             Log.e(TAG, "data가 비어있습니다. 메시지를 수신하지 못했습니다.")
         }
 
-        //
-        val pm =
-            getSystemService(Context.POWER_SERVICE) as PowerManager
-        @SuppressLint("InvalidWakeLockTag") val wakeLock =
-            pm.newWakeLock(
-                PowerManager.SCREEN_DIM_WAKE_LOCK
-                        or PowerManager.ACQUIRE_CAUSES_WAKEUP, "TAG"
-            )
-        wakeLock.acquire(3000)
-        wakeLock.release()
-        remotemessage.data.get("title")?.let { sendNotification(remotemessage.data.get("body")!!, it) }
+
     }
 
     // 백그라운드 알림 설정
@@ -110,7 +103,9 @@ class FCMService : FirebaseMessagingService() {
             val channel = NotificationChannel(channelId, channelName, importance).apply {
                 description = channelDescription
             }
+            channel.lockscreenVisibility = Notification.VISIBILITY_PUBLIC
             notificationManager.createNotificationChannel(channel)
+
         }
 
         // RequestCode, Id를 고유값으로 지정하여 알림이 개별 표시
@@ -142,6 +137,7 @@ class FCMService : FirebaseMessagingService() {
             .setAutoCancel(false) // 알람클릭시 삭제여부
             .setSound(soundUri)  // 알림 소리
             .setContentIntent(pendingIntent) // 알림 실행 시 Intent
+            .setShowWhen(true)
 
         Log.d(TAG, "sendNotification_Foreground")
 
