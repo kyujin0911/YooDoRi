@@ -121,6 +121,9 @@ dependencies {
     //Glide
     implementation ("com.github.bumptech.glide:glide:4.14.2")
     annotationProcessor ("com.github.bumptech.glide:compiler:4.14.2")
+
+    implementation ("com.github.prolificinteractive:material-calendarview:2.0.1")
+    implementation ("com.jakewharton.threetenabp:threetenabp:1.2.1")
 }
 kapt {
     correctErrorTypes = true

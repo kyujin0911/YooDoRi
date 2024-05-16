@@ -7,7 +7,7 @@ import android.os.Bundle
 import android.view.Window
 import kr.ac.tukorea.whereareu.databinding.DialogLoadingBinding
 
-class LoadingDialog(context: Context): Dialog(context) {
+class LoadingDialog(context: Context, val text: String): Dialog(context) {
     private lateinit var binding: DialogLoadingBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -18,6 +18,7 @@ class LoadingDialog(context: Context): Dialog(context) {
         window!!.setBackgroundDrawable(ColorDrawable())
         window!!.setDimAmount(0.5f)
         setContentView(binding.root)
+        binding.loadingTv.text = text
     }
 
 }

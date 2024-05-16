@@ -45,9 +45,7 @@
                     android:id="@+id/map_fragment"
                     android:name="com.naver.maps.map.MapFragment"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    tools:layout_editor_absoluteX="-16dp"
-                    tools:layout_editor_absoluteY="116dp" />
+                    android:layout_height="match_parent" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -71,6 +69,7 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent">
+
 
                     <androidx.constraintlayout.widget.ConstraintLayout
                         android:layout_width="0dp"
@@ -121,7 +120,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginStart="5dp"
                             android:layout_marginTop="14dp"
-                            bind:movementStatus="@{viewModel.dementiaLocationInfo.userStatus}"
+                            android:text="@{viewModel.dementiaStatusInfo.userStatus}"
                             android:textAppearance="@style/TextAppearance.App.18sp.Regular"
                             app:layout_constraintBaseline_toBaselineOf="@id/dementia_name_tv"
                             app:layout_constraintStart_toEndOf="@+id/state"
@@ -144,7 +143,7 @@
                             android:layout_height="25dp"
                             android:layout_marginStart="20dp"
                             android:layout_marginTop="5dp"
-                            android:src="@{viewModel.dementiaLocationInfo.isInternetOn ? @drawable/ic_wifi_on : @drawable/ic_wifi_off}"
+                            android:src="@{viewModel.dementiaStatusInfo.isInternetOn ? @drawable/ic_wifi_on : @drawable/ic_wifi_off}"
                             app:layout_constraintStart_toEndOf="@+id/oval_v"
                             app:layout_constraintTop_toBottomOf="@+id/line_v" />
 
@@ -153,7 +152,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="5dp"
-                            android:text='@{viewModel.dementiaLocationInfo.isInternetOn ? "on" : "off"}'
+                            android:text='@{viewModel.dementiaStatusInfo.isInternetOn ? "on" : "off"}'
                             android:textAppearance="@style/TextAppearance.App.16sp.SemiBold"
                             app:layout_constraintBottom_toBottomOf="@+id/wifi_iv"
                             app:layout_constraintStart_toEndOf="@+id/wifi_iv"
@@ -164,7 +163,7 @@
                             android:layout_width="25dp"
                             android:layout_height="25dp"
                             android:layout_marginStart="15dp"
-                            android:src="@{viewModel.dementiaLocationInfo.isGpsOn ? @drawable/ic_gps_on : @drawable/ic_gps_off}"
+                            android:src="@{viewModel.dementiaStatusInfo.isGpsOn ? @drawable/ic_gps_on : @drawable/ic_gps_off}"
                             app:layout_constraintBottom_toBottomOf="@+id/wifi_iv"
                             app:layout_constraintStart_toEndOf="@+id/internet_status_tv" />
 
@@ -173,7 +172,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="5dp"
-                            android:text='@{viewModel.dementiaLocationInfo.isGpsOn ? "on" : "off"}'
+                            android:text='@{viewModel.dementiaStatusInfo.isGpsOn ? "on" : "off"}'
                             android:textAppearance="@style/TextAppearance.App.16sp.SemiBold"
                             app:layout_constraintBottom_toBottomOf="@+id/wifi_iv"
                             app:layout_constraintStart_toEndOf="@+id/gps_iv"
@@ -184,7 +183,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="15dp"
-                            bind:ringtoneImage="@{viewModel.dementiaLocationInfo.isRingstoneOn}"
+                            bind:ringtoneImage="@{viewModel.dementiaStatusInfo.isRingstoneOn}"
                             app:layout_constraintBottom_toBottomOf="@id/wifi_iv"
                             app:layout_constraintStart_toEndOf="@id/gps_status_tv" />
 
@@ -196,7 +195,7 @@
                             android:textAppearance="@style/TextAppearance.App.16sp.SemiBold"
                             app:layout_constraintBottom_toBottomOf="@id/ring_mode_iv"
                             app:layout_constraintStart_toEndOf="@id/ring_mode_iv"
-                            bind:ringtoneText="@{viewModel.dementiaLocationInfo.isRingstoneOn}"
+                            bind:ringtoneText="@{viewModel.dementiaStatusInfo.isRingstoneOn}"
                             tools:text="벨소리" />
 
                         <ImageView
@@ -214,7 +213,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="5dp"
-                            android:text='@{String.valueOf(viewModel.dementiaLocationInfo.battery) + "%"}'
+                            android:text='@{String.valueOf(viewModel.dementiaStatusInfo.battery) + "%"}'
                             android:textAppearance="@style/TextAppearance.App.16sp.SemiBold"
                             app:layout_constraintBaseline_toBaselineOf="@id/dementia_name_tv"
                             app:layout_constraintStart_toEndOf="@id/battery_iv"
@@ -222,6 +221,15 @@
 
                     </androidx.constraintlayout.widget.ConstraintLayout>
                 </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <com.naver.maps.map.widget.ZoomControlView
+                    android:id="@+id/zoom"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"/>
 
                 <TextView
                     android:id="@+id/predict_tv"
@@ -236,7 +244,6 @@
                     android:text="위치\n예측"
                     android:textSize="16sp"
                     android:onClick="@{()-> view.predict()}"
-                    android:visibility="@{viewModel.isPredicted ? View.GONE : View.VISIBLE}"
                     app:layout_constraintBottom_toTopOf="@id/emergency_tv"
                     app:layout_constraintEnd_toEndOf="parent" />
 
@@ -253,7 +260,6 @@
                     android:gravity="center"
                     android:text="긴급\n도움"
                     android:textSize="16sp"
-                    android:visibility="@{viewModel.isPredicted ? View.GONE : View.VISIBLE}"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent" />
 
@@ -276,7 +282,7 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    tools:visibility="gone">
+                    tools:visibility="visible">
 
                     <TextView
                         android:id="@+id/stop_predict_tv"
@@ -339,7 +345,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
-                        android:text="보호대상자"
+                        android:text="@{viewModel.dementiaName}"
                         android:textAppearance="@style/TextAppearance.App.16sp.Medium"
                         app:layout_constraintStart_toEndOf="@id/dementia_name_title_tv"
                         app:layout_constraintTop_toTopOf="@id/count_down_tv" />
@@ -396,22 +402,53 @@
                         android:layout_marginTop="16dp"
                         android:text="마지막 위치"
                         android:textAppearance="@style/TextAppearance.App.14sp.ExtraBold"
-                        app:layout_constraintStart_toStartOf="@id/count_down_title_tv"
+                        app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@id/count_down_tv" />
 
                     <TextView
                         android:id="@+id/last_location_tv"
-                        android:layout_width="wrap_content"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
                         android:layout_marginTop="16dp"
                         android:text="마지막 위치"
                         android:textAppearance="@style/TextAppearance.App.14sp.Medium"
                         app:layout_constraintStart_toEndOf="@id/last_location_title_tv"
-                        app:layout_constraintTop_toBottomOf="@id/count_down_tv" />
+                        app:layout_constraintEnd_toEndOf="parent"
+                        android:breakStrategy="simple"
+                        android:maxLines="2"
+                        app:layout_constraintTop_toBottomOf="@id/count_down_tv"
+                        app:layout_constraintBottom_toBottomOf="parent"/>
+                    <LinearLayout
+                        android:id="@+id/map_view_btn"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="@id/last_location_tv"
+                        app:layout_constraintBottom_toBottomOf="@id/last_location_tv">
+                        <TextView
+                            android:id="@+id/map_view_tv"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="지도로 보기"
+                            android:textColor="@color/blue"
+                            android:textAppearance="@style/TextAppearance.App.14sp.SemiBold" />
+
+                        <ImageView
+                            android:layout_width="16dp"
+                            android:layout_height="16dp"
+                            android:layout_marginStart="4dp"
+                            android:src="@drawable/ic_arrow_back_24"
+                            android:scaleX="-1"
+                            app:tint="@color/gray60"/>
+                    </LinearLayout>
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
             </androidx.constraintlayout.widget.ConstraintLayout>
+
+
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/bottom_sheet"
@@ -425,7 +462,6 @@
                 app:behavior_hideable="false"
                 android:orientation="vertical"
                 android:paddingBottom="10dp"
-                app:behavior_peekHeight="10dp"
                 app:behavior_halfExpandedRatio="0.3"
                 app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
 
@@ -434,6 +470,7 @@
                     android:layout_width="40dp"
                     android:layout_height="5dp"
                     android:layout_marginTop="12dp"
+                    bind:navigateEvent="@{viewModel.navigateEvent}"
                     android:src="@drawable/rectangle_corner_20_gray"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
@@ -450,7 +487,6 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/bottom_sheet_top_iv"
-
                     app:navGraph="@navigation/nok_graph" />
             </androidx.constraintlayout.widget.ConstraintLayout>
 

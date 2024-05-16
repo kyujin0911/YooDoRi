@@ -1,7 +1,7 @@
 package kr.ac.tukorea.whereareu.data.model.nok.history
 
 data class LocationHistoryResponse(
-    val locationHistory: List<LocationHistory>
+    val locationHistory: List<LocationHistoryDto>
 ){
-    constructor(): this(listOf(LocationHistory()))
+    constructor(): this(listOf(LocationHistoryDto()))
 }

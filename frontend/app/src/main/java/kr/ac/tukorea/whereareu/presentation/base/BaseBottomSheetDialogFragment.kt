@@ -27,7 +27,7 @@ abstract class BaseBottomSheetDialogFragment<V : ViewDataBinding>(@LayoutRes val
             null,
             false
         )
-        binding.lifecycleOwner = this
+        binding.lifecycleOwner = this.viewLifecycleOwner
         return binding.root
     }
 
