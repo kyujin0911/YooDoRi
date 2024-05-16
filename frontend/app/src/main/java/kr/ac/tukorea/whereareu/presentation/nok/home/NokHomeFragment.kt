@@ -7,11 +7,8 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import androidx.core.app.ActivityCompat
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
@@ -22,11 +19,9 @@ import com.naver.maps.geometry.LatLng
 import dagger.hilt.android.AndroidEntryPoint
 import kr.ac.tukorea.whereareu.R
 import kr.ac.tukorea.whereareu.databinding.FragmentHomeBinding
-import kr.ac.tukorea.whereareu.domain.home.InnerItemClickEvent
 import kr.ac.tukorea.whereareu.domain.home.MeaningfulPlaceInfo
 import kr.ac.tukorea.whereareu.domain.home.PoliceStationInfo
 import kr.ac.tukorea.whereareu.presentation.base.BaseFragment
-import kr.ac.tukorea.whereareu.presentation.login.nok.NokIdentityFragmentDirections
 import kr.ac.tukorea.whereareu.presentation.nok.home.adapter.PoliceStationRVA
 import kr.ac.tukorea.whereareu.presentation.nok.home.adapter.MeaningfulPlaceRVA
 import kr.ac.tukorea.whereareu.util.extension.repeatOnStarted
@@ -34,10 +29,10 @@ import kr.ac.tukorea.whereareu.util.extension.showToastShort
 
 
 @AndroidEntryPoint
-class NokHomeFragment : Fragment(R.layout.fragment_home),
+class NokHomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home),
     MeaningfulPlaceRVA.MeaningfulPlaceRVAClickListener, PoliceStationRVA.PoliceStationRVAClickListener {
     private val viewModel: NokHomeViewModel by activityViewModels()
-    private lateinit var binding: FragmentHomeBinding
+
     private val LOCATION_PERMISSION_REQUEST_CODE = 1001
     private val meaningfulPlaceRVA by lazy {
         MeaningfulPlaceRVA()
@@ -46,22 +41,12 @@ class NokHomeFragment : Fragment(R.layout.fragment_home),
         findNavController()
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        binding = FragmentHomeBinding.inflate(inflater, container, false)
-        binding.lifecycleOwner = this.viewLifecycleOwner
-        return binding.root
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initObserver()
         initView()
     }
-    private fun initObserver() {
+    override fun initObserver() {
         repeatOnStarted {
             viewModel.predictEvent.collect{ predictEvent ->
                 handlePredictEvent(predictEvent)
@@ -84,7 +69,7 @@ class NokHomeFragment : Fragment(R.layout.fragment_home),
         }
     }
 
-    private fun initView() {
+    override fun initView() {
         binding.view = this
         binding.viewModel = viewModel
         checkLocationPermission()
@@ -102,44 +87,6 @@ class NokHomeFragment : Fragment(R.layout.fragment_home),
         meaningfulPlaceRVA.setRVAClickListener(this, this)
     }
 
-    /*private fun initBottomSheet(){
-        behavior = BottomSheetBehavior.from(binding.bottomSheet)
-        behavior.state = BottomSheetBehavior.STATE_COLLAPSED
-        behavior.peekHeight = 20
-        behavior.isFitToContents = false
-        behavior.halfExpandedRatio = 0.3f
-
-        //bottom sheet predict layout과 높이 맞추기
-        *//*val viewTreeObserver: ViewTreeObserver = binding.predictLayout.viewTreeObserver
-        viewTreeObserver.addOnGlobalLayoutListener(object : OnGlobalLayoutListener {
-            override fun onGlobalLayout() {
-                behavior.expandedOffset = binding.predictLayout.height + 35
-                binding.predictLayout.viewTreeObserver.removeOnGlobalLayoutListener(this)
-            }
-        })*//*
-
-        // half expanded state일 때 접기 제어
-        behavior.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback(){
-            var isHalfExpanded = false
-            override fun onStateChanged(bottomSheet: View, newState: Int) {
-                *//*when(newState){
-                    BottomSheetBehavior.STATE_HALF_EXPANDED -> {
-                        isHalfExpanded = true
-                    }
-                    BottomSheetBehavior.STATE_COLLAPSED and BottomSheetBehavior.STATE_HALF_EXPANDED-> {
-                        isHalfExpanded = false
-                    }
-                }*//*
-            }
-
-            override fun onSlide(bottomSheet: View, slideOffset: Float) {
-                *//*if(isHalfExpanded && slideOffset < 0.351f){
-                    behavior.state = BottomSheetBehavior.STATE_COLLAPSED
-                }*//*
-            }
-
-        })
-    }*/
     /*override fun onResume() {
         super.onResume()
         if(viewModel.meaningfulPlace.value.isEmpty()){
@@ -184,7 +131,7 @@ class NokHomeFragment : Fragment(R.layout.fragment_home),
 
     // inner RVA 클릭 이벤트
     override fun onClickMoreView(policeStationInfo: PoliceStationInfo) {
-        viewModel.eventInnerItemClick(InnerItemClickEvent(BottomSheetBehavior.STATE_COLLAPSED, policeStationInfo.latLng))
+        viewModel.eventPredict(NokHomeViewModel.PredictEvent.RVAClick(BottomSheetBehavior.STATE_COLLAPSED, policeStationInfo.latLng))
     }
 
     override fun onClickCopyPhoneNumber(phoneNumber: String) {
@@ -204,7 +151,7 @@ class NokHomeFragment : Fragment(R.layout.fragment_home),
     }
 
     override fun onClickMapView(latLng: LatLng) {
-        viewModel.eventInnerItemClick(InnerItemClickEvent(BottomSheetBehavior.STATE_COLLAPSED, latLng))
+        viewModel.eventPredict(NokHomeViewModel.PredictEvent.RVAClick(BottomSheetBehavior.STATE_COLLAPSED, latLng))
     }
 
     override fun onClickInfoView(meaningfulPlace: MeaningfulPlaceInfo) {

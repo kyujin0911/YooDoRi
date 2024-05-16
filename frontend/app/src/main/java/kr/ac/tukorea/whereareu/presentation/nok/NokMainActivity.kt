@@ -85,11 +85,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
         LocalBroadcastManager.getInstance(this).registerReceiver(
             mMessageReceiver, IntentFilter("gps")
         )
-        repeatOnStarted {
-            homeViewModel.navigateEventToString.collect {
-                Log.d("navigateEvent To String", it.toString())
-            }
-        }
+       
         repeatOnStarted {
             homeViewModel.navigateEvent.collect { event ->
                 handleNavigationEvent(event)
@@ -131,15 +127,6 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
         repeatOnStarted {
             homeViewModel.predictEvent.collect { predictEvent ->
                 handlePredictEvent(predictEvent)
-            }
-        }
-
-
-        // 리사이클러뷰 아이템 클릭 이벤트에 따른 bottomSheet, Naver Map 제어
-        repeatOnStarted {
-            homeViewModel.innerItemClickEvent.collect { event ->
-                behavior.state = event.behavior
-                naverMap?.moveCamera(CameraUpdate.scrollTo(event.coord))
             }
         }
 
@@ -454,9 +441,16 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                 })
             }
 
+            // 예측 기능 로딩 완료 알림
             NokHomeViewModel.PredictEvent.PredictDone -> {
                 dismissLoadingDialog()
                 homeViewModel.setIsPredictDone(true)
+            }
+
+            // 리사이클러뷰 아이템 클릭 이벤트에 따른 bottomSheet, Naver Map 제어
+            is NokHomeViewModel.PredictEvent.RVAClick -> {
+                behavior.state = event.behavior
+                naverMap?.moveCamera(CameraUpdate.scrollTo(event.coord))
             }
         }
     }

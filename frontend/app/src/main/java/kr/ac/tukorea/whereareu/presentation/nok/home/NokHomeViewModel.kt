@@ -16,7 +16,6 @@ import kr.ac.tukorea.whereareu.data.model.nok.home.PredictLocationInfo
 import kr.ac.tukorea.whereareu.data.repository.kakao.KakaoRepositoryImpl
 import kr.ac.tukorea.whereareu.data.repository.naver.NaverRepositoryImpl
 import kr.ac.tukorea.whereareu.data.repository.nok.home.NokHomeRepositoryImpl
-import kr.ac.tukorea.whereareu.domain.home.InnerItemClickEvent
 import kr.ac.tukorea.whereareu.domain.home.LastLocation
 import kr.ac.tukorea.whereareu.domain.home.MeaningfulPlaceInfo
 import kr.ac.tukorea.whereareu.domain.home.DementiaStatusInfo
@@ -48,7 +47,6 @@ class NokHomeViewModel @Inject constructor(
     val isPredicted = _isPredicted.asStateFlow()
 
     private val _isPredictDone = MutableStateFlow(false)
-    val isPredictDone = _isPredictDone.asStateFlow()
 
     private val _dementiaKey = MutableStateFlow("")
     private val _nokKey = MutableStateFlow("")
@@ -63,9 +61,6 @@ class NokHomeViewModel @Inject constructor(
     val navigateEvent = _navigateEvent.asSharedFlow()
 
     val navigateEventToString = MutableStateFlow(NavigateEvent.Home.toString())
-
-    private val _innerItemClickEvent = MutableSharedFlow<InnerItemClickEvent>()
-    val innerItemClickEvent = _innerItemClickEvent.asSharedFlow()
 
     private val _meaningfulPlace = MutableStateFlow<List<MeaningfulPlaceInfo>>(emptyList())
     val meaningfulPlace = _meaningfulPlace.asStateFlow()
@@ -91,6 +86,8 @@ class NokHomeViewModel @Inject constructor(
 
         data object PredictDone: PredictEvent()
 
+        data class RVAClick(val behavior: Int, val coord: LatLng): PredictEvent()
+
         data class StopPredict(val isPredicted: Boolean) : PredictEvent()
     }
 
@@ -111,15 +108,9 @@ class NokHomeViewModel @Inject constructor(
         }
     }
 
-    private fun eventPredict(event: PredictEvent) {
+    fun eventPredict(event: PredictEvent) {
         viewModelScope.launch {
             _predictEvent.emit(event)
-        }
-    }
-
-    fun eventInnerItemClick(event: InnerItemClickEvent){
-        viewModelScope.launch {
-            _innerItemClickEvent.emit(event)
         }
     }
 
