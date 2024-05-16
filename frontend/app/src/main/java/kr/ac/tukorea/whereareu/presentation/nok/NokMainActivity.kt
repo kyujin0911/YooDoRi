@@ -299,8 +299,6 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                 homeViewModel.predict()
                 stopGetDementiaLocation()
                 showLoadingDialog(this, "예측 장소를 추출중입니다...")
-                binding.predictTv.isVisible = false
-                binding.emergencyTv.isVisible = false
                 naverMap?.uiSettings?.setLogoMargin(20, 0, 0, behavior.peekHeight + 15)
             }
 
@@ -381,8 +379,6 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                 predictMarkers.forEach { marker ->
                     marker.map = null
                 }
-                binding.predictTv.isVisible = true
-                binding.emergencyTv.isVisible = true
                 binding.layout.translationY = 0f
             }
 
@@ -526,9 +522,8 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
         navController = navHostFragment.navController
 
         binding.bottomNav.setupWithNavController(navController)
-
+        var event: NokHomeViewModel.NavigateEvent = NokHomeViewModel.NavigateEvent.Home
         navController.addOnDestinationChangedListener { controller, destination, arguments ->
-            var event: NokHomeViewModel.NavigateEvent = NokHomeViewModel.NavigateEvent.Home
 
             if (destination.id != R.id.nokHomeFragment) {
                 stopGetDementiaLocation()

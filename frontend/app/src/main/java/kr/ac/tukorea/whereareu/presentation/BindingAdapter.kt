@@ -81,4 +81,15 @@ object BindingAdapter {
     fun setStopStatusPeriod(view: TextView, stopStatusPeriod: String){
         view.text = stopStatusPeriod.replace(",", " ~ ")
     }
+
+    @BindingAdapter("bind:navigateEvent", "bind:isPredicted")
+    @JvmStatic
+    fun setHomeComponentBtnVisible(view: TextView, navigateEvent: String, isPredicted: Boolean){
+        view.isVisible = if ((navigateEvent != "Home") or isPredicted ){
+            false
+        }
+        else {
+            true
+        }
+    }
 }
