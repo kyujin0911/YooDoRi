@@ -1,5 +1,6 @@
 package kr.ac.tukorea.whereareu.firebase
 
+import android.annotation.SuppressLint
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -10,6 +11,7 @@ import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
 import android.media.RingtoneManager
 import android.os.Build
+import android.os.PowerManager
 import android.util.Log
 import android.widget.RemoteViews
 import androidx.core.app.NotificationCompat
@@ -41,7 +43,7 @@ class FCMService : FirebaseMessagingService() {
         val editor = pref.edit()
         editor.putString("token", token).apply()
         editor.commit()
-        Log.i(TAG, "성공적으로 토큰을 저장함")
+        Log.i(TAG, "토큰 저장")
     }
 
     // 포그라운드
@@ -56,7 +58,7 @@ class FCMService : FirebaseMessagingService() {
         Log.d(TAG, "Message data : ${remoteMessage.data}")
         Log.d(TAG, "Message noti : ${remoteMessage.notification}")
 
-        // 포그라운으 알림 설정
+        // 포그라운드 알림 설정
         remoteMessage.notification?.apply {
             val intent = Intent(this@FCMService, NokMainActivity::class.java).apply{
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
@@ -65,8 +67,10 @@ class FCMService : FirebaseMessagingService() {
             val builder = NotificationCompat.Builder(this@FCMService, "WhereAreU")
                 .setContentTitle(title)
                 .setContentText(body)
+                .setSmallIcon(R.drawable.ic_whereareu_logo)
                 .setContentIntent(pendingIntent)
                 .setAutoCancel(true)
+            Log.d(TAG, "using onMessageReceived_Background")
 
             val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
             notificationManager.notify(101, builder.build())
@@ -81,6 +85,18 @@ class FCMService : FirebaseMessagingService() {
         }else {
             Log.e(TAG, "data가 비어있습니다. 메시지를 수신하지 못했습니다.")
         }
+
+        //
+        val pm =
+            getSystemService(Context.POWER_SERVICE) as PowerManager
+        @SuppressLint("InvalidWakeLockTag") val wakeLock =
+            pm.newWakeLock(
+                PowerManager.SCREEN_DIM_WAKE_LOCK
+                        or PowerManager.ACQUIRE_CAUSES_WAKEUP, "TAG"
+            )
+        wakeLock.acquire(3000)
+        wakeLock.release()
+        remotemessage.data.get("title")?.let { sendNotification(remotemessage.data.get("body")!!, it) }
     }
 
     // 백그라운드 알림 설정
@@ -119,13 +135,15 @@ class FCMService : FirebaseMessagingService() {
         // 알림에 대한 UI 정보, 작업
         val notificationBuilder = NotificationCompat.Builder(this, channelId)
             .setPriority(NotificationCompat.PRIORITY_HIGH) // 중요도 (HIGH: 상단바 표시 가능)
-            .setSmallIcon(R.drawable.ic_logo_test) // 아이콘 설정
+            .setSmallIcon(R.drawable.ic_whereareu_logo) // 아이콘 설정
             .setContentTitle(remoteMessage.data["title"].toString()) // 제목
             .setContentText(remoteMessage.data["body"].toString()) // 메시지 내용
 
             .setAutoCancel(false) // 알람클릭시 삭제여부
             .setSound(soundUri)  // 알림 소리
             .setContentIntent(pendingIntent) // 알림 실행 시 Intent
+
+        Log.d(TAG, "sendNotification_Foreground")
 
         // 오레오 버전 이후에는 채널이 필요
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -134,11 +152,14 @@ class FCMService : FirebaseMessagingService() {
         }
 
         // Head up 알람 설정
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             notificationBuilder.setCategory(NotificationCompat.CATEGORY_MESSAGE)
-                .setPriority(NotificationCompat.PRIORITY_MAX)
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+//                .setPriority(NotificationCompat.PRIORITY_MAX)
                 .setDefaults(Notification.DEFAULT_ALL)
+                .setSmallIcon(R.drawable.ic_whereareu_logo)
                 .setFullScreenIntent(pendingIntent, true)
+            Log.d(TAG, "headUp noti")
         }
 
         // 백그라운드 알림 보냄
