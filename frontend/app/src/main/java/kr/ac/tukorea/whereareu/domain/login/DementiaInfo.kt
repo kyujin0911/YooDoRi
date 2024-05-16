@@ -2,5 +2,8 @@ package kr.ac.tukorea.whereareu.domain.login
 data class DementiaInfo(
     val dementiaKey: String,
     val dementiaName: String,
-    val dementiaPhoneNumber: String
-)
+    val dementiaPhoneNumber: String,
+    val updateRate : Int = 60
+){
+    constructor(): this("", "", "", 0)
+}

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <import type="android.view.View"/>
+        <variable
+            name="model"
+            type="kr.ac.tukorea.whereareu.domain.setting.UpdateRate" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/update_time_tv"
+            android:textAppearance="@style/TextAppearance.App.16sp.ExtraBold"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginTop="10dp"
+            android:text="@{model.title}"
+            app:layout_constraintStart_toStartOf="parent"
+            tools:text="1" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="@style/TextAppearance.App.16sp.ExtraBold"
+            android:text="분"
+            app:layout_constraintBaseline_toBaselineOf="@+id/update_time_tv"
+            app:layout_constraintStart_toEndOf="@+id/update_time_tv"
+            android:layout_marginStart="3dp" />
+
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:id="@+id/check_iv"
+            android:src="@drawable/ic_check"
+            android:visibility="@{model.check ? View.VISIBLE : View.GONE}"
+            app:layout_constraintTop_toTopOf="@id/update_time_tv"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0.5dp"
+            android:layout_marginTop="15dp"
+            android:background="@color/gray60"
+            app:layout_constraintTop_toBottomOf="@+id/update_time_tv" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

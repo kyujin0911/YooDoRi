@@ -1,17 +1,14 @@
 package kr.ac.tukorea.whereareu.presentation.login.dementia
 
 import android.content.Context.MODE_PRIVATE
-import android.view.Gravity
-import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.core.content.edit
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import dagger.hilt.android.AndroidEntryPoint
 import kr.ac.tukorea.whereareu.R
-import kr.ac.tukorea.whereareu.data.model.login.request.CheckInterConnectRequest
+import kr.ac.tukorea.whereareu.data.model.DementiaKeyRequest
 import kr.ac.tukorea.whereareu.databinding.FragmentPatientOtpBinding
-import kr.ac.tukorea.whereareu.databinding.ToastLayoutBinding
 import kr.ac.tukorea.whereareu.presentation.base.BaseFragment
 import kr.ac.tukorea.whereareu.presentation.login.LoginViewModel
 import kr.ac.tukorea.whereareu.util.extension.repeatOnStarted
@@ -50,8 +47,6 @@ class PatientOtpFragment : BaseFragment<FragmentPatientOtpBinding>(R.layout.frag
                     putString("key", it.nokKey)
                     commit()
                 }
-
-
                 if (navigator.currentDestination?.id == R.id.patientOtpFragment) {
                     navigator.navigate(R.id.action_patientOtpFragment_to_dementiaAuthorityPageFragment)
                 }
@@ -81,6 +76,6 @@ class PatientOtpFragment : BaseFragment<FragmentPatientOtpBinding>(R.layout.frag
     }
 
     fun onClickInputDone() {
-        viewModel.checkConnected(CheckInterConnectRequest(binding.displayOtpTv.text.toString()))
+        viewModel.checkConnected(DementiaKeyRequest(binding.displayOtpTv.text.toString()))
     }
 }
