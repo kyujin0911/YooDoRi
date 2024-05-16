@@ -1,8 +1,10 @@
 from fastapi import APIRouter, HTTPException, status, Depends
-from fastapi.security import OAuth2PasswordRequestForm, APIKeyHeader
+from fastapi.security import OAuth2PasswordRequestForm, APIKeyHeader, OAuth2PasswordBearer
 
+from apscheduler.schedulers.background import BackgroundScheduler
 from passlib.context import CryptContext
 from haversine import haversine
+from PyKakao import Local
 
 from . import models
 from .random_generator import RandomNumberGenerator
@@ -12,11 +14,15 @@ from .bodymodel import *
 from .util import JWTService
 from .config import Config
 from .schedularFunc import SchedulerFunc
-
-from apscheduler.schedulers.background import BackgroundScheduler
+from .fcm_notification import send_push_notification
+from .LocationPredict import ForecastLSTMClassification, Preprocessing
 
 import asyncio
 import datetime
+import requests
+import urllib.parse
+import pandas as pd
+import time
 
 
 router = APIRouter()
@@ -26,6 +32,9 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 jwt = JWTService()
 schedFunc = SchedulerFunc()
 sched = BackgroundScheduler(timezone="Asia/Seoul", daemon=True)
+kakao = Local(service_key=Config.kakao_service_key)
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+
 
 
 
@@ -89,6 +98,32 @@ async def test_login(from_data: OAuth2PasswordRequestForm = Depends()):
     finally:
         session.close()"""
 
+'''@router.get("/login/google")
+async def google_login():
+    return {
+        "url": f"https://accounts.google.com/o/oauth2/auth?response_type=code&client_id={Config.GOOGLE_CLIENT_ID}&redirect_uri={Config.GOOGLE_REDIRECT_URI}&scope=openid%20profile%20email&access_type=offline"
+    }
+
+@router.get("/auth/google")
+async def auth_google(code: str):
+    token_url = "https://accounts.google.com/o/oauth2/token"
+    decoded_code = urllib.parse.unquote(code)
+    data = {
+        "code": decoded_code,
+        "client_id": Config.GOOGLE_CLIENT_ID,
+        "client_secret": Config.GOOGLE_CLIENT_SECRET,
+        "redirect_uri": Config.GOOGLE_REDIRECT_URI,
+        "grant_type": "authorization_code",
+    }
+    response = requests.post(token_url, data=data)
+    access_token = response.json().get("access_token")
+    user_info = requests.get("https://www.googleapis.com/oauth2/v1/userinfo", headers={"Authorization": f"Bearer {access_token}"})
+    people = people_service.people().connections().list('people/me', personFields='names,emailAddresses')
+    return user_info.json()
+
+@router.get("/token")
+async def get_token(token: str = Depends(oauth2_scheme)):
+    return jwt.decode(token, Config.GOOGLE_CLIENT_SECRET, algorithms=["HS256"])'''
 
 
 
@@ -703,7 +738,7 @@ async def send_location_history(_date : str, user_info : int = Depends(APIKeyHea
                     'distance': distance
                 })
             else:
-                locHistory[-1]['time'] = locHistory[-1]['time'][:8] + ',' + location.time
+                locHistory[-1]['time'] = locHistory[-1]['time'][:8] + '~' + location.time
 
             prev_location = current_location
 
@@ -725,8 +760,123 @@ async def send_location_history(_date : str, user_info : int = Depends(APIKeyHea
 
         return response
 
+@router.get("/locations/predict", responses = {200 : {"model" : PredictLocationResponse, "description" : "위치 예측 성공" }, 404: {"model": ErrorResponse, "description": "위치 정보 부족"}}, description="보호 대상자의 다음 위치 예측(쿼리 스트링)")
+async def predict_location(user_info : int = Depends(APIKeyHeader(name = "Authorization"))):
+    dementia_key = jwt.get_current_user(user_info, session)[0].dementia_key
+
+    try:
+        loc_list = []
+        location_list = session.query(models.location_info).filter_by(dementia_key=dementia_key).order_by(models.location_info.num.desc()).limit(10).all()
+
+        for location in location_list:
+            if location.user_status == "정지":
+                status = 1
+            elif location.user_status == "도보":
+                status = 2
+            elif location.user_status == "차량":
+                status = 3
+            elif location.user_status == "지하철":
+                status = 4
+            else:
+                status = location.user_status
+            loc_list.append({
+                'date' : location.date,
+                'time': location.time,
+                'latitude': location.latitude,
+                'longitude': location.longitude,
+                'user_status' : status
+            })
+
+        loc_list_df = pd.DataFrame(loc_list, columns=['date', 'time', 'latitude', 'longitude', 'user_status'])
+
+        pr = Preprocessing(loc_list_df)
+        df, meaningful_df = pr.run_analysis()
+            
+        test_idx = int(len(df) * 0.8)
+        df_train = df.iloc[:test_idx]
+        df_test = df.iloc[test_idx:]
+
+        seq_len = 5  # 150개의 데이터를 feature로 사용
+        steps = 5  # 향후 150개 뒤의 y를 예측
+        single_output = False
+        metrics = ["accuracy"]  # 모델 성능 지표
+        lstm_params = {
+            "seq_len": seq_len,
+            "epochs": 100,  # epochs 반복 횟수
+            "patience": 30,  # early stopping 조건
+            "steps_per_epoch": 5,  # 1 epochs 시 dataset을 5개로 분할하여 학습
+            "learning_rate": 0.03,
+            "lstm_units": [64, 32],  # Dense Layer: 2, Unit: (64, 32)
+            "activation": "softmax",
+            "dropout": 0,
+            "validation_split": 0.3,  # 검증 데이터셋 30%
+        }
+        fl = ForecastLSTMClassification(class_num=len(df['y'].unique()))
+        model = fl.fit_lstm(
+            df=df_train,
+            steps=steps,
+            single_output=single_output,
+            verbose=True,
+            metrics=metrics,
+            **lstm_params,
+        )
+        y_pred = fl.pred(df=df_test, 
+                    steps=steps, 
+                    num_classes=len(df['y'].unique()),
+                    seq_len=seq_len, 
+                    single_output=single_output)
+        
+        print(y_pred)
+        print(meaningful_df.iloc[y_pred].iloc[-1])
+
+        pred_loc = meaningful_df.iloc[y_pred].iloc[-1]
+
+        geo = kakao.geo_coord2address(pred_loc.longitude, pred_loc.latitude)
+
+        if not geo['documents'][0]['road_address'] == None:
+            xy2addr = geo['documents'][0]['road_address']['address_name'] + " " + geo['documents'][0]['road_address']['building_name']
+                    
+        else:
+            xy2addr = geo['documents'][0]['address']['address_name']
+
+        pol_info = {
+            "policeName" : "이름",
+            "policeAddress" : "주소",
+            "policePhoneNumber" : "전번",
+            "distance" : "거리",
+            "latitude" : "위도",
+            "longitude" : "경도"
+        }
+        pred_loc = {
+            "latitude" : pred_loc.latitude,
+            "longitude" : pred_loc.longitude,
+            "address" : xy2addr
+        }
+        result = {
+            "predictLocation" : pred_loc,
+            "policeInfo" : pol_info
+        }
+        response = {
+            "status" : "susccess",
+            "message" : "predict complete",
+            "result" : result
+        }
+
+        return response
+    
+    finally:
+        session.close()
 
 
+@router.post("/test/fcm", responses = {200 : {"model" : CommonResponse, "description" : "FCM 전송 성공" }}, description="FCM 테스트")
+async def send_fcm(title: str, body: str, token: str):
+
+    send_push_notification(token, body, title)
+
+    return {
+        'status': 'success',
+        'message': 'FCM sent'
+    }
 
 
 '''#스케줄러 비활성화
