@@ -11,6 +11,7 @@ import androidx.activity.viewModels
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
+import androidx.core.view.marginBottom
 import androidx.lifecycle.lifecycleScope
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.navigation.NavController
@@ -300,6 +301,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                 stopGetDementiaLocation()
                 showLoadingDialog(this, "예측 장소를 추출중입니다...")
                 naverMap?.uiSettings?.setLogoMargin(20, 0, 0, behavior.peekHeight + 15)
+                //binding.navermapLogo.bottom = 500
             }
 
             // 보호대상자 마지막 정보 UI 업데이트, 실종 시각 카운트다운 시작
@@ -505,11 +507,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
             override fun onSlide(bottomSheet: View, slideOffset: Float) {
                 _slideOffset = slideOffset
                 if (slideOffset <= 0.3f) {
-                    var logoBottom = naverMap?.uiSettings?.logoMargin?.get(3)
-                    logoBottom?.minus((slideOffset*bottomSheet.height).toInt())
-                    naverMap?.uiSettings?.setLogoMargin(20, 0, 0, logoBottom!! )
-                    Log.d("logo bottom", logoBottom.toString())
-                    Log.d("bottom sheet height", bottomSheet.height.toString())
+                    //binding.navermapLogo.translationY = -slideOffset * bottomSheet.height
                     binding.layout.translationY = -slideOffset * bottomSheet.height * 0.5f
                 }
             }

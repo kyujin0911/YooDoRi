@@ -230,14 +230,6 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
-                <com.naver.maps.map.widget.LogoView
-                    android:id="@+id/navermap_logo"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toStartOf="parent" />
-
                 <TextView
                     android:id="@+id/predict_tv"
                     android:layout_width="60dp"
@@ -466,9 +458,6 @@
                 android:id="@+id/bottom_sheet"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@drawable/rectangle_top_corner_20"
-                android:elevation="10dp"
-                android:minHeight="10dp"
                 android:orientation="vertical"
                 android:paddingBottom="10dp"
                 app:behavior_halfExpandedRatio="0.3"
@@ -476,30 +465,50 @@
                 app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
                 bind:isPredicted="@{viewModel.isPredicted}"
                 bind:navigateEvent="@{viewModel.navigateEvent}">
-
-                <ImageView
-                    android:id="@+id/bottom_sheet_top_iv"
-                    android:layout_width="40dp"
-                    android:layout_height="5dp"
-                    android:layout_marginTop="12dp"
-                    android:src="@drawable/rectangle_corner_20_gray"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
+                <com.naver.maps.map.widget.LogoView
+                    android:id="@+id/navermap_logo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginBottom="16dp"
                     app:layout_constraintTop_toTopOf="parent"
-                    bind:navigateEvent="@{viewModel.navigateEvent}" />
+                    app:layout_constraintStart_toStartOf="parent" />
 
-
-                <androidx.fragment.app.FragmentContainerView
-                    android:id="@+id/fragmentContainer"
-                    android:name="androidx.navigation.fragment.NavHostFragment"
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/bottom_sheet_inner"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
-                    app:defaultNavHost="true"
+                    app:layout_constraintTop_toBottomOf="@id/navermap_logo"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/bottom_sheet_top_iv"
-                    app:navGraph="@navigation/nok_graph" />
+                    android:background="@drawable/rectangle_top_corner_20"
+                    android:elevation="10dp">
+
+                    <ImageView
+                        android:id="@+id/bottom_sheet_top_iv"
+                        android:layout_width="40dp"
+                        android:layout_height="5dp"
+                        android:layout_marginTop="12dp"
+                        android:src="@drawable/rectangle_corner_20_gray"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        bind:navigateEvent="@{viewModel.navigateEvent}" />
+
+
+                    <androidx.fragment.app.FragmentContainerView
+                        android:id="@+id/fragmentContainer"
+                        android:name="androidx.navigation.fragment.NavHostFragment"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        app:defaultNavHost="true"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/bottom_sheet_top_iv"
+                        app:navGraph="@navigation/nok_graph" />
+
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
             </androidx.constraintlayout.widget.ConstraintLayout>
 
 
