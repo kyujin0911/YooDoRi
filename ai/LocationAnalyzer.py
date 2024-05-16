@@ -2,17 +2,10 @@ from pyclustering.cluster.gmeans import gmeans
 from collections import Counter
 import numpy as np
 import pandas as pd
-<<<<<<<< HEAD:ai/LocationAnalyzer.py
-import os
-import sys
-from pyclustering.cluster.gmeans import gmeans
-========
 import warnings
 
 warnings.simplefilter(action='ignore', category=FutureWarning) # FutureWarning 제거
-
 pd.set_option('mode.chained_assignment', None)
->>>>>>>> develop_back:backend/fastapi/app/LocationAnalyzer.py
 
 class LocationAnalyzer:
     def __init__(self, filename):
@@ -33,25 +26,16 @@ class LocationAnalyzer:
 
         # 데이터에 불필요한 부분 제거
         # 추후 데이터 형식에 따라 수정 필요 *
-        data = data.split('\n')[:-1]
-<<<<<<<< HEAD:ai/LocationAnalyzer.py
-========
-        # data = data.split('\n')[6:-1]
->>>>>>>> develop_back:backend/fastapi/app/LocationAnalyzer.py
+        # data = data.split('\n')[:-1]
+        data = data.split('\n')[6:-1]
         for i in range(len(data)):
             line = data[i].split(',')
             latitude.append(line[0])    # 위도
             longitude.append(line[1])   # 경도
-<<<<<<<< HEAD:ai/LocationAnalyzer.py
-            date.append(line[5])        # 날짜
-            time.append(line[6])        # 시간
-
-========
-            date.append(line[2])        # 날짜
-            time.append(line[3])        # 시간
-            # date.append(line[5])
-            # time.append(line[6])
->>>>>>>> develop_back:backend/fastapi/app/LocationAnalyzer.py
+            #date.append(line[2])        # 날짜
+            #time.append(line[3])        # 시간
+            date.append(line[5])
+            time.append(line[6])
         df = pd.DataFrame({"latitude":latitude, "longitude":longitude, "date":date, "time":time})
 
     
@@ -62,7 +46,7 @@ class LocationAnalyzer:
         # 시간대와 요일 추가
         # 시간대 형식 : f00t04 f20t24
         # 4시간 단위로 분리
-        df['hour_block'] = ((df['datetime'].dt.hour) // 4 * 4).astype(str).str.zfill(2) + ((df['datetime'].dt.hour + 4) // 4 * 4).astype(str).str.zfill(2)
+        df['hour_block'] = 'f' + ((df['datetime'].dt.hour) // 4 * 4).astype(str).str.zfill(2) + 't' + ((df['datetime'].dt.hour + 4) // 4 * 4).astype(str).str.zfill(2)
         df['day_of_week'] = df['datetime'].dt.day_name()
         df = df.drop(['date', 'time'], axis=1)
         df = df.drop_duplicates(['datetime'], ignore_index=True)
@@ -103,20 +87,6 @@ class LocationAnalyzer:
                 k = data_df['clusters'].iloc[i][j]
                 self.df['clusterNo'].iloc[k] = i
 
-<<<<<<<< HEAD:ai/LocationAnalyzer.py
-        return result
-
-if __name__ == '__main__':
-    # 파일 경로 가져오기
-    # 지금은 데이터가 저장된 파일의 경로를 실행할 때 입력
-    filePath = r"C:\Users\sk002\OneDrive\바탕 화면\학교\Yoodori\testdata.txt"
-    la = LocationAnalyzer(filePath)
-
-    data = la.gmeansFunc()
-    
-    print(data)
-    
-========
         self.df = self.df[self.df['clusterNo'] != -1]
 
 
@@ -135,4 +105,23 @@ if __name__ == '__main__':
 
         data_list = data_df.values.tolist()
         return data_list
->>>>>>>> develop_back:backend/fastapi/app/LocationAnalyzer.py
+    
+
+
+if __name__ == '__main__':
+    # 파일 경로 가져오기
+    filePath = r"C:\Users\sk002\OneDrive\바탕 화면\학교\Yoodori\Geolife Trajectories 1.3\Data\003\Trajectory\20081202160051.txt"
+    la = LocationAnalyzer(filePath)
+
+    data = la.gmeansFunc()
+    
+    
+    print(data[1])
+    print(data[1][0])
+    print(data[1][0][0]) # latitude
+    print(data[1][0][1]) # longitude
+    print(data[1][2]) # time
+    print(data[1][3]) # w
+
+    print(type(data[1][2]))
+    print(type(data[1][3]))
