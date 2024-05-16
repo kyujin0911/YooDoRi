@@ -135,7 +135,8 @@
                     android:layout_marginTop="16dp"
                     app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                     app:layout_constraintTop_toBottomOf="@id/predict_location_title_tv"
-                    tools:listitem="@layout/item_meaningful_place" />
+                    tools:listitem="@layout/item_meaningful_place"
+                    android:paddingBottom="60dp"/>
 
             </androidx.constraintlayout.widget.ConstraintLayout>
         </androidx.core.widget.NestedScrollView>

@@ -286,7 +286,6 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                     Log.d("zoom", zoom.toString())
                 Log.d("distance", distance.toString())
             }
-            //naverMap?.moveCamera(CameraUpdate.scrollAndZoomTo(latLng, 18.0))
         } catch (e: IndexOutOfBoundsException) {
             Log.d("IndexOutOfBoundsException", e.toString())
         }
@@ -300,8 +299,6 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                 homeViewModel.predict()
                 stopGetDementiaLocation()
                 showLoadingDialog(this, "예측 장소를 추출중입니다...")
-                naverMap?.uiSettings?.setLogoMargin(20, 0, 0, behavior.peekHeight + 15)
-                //binding.navermapLogo.bottom = 500
             }
 
             // 보호대상자 마지막 정보 UI 업데이트, 실종 시각 카운트다운 시작
@@ -311,11 +308,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                 binding.averageMovementSpeedTv.text = String.format("%.2fkm", event.averageSpeed)
 
                 // bottom sheet expanded offset 지정 및 높이 지정
-
                 behavior.expandedOffset = binding.predictLayout.bottom + 20
-                /*binding.bottomSheet.layoutParams.height =
-                    binding.coordinatorLayout.height - binding.predictLayout.bottom
-                naverMap?.uiSettings?.setLogoMargin(20, 0, 0, behavior.peekHeight + 15)*/
             }
 
             // 의미장소 마커 지도에 표시
@@ -352,9 +345,6 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
             // 보호대상자 마지막 위치 마커 지도에 표시
             is NokHomeViewModel.PredictEvent.DisplayDementiaLastLocation -> {
                 binding.lastLocationTv.text = event.lastLocation.address
-
-                //naverMap?.moveCamera(CameraUpdate.scrollTo(event.lastLocation.latLng))
-
                 predictMarkers.add(LAST_LOCATION, Marker().apply {
                     setMarkerWithInfoWindow(
                         context = this@NokMainActivity,
@@ -375,9 +365,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                     circleOverlay.isVisible = false
                     binding.countDownT.text = "00:00"
                 }
-                //binding.bottomSheet.layoutParams.height = binding.coordinatorLayout.height
                 behavior.expandedOffset = 0
-                naverMap?.uiSettings?.setLogoMargin(20, 0, 0, 40)
                 predictMarkers.forEach { marker ->
                     marker.map = null
                 }
@@ -479,7 +467,6 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                 fm.beginTransaction().add(R.id.map_fragment, it).commit()
             }
         mapFragment.getMapAsync { map ->
-            map.uiSettings.setLogoMargin(20, 0, 0, 40)
             map.uiSettings.isZoomControlEnabled = false
             val zoomControlView = findViewById(R.id.zoom) as ZoomControlView
             zoomControlView.map = map
@@ -495,19 +482,18 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
         behavior.addBottomSheetCallback(object : BottomSheetCallback() {
             override fun onStateChanged(bottomSheet: View, newState: Int) {
                 when (newState) {
-                    BottomSheetBehavior.STATE_HALF_EXPANDED -> {
 
-                    }
-
-                    BottomSheetBehavior.STATE_COLLAPSED -> {
-                    }
                 }
             }
 
             override fun onSlide(bottomSheet: View, slideOffset: Float) {
                 _slideOffset = slideOffset
+                binding.navermapLogo.isVisible = if(slideOffset >= 0.5f){
+                    false
+                } else {
+                    true
+                }
                 if (slideOffset <= 0.3f) {
-                    //binding.navermapLogo.translationY = -slideOffset * bottomSheet.height
                     binding.layout.translationY = -slideOffset * bottomSheet.height * 0.5f
                 }
             }
@@ -525,11 +511,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
 
             if (destination.id != R.id.nokHomeFragment) {
                 stopGetDementiaLocation()
-                Log.d("margin", naverMap?.uiSettings?.logoMargin?.contentToString().toString())
-                //naverMap?.uiSettings?.setLogoMargin(20,0,0, behavior.peekHeight + 15)
-                Log.d("margin", naverMap?.uiSettings?.logoMargin?.contentToString().toString())
                 homeViewModel.setIsPredicted(false)
-                naverMap?.uiSettings?.setLogoMargin(20, 0, 0, 40)
             }
 
             if (destination.id != R.id.locationHistoryFragment) {
@@ -551,8 +533,6 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
 
             when (destination.id) {
                 R.id.nokHomeFragment -> {
-                    Log.d("margin", naverMap?.uiSettings?.logoMargin?.contentToString().toString())
-                    naverMap?.uiSettings?.setLogoMargin(20, 0, 0, 40)
                     event = NokHomeViewModel.NavigateEvent.Home
                     homeViewModel.fetchUserInfo()
                     binding.mapViewBtn.setOnClickListener {
@@ -561,6 +541,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                 }
 
                 R.id.nokSettingFragment, R.id.modifyUserInfoFragment, R.id.settingUpdateTimeFragment -> {
+                    binding.navermapLogo.isVisible = false
                     behavior.isDraggable = false
                     behavior.state = BottomSheetBehavior.STATE_EXPANDED
                     event = NokHomeViewModel.NavigateEvent.Setting
