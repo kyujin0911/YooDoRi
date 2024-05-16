@@ -23,7 +23,8 @@
             android:layout_height="30dp"
             android:src="@drawable/ic_meaning_place"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintTop_toTopOf="@id/address_tv"
+            app:layout_constraintBottom_toBottomOf="@id/address_tv"
             app:tint="@color/yellow" />
 
         <TextView
@@ -34,10 +35,10 @@
             android:gravity="start"
             android:text="@{model.address}"
             android:textAppearance="@style/TextAppearance.App.16sp.ExtraBold"
-            app:layout_constraintBottom_toBottomOf="@id/icon_iv"
+            app:layout_constraintBottom_toTopOf="@id/timeInfo_title_tv"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/icon_iv"
-            app:layout_constraintTop_toTopOf="@id/icon_iv"
+            app:layout_constraintTop_toTopOf="parent"
             tools:text="주소" />
 
         <TextView
