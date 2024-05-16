@@ -8,13 +8,14 @@ import android.graphics.PointF
 import android.util.Log
 import android.view.View
 import androidx.activity.viewModels
+import androidx.collection.forEach
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
-import androidx.core.view.marginBottom
 import androidx.lifecycle.lifecycleScope
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.navigation.NavController
+import androidx.navigation.NavGraph
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -24,7 +25,6 @@ import com.naver.maps.map.CameraAnimation
 import com.naver.maps.map.CameraUpdate
 import com.naver.maps.map.MapFragment
 import com.naver.maps.map.NaverMap
-import com.naver.maps.map.NaverMapOptions
 import com.naver.maps.map.OnMapReadyCallback
 import com.naver.maps.map.overlay.CircleOverlay
 import com.naver.maps.map.overlay.Marker
@@ -52,8 +52,8 @@ import kr.ac.tukorea.whereareu.util.extension.setInfoWindowText
 import kr.ac.tukorea.whereareu.util.extension.setMarker
 import kr.ac.tukorea.whereareu.util.extension.setMarkerWithInfoWindow
 import kr.ac.tukorea.whereareu.util.extension.setPath
-import java.lang.IndexOutOfBoundsException
 import kotlin.math.roundToInt
+
 
 @AndroidEntryPoint
 class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_nok_main),
@@ -98,7 +98,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
         )
         repeatOnStarted {
             homeViewModel.navigateEvent.collect {
-                Log.d("navigateEvent", it)
+                Log.d("navigateEvent", it.toString())
             }
         }
 
@@ -324,7 +324,6 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                             )
                         }
                     )
-                    Log.d("markers 2", predictMarkers.toString())
                 }
             }
 
@@ -382,6 +381,9 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                     naverMap = naverMap,
                     infoText = "예상 위치")
                 })
+            }
+
+            NokHomeViewModel.PredictEvent.PredictDone -> {
                 dismissLoadingDialog()
             }
         }
@@ -502,17 +504,27 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
 
     private fun initNavigator() {
         val navHostFragment =
-            supportFragmentManager.findFragmentById(R.id.fragmentContainer) as NavHostFragment
+            supportFragmentManager.findFragmentById(kr.ac.tukorea.whereareu.R.id.fragmentContainer) as NavHostFragment
         navController = navHostFragment.navController
 
         binding.bottomNav.setupWithNavController(navController)
         var event: NokHomeViewModel.NavigateEvent = NokHomeViewModel.NavigateEvent.Home
         navController.addOnDestinationChangedListener { controller, destination, arguments ->
+            Log.d("current id", navController.currentDestination?.id.toString())
+            Log.d("meaningful place id", kr.ac.tukorea.whereareu.R.id.meaningfulPlaceDetailFragment.toString())
+            val navInflater = navController.navInflater
+            val navGraph = navInflater.inflate(kr.ac.tukorea.whereareu.R.navigation.nok_graph)
 
-            if (destination.id != R.id.nokHomeFragment) {
+            // homeTab을 동적으로 가져오기
+
+            // homeTab을 동적으로 가져오기
+            val homeTab = navGraph.findNode(kr.ac.tukorea.whereareu.R.id.homeTab) as NavGraph
+            //Log.d("g홈탭",homeTab.nodes.)
+            /*if (destination.id != R.id.nokHomeFragment and R.id.meaningfulPlaceDetailFragment) {
+                Log.d("not home", "not home")
                 stopGetDementiaLocation()
                 homeViewModel.setIsPredicted(false)
-            }
+            }*/
 
             if (destination.id != R.id.locationHistoryFragment) {
                 with(locationHistoryMetaData){
@@ -528,11 +540,15 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
 
             if (destination.id != R.id.nokSettingFragment or R.id.modifyUserInfoFragment or R.id.settingUpdateTimeFragment) {
                 behavior.isDraggable = true
-                behavior.state = BottomSheetBehavior.STATE_COLLAPSED
+                //behavior.state = BottomSheetBehavior.STATE_COLLAPSED
             }
 
             when (destination.id) {
                 R.id.nokHomeFragment -> {
+                    if(homeViewModel.isPredicted.value){
+                        Log.d("막아", "막으라고")
+                       return@addOnDestinationChangedListener
+                    }
                     event = NokHomeViewModel.NavigateEvent.Home
                     homeViewModel.fetchUserInfo()
                     binding.mapViewBtn.setOnClickListener {
@@ -559,6 +575,8 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                     locationHistoryViewModel.setIsLoading(true)
                     event = NokHomeViewModel.NavigateEvent.LocationHistory
                 }
+                R.id.meaningfulPlaceDetailFragment -> {}
+
             }
             homeViewModel.eventNavigate(event)
         }

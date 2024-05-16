@@ -47,6 +47,9 @@ class NokHomeViewModel @Inject constructor(
     private val _isPredicted = MutableStateFlow(false)
     val isPredicted = _isPredicted.asStateFlow()
 
+    private val _isPredictDone = MutableStateFlow(false)
+    val isPredictDone = _isPredictDone.asStateFlow()
+
     private val _dementiaKey = MutableStateFlow("")
     private val _nokKey = MutableStateFlow("")
 
@@ -56,11 +59,17 @@ class NokHomeViewModel @Inject constructor(
     private val _dementiaName = MutableStateFlow("")
     val dementiaName = _dementiaName.asStateFlow()
 
-    private val _navigateEvent = MutableStateFlow(NavigateEvent.Home.toString())
-    val navigateEvent = _navigateEvent.asStateFlow()
+    private val _navigateEvent = MutableSharedFlow<NavigateEvent>()
+    val navigateEvent = _navigateEvent.asSharedFlow()
+
+    val navigateEventToString = MutableStateFlow(NavigateEvent.Home.toString())
 
     private val _innerItemClickEvent = MutableSharedFlow<InnerItemClickEvent>()
     val innerItemClickEvent = _innerItemClickEvent.asSharedFlow()
+
+    private val _meaningfulPlace = MutableStateFlow<List<MeaningfulPlaceInfo>>(emptyList())
+    val meaningfulPlace = _meaningfulPlace.asStateFlow()
+
 
     sealed class PredictEvent {
         data class StartPredict(val isPredicted: Boolean) : PredictEvent()
@@ -80,6 +89,8 @@ class NokHomeViewModel @Inject constructor(
         data class SearchNearbyPoliceStation(val policeStationList: List<PoliceStationInfo>) :
             PredictEvent()
 
+        data object PredictDone: PredictEvent()
+
         data class StopPredict(val isPredicted: Boolean) : PredictEvent()
     }
 
@@ -89,11 +100,14 @@ class NokHomeViewModel @Inject constructor(
         data object MeaningfulPlace: NavigateEvent
         data object LocationHistory: NavigateEvent
         data object SafeArea: NavigateEvent
+
+        data class HomeState(val isPredicted: Boolean, val isPredictDone: Boolean): NavigateEvent
     }
 
     fun eventNavigate(event: NavigateEvent){
         viewModelScope.launch {
-            _navigateEvent.value = event.toString()
+            _navigateEvent.emit(event)
+            navigateEventToString.value = event.toString()
         }
     }
 
@@ -107,6 +121,11 @@ class NokHomeViewModel @Inject constructor(
         viewModelScope.launch {
             _innerItemClickEvent.emit(event)
         }
+    }
+
+    fun setIsPredictDone(isPredictDone: Boolean){
+        _isPredictDone.value = isPredictDone
+        eventNavigate(NavigateEvent.HomeState(_isPredicted.value, isPredictDone))
     }
 
     fun setDementiaKey(dementiaKey: String) {
@@ -124,10 +143,11 @@ class NokHomeViewModel @Inject constructor(
     fun setIsPredicted(isPredicted: Boolean) {
         viewModelScope.launch {
             _isPredicted.emit(isPredicted)
+            eventNavigate(NavigateEvent.HomeState(isPredicted, _isPredictDone.value))
             if (isPredicted) {
-                eventPredict(PredictEvent.StartPredict(true))
+                eventPredict(PredictEvent.StartPredict(isPredicted))
             } else {
-                eventPredict(PredictEvent.StopPredict(false))
+                eventPredict(PredictEvent.StopPredict(isPredicted))
             }
         }
     }
@@ -162,11 +182,12 @@ class NokHomeViewModel @Inject constructor(
     fun predict() {
         viewModelScope.launch {
             val time = measureTimeMillis {
-                val dementiaLastInfo = async { getDementiaLastInfo() }.await()
+                val dementiaLastInfo = async { getDementiaLastInfo() }
                 //Log.d("lastInfo", dementiaLastInfo.toString())
-                val meaningfulPlaceList = async { getMeaningfulPlaces() }.await()
+                val meaningfulPlaceList = async { getMeaningfulPlaces() }
                 val predictLocation = async { fetchPredictInfoGura() }.await()
-
+                eventPredict(PredictEvent.PredictDone)
+                setIsPredictDone(true)
             }
             Log.d("after refactor time", time.toString())
         }
@@ -202,6 +223,7 @@ class NokHomeViewModel @Inject constructor(
             }
 
             eventPredict(PredictEvent.MeaningFulPlace(meaningfulPlaceInfo))
+            _meaningfulPlace.value = meaningfulPlaceInfo
         }.onException {
             Log.d("error", it.toString())
         }

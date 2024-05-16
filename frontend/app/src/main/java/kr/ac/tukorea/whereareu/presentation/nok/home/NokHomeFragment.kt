@@ -5,18 +5,28 @@ import android.content.ClipboardManager
 import android.content.Context.CLIPBOARD_SERVICE
 import android.content.pm.PackageManager
 import android.os.Build
+import android.os.Bundle
 import android.util.Log
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import androidx.core.app.ActivityCompat
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.navigation.NavController
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.naver.maps.geometry.LatLng
 import dagger.hilt.android.AndroidEntryPoint
 import kr.ac.tukorea.whereareu.R
+import kr.ac.tukorea.whereareu.databinding.FragmentHomeBinding
 import kr.ac.tukorea.whereareu.domain.home.InnerItemClickEvent
+import kr.ac.tukorea.whereareu.domain.home.MeaningfulPlaceInfo
 import kr.ac.tukorea.whereareu.domain.home.PoliceStationInfo
 import kr.ac.tukorea.whereareu.presentation.base.BaseFragment
+import kr.ac.tukorea.whereareu.presentation.login.nok.NokIdentityFragmentDirections
 import kr.ac.tukorea.whereareu.presentation.nok.home.adapter.PoliceStationRVA
 import kr.ac.tukorea.whereareu.presentation.nok.home.adapter.MeaningfulPlaceRVA
 import kr.ac.tukorea.whereareu.util.extension.repeatOnStarted
@@ -24,14 +34,34 @@ import kr.ac.tukorea.whereareu.util.extension.showToastShort
 
 
 @AndroidEntryPoint
-class NokHomeFragment : BaseFragment<kr.ac.tukorea.whereareu.databinding.FragmentHomeBinding>(R.layout.fragment_home),
+class NokHomeFragment : Fragment(R.layout.fragment_home),
     MeaningfulPlaceRVA.MeaningfulPlaceRVAClickListener, PoliceStationRVA.PoliceStationRVAClickListener {
     private val viewModel: NokHomeViewModel by activityViewModels()
+    private lateinit var binding: FragmentHomeBinding
     private val LOCATION_PERMISSION_REQUEST_CODE = 1001
     private val meaningfulPlaceRVA by lazy {
         MeaningfulPlaceRVA()
     }
-    override fun initObserver() {
+    private val navigator: NavController by lazy {
+        findNavController()
+    }
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        binding = FragmentHomeBinding.inflate(inflater, container, false)
+        binding.lifecycleOwner = this.viewLifecycleOwner
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        initObserver()
+        initView()
+    }
+    private fun initObserver() {
         repeatOnStarted {
             viewModel.predictEvent.collect{ predictEvent ->
                 handlePredictEvent(predictEvent)
@@ -54,7 +84,7 @@ class NokHomeFragment : BaseFragment<kr.ac.tukorea.whereareu.databinding.Fragmen
         }
     }
 
-    override fun initView() {
+    private fun initView() {
         binding.view = this
         binding.viewModel = viewModel
         checkLocationPermission()
@@ -109,6 +139,14 @@ class NokHomeFragment : BaseFragment<kr.ac.tukorea.whereareu.databinding.Fragmen
             }
 
         })
+    }*/
+    /*override fun onResume() {
+        super.onResume()
+        if(viewModel.meaningfulPlace.value.isEmpty()){
+            return
+        }
+        initMeaningfulListRVA()
+        meaningfulPlaceRVA.submitList(viewModel.meaningfulPlace.value)
     }*/
 
     private fun checkLocationPermission() {
@@ -167,5 +205,12 @@ class NokHomeFragment : BaseFragment<kr.ac.tukorea.whereareu.databinding.Fragmen
 
     override fun onClickMapView(latLng: LatLng) {
         viewModel.eventInnerItemClick(InnerItemClickEvent(BottomSheetBehavior.STATE_COLLAPSED, latLng))
+    }
+
+    override fun onClickInfoView(meaningfulPlace: MeaningfulPlaceInfo) {
+        val action = NokHomeFragmentDirections.actionNokHomeFragmentToMeaningfulPlaceDetailFragment(
+            meaningfulPlace
+        )
+        navigator.navigate(action)
     }
 }

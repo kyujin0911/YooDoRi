@@ -3,42 +3,65 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main_graph"
-    app:startDestination="@id/nokHomeFragment">
+    app:startDestination="@id/homeTab">
 
     <fragment
         android:id="@+id/meaningfulPlaceFragment"
         android:name="kr.ac.tukorea.whereareu.presentation.MeaningfulPlaceFragment"
-        android:label="MeaningfulPlaceFragment" />
+        android:label="MeaningfulPlaceFragment"
+        tools:layout="@layout/fragment_meaningful_place" />
     <fragment
         android:id="@+id/safeAreaFragment"
         android:name="kr.ac.tukorea.whereareu.presentation.SafeAreaFragment"
-        android:label="SafeAreaFragment" />
+        android:label="SafeAreaFragment"
+        tools:layout="@layout/fragment_safe_area" />
     <fragment
         android:id="@+id/locationHistoryFragment"
         android:name="kr.ac.tukorea.whereareu.presentation.nok.history.LocationHistoryFragment"
-        android:label="LocationHistoryFragment" />
-    <fragment
-        android:id="@+id/nokHomeFragment"
-        android:name="kr.ac.tukorea.whereareu.presentation.nok.home.NokHomeFragment"
-        android:label="NokHomeFragment" />
-    <navigation android:id="@+id/settingTab"
+        android:label="LocationHistoryFragment"
+        tools:layout="@layout/fragment_location_history" />
+    <navigation
+        android:id="@+id/homeTab"
+        app:startDestination="@id/nokHomeFragment">
+        <fragment
+            android:id="@+id/nokHomeFragment"
+            android:name="kr.ac.tukorea.whereareu.presentation.nok.home.NokHomeFragment"
+            android:label="NokHomeFragment"
+            tools:layout="@layout/fragment_home">
+            <action
+                android:id="@+id/action_nokHomeFragment_to_meaningfulPlaceDetailFragment"
+                app:destination="@id/meaningfulPlaceDetailFragment" />
+        </fragment>
+        <fragment
+            android:id="@+id/meaningfulPlaceDetailFragment"
+            android:name="kr.ac.tukorea.whereareu.presentation.nok.home.MeaningfulPlaceDetailFragment"
+            android:label="MeaningfulPlaceDetailFragment"
+            tools:layout="@layout/fragment_meaningful_place_detail">
+            <argument
+                android:name="meaningfulPlace"
+                app:argType="kr.ac.tukorea.whereareu.domain.home.MeaningfulPlaceInfo" />
+        </fragment>
+
+    </navigation>
+    <navigation
+        android:id="@+id/settingTab"
         app:startDestination="@id/nokSettingFragment">
         <fragment
             android:id="@+id/nokSettingFragment"
             android:name="kr.ac.tukorea.whereareu.presentation.nok.setting.NokSettingFragment"
-            android:label="NokSettingFragment" >
+            android:label="NokSettingFragment">
             <action
                 android:id="@+id/action_nokSettingFragment_to_modifyUserInfoFragment"
                 app:destination="@id/modifyUserInfoFragment" />
             <action
                 android:id="@+id/action_nokSettingFragment_to_settingUpdateTimeFragment"
-                app:destination="@+id/settingUpdateTimeFragment"/>
+                app:destination="@+id/settingUpdateTimeFragment" />
         </fragment>
         <fragment
             android:id="@+id/modifyUserInfoFragment"
             android:name="kr.ac.tukorea.whereareu.presentation.nok.setting.ModifyUserInfoFragment"
             android:label="fragment_modify_user_info"
-            tools:layout="@layout/fragment_nok_modify_user_info" >
+            tools:layout="@layout/fragment_nok_modify_user_info">
             <action
                 android:id="@+id/action_modifyUserInfoFragment_to_nokSettingFragment"
                 app:destination="@id/nokSettingFragment" />

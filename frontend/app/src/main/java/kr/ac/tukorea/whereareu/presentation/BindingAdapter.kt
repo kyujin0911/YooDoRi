@@ -66,11 +66,11 @@ object BindingAdapter {
     @JvmStatic
     fun setBottomSheetIconVisible(view: ImageView, navigateEvent: String){
         val color = when(navigateEvent){
-            NokHomeViewModel.NavigateEvent.Home.toString() -> R.color.gray40
-            NokHomeViewModel.NavigateEvent.LocationHistory.toString() -> R.color.white
-            NokHomeViewModel.NavigateEvent.MeaningfulPlace.toString() -> R.color.gray40
-            NokHomeViewModel.NavigateEvent.Setting.toString() -> R.color.white
-            NokHomeViewModel.NavigateEvent.SafeArea.toString() -> R.color.gray40
+            "Home" -> R.color.gray40
+            "LocationHistory" -> R.color.white
+            "MeaningfulPlace" -> R.color.gray40
+            "Setting" -> R.color.white
+            "SafeArea" -> R.color.gray40
             else -> R.color.white
         }
         view.setColorFilter(ContextCompat.getColor(view.context, color))
@@ -91,5 +91,16 @@ object BindingAdapter {
         else {
             true
         }
+    }
+
+    @BindingAdapter("bind:dayOfWeek")
+    @JvmStatic
+    fun setDayOfWeekColor(view: TextView, dayOfWeek: String){
+        val drawable = when(dayOfWeek){
+            "토" -> R.drawable.oval_blue
+            "일" -> R.drawable.oval_red
+            else -> R.drawable.oval_black
+        }
+        view.background = ContextCompat.getDrawable(view.context, drawable)
     }
 }

@@ -88,7 +88,7 @@
                             android:id="@+id/oval_v"
                             android:layout_width="46dp"
                             android:layout_height="46dp"
-                            android:background="@drawable/oval"
+                            android:background="@drawable/oval_yellow"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toTopOf="parent" />
@@ -237,7 +237,7 @@
                     android:layout_height="60dp"
                     android:layout_marginEnd="16dp"
                     android:layout_marginBottom="16dp"
-                    android:background="@drawable/oval"
+                    android:background="@drawable/oval_yellow"
                     android:elevation="8dp"
                     android:fontFamily="@font/suite_extrabold"
                     android:gravity="center"
@@ -247,7 +247,7 @@
                     app:layout_constraintBottom_toTopOf="@id/emergency_tv"
                     app:layout_constraintEnd_toEndOf="parent"
                     bind:isPredicted="@{viewModel.isPredicted}"
-                    bind:navigateEvent="@{viewModel.navigateEvent}" />
+                    bind:navigateEvent="@{viewModel.navigateEventToString}" />
 
                 <TextView
                     android:id="@+id/emergency_tv"
@@ -255,7 +255,7 @@
                     android:layout_height="60dp"
                     android:layout_marginEnd="16dp"
                     android:layout_marginBottom="16dp"
-                    android:background="@drawable/oval"
+                    android:background="@drawable/oval_yellow"
                     android:backgroundTint="@color/red"
                     android:elevation="8dp"
                     android:fontFamily="@font/suite_extrabold"
@@ -265,12 +265,12 @@
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     bind:isPredicted="@{viewModel.isPredicted}"
-                    bind:navigateEvent="@{viewModel.navigateEvent}" />
+                    bind:navigateEvent="@{viewModel.navigateEventToString}" />
 
                 <androidx.constraintlayout.widget.Group
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:visibility='@{viewModel.navigateEvent.equals("Home") ? View.VISIBLE : View.GONE}'
+                    android:visibility='@{viewModel.navigateEventToString.equals("Home") ? View.VISIBLE : View.GONE}'
                     app:constraint_referenced_ids="predict_tv, emergency_tv, user_info_layout" />
 
                 <androidx.constraintlayout.widget.ConstraintLayout
@@ -464,7 +464,7 @@
                 app:behavior_hideable="false"
                 app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
                 bind:isPredicted="@{viewModel.isPredicted}"
-                bind:navigateEvent="@{viewModel.navigateEvent}">
+                bind:navigateEvent="@{viewModel.navigateEventToString}">
                 <com.naver.maps.map.widget.LogoView
                     android:id="@+id/navermap_logo"
                     android:layout_width="wrap_content"
@@ -493,7 +493,7 @@
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
-                        bind:navigateEvent="@{viewModel.navigateEvent}" />
+                        bind:navigateEvent="@{viewModel.navigateEventToString}" />
 
 
                     <androidx.fragment.app.FragmentContainerView

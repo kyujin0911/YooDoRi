@@ -1,11 +1,14 @@
 package kr.ac.tukorea.whereareu.presentation.nok.home.adapter
 
+import android.content.Context
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import kr.ac.tukorea.whereareu.R
 import kr.ac.tukorea.whereareu.data.model.nok.home.TimeInfo
 import kr.ac.tukorea.whereareu.databinding.ItemTimeInfoBinding
 
