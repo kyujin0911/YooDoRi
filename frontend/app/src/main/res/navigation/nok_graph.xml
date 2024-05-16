@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main_graph"
+    app:startDestination="@id/nokHomeFragment">
+
+    <fragment
+        android:id="@+id/meaningfulPlaceFragment"
+        android:name="kr.ac.tukorea.whereareu.presentation.MeaningfulPlaceFragment"
+        android:label="MeaningfulPlaceFragment" />
+    <fragment
+        android:id="@+id/safeAreaFragment"
+        android:name="kr.ac.tukorea.whereareu.presentation.SafeAreaFragment"
+        android:label="SafeAreaFragment" />
+    <fragment
+        android:id="@+id/locationHistoryFragment"
+        android:name="kr.ac.tukorea.whereareu.presentation.nok.history.LocationHistoryFragment"
+        android:label="LocationHistoryFragment" />
+    <fragment
+        android:id="@+id/nokHomeFragment"
+        android:name="kr.ac.tukorea.whereareu.presentation.nok.home.NokHomeFragment"
+        android:label="NokHomeFragment" />
+    <navigation android:id="@+id/settingTab"
+        app:startDestination="@id/nokSettingFragment">
+        <fragment
+            android:id="@+id/nokSettingFragment"
+            android:name="kr.ac.tukorea.whereareu.presentation.nok.setting.NokSettingFragment"
+            android:label="NokSettingFragment" >
+            <action
+                android:id="@+id/action_nokSettingFragment_to_modifyUserInfoFragment"
+                app:destination="@id/modifyUserInfoFragment" />
+            <action
+                android:id="@+id/action_nokSettingFragment_to_settingUpdateTimeFragment"
+                app:destination="@+id/settingUpdateTimeFragment"/>
+        </fragment>
+        <fragment
+            android:id="@+id/modifyUserInfoFragment"
+            android:name="kr.ac.tukorea.whereareu.presentation.nok.setting.ModifyUserInfoFragment"
+            android:label="fragment_modify_user_info"
+            tools:layout="@layout/fragment_nok_modify_user_info" >
+            <action
+                android:id="@+id/action_modifyUserInfoFragment_to_nokSettingFragment"
+                app:destination="@id/nokSettingFragment" />
+        </fragment>
+        <fragment
+            android:id="@+id/settingUpdateTimeFragment"
+            android:name="kr.ac.tukorea.whereareu.presentation.nok.setting.SettingUpdateRateFragment"
+            android:label="fragment_setting_update_time"
+            tools:layout="@layout/fragment_setting_update_time">
+            <action
+                android:id="@+id/action_settingUpdateTimeFragment_to_nokSettingFragment"
+                app:destination="@id/nokSettingFragment" />
+        </fragment>
+    </navigation>
+</navigation>

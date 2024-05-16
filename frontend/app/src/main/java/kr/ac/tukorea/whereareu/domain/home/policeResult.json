@@ -1,0 +1,2586 @@
+{
+  "status": "success",
+  "message": "Location history data sent",
+  "result": {
+    "locationHistory": [
+      {
+        "latitude": 37.4016759,
+        "longitude": 126.9341057,
+        "time": "13:56:39,14:01:42",
+        "userStatus": 1
+      },
+      {
+        "latitude": 37.4016759,
+        "longitude": 126.9341057,
+        "time": "14:02:43",
+        "userStatus": 2
+      },
+      {
+        "latitude": 37.4004841,
+        "longitude": 126.9334528,
+        "time": "14:07:44",
+        "userStatus": 2
+      },
+      {
+        "latitude": 37.3998076,
+        "longitude": 126.9338499,
+        "time": "14:08:44",
+        "userStatus": 3
+      },
+      {
+        "latitude": 37.3989014,
+        "longitude": 126.9341879,
+        "time": "14:09:57",
+        "userStatus": 1
+      },
+      {
+        "latitude": 37.3989515,
+        "longitude": 126.9349544,
+        "time": "14:10:57",
+        "userStatus": 2
+      },
+      {
+        "latitude": 37.3991577,
+        "longitude": 126.9358692,
+        "time": "14:11:59",
+        "userStatus": 2
+      },
+      {
+        "latitude": 37.3990331,
+        "longitude": 126.9357238,
+        "time": "14:13:00",
+        "userStatus": 2
+      },
+      {
+        "latitude": 37.3987673,
+        "longitude": 126.9422292,
+        "time": "14:14:01,14:15:02",
+        "userStatus": 1
+      },
+      {
+        "latitude": 37.3990402,
+        "longitude": 126.9448224,
+        "time": "14:16:06",
+        "userStatus": 4
+      },
+      {
+        "latitude": 37.3952527,
+        "longitude": 126.9484773,
+        "time": "14:18:17",
+        "userStatus": 1
+      },
+      {
+        "latitude": 37.3914005,
+        "longitude": 126.9505969,
+        "time": "14:19:18",
+        "userStatus": 4
+      },
+      {
+        "latitude": 37.3914747,
+        "longitude": 126.9506217,
+        "time": "14:20:22",
+        "userStatus": 1
+      },
+      {
+        "latitude": 37.3897029,
+        "longitude": 126.9512872,
+        "time": "14:22:36",
+        "userStatus": 2
+      },
+      {
+        "latitude": 37.3897835,
+        "longitude": 126.9508121,
+        "time": "14:23:37",
+        "userStatus": 1
+      },
+      {
+        "latitude": 37.3896207,
+        "longitude": 126.9501602,
+        "time": "14:24:37",
+        "userStatus": 2
+      },
+      {
+        "latitude": 37.3896207,
+        "longitude": 126.95016,
+        "time": "14:25:38",
+        "userStatus": 2
+      },
+      {
+        "latitude": 37.3896207,
+        "longitude": 126.95016,
+        "time": "14:26:39",
+        "userStatus": 2
+      },
+      {
+        "latitude": 37.3896206,
+        "longitude": 126.9501597,
+        "time": "14:27:40",
+        "userStatus": 2
+      },
+      {
+        "latitude": 37.3896206,
+        "longitude": 126.9501599,
+        "time": "14:28:41",
+        "userStatus": 2
+      },
+      {
+        "latitude": 37.3896201,
+        "longitude": 126.9501605,
+        "time": "14:29:42",
+        "userStatus": 2
+      },
+      {
+        "latitude": 37.3896201,
+        "longitude": 126.9501605,
+        "time": "14:30:43",
+        "userStatus": 2
+      },
+      {
+        "latitude": 37.3896201,
+        "longitude": 126.9501605,
+        "time": "14:31:45",
+        "userStatus": 2
+      },
+      {
+        "latitude": 37.3896201,
+        "longitude": 126.9501605,
+        "time": "14:32:46",
+        "userStatus": 2
+      },
+      {
+        "latitude": 37.3896201,
+        "longitude": 126.9501605,
+        "time": "14:33:47",
+        "userStatus": 2
+      },
+      {
+        "latitude": 37.3896201,
+        "longitude": 126.9501605,
+        "time": "14:34:48",
+        "userStatus": 2
+      },
+      {
+        "latitude": 37.3896201,
+        "longitude": 126.9501605,
+        "time": "14:35:50",
+        "userStatus": 2
+      },
+      {
+        "latitude": 37.3896201,
+        "longitude": 126.9501605,
+        "time": "14:39:05",
+        "userStatus": 2
+      },
+      {
+        "latitude": 37.3725836,
+        "longitude": 126.9434661,
+        "time": "14:42:19",
+        "userStatus": 2
+      },
+      {
+        "latitude": 37.3725836,
+        "longitude": 126.9434661,
+        "time": "14:43:00",
+        "userStatus": 4
+      },
+      {
+        "latitude": 37.3725836,
+        "longitude": 126.9434661,
+        "time": "14:43:54",
+        "userStatus": 4
+      },
+      {
+        "latitude": 37.3507366,
+        "longitude": 126.9257061,
+        "time": "14:44:55",
+        "userStatus": 3
+      },
+      {
+        "latitude": 37.3507281,
+        "longitude": 126.9256234,
+        "time": "14:45:56",
+        "userStatus": 3
+      },
+      {
+        "latitude": 37.341574,
+        "longitude": 126.9237063,
+        "time": "14:46:57",
+        "userStatus": 1
+      },
+      {
+        "latitude": 37.3508335,
+        "longitude": 126.9256841,
+        "time": "14:47:58",
+        "userStatus": 4
+      },
+      {
+        "latitude": 37.3279833,
+        "longitude": 126.916868,
+        "time": "14:48:59",
+        "userStatus": 4
+      },
+      {
+        "latitude": 37.3270297,
+        "longitude": 126.9160735,
+        "time": "14:50:00",
+        "userStatus": 4
+      },
+      {
+        "latitude": 37.312218,
+        "longitude": 126.9036489,
+        "time": "14:51:01",
+        "userStatus": 4
+      },
+      {
+        "latitude": 37.3120417,
+        "longitude": 126.9035425,
+        "time": "14:52:02",
+        "userStatus": 4
+      },
+      {
+        "latitude": 37.3060701,
+        "longitude": 126.8706009,
+        "time": "14:53:03",
+        "userStatus": 4
+      },
+      {
+        "latitude": 37.3028569,
+        "longitude": 126.8667351,
+        "time": "14:54:04",
+        "userStatus": 3
+      },
+      {
+        "latitude": 37.3028596,
+        "longitude": 126.8668948,
+        "time": "14:55:05",
+        "userStatus": 2
+      },
+      {
+        "latitude": 37.3071285,
+        "longitude": 126.8570693,
+        "time": "14:56:06",
+        "userStatus": 3
+      },
+      {
+        "latitude": 37.3099153,
+        "longitude": 126.853386,
+        "time": "14:57:07",
+        "userStatus": 2
+      },
+      {
+        "latitude": 37.3098494,
+        "longitude": 126.8533671,
+        "time": "14:58:07",
+        "userStatus": 2
+      },
+      {
+        "latitude": 37.3159906,
+        "longitude": 126.8383037,
+        "time": "14:59:08",
+        "userStatus": 2
+      },
+      {
+        "latitude": 37.3151811,
+        "longitude": 126.8312084,
+        "time": "15:00:09",
+        "userStatus": 2
+      },
+      {
+        "latitude": 37.3167862,
+        "longitude": 126.8229744,
+        "time": "15:01:10",
+        "userStatus": 2
+      },
+      {
+        "latitude": 37
+        2024-05-08
+        21: 41
+        :
+        36.326
+        2314-2714
+        okhttp.OkHttpClient
+        kr.ac.tukorea.whereareu
+        I
+        .3167954,
+        "longitude": 126.8229795,
+        "time": "15:02:11",
+        "userStatus": 2
+      },
+      {
+        "latitude": 37.3207857,
+        "longitude": 126.8056557,
+        "time": "15:03:12",
+        "userStatus": 2
+      },
+      {
+        "latitude": 37.3226072,
+        "longitude": 126.8003873,
+        "time": "15:04:12",
+        "userStatus": 2
+      },
+      {
+        "latitude": 37.3268543,
+        "longitude": 126.7894425,
+        "time": "15:05:13",
+        "userStatus": 2
+      },
+      {
+        "latitude": 37.3270219,
+        "longitude": 126.7888396,
+        "time": "15:06:15",
+        "userStatus": 2
+      },
+      {
+        "latitude": 37.3271679,
+        "longitude": 126.7875559,
+        "time": "15:08:20",
+        "userStatus": 2
+      },
+      {
+        "latitude": 37.3396861,
+        "longitude": 126.7614229,
+        "time": "15:09:54",
+        "userStatus": 2
+      },
+      {
+        "latitude": 37.3516055,
+        "longitude": 126.7487626,
+        "time": "15:10:55",
+        "userStatus": 1
+      },
+      {
+        "latitude": 37.3517464,
+        "longitude": 126.7430489,
+        "time": "15:11:57",
+        "userStatus": 2
+      },
+      {
+        "latitude": 37.3516215,
+        "longitude": 126.7423319,
+        "time": "15:12:57",
+        "userStatus": 2
+      },
+      {
+        "latitude": 37.3517775,
+        "longitude": 126.7414768,
+        "time": "15:13:59",
+        "userStatus": 2
+      },
+      {
+        "latitude": 37.3518189,
+        "longitude": 126.7416503,
+        "time": "15:15:00",
+        "userStatus": 2
+      },
+      {
+        "latitude": 37.3397811,
+        "longitude": 126.7348403,
+        "time": "15:51:20,15:54:46",
+        "userStatus": 1
+      },
+      {
+        "latitude": 37.3397811,
+        "longitude": 126.7348403,
+        "time": "15:54:57",
+        "userStatus": 4
+      },
+      {
+        "latitude": 37.3397811,
+        "longitude": 126.7348403,
+        "time": "15:55:08",
+        "userStatus": 2
+      },
+      {
+        "latitude": 37.3397811,
+        "longitude": 126.7348403,
+        "time": "15:55:19",
+        "userStatus": 2
+      },
+      {
+        "latitude": 37.3397811,
+        "longitude": 126.7348403,
+        "time": "15:58:02,16:04:29",
+        "userStatus": 1
+      },
+      {
+        "latitude": 37.3397811,
+        "longitude": 126.7348403,
+        "time": "16:17:06",
+        "userStatus": 2
+      },
+      {
+        "latitude": 37.3397811,
+        "longitude": 126.7348403,
+        "time": "16:20:32",
+        "userStatus": 2
+      },
+      {
+        "latitude": 37.3397811,
+        "longitude": 126.7348403,
+        "time": "16:20:43",
+        "userStatus": 2
+      },
+      {
+        "latitude": 37.3397811,
+        "longitude": 126.7348403,
+        "time": "16:20:54",
+        "userStatus": 2
+      },
+      {
+        "latitude": 37.3397811,
+        "longitude": 126.7348403,
+        "time": "16:21:05",
+        "userStatus": 2
+      },
+      {
+        "latitude": 37.3397811,
+        "longitude": 126.7348403,
+        "time": "16:23:34,16:26:54",
+        "userStatus": 1
+      },
+      {
+        "latitude": 37.3397811,
+        "longitude": 126.7348403,
+        "time": "16:27:05",
+        "userStatus": 2
+      },
+      {
+        "latitude": 37.3397811,
+        "longitude": 126.7348403,
+        "time": "16:27:16",
+        "userStatus": 2
+      },
+      {
+        "latitude": 37.3397811,
+        "longitude": 126.7348403,
+        "time": "16:27:27",
+        "userStatus": 2
+      },
+      {
+        "latitude": 37.3397811,
+        "longitude": 126.7348403,
+        "time": "16:27:37",
+        "userStatus": 2
+      },
+      {
+        "latitude": 37.3397811,
+        "longitude": 126.7348403,
+        "time": "16:27:48",
+        "userStatus": 2
+      },
+      {
+        "latitude": 37.3397811,
+        "longitude": 126.7348403,
+        "time": "16:27:59",
+        "userStatus": 2
+      },
+      {
+        "latitude": 37.3397811,
+        "longitude": 126.7348403,
+        "time": "16:28:10",
+        "userStatus": 2
+      },
+      {
+        "latitude": 37.3397811,
+        "longitude": 126.7348403,
+        "time": "16:28:21",
+        "userStatus": 1
+      },
+      {
+        "latitude": 37.3397811,
+        "longitude": 126.7348403,
+        "time": "16:28:32",
+        "userStatus": 2
+      },
+      {
+        "latitude": 37.3397811,
+        "longitude": 126.7348403,
+        "time": "16:28:42",
+        "userStatus": 2
+      },
+      {
+        "latitude": 37.3397811,
+        "longitude": 126.7348403,
+        "time": "16:28:53",
+        "userStatus": 1
+      },
+      {
+        "latitude": 37.3397811,
+        "longitude": 126.7348403,
+        "time": "16:29:04",
+        "userStatus": 2
+      },
+      {
+        "latitude": 37.3397811,
+        "longitude": 126.7348403,
+        "time": "16:29:14",
+        "userStatus": 2
+      },
+      {
+        "latitude": 37.3397811,
+        "longitude": 126.7348403,
+        "time": "16:29:25",
+        "userStatus": 1
+      },
+      {
+        "latitude": 37.3397811,
+        "longitude": 126.7348403,
+        "time": "16:29:36",
+        "userStatus": 2
+      },
+      {
+        "latitude": 37.3397811,
+        "longitude": 126.7348403,
+        "time": "16:29:47",
+        "userStatus": 2
+      },
+      {
+        "latitude": 37.3397811,
+        "longitude": 126.7348403,
+        "time": "16:29:58",
+        "userStatus": 2
+      },
+      {
+        "latitude": 37.3397811,
+        "longitude": 126.7348403,
+        "time": "16:30:09",
+        "userStatus": 2
+      },
+      {
+        "latitude": 37.3397811,
+        "longitude": 126.7348403,
+        "time": "16:30:23",
+        "userStatus": 2
+      },
+      {
+        "latitude": 37.3397811,
+        "longitude": 126.7348403,
+        "time": "16:30:35,16:30:45",
+        "userStatus": 1
+      },
+      {
+        "latitude": 37.3397811,
+        "longitude": 126.7348403,
+        "time": "16:30:56",
+        "userStatus": 4
+      },
+      {
+        "latitude": 37.3397811,
+        "longitude": 126.7348403,
+        "time": "16:31:07",
+        "userStatus": 1
+      },
+      {
+        "latitude": 37.3397811,
+        "longitude": 126.7348403,
+        "time": "16:31:21",
+        "userStatus": 4
+      },
+      {
+        "latitude": 37.3397811,
+        "longitude": 126.7348403,
+        "time": "16:31:31",
+        "userStatus": 4
+      },
+      {
+        "latitude": 37.3397811,
+        "longitude": 126.7348403,
+        "time": "16:31:42",
+        "userStatus": 4
+      },
+      {
+        "latitude": 37.3397811,
+        "longitude": 126.7348403,
+        "time": "16:31:53",
+        "userStatus": 1
+      },
+      {
+        "latitud
+        2024-05-08
+        21: 41
+        :
+        36.326
+        2314-2714
+        okhttp.OkHttpClient
+        kr.ac.tukorea.whereareu
+        I
+        e
+        ":37.3397811,"
+        longitude
+        ":126.7348403,"
+        time
+        ":"
+        16: 32
+        :
+        04
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.3397811,"
+        longitude
+        ":126.7348403,"
+        time
+        ":"
+        16: 32
+        :
+        15
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.3397811,"
+        longitude
+        ":126.7348403,"
+        time
+        ":"
+        16: 32
+        :
+        27
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.3397811,"
+        longitude
+        ":126.7348403,"
+        time
+        ":"
+        16: 32
+        :
+        37
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.3397811,"
+        longitude
+        ":126.7348403,"
+        time
+        ":"
+        16: 32
+        :
+        48
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.3397811,"
+        longitude
+        ":126.7348403,"
+        time
+        ":"
+        16: 32
+        :
+        59
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.3397811,"
+        longitude
+        ":126.7348403,"
+        time
+        ":"
+        16: 33
+        :
+        10,
+        16: 33
+        :
+        20
+        ","
+        userStatus
+        ":1},{"
+        latitude
+        ":37.3397811,"
+        longitude
+        ":126.7348403,"
+        time
+        ":"
+        16: 33
+        :
+        31
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.3397811,"
+        longitude
+        ":126.7348403,"
+        time
+        ":"
+        16: 33
+        :
+        43,
+        17: 21
+        :
+        12
+        ","
+        userStatus
+        ":1},{"
+        latitude
+        ":37.3397743,"
+        longitude
+        ":126.7348831,"
+        time
+        ":"
+        17: 21
+        :
+        23
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.3397719,"
+        longitude
+        ":126.7348799,"
+        time
+        ":"
+        17: 21
+        :
+        33
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.3397838,"
+        longitude
+        ":126.7348592,"
+        time
+        ":"
+        17: 21
+        :
+        44
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.3397911,"
+        longitude
+        ":126.7348636,"
+        time
+        ":"
+        17: 21
+        :
+        55
+        ","
+        userStatus
+        ":4},{"
+        latitude
+        ":37.3397604,"
+        longitude
+        ":126.7349086,"
+        time
+        ":"
+        17: 22
+        :
+        06
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.3396617,"
+        longitude
+        ":126.7350589,"
+        time
+        ":"
+        17: 22
+        :
+        17
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.3397112,"
+        longitude
+        ":126.7349964,"
+        time
+        ":"
+        17: 22
+        :
+        28
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.3397659,"
+        longitude
+        ":126.7348097,"
+        time
+        ":"
+        17: 22
+        :
+        45
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.3397615,"
+        longitude
+        ":126.7346572,"
+        time
+        ":"
+        17: 22
+        :
+        56
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.3395292,"
+        longitude
+        ":126.7350423,"
+        time
+        ":"
+        17: 23
+        :
+        07
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.3395467,"
+        longitude
+        ":126.7349008,"
+        time
+        ":"
+        17: 23
+        :
+        21
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.3396707,"
+        longitude
+        ":126.7347364,"
+        time
+        ":"
+        17: 23
+        :
+        32
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.339653,"
+        longitude
+        ":126.7347488,"
+        time
+        ":"
+        17: 23
+        :
+        43
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.3397584,"
+        longitude
+        ":126.7345636,"
+        time
+        ":"
+        17: 23
+        :
+        54
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.3397974,"
+        longitude
+        ":126.7347014,"
+        time
+        ":"
+        17: 24
+        :
+        04
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.3399539,"
+        longitude
+        ":126.7345868,"
+        time
+        ":"
+        17: 24
+        :
+        15
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.3400813,"
+        longitude
+        ":126.7344394,"
+        time
+        ":"
+        17: 24
+        :
+        26
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.3402692,"
+        longitude
+        ":126.7339143,"
+        time
+        ":"
+        17: 24
+        :
+        40
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.3404515,"
+        longitude
+        ":126.7334704,"
+        time
+        ":"
+        17: 24
+        :
+        54
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.3403965,"
+        longitude
+        ":126.7334226,"
+        time
+        ":"
+        17: 25
+        :
+        06
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.3402835,"
+        longitude
+        ":126.7334179,"
+        time
+        ":"
+        17: 25
+        :
+        17
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.3400532,"
+        longitude
+        ":126.7333976,"
+        time
+        ":"
+        17: 25
+        :
+        28
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.3402932,"
+        longitude
+        ":126.7332936,"
+        time
+        ":"
+        17: 25
+        :
+        47
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.3401469,"
+        longitude
+        ":126.7331291,"
+        time
+        ":"
+        17: 26
+        :
+        01
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.3401431,"
+        longitude
+        ":126.7329804,"
+        time
+        ":"
+        17: 26
+        :
+        15
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.3402454,"
+        longitude
+        ":126.733259,"
+        time
+        ":"
+        17: 26
+        :
+        25
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.3401817,"
+        longitude
+        ":126.733244,"
+        time
+        ":"
+        17: 26
+        :
+        37
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.3401669,"
+        longitude
+        ":126.7333275,"
+        time
+        ":"
+        17: 26
+        :
+        48
+        ","
+        userStatus
+        ":1},{"
+        latitude
+        ":37.3399384,"
+        longitude
+        ":126.7331385,"
+        time
+        ":"
+        17: 26
+        :
+        58
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.3399384,"
+        longitude
+        ":126.7331385,"
+        time
+        ":"
+        17: 27
+        :
+        09
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.3399384,"
+        longitude
+        ":126.7331385,"
+        time
+        ":"
+        17: 27
+        :
+        20
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.3402233,"
+        longitude
+        ":126.7333108,"
+        time
+        ":"
+        17: 27
+        :
+        31
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.3398031,"
+        longitude
+        ":126.7331629,"
+        time
+        ":"
+        17: 27
+        :
+        42
+        ","
+        userStatus
+        ":1},{"
+        latitude
+        ":37.3395485,"
+        longitude
+        ":126.733026,"
+        time
+        ":"
+        17: 27
+        :
+        53
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.3395354,"
+        longitude
+        ":126.732679,"
+        time
+        ":"
+        17: 28
+        :
+        10
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.3397307,"
+        longitude
+        ":126.7327872,"
+        time
+        ":"
+        17: 28
+        :
+        25
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.3402917,"
+        longitude
+        ":126.7329672,"
+        time
+        ":"
+        17: 28
+        :
+        57
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.3402823,"
+        longitude
+        ":126.733215,"
+        time
+        ":"
+        17: 29
+        :
+        09
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.3397856,"
+        longitude
+        ":126.7329019,"
+        time
+        ":"
+        17: 29
+        :
+        21
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.3394156,"
+        longitude
+        ":126.7325412,"
+        time
+        ":"
+        17: 29
+        :
+        32
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.339354,"
+        longi
+        2024-05-08
+        21: 41
+        :
+        36.326
+        2314-2714
+        okhttp.OkHttpClient
+        kr.ac.tukorea.whereareu
+        I
+        tude
+        ":126.7324764,"
+        time
+        ":"
+        17: 29
+        :
+        43
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.3395436,"
+        longitude
+        ":126.7328327,"
+        time
+        ":"
+        17: 30
+        :
+        02,
+        17: 30
+        :
+        13
+        ","
+        userStatus
+        ":1},{"
+        latitude
+        ":37.3402517,"
+        longitude
+        ":126.7330959,"
+        time
+        ":"
+        17: 30
+        :
+        25
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.3397356,"
+        longitude
+        ":126.7328873,"
+        time
+        ":"
+        17: 30
+        :
+        36
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.3397261,"
+        longitude
+        ":126.7327088,"
+        time
+        ":"
+        17: 30
+        :
+        47
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.3398909,"
+        longitude
+        ":126.7326149,"
+        time
+        ":"
+        17: 30
+        :
+        59
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.3395071,"
+        longitude
+        ":126.7325474,"
+        time
+        ":"
+        17: 31
+        :
+        18
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.3398138,"
+        longitude
+        ":126.7326828,"
+        time
+        ":"
+        17: 31
+        :
+        30
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.3398632,"
+        longitude
+        ":126.7328464,"
+        time
+        ":"
+        17: 31
+        :
+        44
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.3400332,"
+        longitude
+        ":126.7326939,"
+        time
+        ":"
+        17: 31
+        :
+        57
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.3402541,"
+        longitude
+        ":126.7328714,"
+        time
+        ":"
+        17: 32
+        :
+        11
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.3403574,"
+        longitude
+        ":126.7332161,"
+        time
+        ":"
+        17: 32
+        :
+        21
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.3402548,"
+        longitude
+        ":126.7329092,"
+        time
+        ":"
+        17: 32
+        :
+        33
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.3398123,"
+        longitude
+        ":126.7328204,"
+        time
+        ":"
+        17: 32
+        :
+        43
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.339454,"
+        longitude
+        ":126.7326627,"
+        time
+        ":"
+        17: 32
+        :
+        54
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.3399251,"
+        longitude
+        ":126.7326565,"
+        time
+        ":"
+        17: 33
+        :
+        06
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.3398878,"
+        longitude
+        ":126.7326656,"
+        time
+        ":"
+        17: 33
+        :
+        17
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.3399885,"
+        longitude
+        ":126.7328252,"
+        time
+        ":"
+        17: 33
+        :
+        28
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.3402764,"
+        longitude
+        ":126.7329121,"
+        time
+        ":"
+        17: 33
+        :
+        39
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.3402325,"
+        longitude
+        ":126.7328616,"
+        time
+        ":"
+        17: 33
+        :
+        50
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.3397484,"
+        longitude
+        ":126.7325918,"
+        time
+        ":"
+        17: 34
+        :
+        01
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.3394583,"
+        longitude
+        ":126.7325617,"
+        time
+        ":"
+        17: 34
+        :
+        12
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.3394624,"
+        longitude
+        ":126.7325258,"
+        time
+        ":"
+        17: 35
+        :
+        00
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.3394764,"
+        longitude
+        ":126.7324506,"
+        time
+        ":"
+        17: 35
+        :
+        11
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.3397948,"
+        longitude
+        ":126.7323935,"
+        time
+        ":"
+        17: 35
+        :
+        29
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.3397765,"
+        longitude
+        ":126.732299,"
+        time
+        ":"
+        17: 35
+        :
+        48
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.3395211,"
+        longitude
+        ":126.7323437,"
+        time
+        ":"
+        17: 36
+        :
+        20
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.3399491,"
+        longitude
+        ":126.7322433,"
+        time
+        ":"
+        17: 36
+        :
+        31
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.3398802,"
+        longitude
+        ":126.7323097,"
+        time
+        ":"
+        17: 36
+        :
+        42
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.3398403,"
+        longitude
+        ":126.7322977,"
+        time
+        ":"
+        17: 36
+        :
+        53
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.3395681,"
+        longitude
+        ":126.7322211,"
+        time
+        ":"
+        17: 37
+        :
+        05
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.3397642,"
+        longitude
+        ":126.732384,"
+        time
+        ":"
+        17: 37
+        :
+        16
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.3395547,"
+        longitude
+        ":126.7324067,"
+        time
+        ":"
+        17: 37
+        :
+        30
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.3397849,"
+        longitude
+        ":126.7322653,"
+        time
+        ":"
+        17: 37
+        :
+        42
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.3395794,"
+        longitude
+        ":126.7323853,"
+        time
+        ":"
+        17: 38
+        :
+        14
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.3395434,"
+        longitude
+        ":126.7323649,"
+        time
+        ":"
+        17: 38
+        :
+        26
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.339509,"
+        longitude
+        ":126.732393,"
+        time
+        ":"
+        17: 38
+        :
+        44
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.3394876,"
+        longitude
+        ":126.7324577,"
+        time
+        ":"
+        17: 39
+        :
+        02
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.3395633,"
+        longitude
+        ":126.7323396,"
+        time
+        ":"
+        17: 39
+        :
+        13
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.3395969,"
+        longitude
+        ":126.7321247,"
+        time
+        ":"
+        17: 39
+        :
+        24
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.3394804,"
+        longitude
+        ":126.7320618,"
+        time
+        ":"
+        17: 39
+        :
+        35
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.3396786,"
+        longitude
+        ":126.7323705,"
+        time
+        ":"
+        17: 39
+        :
+        46
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.3397543,"
+        longitude
+        ":126.732383,"
+        time
+        ":"
+        17: 39
+        :
+        58
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.339707,"
+        longitude
+        ":126.7323184,"
+        time
+        ":"
+        17: 40
+        :
+        12
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.3399013,"
+        longitude
+        ":126.7323522,"
+        time
+        ":"
+        17: 40
+        :
+        24
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.3394608,"
+        longitude
+        ":126.7324876,"
+        time
+        ":"
+        17: 40
+        :
+        36
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.3397772,"
+        longitude
+        ":126.7323599,"
+        time
+        ":"
+        17: 40
+        :
+        48
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.3397162,"
+        longitude
+        ":126.7323451,"
+        time
+        ":"
+        17: 40
+        :
+        59
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.3396417,"
+        longitude
+        ":126.7322829,"
+        time
+        ":"
+        17: 41
+        :
+        10
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.3397705,"
+        longitude
+        ":126.7322591,"
+        time
+        ":"
+        17: 2024-05-08
+        21: 41
+        :
+        36.326
+        2314-2714
+        okhttp.OkHttpClient
+        kr.ac.tukorea.whereareu
+        I
+        41: 21
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.3397948,"
+        longitude
+        ":126.7324017,"
+        time
+        ":"
+        17: 41
+        :
+        32
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.3398048,"
+        longitude
+        ":126.7322985,"
+        time
+        ":"
+        17: 41
+        :
+        44
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.3395144,"
+        longitude
+        ":126.7323225,"
+        time
+        ":"
+        17: 42
+        :
+        15
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.3394748,"
+        longitude
+        ":126.7324844,"
+        time
+        ":"
+        17: 42
+        :
+        27
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.3396163,"
+        longitude
+        ":126.7324721,"
+        time
+        ":"
+        17: 42
+        :
+        39
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.3396507,"
+        longitude
+        ":126.7322635,"
+        time
+        ":"
+        17: 42
+        :
+        50
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.3396222,"
+        longitude
+        ":126.7324397,"
+        time
+        ":"
+        17: 43
+        :
+        29
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.3397408,"
+        longitude
+        ":126.7323135,"
+        time
+        ":"
+        17: 43
+        :
+        40
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.3398863,"
+        longitude
+        ":126.7322783,"
+        time
+        ":"
+        17: 43
+        :
+        51
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.3397775,"
+        longitude
+        ":126.7322852,"
+        time
+        ":"
+        17: 44
+        :
+        02
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.3396959,"
+        longitude
+        ":126.7323441,"
+        time
+        ":"
+        17: 44
+        :
+        13
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.3396859,"
+        longitude
+        ":126.73232,"
+        time
+        ":"
+        17: 44
+        :
+        46
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.3395932,"
+        longitude
+        ":126.7323162,"
+        time
+        ":"
+        17: 45
+        :
+        04
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.3395719,"
+        longitude
+        ":126.7322881,"
+        time
+        ":"
+        17: 45
+        :
+        15
+        ","
+        userStatus
+        ":3},{"
+        latitude
+        ":37.3396019,"
+        longitude
+        ":126.7322912,"
+        time
+        ":"
+        17: 45
+        :
+        26
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.3395697,"
+        longitude
+        ":126.7323041,"
+        time
+        ":"
+        17: 45
+        :
+        36
+        ","
+        userStatus
+        ":1},{"
+        latitude
+        ":37.3396622,"
+        longitude
+        ":126.7322981,"
+        time
+        ":"
+        17: 45
+        :
+        47
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.3397552,"
+        longitude
+        ":126.7322971,"
+        time
+        ":"
+        17: 45
+        :
+        58,
+        17: 46
+        :
+        08
+        ","
+        userStatus
+        ":1},{"
+        latitude
+        ":37.3396223,"
+        longitude
+        ":126.7323037,"
+        time
+        ":"
+        17: 46
+        :
+        19
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.3396029,"
+        longitude
+        ":126.7323219,"
+        time
+        ":"
+        17: 46
+        :
+        30,
+        17: 47
+        :
+        30
+        ","
+        userStatus
+        ":1},{"
+        latitude
+        ":37.339618,"
+        longitude
+        ":126.7323322,"
+        time
+        ":"
+        17: 47
+        :
+        42
+        ","
+        userStatus
+        ":3},{"
+        latitude
+        ":37.3395613,"
+        longitude
+        ":126.7323143,"
+        time
+        ":"
+        17: 47
+        :
+        56
+        ","
+        userStatus
+        ":3},{"
+        latitude
+        ":37.3395769,"
+        longitude
+        ":126.7323186,"
+        time
+        ":"
+        17: 48
+        :
+        08
+        ","
+        userStatus
+        ":3},{"
+        latitude
+        ":37.3394415,"
+        longitude
+        ":126.7319197,"
+        time
+        ":"
+        17: 48
+        :
+        20
+        ","
+        userStatus
+        ":3},{"
+        latitude
+        ":37.3396351,"
+        longitude
+        ":126.7320968,"
+        time
+        ":"
+        17: 48
+        :
+        31
+        ","
+        userStatus
+        ":3},{"
+        latitude
+        ":37.339714,"
+        longitude
+        ":126.7322973,"
+        time
+        ":"
+        17: 48
+        :
+        42
+        ","
+        userStatus
+        ":3},{"
+        latitude
+        ":37.3395709,"
+        longitude
+        ":126.732314,"
+        time
+        ":"
+        17: 48
+        :
+        53
+        ","
+        userStatus
+        ":3},{"
+        latitude
+        ":37.3397855,"
+        longitude
+        ":126.7324102,"
+        time
+        ":"
+        17: 49
+        :
+        04
+        ","
+        userStatus
+        ":3},{"
+        latitude
+        ":37.3396533,"
+        longitude
+        ":126.7323471,"
+        time
+        ":"
+        17: 49
+        :
+        15
+        ","
+        userStatus
+        ":3},{"
+        latitude
+        ":37.3405646,"
+        longitude
+        ":126.7324271,"
+        time
+        ":"
+        17: 49
+        :
+        29,
+        17: 59
+        :
+        40
+        ","
+        userStatus
+        ":1},{"
+        latitude
+        ":37.3463583,"
+        longitude
+        ":126.7356006,"
+        time
+        ":"
+        17: 59
+        :
+        51
+        ","
+        userStatus
+        ":4},{"
+        latitude
+        ":37.3463607,"
+        longitude
+        ":126.7356014,"
+        time
+        ":"
+        18: 00
+        :
+        02
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.3463644,"
+        longitude
+        ":126.7356029,"
+        time
+        ":"
+        18: 00
+        :
+        13,
+        18: 00
+        :
+        24
+        ","
+        userStatus
+        ":1},{"
+        latitude
+        ":37.3502408,"
+        longitude
+        ":126.7397512,"
+        time
+        ":"
+        18: 00
+        :
+        34
+        ","
+        userStatus
+        ":3},{"
+        latitude
+        ":37.3506856,"
+        longitude
+        ":126.7401421,"
+        time
+        ":"
+        18: 00
+        :
+        45,
+        18: 02
+        :
+        01
+        ","
+        userStatus
+        ":1},{"
+        latitude
+        ":37.3513498,"
+        longitude
+        ":126.7402468,"
+        time
+        ":"
+        18: 02
+        :
+        13
+        ","
+        userStatus
+        ":4},{"
+        latitude
+        ":37.3514859,"
+        longitude
+        ":126.7408667,"
+        time
+        ":"
+        18: 02
+        :
+        25,
+        18: 02
+        :
+        36
+        ","
+        userStatus
+        ":1},{"
+        latitude
+        ":37.3511321,"
+        longitude
+        ":126.7420916,"
+        time
+        ":"
+        18: 02
+        :
+        47
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.3510947,"
+        longitude
+        ":126.7421337,"
+        time
+        ":"
+        18: 03
+        :
+        00,
+        18: 03
+        :
+        11
+        ","
+        userStatus
+        ":1},{"
+        latitude
+        ":37.3511561,"
+        longitude
+        ":126.7421278,"
+        time
+        ":"
+        18: 03
+        :
+        22
+        ","
+        userStatus
+        ":4},{"
+        latitude
+        ":37.3475324,"
+        longitude
+        ":126.7349472,"
+        time
+        ":"
+        18: 03
+        :
+        34,
+        18: 03
+        :
+        57
+        ","
+        userStatus
+        ":1},{"
+        latitude
+        ":37.3511671,"
+        longitude
+        ":126.7423038,"
+        time
+        ":"
+        18: 04
+        :
+        09
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.3511748,"
+        longitude
+        ":126.7421988,"
+        time
+        ":"
+        18: 04
+        :
+        20
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.3512311,"
+        longitude
+        ":126.742123,"
+        time
+        ":"
+        18: 04
+        :
+        31
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.3511884,"
+        longitude
+        ":126.7421777,"
+        time
+        ":"
+        18: 04
+        :
+        42
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.3511227,"
+        longitude
+        ":126.7422763,"
+        time
+        ":"
+        18: 04
+        :
+        58
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.35118,"
+        longitude
+        ":126.7424352,"
+        time
+        ":"
+        18: 05
+        :
+        12
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.3512593,"
+        longitude
+        ":126.7423493,"
+        time
+        ":"
+        18: 05
+        :
+        31
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.3513556,"
+        l
+        2024-05-08
+        21: 41
+        :
+        36.326
+        2314-2714
+        okhttp.OkHttpClient
+        kr.ac.tukorea.whereareu
+        I
+        ongitude
+        ":126.7425395,"
+        time
+        ":"
+        18: 05
+        :
+        42
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.3513729,"
+        longitude
+        ":126.7425215,"
+        time
+        ":"
+        18: 05
+        :
+        53
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.3514091,"
+        longitude
+        ":126.7425978,"
+        time
+        ":"
+        18: 06
+        :
+        05
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.3515645,"
+        longitude
+        ":126.7426014,"
+        time
+        ":"
+        18: 06
+        :
+        19
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.3518858,"
+        longitude
+        ":126.7428236,"
+        time
+        ":"
+        18: 06
+        :
+        38
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.3519213,"
+        longitude
+        ":126.7428502,"
+        time
+        ":"
+        18: 06
+        :
+        49
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.3519078,"
+        longitude
+        ":126.7428406,"
+        time
+        ":"
+        18: 07
+        :
+        01
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.3518551,"
+        longitude
+        ":126.7428724,"
+        time
+        ":"
+        18: 07
+        :
+        12
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.351828,"
+        longitude
+        ":126.742694,"
+        time
+        ":"
+        18: 07
+        :
+        24
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.351997,"
+        longitude
+        ":126.7422744,"
+        time
+        ":"
+        18: 07
+        :
+        35
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.352018,"
+        longitude
+        ":126.7422391,"
+        time
+        ":"
+        18: 07
+        :
+        46
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.3510227,"
+        longitude
+        ":126.7433311,"
+        time
+        ":"
+        18: 08
+        :
+        04
+        ","
+        userStatus
+        ":2},{"
+        latitude
+        ":37.3507725,"
+        longitude
+        ":126.7436022,"
+        time
+        ":"
+        18: 08
+        :
+        15,
+        18: 13
+        :
+        53
+        ","
+        userStatus
+        ":1}]}}
