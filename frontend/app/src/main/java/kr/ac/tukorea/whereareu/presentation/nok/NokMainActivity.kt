@@ -47,6 +47,7 @@ import kr.ac.tukorea.whereareu.presentation.nok.home.NokHomeViewModel
 import kr.ac.tukorea.whereareu.presentation.nok.setting.SettingViewModel
 import kr.ac.tukorea.whereareu.util.extension.getUserKey
 import kr.ac.tukorea.whereareu.util.extension.repeatOnStarted
+import kr.ac.tukorea.whereareu.util.extension.setInfoWindowText
 import kr.ac.tukorea.whereareu.util.extension.setMarker
 import kr.ac.tukorea.whereareu.util.extension.setMarkerWithInfoWindow
 import kr.ac.tukorea.whereareu.util.extension.setPath
@@ -203,7 +204,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
     private fun initLocationHistory(
         coords: List<LatLng>,
         path: PathOverlay = locationHistoryMetaData.paths[0],
-        pathColor: Int = R.color.yellow,
+        pathColor: Int = R.color.deep_yellow,
         marker: Marker = locationHistoryMetaData.markers[0],
         markerColor: OverlayImage = MarkerIcons.YELLOW,
         infoText: String = "현재 위치 기록"
@@ -228,8 +229,9 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
             val latLng = path.coords[progress]
             var animation = CameraAnimation.Fly
             val distance = list[progress].distance.toDouble()
-            var duration = 2000L
+            var duration = 1000L
             marker.position = latLng
+            marker.setInfoWindowText(this, list[progress].time)
             if (progress == 0) {
                 naverMap?.moveCamera(
                     CameraUpdate.scrollAndZoomTo(latLng, zoom)
@@ -263,7 +265,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                             animation = CameraAnimation.Easing
                             duration = 500L
                         }*/
-                        in 0.0..0.01 -> {
+                        /*in 0.0..0.01 -> {
                             zoom = 18.0
                             animation = CameraAnimation.Easing
                             duration = 100L
@@ -273,11 +275,11 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                             zoom = 15.0
                             animation = CameraAnimation.Easing
                             duration = 1000L
-                        }
+                        }*/
                     }
                     naverMap?.moveCamera(
-                        CameraUpdate.scrollAndZoomTo(latLng, zoom)
-                            .animate(animation, duration)
+                        CameraUpdate.scrollTo(latLng)
+                            .animate(CameraAnimation.Easing, duration)
                     )
                     Log.d("zoom", zoom.toString())
                 Log.d("distance", distance.toString())
@@ -345,8 +347,6 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                         )
                     })
                 }
-
-                dismissLoadingDialog()
             }
 
             // 보호대상자 마지막 위치 마커 지도에 표시
@@ -394,6 +394,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                     naverMap = naverMap,
                     infoText = "예상 위치")
                 })
+                dismissLoadingDialog()
             }
         }
     }

@@ -164,8 +164,8 @@ class NokHomeViewModel @Inject constructor(
             val time = measureTimeMillis {
                 val dementiaLastInfo = async { getDementiaLastInfo() }.await()
                 //Log.d("lastInfo", dementiaLastInfo.toString())
-                val predictLocation = async { fetchPredictInfo() }.await()
                 val meaningfulPlaceList = async { getMeaningfulPlaces() }.await()
+                val predictLocation = async { fetchPredictInfoGura() }.await()
 
             }
             Log.d("after refactor time", time.toString())
@@ -209,6 +209,14 @@ class NokHomeViewModel @Inject constructor(
 
     private suspend fun fetchPredictInfo(){
         nokHomeRepository.fetchPredictInfo(_dementiaKey.value).onSuccess { response ->
+            eventPredict(PredictEvent.PredictLocation(response.predictLocation))
+        }.onException {
+            Log.d("predict exception", it.toString())
+        }
+    }
+
+    private suspend fun fetchPredictInfoGura(){
+        nokHomeRepository.fetchPredictInfoGura(_dementiaKey.value).onSuccess { response ->
             eventPredict(PredictEvent.PredictLocation(response.predictLocation))
         }.onException {
             Log.d("predict exception", it.toString())

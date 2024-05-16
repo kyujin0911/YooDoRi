@@ -65,3 +65,10 @@ fun PathOverlay.setPath(context: Context, latLngList: List<LatLng>, pathColor: I
         map = naverMap
     }
 }
+
+fun Marker.setInfoWindowText(context: Context, text: String){
+    InfoWindow().apply {
+        setAdapter(context, text)
+        open(this@setInfoWindowText)
+    }
+}

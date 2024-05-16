@@ -7,6 +7,7 @@ data class PoliceStationInfoResponse(
     val policeName: String,
     val distance: String,
     val policeAddress: String,
+    val roadAddress: String,
     val policePhoneNumber: String,
     val latitude: String,
     val longitude: String

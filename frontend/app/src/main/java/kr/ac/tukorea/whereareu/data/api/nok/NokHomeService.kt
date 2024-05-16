@@ -28,4 +28,7 @@ interface NokHomeService {
 
     @GET("locations/predict")
     suspend fun fetchPredictInfo(@Query("dementiaKey") dementiaKey: String): Response<ResponseBody<PredictResponse>>
+
+    @GET("locations/predict/gura")
+    suspend fun fetchPredictInfoGura(@Query("dementiaKey") dementiaKey: String): Response<ResponseBody<PredictResponse>>
 }

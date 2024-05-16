@@ -31,6 +31,10 @@ class NokHomeRepositoryImpl @Inject constructor(
         return handleApi({api.fetchPredictInfo(dementiaKey)}) { response: ResponseBody<PredictResponse> -> response.result}
     }
 
+    override suspend fun fetchPredictInfoGura(dementiaKey: String): NetworkResult<PredictResponse> {
+        return handleApi({api.fetchPredictInfoGura(dementiaKey)}) { response: ResponseBody<PredictResponse> -> response.result}
+    }
+
     override suspend fun getUserInfo(nokKey: String): NetworkResult<GetUserInfoResponse> {
         return handleApi({api.getUserInfo(nokKey)}) {response: ResponseBody<GetUserInfoResponse> -> response.result}
     }

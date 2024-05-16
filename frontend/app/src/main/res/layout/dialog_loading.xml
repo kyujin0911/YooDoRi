@@ -21,7 +21,7 @@
             android:layout_height="100dp"
             app:lottie_autoPlay="true"
             app:lottie_loop="true"
-            app:lottie_repeatCount="5"
+            app:lottie_repeatCount="20"
             app:lottie_rawRes="@raw/animation_1712216917883" />
 
         <TextView

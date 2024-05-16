@@ -282,7 +282,7 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    tools:visibility="gone">
+                    tools:visibility="visible">
 
                     <TextView
                         android:id="@+id/stop_predict_tv"
@@ -402,19 +402,23 @@
                         android:layout_marginTop="16dp"
                         android:text="마지막 위치"
                         android:textAppearance="@style/TextAppearance.App.14sp.ExtraBold"
-                        app:layout_constraintStart_toStartOf="@id/count_down_title_tv"
+                        app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@id/count_down_tv" />
 
                     <TextView
                         android:id="@+id/last_location_tv"
-                        android:layout_width="wrap_content"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
                         android:layout_marginTop="16dp"
                         android:text="마지막 위치"
                         android:textAppearance="@style/TextAppearance.App.14sp.Medium"
                         app:layout_constraintStart_toEndOf="@id/last_location_title_tv"
-                        app:layout_constraintTop_toBottomOf="@id/count_down_tv" />
+                        app:layout_constraintEnd_toEndOf="parent"
+                        android:breakStrategy="simple"
+                        android:maxLines="2"
+                        app:layout_constraintTop_toBottomOf="@id/count_down_tv"
+                        app:layout_constraintBottom_toBottomOf="parent"/>
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
             </androidx.constraintlayout.widget.ConstraintLayout>
