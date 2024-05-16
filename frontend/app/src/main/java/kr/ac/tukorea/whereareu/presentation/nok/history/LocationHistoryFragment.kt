@@ -273,6 +273,7 @@ class LocationHistoryFragment :
         dialogViewModel.setSelectedDates(emptyList())
         viewModel.setIsMultipleSelected(false)
         viewModel.setMaxProgress(0)
+        viewModel.setIsLoading(true)
     }
 
     private fun translateDayOfWeekInKorean(dayOfWeek: DayOfWeek): String {

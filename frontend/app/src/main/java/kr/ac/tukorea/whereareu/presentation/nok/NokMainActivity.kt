@@ -8,14 +8,12 @@ import android.graphics.PointF
 import android.util.Log
 import android.view.View
 import androidx.activity.viewModels
-import androidx.collection.forEach
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.navigation.NavController
-import androidx.navigation.NavGraph
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -67,19 +65,10 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
     private val circleOverlay = CircleOverlay()
     private lateinit var behavior: BottomSheetBehavior<ConstraintLayout>
     private lateinit var navController: NavController
-    private val predictMarkers = mutableListOf<Marker>()
+    private val homeMarkers = mutableListOf<Marker>()
     private var zoom = 14.0
     private val locationHistoryMetaData = LocationHistoryMetaData()
     private var _slideOffset = 0f
-    private fun saveUserKeys() {
-        val dementiaKey = getUserKey("dementia")
-        homeViewModel.setDementiaKey(dementiaKey)
-        locationHistoryViewModel.setDementiaKey(dementiaKey)
-
-        val nokKey = getUserKey("nok")
-        homeViewModel.setNokKey(nokKey)
-        settingViewModel.setNokKey(nokKey)
-    }
 
     private fun getUpdateLocationJob(duration: Long): Job {
         return lifecycleScope.launch {
@@ -97,8 +86,13 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
             mMessageReceiver, IntentFilter("gps")
         )
         repeatOnStarted {
-            homeViewModel.navigateEvent.collect {
-                Log.d("navigateEvent", it.toString())
+            homeViewModel.navigateEventToString.collect {
+                Log.d("navigateEvent To String", it.toString())
+            }
+        }
+        repeatOnStarted {
+            homeViewModel.navigateEvent.collect { event ->
+                handleNavigationEvent(event)
             }
         }
 
@@ -125,7 +119,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
             homeViewModel.dementiaLocationInfo.collect { response ->
                 Log.d("dementiaLocation response", response.toString())
                 //예측 기능 사용시 보호대상자 위치 UI 업데이트 X
-                if (homeViewModel.isPredicted.value || navController.currentDestination?.id != R.id.nokHomeFragment) {
+                if (navController.currentDestination?.id != R.id.nokHomeFragment) {
                     return@collect
                 }
                 val coord = LatLng(response.latitude, response.longitude)
@@ -156,6 +150,51 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
         }
     }
 
+    private fun handleNavigationEvent(event: NokHomeViewModel.NavigateEvent) {
+        when (event) {
+            NokHomeViewModel.NavigateEvent.Home -> {}
+
+            is NokHomeViewModel.NavigateEvent.HomeState -> {
+                Log.d("Homesttate", event.toString())
+                behavior.isDraggable = true
+                if (!event.isPredicted && !event.isPredictDone) {
+                    homeViewModel.fetchUserInfo()
+                }
+                if (event.isPredicted && !event.isPredictDone) {
+                    behavior.state = BottomSheetBehavior.STATE_COLLAPSED
+                }
+                clearLocationFragmentUI()
+            }
+
+            NokHomeViewModel.NavigateEvent.LocationHistory -> {
+                clearSettingFragmentUI()
+                stopHomeFragmentJob()
+
+            }
+
+            NokHomeViewModel.NavigateEvent.MeaningfulPlace -> {
+                clearSettingFragmentUI()
+                stopHomeFragmentJob()
+                clearLocationFragmentUI()
+            }
+
+            NokHomeViewModel.NavigateEvent.SafeArea -> {
+                clearSettingFragmentUI()
+                stopHomeFragmentJob()
+                clearLocationFragmentUI()
+            }
+
+            NokHomeViewModel.NavigateEvent.Setting -> {
+                binding.navermapLogo.isVisible = false
+                behavior.isDraggable = false
+                behavior.state = BottomSheetBehavior.STATE_EXPANDED
+
+                stopHomeFragmentJob()
+                clearLocationFragmentUI()
+            }
+        }
+    }
+
     private fun handleLocationHistoryEvent(event: LocationHistoryViewModel.LocationHistoryEvent) {
         when (event) {
             LocationHistoryViewModel.LocationHistoryEvent.FetchFail -> {
@@ -171,7 +210,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
 
             is LocationHistoryViewModel.LocationHistoryEvent.FetchSuccessMultiple -> {
                 Log.d("multipla success", "성공")
-                with(locationHistoryMetaData){
+                with(locationHistoryMetaData) {
                     locationHistory = event.locationHistory[0]
                     locationHistory2 = event.locationHistory[1]
                     val latLngList = locationHistory.map { LatLng(it.latitude, it.longitude) }
@@ -191,13 +230,24 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
             }
 
             is LocationHistoryViewModel.LocationHistoryEvent.OnProgress2Changed -> {
-                with(locationHistoryMetaData){
-                    moveCameraAlongLocationHistory(paths[1], markers[1], event.progress, locationHistory2)
+                with(locationHistoryMetaData) {
+                    moveCameraAlongLocationHistory(
+                        paths[1],
+                        markers[1],
+                        event.progress,
+                        locationHistory2
+                    )
                 }
             }
+
             is LocationHistoryViewModel.LocationHistoryEvent.OnProgressChanged -> {
-                with(locationHistoryMetaData){
-                    moveCameraAlongLocationHistory(paths[0], markers[0], event.progress, locationHistory)
+                with(locationHistoryMetaData) {
+                    moveCameraAlongLocationHistory(
+                        paths[0],
+                        markers[0],
+                        event.progress,
+                        locationHistory
+                    )
                 }
             }
         }
@@ -223,7 +273,12 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
         )
     }
 
-    private fun moveCameraAlongLocationHistory(path: PathOverlay, marker: Marker, progress: Int, list: List<LocationHistory>){
+    private fun moveCameraAlongLocationHistory(
+        path: PathOverlay,
+        marker: Marker,
+        progress: Int,
+        list: List<LocationHistory>
+    ) {
         if (progress == -1) {
             return
         }
@@ -240,50 +295,50 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                         .animate(animation, duration)
                 )
             } else {
-                    when (distance) {
-                        //이동 상태 정보도 받아와야 될듯
-                        /*
-                        거리에 따라 디테일 하게 줌 변경
-                        in 0.0..0.01 -> {
-                            zoom = 19.0
-                            animation = CameraAnimation.Easing
-                            duration = 100L
-                        }
-
-                        in 400.0..Double.MAX_VALUE -> {
-                            zoom = 15.0
-                            animation = CameraAnimation.Easing
-                            duration = 1500L
-                        }
-
-                        in 100.0..399.9 -> {
-                            //zoom = 16.0
-                            animation = CameraAnimation.Easing
-                            duration = 500L
-                        }
-
-                        else -> {
-                            //zoom = 17.0
-                            animation = CameraAnimation.Easing
-                            duration = 500L
-                        }*/
-                        /*in 0.0..0.01 -> {
-                            zoom = 18.0
-                            animation = CameraAnimation.Easing
-                            duration = 100L
-                        }
-
-                        else -> {
-                            zoom = 15.0
-                            animation = CameraAnimation.Easing
-                            duration = 1000L
-                        }*/
+                when (distance) {
+                    //이동 상태 정보도 받아와야 될듯
+                    /*
+                    거리에 따라 디테일 하게 줌 변경
+                    in 0.0..0.01 -> {
+                        zoom = 19.0
+                        animation = CameraAnimation.Easing
+                        duration = 100L
                     }
-                    naverMap?.moveCamera(
-                        CameraUpdate.scrollTo(latLng)
-                            .animate(CameraAnimation.Easing, duration)
-                    )
-                    Log.d("zoom", zoom.toString())
+
+                    in 400.0..Double.MAX_VALUE -> {
+                        zoom = 15.0
+                        animation = CameraAnimation.Easing
+                        duration = 1500L
+                    }
+
+                    in 100.0..399.9 -> {
+                        //zoom = 16.0
+                        animation = CameraAnimation.Easing
+                        duration = 500L
+                    }
+
+                    else -> {
+                        //zoom = 17.0
+                        animation = CameraAnimation.Easing
+                        duration = 500L
+                    }*/
+                    /*in 0.0..0.01 -> {
+                        zoom = 18.0
+                        animation = CameraAnimation.Easing
+                        duration = 100L
+                    }
+
+                    else -> {
+                        zoom = 15.0
+                        animation = CameraAnimation.Easing
+                        duration = 1000L
+                    }*/
+                }
+                naverMap?.moveCamera(
+                    CameraUpdate.scrollTo(latLng)
+                        .animate(CameraAnimation.Easing, duration)
+                )
+                Log.d("zoom", zoom.toString())
                 Log.d("distance", distance.toString())
             }
         } catch (e: IndexOutOfBoundsException) {
@@ -314,7 +369,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
             // 의미장소 마커 지도에 표시
             is NokHomeViewModel.PredictEvent.MeaningFulPlace -> {
                 event.meaningfulPlaceForList.forEach { meaningfulPlace ->
-                    predictMarkers.add(
+                    homeMarkers.add(
                         Marker().apply {
                             setMarker(
                                 latLng = meaningfulPlace.latLng,
@@ -330,7 +385,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
             // 의미장소 주변 경찰서 마커 지도에 표시
             is NokHomeViewModel.PredictEvent.SearchNearbyPoliceStation -> {
                 event.policeStationList.forEach { policeStation ->
-                    predictMarkers.add(Marker().apply {
+                    homeMarkers.add(Marker().apply {
                         setMarker(
                             latLng = policeStation.latLng,
                             MarkerIcons.BLUE,
@@ -344,7 +399,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
             // 보호대상자 마지막 위치 마커 지도에 표시
             is NokHomeViewModel.PredictEvent.DisplayDementiaLastLocation -> {
                 binding.lastLocationTv.text = event.lastLocation.address
-                predictMarkers.add(LAST_LOCATION, Marker().apply {
+                homeMarkers.add(LAST_LOCATION, Marker().apply {
                     setMarkerWithInfoWindow(
                         context = this@NokMainActivity,
                         latLng = event.lastLocation.latLng,
@@ -354,6 +409,9 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                         infoText = "실종 직전 위치"
                     )
                 })
+                binding.mapViewBtn.setOnClickListener {
+                    naverMap?.moveCamera(CameraUpdate.scrollTo(homeMarkers[LAST_LOCATION].position))
+                }
             }
 
             // 예측 중지, 실종 시각 카운트다운 중지
@@ -365,26 +423,40 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                     binding.countDownT.text = "00:00"
                 }
                 behavior.expandedOffset = 0
-                predictMarkers.forEach { marker ->
+                homeMarkers.forEach { marker ->
                     marker.map = null
                 }
                 binding.layout.translationY = 0f
+                homeViewModel.setIsPredictDone(false)
             }
 
             is NokHomeViewModel.PredictEvent.PredictLocation -> {
-                naverMap?.moveCamera(CameraUpdate.scrollTo(LatLng(event.predictLocation.latitude.toDouble(), event.predictLocation.longitude.toDouble())))
-                predictMarkers.add(Marker().apply {
-                    setMarkerWithInfoWindow(this@NokMainActivity,
-                    latLng = LatLng(event.predictLocation.latitude.toDouble(), event.predictLocation.longitude.toDouble()),
-                    markerIconColor = MarkerIcons.GREEN,
-                    markerText = event.predictLocation.address,
-                    naverMap = naverMap,
-                    infoText = "예상 위치")
+                naverMap?.moveCamera(
+                    CameraUpdate.scrollTo(
+                        LatLng(
+                            event.predictLocation.latitude.toDouble(),
+                            event.predictLocation.longitude.toDouble()
+                        )
+                    )
+                )
+                homeMarkers.add(Marker().apply {
+                    setMarkerWithInfoWindow(
+                        this@NokMainActivity,
+                        latLng = LatLng(
+                            event.predictLocation.latitude.toDouble(),
+                            event.predictLocation.longitude.toDouble()
+                        ),
+                        markerIconColor = MarkerIcons.GREEN,
+                        markerText = event.predictLocation.address,
+                        naverMap = naverMap,
+                        infoText = "예상 위치"
+                    )
                 })
             }
 
             NokHomeViewModel.PredictEvent.PredictDone -> {
                 dismissLoadingDialog()
+                homeViewModel.setIsPredictDone(true)
             }
         }
     }
@@ -457,6 +529,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
     override fun initView() {
         binding.view = this
         binding.viewModel = homeViewModel
+        homeViewModel.fetchUserInfo()
         initBottomSheet()
         initMap()
         initNavigator()
@@ -483,14 +556,11 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
         behavior.setPeekHeight(200, true)
         behavior.addBottomSheetCallback(object : BottomSheetCallback() {
             override fun onStateChanged(bottomSheet: View, newState: Int) {
-                when (newState) {
-
-                }
             }
 
             override fun onSlide(bottomSheet: View, slideOffset: Float) {
                 _slideOffset = slideOffset
-                binding.navermapLogo.isVisible = if(slideOffset >= 0.5f){
+                binding.navermapLogo.isVisible = if (slideOffset >= 0.5f) {
                     false
                 } else {
                     true
@@ -504,81 +574,33 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
 
     private fun initNavigator() {
         val navHostFragment =
-            supportFragmentManager.findFragmentById(kr.ac.tukorea.whereareu.R.id.fragmentContainer) as NavHostFragment
+            supportFragmentManager.findFragmentById(R.id.fragmentContainer) as NavHostFragment
         navController = navHostFragment.navController
 
         binding.bottomNav.setupWithNavController(navController)
-        var event: NokHomeViewModel.NavigateEvent = NokHomeViewModel.NavigateEvent.Home
         navController.addOnDestinationChangedListener { controller, destination, arguments ->
-            Log.d("current id", navController.currentDestination?.id.toString())
-            Log.d("meaningful place id", kr.ac.tukorea.whereareu.R.id.meaningfulPlaceDetailFragment.toString())
-            val navInflater = navController.navInflater
-            val navGraph = navInflater.inflate(kr.ac.tukorea.whereareu.R.navigation.nok_graph)
-
-            // homeTab을 동적으로 가져오기
-
-            // homeTab을 동적으로 가져오기
-            val homeTab = navGraph.findNode(kr.ac.tukorea.whereareu.R.id.homeTab) as NavGraph
-            //Log.d("g홈탭",homeTab.nodes.)
-            /*if (destination.id != R.id.nokHomeFragment and R.id.meaningfulPlaceDetailFragment) {
-                Log.d("not home", "not home")
-                stopGetDementiaLocation()
-                homeViewModel.setIsPredicted(false)
-            }*/
-
-            if (destination.id != R.id.locationHistoryFragment) {
-                with(locationHistoryMetaData){
-                    paths.forEach {
-                        it.map = null
-                    }
-                    //path = null
-                    markers.forEach {
-                        it.map = null
-                    }
-                }
-            }
-
-            if (destination.id != R.id.nokSettingFragment or R.id.modifyUserInfoFragment or R.id.settingUpdateTimeFragment) {
-                behavior.isDraggable = true
-                //behavior.state = BottomSheetBehavior.STATE_COLLAPSED
-            }
-
             when (destination.id) {
-                R.id.nokHomeFragment -> {
-                    if(homeViewModel.isPredicted.value){
-                        Log.d("막아", "막으라고")
-                       return@addOnDestinationChangedListener
-                    }
-                    event = NokHomeViewModel.NavigateEvent.Home
-                    homeViewModel.fetchUserInfo()
-                    binding.mapViewBtn.setOnClickListener {
-                        naverMap?.moveCamera(CameraUpdate.scrollTo(predictMarkers[LAST_LOCATION].position))
-                    }
+                R.id.nokHomeFragment, R.id.meaningfulPlaceDetailFragment -> {
+                    homeViewModel.eventHomeState()
+                    homeViewModel.eventNavigate(NokHomeViewModel.NavigateEvent.Home)
                 }
 
                 R.id.nokSettingFragment, R.id.modifyUserInfoFragment, R.id.settingUpdateTimeFragment -> {
-                    binding.navermapLogo.isVisible = false
-                    behavior.isDraggable = false
-                    behavior.state = BottomSheetBehavior.STATE_EXPANDED
-                    event = NokHomeViewModel.NavigateEvent.Setting
+                    homeViewModel.eventNavigate(NokHomeViewModel.NavigateEvent.Setting)
                 }
 
                 R.id.safeAreaFragment -> {
-                    event = NokHomeViewModel.NavigateEvent.SafeArea
+                    homeViewModel.eventNavigate(NokHomeViewModel.NavigateEvent.SafeArea)
                 }
 
                 R.id.meaningfulPlaceFragment -> {
-                    event = NokHomeViewModel.NavigateEvent.MeaningfulPlace
+                    homeViewModel.eventNavigate(NokHomeViewModel.NavigateEvent.MeaningfulPlace)
                 }
 
                 R.id.locationHistoryFragment -> {
-                    locationHistoryViewModel.setIsLoading(true)
-                    event = NokHomeViewModel.NavigateEvent.LocationHistory
+                    homeViewModel.eventNavigate(NokHomeViewModel.NavigateEvent.LocationHistory)
                 }
-                R.id.meaningfulPlaceDetailFragment -> {}
-
             }
-            homeViewModel.eventNavigate(event)
         }
     }
 
@@ -592,6 +614,38 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
     }
 
     override fun onMapReady(p0: NaverMap) {
+    }
+
+    private fun saveUserKeys() {
+        val dementiaKey = getUserKey("dementia")
+        homeViewModel.setDementiaKey(dementiaKey)
+        locationHistoryViewModel.setDementiaKey(dementiaKey)
+
+        val nokKey = getUserKey("nok")
+        homeViewModel.setNokKey(nokKey)
+        settingViewModel.setNokKey(nokKey)
+    }
+
+    private fun stopHomeFragmentJob() {
+        stopGetDementiaLocation()
+        homeViewModel.setIsPredicted(false)
+    }
+
+    private fun clearLocationFragmentUI() {
+        with(locationHistoryMetaData) {
+            paths.forEach {
+                it.map = null
+            }
+            //path = null
+            markers.forEach {
+                it.map = null
+            }
+        }
+    }
+
+    private fun clearSettingFragmentUI() {
+        behavior.isDraggable = true
+        behavior.state = BottomSheetBehavior.STATE_HALF_EXPANDED
     }
 
     companion object {
