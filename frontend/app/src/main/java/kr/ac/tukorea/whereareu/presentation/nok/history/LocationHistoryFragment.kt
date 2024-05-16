@@ -271,6 +271,7 @@ class LocationHistoryFragment :
     override fun onStop() {
         super.onStop()
         dialogViewModel.setSelectedDates(emptyList())
+        viewModel.setIsMultipleSelected(false)
         viewModel.setMaxProgress(0)
     }
 
