@@ -426,6 +426,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
             outlineWidth = 5
             outlineColor = ContextCompat.getColor(this@NokMainActivity, R.color.deep_purple)
             radius = 0.0
+            isVisible = true
         }
 
         countDownJob = lifecycleScope.launch {
