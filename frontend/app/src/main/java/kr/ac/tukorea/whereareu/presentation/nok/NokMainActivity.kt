@@ -69,6 +69,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
     private val predictMarkers = mutableListOf<Marker>()
     private var zoom = 14.0
     private val locationHistoryMetaData = LocationHistoryMetaData()
+    private var _slideOffset = 0f
     private fun saveUserKeys() {
         val dementiaKey = getUserKey("dementia")
         homeViewModel.setDementiaKey(dementiaKey)
@@ -300,6 +301,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                 showLoadingDialog(this, "예측 장소를 추출중입니다...")
                 binding.predictTv.isVisible = false
                 binding.emergencyTv.isVisible = false
+                naverMap?.uiSettings?.setLogoMargin(20, 0, 0, behavior.peekHeight + 15)
             }
 
             // 보호대상자 마지막 정보 UI 업데이트, 실종 시각 카운트다운 시작
@@ -311,9 +313,9 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                 // bottom sheet expanded offset 지정 및 높이 지정
 
                 behavior.expandedOffset = binding.predictLayout.bottom + 20
-                binding.bottomSheet.layoutParams.height =
+                /*binding.bottomSheet.layoutParams.height =
                     binding.coordinatorLayout.height - binding.predictLayout.bottom
-                naverMap?.uiSettings?.setLogoMargin(20, 0, 0, behavior.peekHeight + 15)
+                naverMap?.uiSettings?.setLogoMargin(20, 0, 0, behavior.peekHeight + 15)*/
             }
 
             // 의미장소 마커 지도에 표시
@@ -373,7 +375,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                     circleOverlay.isVisible = false
                     binding.countDownT.text = "00:00"
                 }
-                binding.bottomSheet.layoutParams.height = binding.coordinatorLayout.height
+                //binding.bottomSheet.layoutParams.height = binding.coordinatorLayout.height
                 behavior.expandedOffset = 0
                 naverMap?.uiSettings?.setLogoMargin(20, 0, 0, 40)
                 predictMarkers.forEach { marker ->
@@ -381,6 +383,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                 }
                 binding.predictTv.isVisible = true
                 binding.emergencyTv.isVisible = true
+                binding.layout.translationY = 0f
             }
 
             is NokHomeViewModel.PredictEvent.PredictLocation -> {
@@ -504,9 +507,14 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
             }
 
             override fun onSlide(bottomSheet: View, slideOffset: Float) {
-
+                _slideOffset = slideOffset
                 if (slideOffset <= 0.3f) {
-                    binding.layout.translationY = -slideOffset * bottomSheet.height
+                    var logoBottom = naverMap?.uiSettings?.logoMargin?.get(3)
+                    logoBottom?.minus((slideOffset*bottomSheet.height).toInt())
+                    naverMap?.uiSettings?.setLogoMargin(20, 0, 0, logoBottom!! )
+                    Log.d("logo bottom", logoBottom.toString())
+                    Log.d("bottom sheet height", bottomSheet.height.toString())
+                    binding.layout.translationY = -slideOffset * bottomSheet.height * 0.5f
                 }
             }
         })
@@ -528,7 +536,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                 //naverMap?.uiSettings?.setLogoMargin(20,0,0, behavior.peekHeight + 15)
                 Log.d("margin", naverMap?.uiSettings?.logoMargin?.contentToString().toString())
                 homeViewModel.setIsPredicted(false)
-                naverMap?.uiSettings?.setLogoMargin(20, 0, 0, behavior.peekHeight + 15)
+                naverMap?.uiSettings?.setLogoMargin(20, 0, 0, 40)
             }
 
             if (destination.id != R.id.locationHistoryFragment) {
