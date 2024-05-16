@@ -15,4 +15,7 @@
     <color name="blue">#0054BD</color>
     <color name="purple">#4D9D8CD8</color>
     <color name="deep_purple">#673AB7</color>
+    <color name="marker_blue">#4DB0FE</color>
+    <color name="marker_yellow">#FEC701</color>
+    <color name="marker_green">#08D976</color>
 </resources>

@@ -419,6 +419,31 @@
                         android:maxLines="2"
                         app:layout_constraintTop_toBottomOf="@id/count_down_tv"
                         app:layout_constraintBottom_toBottomOf="parent"/>
+                    <LinearLayout
+                        android:id="@+id/map_view_btn"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="@id/last_location_tv"
+                        app:layout_constraintBottom_toBottomOf="@id/last_location_tv">
+                        <TextView
+                            android:id="@+id/map_view_tv"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="지도로 보기"
+                            android:textColor="@color/blue"
+                            android:textAppearance="@style/TextAppearance.App.14sp.SemiBold" />
+
+                        <ImageView
+                            android:layout_width="16dp"
+                            android:layout_height="16dp"
+                            android:layout_marginStart="4dp"
+                            android:src="@drawable/ic_arrow_back_24"
+                            android:scaleX="-1"
+                            app:tint="@color/gray60"/>
+                    </LinearLayout>
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
             </androidx.constraintlayout.widget.ConstraintLayout>

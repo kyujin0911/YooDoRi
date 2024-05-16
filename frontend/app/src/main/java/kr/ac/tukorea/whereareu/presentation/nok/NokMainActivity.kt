@@ -321,13 +321,11 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                 event.meaningfulPlaceForList.forEach { meaningfulPlace ->
                     predictMarkers.add(
                         Marker().apply {
-                            setMarkerWithInfoWindow(
-                                context = this@NokMainActivity,
+                            setMarker(
                                 latLng = meaningfulPlace.latLng,
                                 markerIconColor = MarkerIcons.YELLOW,
-                                markerText = meaningfulPlace.address,
+                                text = meaningfulPlace.address,
                                 naverMap = naverMap,
-                                infoText = "의미 장소"
                             )
                         }
                     )
@@ -353,7 +351,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
             is NokHomeViewModel.PredictEvent.DisplayDementiaLastLocation -> {
                 binding.lastLocationTv.text = event.lastLocation.address
 
-                naverMap?.moveCamera(CameraUpdate.scrollTo(event.lastLocation.latLng))
+                //naverMap?.moveCamera(CameraUpdate.scrollTo(event.lastLocation.latLng))
 
                 predictMarkers.add(LAST_LOCATION, Marker().apply {
                     setMarkerWithInfoWindow(
@@ -386,6 +384,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
             }
 
             is NokHomeViewModel.PredictEvent.PredictLocation -> {
+                naverMap?.moveCamera(CameraUpdate.scrollTo(LatLng(event.predictLocation.latitude.toDouble(), event.predictLocation.longitude.toDouble())))
                 predictMarkers.add(Marker().apply {
                     setMarkerWithInfoWindow(this@NokMainActivity,
                     latLng = LatLng(event.predictLocation.latitude.toDouble(), event.predictLocation.longitude.toDouble()),
@@ -554,6 +553,9 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                     naverMap?.uiSettings?.setLogoMargin(20, 0, 0, 40)
                     event = NokHomeViewModel.NavigateEvent.Home
                     homeViewModel.fetchUserInfo()
+                    binding.mapViewBtn.setOnClickListener {
+                        naverMap?.moveCamera(CameraUpdate.scrollTo(predictMarkers[LAST_LOCATION].position))
+                    }
                 }
 
                 R.id.nokSettingFragment, R.id.modifyUserInfoFragment, R.id.settingUpdateTimeFragment -> {

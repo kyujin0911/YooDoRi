@@ -78,8 +78,7 @@
             android:layout_marginStart="8dp"
             android:textAppearance="@style/TextAppearance.App.14sp.SemiBold"
             app:layout_constraintBaseline_toBaselineOf="@id/road_address_title_tv"
-            app:layout_constraintStart_toEndOf="@id/road_address_tv"
-            app:layout_constraintEnd_toEndOf="parent"/>
+            app:layout_constraintStart_toEndOf="@id/road_address_tv" />
 
         <TextView
             android:id="@+id/road_address_tv"
@@ -90,7 +89,6 @@
             android:layout_marginStart="8dp"
             android:maxLines="1"
             android:ellipsize="end"
-            app:layout_constraintEnd_toStartOf="@id/copy_road_address_btn"
             android:textAppearance="@style/TextAppearance.App.14sp.Regular"
             app:layout_constraintTop_toBottomOf="@id/name_tv"
             app:layout_constraintStart_toEndOf="@id/road_address_title_tv"
