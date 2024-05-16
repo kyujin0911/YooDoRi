@@ -1,53 +1,520 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools">
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:bind="http://schemas.android.com/apk/res-auto">
 
     <data>
+
+        <variable
+            name="view"
+            type="kr.ac.tukorea.whereareu.presentation.nok.NokMainActivity" />
+
+        <variable
+            name="viewModel"
+            type="kr.ac.tukorea.whereareu.presentation.nok.home.NokHomeViewModel" />
+
+        <import type="android.view.View" />
+
+        <variable
+            name="Setting"
+            type="String" />
 
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/layout"
-        tools:context=".presentation.nok.NokMainActivity">
+        android:backgroundTint="@color/white">
 
-        <androidx.fragment.app.FragmentContainerView
-            android:id="@+id/fragmentContainer"
-            android:name="androidx.navigation.fragment.NavHostFragment"
-            android:layout_width="0dp"
+        <androidx.coordinatorlayout.widget.CoordinatorLayout
+            android:id="@+id/coordinator_layout"
+            android:layout_width="match_parent"
             android:layout_height="0dp"
-            app:defaultNavHost="true"
+            android:backgroundTint="@color/white"
             app:layout_constraintBottom_toTopOf="@id/bottomNav"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:navGraph="@navigation/nok_graph" />
+            app:layout_constraintTop_toTopOf="parent">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/layout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior">
+
+                <androidx.fragment.app.FragmentContainerView
+                    android:id="@+id/map_fragment"
+                    android:name="com.naver.maps.map.MapFragment"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/user_info_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="16dp"
+                    android:layout_marginTop="40dp"
+                    android:background="@drawable/rectangle_corner_50"
+                    android:backgroundTint="@color/yellow"
+                    android:elevation="10dp"
+                    android:orientation="horizontal"
+                    android:padding="4dp"
+                    android:visibility="visible"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="1dp"
+                        android:background="@drawable/rectangle_corner_50"
+                        android:backgroundTint="@color/white"
+                        android:paddingHorizontal="12dp"
+                        android:paddingVertical="8dp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent">
+
+                        <View
+                            android:id="@+id/oval_v"
+                            android:layout_width="46dp"
+                            android:layout_height="46dp"
+                            android:background="@drawable/oval"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <TextView
+                            android:id="@+id/dementia_name_tv"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="20dp"
+                            android:text="@{viewModel.dementiaName}"
+                            android:textAppearance="@style/TextAppearance.App.18sp.ExtraBold"
+                            app:layout_constraintStart_toEndOf="@+id/oval_v"
+                            app:layout_constraintTop_toTopOf="parent"
+                            tools:text="황순권" />
+
+                        <TextView
+                            android:id="@+id/state"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="14dp"
+                            android:text="이동상태:"
+                            android:textAppearance="@style/TextAppearance.App.18sp.ExtraBold"
+                            app:layout_constraintBaseline_toBaselineOf="@id/dementia_name_tv"
+                            app:layout_constraintStart_toStartOf="@+id/gps_iv" />
+
+                        <TextView
+                            android:id="@+id/state_tv"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="5dp"
+                            android:layout_marginTop="14dp"
+                            android:text="@{viewModel.dementiaStatusInfo.userStatus}"
+                            android:textAppearance="@style/TextAppearance.App.18sp.Regular"
+                            app:layout_constraintBaseline_toBaselineOf="@id/dementia_name_tv"
+                            app:layout_constraintStart_toEndOf="@+id/state"
+                            tools:text="도보" />
+
+                        <View
+                            android:id="@+id/line_v"
+                            android:layout_width="0dp"
+                            android:layout_height="1dp"
+                            android:layout_marginStart="12dp"
+                            android:layout_marginTop="5dp"
+                            android:background="@color/black"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toEndOf="@+id/oval_v"
+                            app:layout_constraintTop_toBottomOf="@+id/dementia_name_tv" />
+
+                        <ImageView
+                            android:id="@+id/wifi_iv"
+                            android:layout_width="27dp"
+                            android:layout_height="25dp"
+                            android:layout_marginStart="20dp"
+                            android:layout_marginTop="5dp"
+                            android:src="@{viewModel.dementiaStatusInfo.isInternetOn ? @drawable/ic_wifi_on : @drawable/ic_wifi_off}"
+                            app:layout_constraintStart_toEndOf="@+id/oval_v"
+                            app:layout_constraintTop_toBottomOf="@+id/line_v" />
+
+                        <TextView
+                            android:id="@+id/internet_status_tv"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="5dp"
+                            android:text='@{viewModel.dementiaStatusInfo.isInternetOn ? "on" : "off"}'
+                            android:textAppearance="@style/TextAppearance.App.16sp.SemiBold"
+                            app:layout_constraintBottom_toBottomOf="@+id/wifi_iv"
+                            app:layout_constraintStart_toEndOf="@+id/wifi_iv"
+                            tools:text="on" />
+
+                        <ImageView
+                            android:id="@+id/gps_iv"
+                            android:layout_width="25dp"
+                            android:layout_height="25dp"
+                            android:layout_marginStart="15dp"
+                            android:src="@{viewModel.dementiaStatusInfo.isGpsOn ? @drawable/ic_gps_on : @drawable/ic_gps_off}"
+                            app:layout_constraintBottom_toBottomOf="@+id/wifi_iv"
+                            app:layout_constraintStart_toEndOf="@+id/internet_status_tv" />
+
+                        <TextView
+                            android:id="@+id/gps_status_tv"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="5dp"
+                            android:text='@{viewModel.dementiaStatusInfo.isGpsOn ? "on" : "off"}'
+                            android:textAppearance="@style/TextAppearance.App.16sp.SemiBold"
+                            app:layout_constraintBottom_toBottomOf="@+id/wifi_iv"
+                            app:layout_constraintStart_toEndOf="@+id/gps_iv"
+                            tools:text="on" />
+
+                        <ImageView
+                            android:id="@+id/ring_mode_iv"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="15dp"
+                            bind:ringtoneImage="@{viewModel.dementiaStatusInfo.isRingstoneOn}"
+                            app:layout_constraintBottom_toBottomOf="@id/wifi_iv"
+                            app:layout_constraintStart_toEndOf="@id/gps_status_tv" />
+
+                        <TextView
+                            android:id="@+id/ring_mode_tv"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="5dp"
+                            android:textAppearance="@style/TextAppearance.App.16sp.SemiBold"
+                            app:layout_constraintBottom_toBottomOf="@id/ring_mode_iv"
+                            app:layout_constraintStart_toEndOf="@id/ring_mode_iv"
+                            bind:ringtoneText="@{viewModel.dementiaStatusInfo.isRingstoneOn}"
+                            tools:text="벨소리" />
+
+                        <ImageView
+                            android:id="@+id/battery_iv"
+                            android:layout_width="27dp"
+                            android:layout_height="17dp"
+                            android:layout_marginStart="15dp"
+                            android:src="@drawable/ic_battery"
+                            app:layout_constraintBottom_toBottomOf="@id/battery_tv"
+                            app:layout_constraintStart_toEndOf="@+id/state_tv"
+                            app:layout_constraintTop_toTopOf="@id/battery_tv" />
+
+                        <TextView
+                            android:id="@+id/battery_tv"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="5dp"
+                            android:text='@{String.valueOf(viewModel.dementiaStatusInfo.battery) + "%"}'
+                            android:textAppearance="@style/TextAppearance.App.16sp.SemiBold"
+                            app:layout_constraintBaseline_toBaselineOf="@id/dementia_name_tv"
+                            app:layout_constraintStart_toEndOf="@id/battery_iv"
+                            tools:text="100%" />
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <com.naver.maps.map.widget.ZoomControlView
+                    android:id="@+id/zoom"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"/>
+
+                <TextView
+                    android:id="@+id/predict_tv"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginBottom="16dp"
+                    android:background="@drawable/oval"
+                    android:elevation="8dp"
+                    android:fontFamily="@font/suite_extrabold"
+                    android:gravity="center"
+                    android:text="위치\n예측"
+                    android:textSize="16sp"
+                    android:onClick="@{()-> view.predict()}"
+                    app:layout_constraintBottom_toTopOf="@id/emergency_tv"
+                    app:layout_constraintEnd_toEndOf="parent" />
+
+                <TextView
+                    android:id="@+id/emergency_tv"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginBottom="16dp"
+                    android:background="@drawable/oval"
+                    android:backgroundTint="@color/red"
+                    android:elevation="8dp"
+                    android:fontFamily="@font/suite_extrabold"
+                    android:gravity="center"
+                    android:text="긴급\n도움"
+                    android:textSize="16sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent" />
+
+                <androidx.constraintlayout.widget.Group
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:visibility='@{viewModel.navigateEvent.equals("Home") ? View.VISIBLE : View.GONE}'
+                    app:constraint_referenced_ids="predict_tv, emergency_tv, user_info_layout" />
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/predict_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/white"
+                    android:elevation="10dp"
+                    android:orientation="horizontal"
+                    android:paddingHorizontal="24dp"
+                    android:paddingVertical="12dp"
+                    android:visibility="@{viewModel.isPredicted ? View.VISIBLE : View.GONE}"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:visibility="visible">
+
+                    <TextView
+                        android:id="@+id/stop_predict_tv"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:onClick="@{()->view.stopPredict()}"
+                        android:text="예측 중지"
+                        android:textAppearance="@style/TextAppearance.App.16sp.ExtraBold"
+                        android:textColor="@color/red"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="@id/count_down_title_tv" />
+
+                    <TextView
+                        android:id="@+id/count_down_title_tv"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="40dp"
+                        android:text="실종 경과 시간"
+                        android:textAppearance="@style/TextAppearance.App.20sp.ExtraBold"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <LinearLayout
+                        android:id="@+id/count_down_tv"
+                        android:layout_width="80dp"
+                        android:layout_height="80dp"
+                        android:orientation="horizontal"
+                        android:gravity="center"
+                        android:layout_marginTop="8dp"
+                        android:background="@drawable/oval_corner_10_stroke_yellow"
+                        app:layout_constraintEnd_toEndOf="@id/count_down_title_tv"
+                        app:layout_constraintStart_toStartOf="@id/count_down_title_tv"
+                        app:layout_constraintTop_toBottomOf="@id/count_down_title_tv">
+
+                        <TextView
+                            android:id="@+id/count_down_t"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="00:00"
+                            android:textAppearance="@style/TextAppearance.App.16sp.jalnan2"
+                            android:textSize="20sp"
+                            app:layout_constraintEnd_toEndOf="@id/count_down_title_tv"
+                            app:layout_constraintStart_toStartOf="@id/count_down_title_tv"
+                            app:layout_constraintTop_toBottomOf="@id/count_down_title_tv" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/dementia_name_title_tv"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="54dp"
+                        android:text="보호대상자"
+                        android:textAppearance="@style/TextAppearance.App.16sp.ExtraBold"
+                        app:layout_constraintStart_toEndOf="@id/count_down_tv"
+                        app:layout_constraintTop_toTopOf="@id/count_down_tv" />
+
+                    <TextView
+                        android:id="@+id/dementia_name_predict_tv"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:text="@{viewModel.dementiaName}"
+                        android:textAppearance="@style/TextAppearance.App.16sp.Medium"
+                        app:layout_constraintStart_toEndOf="@id/dementia_name_title_tv"
+                        app:layout_constraintTop_toTopOf="@id/count_down_tv" />
+
+                    <TextView
+                        android:id="@+id/movement_radius_title_tv"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:text="예상 이동 반경"
+                        android:textAppearance="@style/TextAppearance.App.16sp.ExtraBold"
+                        app:layout_constraintBottom_toTopOf="@+id/average_movement_speed_tv"
+                        app:layout_constraintStart_toStartOf="@id/dementia_name_title_tv"
+                        app:layout_constraintTop_toBottomOf="@+id/dementia_name_title_tv" />
+
+                    <TextView
+                        android:id="@+id/movement_radius_tv"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:text="15km"
+                        android:textAppearance="@style/TextAppearance.App.16sp.Medium"
+                        app:layout_constraintBottom_toTopOf="@+id/average_movement_title_speed_tv"
+                        app:layout_constraintStart_toEndOf="@id/movement_radius_title_tv"
+                        app:layout_constraintTop_toBottomOf="@+id/dementia_name_title_tv" />
+
+                    <TextView
+                        android:id="@+id/average_movement_title_speed_tv"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:text="평균 이동 속도"
+                        android:textAppearance="@style/TextAppearance.App.16sp.ExtraBold"
+                        app:layout_constraintBottom_toBottomOf="@id/count_down_tv"
+                        app:layout_constraintStart_toStartOf="@id/dementia_name_title_tv"
+                        app:layout_constraintTop_toBottomOf="@+id/movement_radius_title_tv" />
+
+                    <TextView
+                        android:id="@+id/average_movement_speed_tv"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:layout_marginTop="6dp"
+                        android:text="12km/h"
+                        android:textAppearance="@style/TextAppearance.App.16sp.Medium"
+                        app:layout_constraintBottom_toBottomOf="@id/count_down_tv"
+                        app:layout_constraintStart_toEndOf="@id/average_movement_title_speed_tv"
+                        app:layout_constraintTop_toBottomOf="@+id/movement_radius_title_tv" />
+
+                    <TextView
+                        android:id="@+id/last_location_title_tv"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:text="마지막 위치"
+                        android:textAppearance="@style/TextAppearance.App.14sp.ExtraBold"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/count_down_tv" />
+
+                    <TextView
+                        android:id="@+id/last_location_tv"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:layout_marginTop="16dp"
+                        android:text="마지막 위치"
+                        android:textAppearance="@style/TextAppearance.App.14sp.Medium"
+                        app:layout_constraintStart_toEndOf="@id/last_location_title_tv"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        android:breakStrategy="simple"
+                        android:maxLines="2"
+                        app:layout_constraintTop_toBottomOf="@id/count_down_tv"
+                        app:layout_constraintBottom_toBottomOf="parent"/>
+                    <LinearLayout
+                        android:id="@+id/map_view_btn"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="@id/last_location_tv"
+                        app:layout_constraintBottom_toBottomOf="@id/last_location_tv">
+                        <TextView
+                            android:id="@+id/map_view_tv"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="지도로 보기"
+                            android:textColor="@color/blue"
+                            android:textAppearance="@style/TextAppearance.App.14sp.SemiBold" />
+
+                        <ImageView
+                            android:layout_width="16dp"
+                            android:layout_height="16dp"
+                            android:layout_marginStart="4dp"
+                            android:src="@drawable/ic_arrow_back_24"
+                            android:scaleX="-1"
+                            app:tint="@color/gray60"/>
+                    </LinearLayout>
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/bottom_sheet"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/rectangle_top_corner_20"
+                android:elevation="10dp"
+                android:minHeight="10dp"
+                bind:isPredicted="@{viewModel.isPredicted}"
+                bind:navigateEvent="@{viewModel.navigateEvent}"
+                app:behavior_hideable="false"
+                android:orientation="vertical"
+                android:paddingBottom="10dp"
+                app:behavior_halfExpandedRatio="0.3"
+                app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
+
+                <ImageView
+                    android:id="@+id/bottom_sheet_top_iv"
+                    android:layout_width="40dp"
+                    android:layout_height="5dp"
+                    android:layout_marginTop="12dp"
+                    bind:navigateEvent="@{viewModel.navigateEvent}"
+                    android:src="@drawable/rectangle_corner_20_gray"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+
+                <androidx.fragment.app.FragmentContainerView
+                    android:id="@+id/fragmentContainer"
+                    android:name="androidx.navigation.fragment.NavHostFragment"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    app:defaultNavHost="true"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/bottom_sheet_top_iv"
+                    app:navGraph="@navigation/nok_graph" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+        </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
         <com.google.android.material.bottomnavigation.BottomNavigationView
             android:id="@+id/bottomNav"
             style="@style/Widget.MyApp.BottomNavigationView.Material2"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:clipToOutline="true"
             android:background="@drawable/bg_bottom_navigation"
             android:backgroundTint="@android:color/transparent"
-            app:itemIconTint="@drawable/bottom_color_selector"
-            app:itemRippleColor="@null"
-            app:labelVisibilityMode="labeled"
-            app:itemIconSize="32dp"
+            android:clipToOutline="true"
             android:paddingVertical="16dp"
-            app:itemPaddingTop="2dp"
+            app:itemIconSize="32dp"
+            app:itemIconTint="@drawable/bottom_color_selector"
             app:itemPaddingBottom="0dp"
+            app:itemPaddingTop="2dp"
+            app:itemRippleColor="@null"
+            app:itemTextAppearanceActive="@style/TextAppearance.App.14sp.SemiBold"
+            app:itemTextAppearanceInactive="@style/TextAppearance.App.14sp.SemiBold"
+            app:itemTextColor="@drawable/bottom_color_selector"
+            app:labelVisibilityMode="labeled"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:itemTextColor="@drawable/bottom_color_selector"
-            app:itemTextAppearanceInactive="@style/TextAppearance.App.14sp.SemiBold"
-            app:itemTextAppearanceActive="@style/TextAppearance.App.14sp.SemiBold"
             app:menu="@menu/nok_main_menu" />
-
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

@@ -9,8 +9,11 @@ import kr.ac.tukorea.whereareu.R
 import kr.ac.tukorea.whereareu.WhereAreUApplication
 import kr.ac.tukorea.whereareu.data.api.dementia.DementiaHomeService
 import kr.ac.tukorea.whereareu.data.api.LoginService
+import kr.ac.tukorea.whereareu.data.api.SettingService
 import kr.ac.tukorea.whereareu.data.api.nok.NokHomeService
 import kr.ac.tukorea.whereareu.util.location.LocationService
+import kr.ac.tukorea.whereareu.util.network.KakaoInterceptor
+import kr.ac.tukorea.whereareu.util.network.NaverInterceptor
 import okhttp3.Interceptor
 import okhttp3.Interceptor.*
 import okhttp3.OkHttpClient
@@ -20,18 +23,57 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.converter.scalars.ScalarsConverterFactory
 import java.util.concurrent.TimeUnit
+import javax.inject.Named
+import javax.inject.Qualifier
 import javax.inject.Singleton
 
 
 @Module
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
+    @Qualifier
+    @Retention(AnnotationRetention.BINARY)
+    annotation class BaseRetrofit
+
+    @Qualifier
+    @Retention(AnnotationRetention.BINARY)
+    annotation class NaverRetrofit
+
+    @Qualifier
+    @Retention(AnnotationRetention.BINARY)
+    annotation class KaKaoRetrofit
+
     const val NETWORK_EXCEPTION_OFFLINE_CASE = "network status is offline"
-    const val NETWORK_EXCEPTION_BODY_IS_NULL = "result body is null"
+    const val NETWORK_EXCEPTION_BODY_IS_NULL = "result.json body is null"
 
     @Provides
     @Singleton
+    @BaseRetrofit
     fun provideOKHttpClient(): OkHttpClient {
+        val interceptor = HttpLoggingInterceptor().apply {
+            level = HttpLoggingInterceptor.Level.BODY
+        }
+
+        val closeInterceptor = Interceptor { chain ->
+            val request: Request =
+                chain.request().newBuilder().addHeader("Connection", "close").build()
+            chain.proceed(request)
+        }
+
+        return OkHttpClient.Builder()
+            .connectTimeout(40, TimeUnit.SECONDS)
+            .readTimeout(40, TimeUnit.SECONDS)
+            .writeTimeout(40, TimeUnit.SECONDS)
+            .addInterceptor(interceptor)
+            .addNetworkInterceptor(closeInterceptor)
+            .retryOnConnectionFailure(false)
+            .build()
+    }
+
+    @Provides
+    @Singleton
+    @NaverRetrofit
+    fun provideNaverOKHttpClient(): OkHttpClient {
         val interceptor = HttpLoggingInterceptor().apply {
             level = HttpLoggingInterceptor.Level.BODY
         }
@@ -46,6 +88,7 @@ object NetworkModule {
             .connectTimeout(10, TimeUnit.SECONDS)
             .readTimeout(10, TimeUnit.SECONDS)
             .writeTimeout(5, TimeUnit.SECONDS)
+            .addInterceptor(NaverInterceptor())
             .addInterceptor(interceptor)
             .addNetworkInterceptor(closeInterceptor)
             .retryOnConnectionFailure(false)
@@ -54,7 +97,34 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit {
+    @KaKaoRetrofit
+    fun provideKakaoOKHttpClient(): OkHttpClient {
+        val interceptor = HttpLoggingInterceptor().apply {
+            level = HttpLoggingInterceptor.Level.BODY
+        }
+
+        val closeInterceptor = Interceptor { chain ->
+            val request: Request =
+                chain.request().newBuilder().addHeader("Connection", "close").build()
+            chain.proceed(request)
+        }
+
+        return OkHttpClient.Builder()
+            .connectTimeout(10, TimeUnit.SECONDS)
+            .readTimeout(10, TimeUnit.SECONDS)
+            .writeTimeout(5, TimeUnit.SECONDS)
+            .addInterceptor(KakaoInterceptor())
+            .addInterceptor(interceptor)
+            .addNetworkInterceptor(closeInterceptor)
+            .retryOnConnectionFailure(false)
+            .build()
+    }
+
+    @Provides
+    @Singleton
+    @BaseRetrofit
+    fun provideRetrofit(
+        @BaseRetrofit okHttpClient: OkHttpClient): Retrofit {
         return Retrofit.Builder()
             .client(okHttpClient)
             .baseUrl(WhereAreUApplication.getString(R.string. base_url))
@@ -65,28 +135,30 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideTestApi(retrofit: Retrofit): LoginService {
-        return retrofit.buildService()
+    @NaverRetrofit
+    fun provideNaverRetrofit(
+        @NaverRetrofit okHttpClient: OkHttpClient): Retrofit {
+        return Retrofit.Builder()
+            .client(okHttpClient)
+            .baseUrl(WhereAreUApplication.getString(R.string. naver_url))
+            .addConverterFactory(ScalarsConverterFactory.create())
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
     }
 
     @Provides
     @Singleton
-    fun provideDementiaHomeApi(retrofit: Retrofit): DementiaHomeService {
-        return retrofit.buildService()
+    @KaKaoRetrofit
+    fun provideKakaoRetrofit(
+        @KaKaoRetrofit okHttpClient: OkHttpClient): Retrofit {
+        return Retrofit.Builder()
+            .client(okHttpClient)
+            .baseUrl(WhereAreUApplication.getString(R.string. kakao_url))
+            .addConverterFactory(ScalarsConverterFactory.create())
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
     }
-
-    @Provides
-    @Singleton
-    fun provideNokHomeApi(retrofit: Retrofit): NokHomeService {
-        return retrofit.buildService()
-    }
-
-    @Provides
-    @Singleton
-    fun provideLocationService(): LocationService{
-        return LocationService()
-    }
-
+    
     private inline fun <reified T> Retrofit.buildService(): T {
         return this.create(T::class.java)
     }
