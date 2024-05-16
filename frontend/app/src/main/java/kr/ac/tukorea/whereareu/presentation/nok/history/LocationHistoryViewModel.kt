@@ -103,7 +103,7 @@ class LocationHistoryViewModel @Inject constructor(
         viewModelScope.launch {
             val list = listOf( async { fetchLocationHistory(date1) },
             async { fetchLocationHistory(date2) }).awaitAll()
-            if (list.isNotEmpty()){
+            if (list[0].isNotEmpty() && list[1].isNotEmpty()){
                 eventLocationHistory(LocationHistoryEvent.FetchSuccessMultiple(list))
                 _maxProgress.value = list[0].indices.last
                 _maxProgress2.value = list[1].indices.last
