@@ -7,7 +7,6 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.graphics.drawable.BitmapDrawable
 import android.media.RingtoneManager
 import android.os.Build
@@ -15,7 +14,6 @@ import android.util.Log
 import android.widget.RemoteViews
 import androidx.core.app.NotificationCompat
 import com.google.android.gms.tasks.OnCompleteListener
-import com.google.common.io.Resources.getResource
 import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
@@ -64,7 +62,7 @@ class FCMService : FirebaseMessagingService() {
             }
             val pendingIntent = PendingIntent.getActivity(this@FCMService, 0, intent, PendingIntent.FLAG_IMMUTABLE)
             val builder = NotificationCompat.Builder(this@FCMService, "WhereAreU")
-                .setSmallIcon(R.drawable.ic_logo_test)
+                .setSmallIcon(R.drawable.ic_whereareu_logo)
                 .setContentTitle(title)
                 .setContentText(body)
                 .setContentIntent(pendingIntent)

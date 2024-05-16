@@ -2,18 +2,18 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION"/>
-    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
-<!--    FCM -->
-    <uses-permission android:name="android.permission.VIBRATE"/>
-    <uses-permission android:name="android.permission.WAKE_LOCK"/>
+    <!--    FCM -->
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <application
         android:name=".WhereAreUApplication"
@@ -27,12 +27,15 @@
         android:theme="@style/Theme.WhereAreU"
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
-        <service android:name=".util.location.LocationService" android:foregroundServiceType="location"
+        <service
+            android:name=".util.location.LocationService"
+            android:foregroundServiceType="location"
             tools:ignore="ForegroundServicePermission" />
 
         <meta-data
             android:name="com.naver.maps.map.CLIENT_ID"
-            android:value="${NAVER_CLIENT_ID}"/>
+            android:value="${NAVER_CLIENT_ID}" />
+
         <activity
             android:name=".presentation.login.SplashActivity"
             android:exported="true"
@@ -47,12 +50,11 @@
         <activity
             android:name=".presentation.nok.NokMainActivity"
             android:exported="false"
-            android:theme="@style/Theme.WhereAreU"/>
+            android:theme="@style/Theme.WhereAreU" />
         <activity
             android:name=".presentation.login.LoginActivity"
             android:exported="false"
-            android:theme="@style/Theme.WhereAreU">
-        </activity>
+            android:theme="@style/Theme.WhereAreU"></activity>
         <activity android:name="kr.ac.tukorea.whereareu.presentation.dementia.DementiaMainActivity" />
 
         <service
@@ -64,8 +66,11 @@
             </intent-filter>
         </service>
         <meta-data
-        android:name="com.google.firebase.messaging.default_notification_icon"
-        android:resource="@drawable/ic_logo_test" />
+            android:name="com.google.firebase.messaging.default_notification_icon"
+            android:resource="@drawable/ic_whereareu_logo" />
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_color"
+            android:resource="@color/yellow"/>
     </application>
 
 </manifest>
