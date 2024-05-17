@@ -68,7 +68,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
     private val homeMarkers = mutableListOf<Marker>()
     private var zoom = 14.0
     private val locationHistoryMetaData = LocationHistoryMetaData()
-    private var _slideOffset = 0f
+    private val tag = "NokMainActivity:"
 
     private fun getUpdateLocationJob(duration: Long): Job {
         return lifecycleScope.launch {
@@ -85,9 +85,10 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
         LocalBroadcastManager.getInstance(this).registerReceiver(
             mMessageReceiver, IntentFilter("gps")
         )
-       
+
         repeatOnStarted {
             homeViewModel.navigateEvent.collect { event ->
+                Log.d("$tag navigateEvent collect", event.toString())
                 handleNavigationEvent(event)
             }
         }
@@ -95,14 +96,14 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
         // 앱 처음 실행, 예측 중지 시 보호대상자 위치를 갖고 오는 job이 없으면 새로운 job을 생성해서 실행
         repeatOnStarted {
             homeViewModel.updateRate.collect { updateRate ->
-                Log.d("home updatteRate", updateRate.toString())
+                Log.d("$tag updateRate collect", updateRate.toString())
                 if (updateRate == 0L) {
                     return@collect
                 }
 
                 // 위치 업데이트 주기 변경 시 기존 job을 취소하고 updateRate에 맞게 재시작
                 if (updateLocationJob != null) {
-                    Log.d("job home cancel", "cc")
+                    Log.d("$tag updateRate restart", updateRate.toString())
                     updateLocationJob?.cancelAndJoin()
                 }
                 updateLocationJob = getUpdateLocationJob(updateRate.times(60 * 1000))
@@ -113,7 +114,8 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
         repeatOnStarted {
             delay(100)
             homeViewModel.dementiaLocationInfo.collect { response ->
-                Log.d("dementiaLocation response", response.toString())
+                Log.d("$tag dementiaLocationInfo collect", response.toString())
+
                 //예측 기능 사용시 보호대상자 위치 UI 업데이트 X
                 if (navController.currentDestination?.id != R.id.nokHomeFragment) {
                     return@collect
@@ -125,13 +127,15 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
 
         // 예측 기능 실행
         repeatOnStarted {
-            homeViewModel.predictEvent.collect { predictEvent ->
-                handlePredictEvent(predictEvent)
+            homeViewModel.predictEvent.collect { event ->
+                Log.d("$tag predictEvent collect", event.toString())
+                handlePredictEvent(event)
             }
         }
 
         repeatOnStarted {
             locationHistoryViewModel.locationHistoryEvent.collect { event ->
+                Log.d("$tag locationHistoryEvent collect", event.toString())
                 handleLocationHistoryEvent(event)
             }
         }
@@ -142,10 +146,10 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
             NokHomeViewModel.NavigateEvent.Home -> {}
 
             is NokHomeViewModel.NavigateEvent.HomeState -> {
-                Log.d("Homesttate", event.toString())
                 behavior.isDraggable = true
                 if (!event.isPredicted && !event.isPredictDone) {
                     homeViewModel.fetchUserInfo()
+                    binding.layout.translationY = 0f
                 }
                 if (event.isPredicted && !event.isPredictDone) {
                     behavior.state = BottomSheetBehavior.STATE_COLLAPSED
@@ -329,7 +333,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                 Log.d("distance", distance.toString())
             }
         } catch (e: IndexOutOfBoundsException) {
-            Log.d("IndexOutOfBoundsException", e.toString())
+            Log.d("$tag moveCameraAlongLocationHistory IndexOutOfBoundsException", e.toString())
         }
     }
 
@@ -412,9 +416,12 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                 behavior.expandedOffset = 0
                 homeMarkers.forEach { marker ->
                     marker.map = null
+                    marker.isVisible = false
                 }
+                homeMarkers.clear()
                 binding.layout.translationY = 0f
                 homeViewModel.setIsPredictDone(false)
+                homeViewModel.eventHomeState()
             }
 
             is NokHomeViewModel.PredictEvent.PredictLocation -> {
@@ -445,6 +452,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
             NokHomeViewModel.PredictEvent.PredictDone -> {
                 dismissLoadingDialog()
                 homeViewModel.setIsPredictDone(true)
+                homeViewModel.eventHomeState()
             }
 
             // 리사이클러뷰 아이템 클릭 이벤트에 따른 bottomSheet, Naver Map 제어
@@ -505,7 +513,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
 
     private fun stopGetDementiaLocation() {
         lifecycleScope.launch {
-            Log.d("NokMainActivity", "stopGetDementiaLocation")
+            Log.d("$tag stopGetDementiaLocation", "stopGetDementiaLocation")
             updateLocationJob?.cancelAndJoin()
         }
         naverMap?.locationOverlay?.isVisible = false
@@ -514,6 +522,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
 
     fun predict() {
         homeViewModel.setIsPredicted(true)
+        homeViewModel.eventHomeState()
     }
 
     fun stopPredict() {
@@ -553,7 +562,6 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
             }
 
             override fun onSlide(bottomSheet: View, slideOffset: Float) {
-                _slideOffset = slideOffset
                 binding.navermapLogo.isVisible = if (slideOffset >= 0.5f) {
                     false
                 } else {

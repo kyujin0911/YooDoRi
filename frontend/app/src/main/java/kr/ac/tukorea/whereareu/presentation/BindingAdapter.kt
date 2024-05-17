@@ -55,10 +55,14 @@ object BindingAdapter {
     @BindingAdapter("bind:navigateEvent", "bind:isPredicted")
     @JvmStatic
     fun setBottomSheetVisible(view: ConstraintLayout, navigateEvent: String, isPredicted: Boolean) {
-        view.isVisible = if (navigateEvent == "Home" && !isPredicted) {
-            false
+        if(navigateEvent == "Home"){
+            view.isVisible = if(isPredicted){
+                true
+            } else {
+                false
+            }
         } else {
-            true
+            view.isVisible = true
         }
     }
 
@@ -85,7 +89,7 @@ object BindingAdapter {
     @BindingAdapter("bind:navigateEvent", "bind:isPredicted")
     @JvmStatic
     fun setHomeComponentBtnVisible(view: TextView, navigateEvent: String, isPredicted: Boolean){
-        view.isVisible = if ((navigateEvent != "Home") or isPredicted ){
+        view.isVisible = if (isPredicted){
             false
         }
         else {

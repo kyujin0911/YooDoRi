@@ -36,46 +36,23 @@
             android:gravity="start"
             android:text="@{model.address}"
             android:textAppearance="@style/TextAppearance.App.16sp.ExtraBold"
-            app:layout_constraintBottom_toTopOf="@id/timeInfo_title_tv"
+            app:layout_constraintBottom_toTopOf="@id/map_view_btn"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/icon_iv"
             app:layout_constraintTop_toTopOf="parent"
             tools:text="주소" />
 
         <TextView
-            android:id="@+id/timeInfo_title_tv"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="16dp"
-            android:text="방문 시간 정보"
-            android:textAppearance="@style/TextAppearance.App.14sp.Bold"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/address_tv" />
-
-        <TextView
-            android:id="@+id/police_station_title_tv"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:text="인근 경찰서"
-            android:textAppearance="@style/TextAppearance.App.14sp.Bold"
-            android:visibility="@{model.isExpanded ? View.VISIBLE : View.GONE}"
-            app:layout_constraintBottom_toBottomOf="@id/more_view_btn"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@id/more_view_btn" />
-
-        <TextView
             android:id="@+id/map_view_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
+            android:layout_marginTop="8dp"
             android:layout_marginEnd="4dp"
             android:text="지도로 보기"
             android:textAppearance="@style/TextAppearance.App.14sp.SemiBold"
             android:textColor="@color/blue"
             app:layout_constraintEnd_toStartOf="@id/map_view_iv"
-            app:layout_constraintTop_toBottomOf="@id/time_info_rv" />
+            app:layout_constraintTop_toBottomOf="@id/address_tv" />
 
         <ImageView
             android:id="@+id/map_view_iv"
@@ -93,7 +70,7 @@
             android:id="@+id/info_view_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="12dp"
             android:layout_marginEnd="4dp"
             android:text="정보 보기"
             android:textAppearance="@style/TextAppearance.App.14sp.SemiBold"
@@ -112,60 +89,6 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@id/info_view_btn"
             app:tint="@color/gray60" />
-
-        <TextView
-            android:id="@+id/more_view_btn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text='@{model.isExpanded ? "접기" : "인근 경찰서 정보 보기" }'
-            android:textAppearance="@style/TextAppearance.App.14sp.SemiBold"
-            android:textColor="@color/blue"
-            app:layout_constraintEnd_toStartOf="@id/more_view_iv"
-            app:layout_constraintTop_toBottomOf="@id/info_view_btn"
-            tools:text="인근 경찰서 정보 보기" />
-
-        <ImageView
-            android:id="@+id/more_view_iv"
-            android:layout_width="16dp"
-            android:layout_height="16dp"
-            android:layout_marginStart="4dp"
-            android:scaleX="-1"
-            android:src="@drawable/ic_arrow_back_24"
-            app:layout_constraintBottom_toBottomOf="@id/more_view_btn"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@id/more_view_btn"
-            app:tint="@color/gray60"
-            tools:src="@drawable/ic_keyboard_arrow_down_24" />
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/time_info_rv"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="8dp"
-            android:nestedScrollingEnabled="false"
-            android:orientation="vertical"
-            android:overScrollMode="never"
-            app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/timeInfo_title_tv"
-            app:spanCount="3"
-            tools:listitem="@layout/item_time_info" />
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/police_rv"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="8dp"
-            android:nestedScrollingEnabled="false"
-            android:overScrollMode="never"
-            android:visibility="@{model.isExpanded ? View.VISIBLE : View.GONE}"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            app:layout_constraintTop_toBottomOf="@id/more_view_btn"
-            tools:listitem="@layout/item_police_station" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

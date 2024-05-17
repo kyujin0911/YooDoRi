@@ -30,12 +30,10 @@ class MeaningfulPlaceRVA :
         }
 
     }) {
-    private var policeStationRVAClickListener: PoliceStationRVA.PoliceStationRVAClickListener? = null
     private var meaningfulPlaceRVAClickListener: MeaningfulPlaceRVAClickListener? = null
 
     //RVA 클릭 리스너 초기화
-    fun setRVAClickListener(outerListener: MeaningfulPlaceRVAClickListener, innerListener: PoliceStationRVA.PoliceStationRVAClickListener){
-        policeStationRVAClickListener = innerListener
+    fun setRVAClickListener(outerListener: MeaningfulPlaceRVAClickListener){
         meaningfulPlaceRVAClickListener = outerListener
     }
 
@@ -45,12 +43,6 @@ class MeaningfulPlaceRVA :
             with(binding) {
                 model = meaningfulPlace
 
-                moreViewBtn.setOnClickListener {
-                    meaningfulPlace.isExpanded = meaningfulPlace.isExpanded.not()
-                    notifyItemChanged(bindingAdapterPosition)
-                    Log.d("isExpanded", meaningfulPlace.isExpanded.toString())
-                }
-
                 mapViewBtn.setOnClickListener {
                     meaningfulPlaceRVAClickListener?.onClickMapView(meaningfulPlace.latLng)
                 }
@@ -59,17 +51,6 @@ class MeaningfulPlaceRVA :
                     meaningfulPlaceRVAClickListener?.onClickInfoView(meaningfulPlace)
                 }
 
-                val policeStationRVA = PoliceStationRVA()
-                policeStationRVA.setPoliceStationRVAClickListener(policeStationRVAClickListener!!)
-                policeRv.adapter = policeStationRVA
-                policeStationRVA.submitList(meaningfulPlace.policeStationInfo)
-
-                val timeInfoRVA = TimeInfoRVA()
-                timeInfoRv.adapter = timeInfoRVA
-                val timeInfo = meaningfulPlace.timeInfo.map {info ->
-                    TimeInfo(convertDayOfWeekInKorean(info.dayOfTheWeek), convertTimeInKorean(info.time))
-                }
-                timeInfoRVA.submitList(timeInfo)
             }
         }
     }

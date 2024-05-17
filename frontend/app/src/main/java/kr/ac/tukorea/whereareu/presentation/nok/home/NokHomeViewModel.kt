@@ -34,14 +34,15 @@ class NokHomeViewModel @Inject constructor(
     private val naverRepository: NaverRepositoryImpl,
     private val kakaoRepository: KakaoRepositoryImpl
 ) : ViewModel() {
+    private var tag = "HomeViewModel:"
 
     private val _dementiaLocationInfo = MutableSharedFlow<LocationInfo>()
     val dementiaLocationInfo = _dementiaLocationInfo.asSharedFlow()
 
     val dementiaStatusInfo = MutableStateFlow(DementiaStatusInfo())
 
-    private val _updateRate = MutableStateFlow<Long>(0L)
-    val updateRate = _updateRate.asStateFlow()
+    private val _updateRate = MutableSharedFlow<Long>()
+    val updateRate = _updateRate.asSharedFlow()
 
     private val _isPredicted = MutableStateFlow(false)
     val isPredicted = _isPredicted.asStateFlow()
@@ -62,8 +63,11 @@ class NokHomeViewModel @Inject constructor(
 
     val navigateEventToString = MutableStateFlow(NavigateEvent.Home.toString())
 
-    private val _meaningfulPlace = MutableStateFlow<List<MeaningfulPlaceInfo>>(emptyList())
-    val meaningfulPlace = _meaningfulPlace.asStateFlow()
+    private val _tempMeaningfulPlace = MutableStateFlow<List<MeaningfulPlaceInfo>>(emptyList())
+    val tempMeaningfulPlace = _tempMeaningfulPlace.asStateFlow()
+
+    private val _meaningfulPlace = MutableSharedFlow<List<MeaningfulPlaceInfo>>()
+    val meaningfulPlace = _meaningfulPlace.asSharedFlow()
 
 
     sealed class PredictEvent {
@@ -97,7 +101,6 @@ class NokHomeViewModel @Inject constructor(
         data object MeaningfulPlace: NavigateEvent
         data object LocationHistory: NavigateEvent
         data object SafeArea: NavigateEvent
-
         data class HomeState(val isPredicted: Boolean, val isPredictDone: Boolean): NavigateEvent
     }
 
@@ -124,6 +127,16 @@ class NokHomeViewModel @Inject constructor(
         }
     }
 
+    fun eventMeaningfulPlace(){
+        viewModelScope.launch {
+            if (_tempMeaningfulPlace.value.isEmpty()){
+                Log.d("$tag eventMeaningfulPlace", "_meaningfulPlace isEmpty")
+                return@launch
+            }
+            _meaningfulPlace.emit(_tempMeaningfulPlace.value)
+        }
+    }
+
     fun setDementiaKey(dementiaKey: String) {
         _dementiaKey.value = dementiaKey
     }
@@ -133,7 +146,9 @@ class NokHomeViewModel @Inject constructor(
     }
 
     fun setUpdateRate(updateRate: Long){
-        _updateRate.value = updateRate
+        viewModelScope.launch {
+            _updateRate.emit(updateRate)
+        }
     }
 
     fun setIsPredicted(isPredicted: Boolean) {
@@ -151,8 +166,8 @@ class NokHomeViewModel @Inject constructor(
         viewModelScope.launch {
             nokHomeRepository.getUserInfo(_nokKey.value).onSuccess {
                 _dementiaName.emit(it.dementiaInfoRecord.dementiaName)
-                _updateRate.value = it.nokInfoRecord.updateRate.toLong()
-                Log.d("fetchUserInfo", _updateRate.value.toString())
+                _updateRate.emit(it.nokInfoRecord.updateRate.toLong())
+                Log.d("$tag fetchUserInfo", it.toString())
             }
         }
     }
@@ -161,19 +176,20 @@ class NokHomeViewModel @Inject constructor(
         viewModelScope.launch {
             nokHomeRepository.getDementiaLocationInfo(_dementiaKey.value).onSuccess {
                 if(_isPredicted.value){
-                    Log.d("returnee", "renreu")
                     return@launch
                 }
                 _dementiaLocationInfo.emit(it.toModel(_isPredicted.value))
                 dementiaStatusInfo.value = DementiaStatusInfo(
                     it.userStatus, it.battery, it.isGpsOn, it.isInternetOn, it.isRingstoneOn
                 )
+
+                Log.d("$tag getDementiaLocation", it.toString())
             }.onError {
-                Log.d("error", it.toString())
+                Log.d("$tag error", it.toString())
             }.onException {
-                Log.d("exception", it.toString())
+                Log.d("$tag exception", it.toString())
             }.onFail {
-                Log.d("fail", it.toString())
+                Log.d("$tag fail", it.toString())
             }
         }
     }
@@ -181,12 +197,10 @@ class NokHomeViewModel @Inject constructor(
     fun predict() {
         viewModelScope.launch {
             val time = measureTimeMillis {
-                val dementiaLastInfo = async { getDementiaLastInfo() }
-                //Log.d("lastInfo", dementiaLastInfo.toString())
-                val meaningfulPlaceList = async { getMeaningfulPlaces() }
-                val predictLocation = async { fetchPredictInfoGura() }.await()
+                async { getDementiaLastInfo() }
+                async { getMeaningfulPlaces() }
+                async { fetchPredictInfoGura() }.await()
                 eventPredict(PredictEvent.PredictDone)
-                //setIsPredictDone(true)
             }
             Log.d("after refactor time", time.toString())
         }
@@ -195,7 +209,7 @@ class NokHomeViewModel @Inject constructor(
     private suspend fun getDementiaLastInfo() {
         nokHomeRepository.getDementiaLastInfo(DementiaKeyRequest(_dementiaKey.value))
             .onSuccess { response ->
-                Log.d("last info", response.toString())
+                Log.d("$tag getDementiaLastInfo", response.toString())
                 val averageSpeed = response.averageSpeed.div(3.6)
                 val latLng = LatLng(response.lastLatitude, response.lastLongitude)
 
@@ -207,12 +221,12 @@ class NokHomeViewModel @Inject constructor(
                     )
                 )
             }.onException {
-                Log.d("error", it.toString())
+                Log.d("$tag error", it.toString())
             }
     }
     private suspend fun getMeaningfulPlaces() {
         nokHomeRepository.getMeaningfulPlace(_dementiaKey.value).onSuccess { response ->
-            Log.d("getMeaningfulPlace", response.toString())
+            Log.d("$tag getMeaningfulPlaces", response.toString())
             val meaningfulPlaceInfo = response.meaningfulPlaces.map { meaningfulPlace ->
                 val policeStationInfo = meaningfulPlace.policeStationInfo.map {policeStation ->
                     policeStation.toModel()
@@ -222,14 +236,16 @@ class NokHomeViewModel @Inject constructor(
             }
 
             eventPredict(PredictEvent.MeaningFulPlace(meaningfulPlaceInfo))
-            _meaningfulPlace.value = meaningfulPlaceInfo
+            _tempMeaningfulPlace.value = meaningfulPlaceInfo
+            _meaningfulPlace.emit(meaningfulPlaceInfo)
         }.onException {
-            Log.d("error", it.toString())
+            Log.d("$tag error", it.toString())
         }
     }
 
     private suspend fun fetchPredictInfo(){
         nokHomeRepository.fetchPredictInfo(_dementiaKey.value).onSuccess { response ->
+            Log.d("$tag fetchPredictInfo", response.toString())
             eventPredict(PredictEvent.PredictLocation(response.predictLocation))
         }.onException {
             Log.d("predict exception", it.toString())
@@ -238,6 +254,7 @@ class NokHomeViewModel @Inject constructor(
 
     private suspend fun fetchPredictInfoGura(){
         nokHomeRepository.fetchPredictInfoGura(_dementiaKey.value).onSuccess { response ->
+            Log.d("$tag fetchPredictInfoGura", response.toString())
             eventPredict(PredictEvent.PredictLocation(response.predictLocation))
         }.onException {
             Log.d("predict exception", it.toString())

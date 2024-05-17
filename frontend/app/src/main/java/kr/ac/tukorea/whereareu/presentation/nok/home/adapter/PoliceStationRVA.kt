@@ -42,7 +42,7 @@ class PoliceStationRVA() :
                 model = policeStationInfo
 
                 mapViewBtn.setOnClickListener {
-                    policeStationRVAClickListener?.onClickMoreView(policeStationInfo)
+                    policeStationRVAClickListener?.onClickMapView(policeStationInfo)
                 }
 
                 copyPhoneNumberBtn.setOnClickListener {
@@ -73,7 +73,7 @@ class PoliceStationRVA() :
         holder.bind(currentList[position])
     }
     interface PoliceStationRVAClickListener {
-        fun onClickMoreView(policeStationInfo: PoliceStationInfo)
+        fun onClickMapView(policeStationInfo: PoliceStationInfo)
         fun onClickCopyPhoneNumber(phoneNumber: String)
         fun onClickCopyAddress(address: String)
     }
