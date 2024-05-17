@@ -1,6 +1,7 @@
 package kr.ac.tukorea.whereareu.presentation
 
 import android.content.Context
+import android.util.Log
 import android.view.View
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -89,11 +90,15 @@ object BindingAdapter {
     @BindingAdapter("bind:navigateEvent", "bind:isPredicted")
     @JvmStatic
     fun setHomeComponentBtnVisible(view: TextView, navigateEvent: String, isPredicted: Boolean){
-        view.isVisible = if (isPredicted){
-            false
-        }
-        else {
-            true
+        Log.d("binding adapter djs", isPredicted.toString())
+        if(navigateEvent == "Home"){
+            view.isVisible = if(isPredicted){
+                false
+            } else {
+                true
+            }
+        } else {
+            view.isVisible = false
         }
     }
 

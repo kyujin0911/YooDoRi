@@ -106,8 +106,10 @@ class NokHomeViewModel @Inject constructor(
 
     fun eventNavigate(event: NavigateEvent){
         viewModelScope.launch {
+            if((event is NavigateEvent.HomeState).not()){
+                navigateEventToString.value = event.toString()
+            }
             _navigateEvent.emit(event)
-            navigateEventToString.value = event.toString()
         }
     }
 

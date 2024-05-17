@@ -34,6 +34,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kr.ac.tukorea.whereareu.R
 import kr.ac.tukorea.whereareu.databinding.ActivityNokMainBinding
@@ -93,6 +94,12 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
             }
         }
 
+        repeatOnStarted {
+            homeViewModel.navigateEventToString.collect{
+                Log.d("naviate to string", it)
+            }
+        }
+
         // 앱 처음 실행, 예측 중지 시 보호대상자 위치를 갖고 오는 job이 없으면 새로운 job을 생성해서 실행
         repeatOnStarted {
             homeViewModel.updateRate.collect { updateRate ->
@@ -139,6 +146,12 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                 handleLocationHistoryEvent(event)
             }
         }
+
+        repeatOnStarted {
+            homeViewModel.isPredicted.collect{
+                Log.d("isPredicted", it.toString())
+            }
+        }
     }
 
     private fun handleNavigationEvent(event: NokHomeViewModel.NavigateEvent) {
@@ -147,6 +160,16 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
 
             is NokHomeViewModel.NavigateEvent.HomeState -> {
                 behavior.isDraggable = true
+                if(event.isPredicted){
+                    if(event.isPredictDone == false){
+                        behavior.state = BottomSheetBehavior.STATE_COLLAPSED
+                    }
+                } else {
+                    homeViewModel.fetchUserInfo()
+                    binding.layout.translationY = 0f
+                }
+
+
                 if (!event.isPredicted && !event.isPredictDone) {
                     homeViewModel.fetchUserInfo()
                     binding.layout.translationY = 0f
