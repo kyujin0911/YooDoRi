@@ -444,7 +444,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                 homeMarkers.clear()
                 binding.layout.translationY = 0f
                 homeViewModel.setIsPredictDone(false)
-                homeViewModel.eventHomeState()
+                //homeViewModel.eventHomeState()
             }
 
             is NokHomeViewModel.PredictEvent.PredictLocation -> {

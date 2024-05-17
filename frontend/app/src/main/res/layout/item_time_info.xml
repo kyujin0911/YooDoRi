@@ -7,7 +7,7 @@
     <data>
         <variable
             name="model"
-            type="kr.ac.tukorea.whereareu.data.model.nok.home.TimeInfo" />
+            type="kr.ac.tukorea.whereareu.domain.home.GroupedTimeInfo" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -33,7 +33,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:text="@{model.time}"
             tools:text="시간"
             android:layout_marginStart="6dp"
             android:textAppearance="@style/TextAppearance.App.12sp.regular"

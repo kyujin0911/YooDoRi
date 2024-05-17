@@ -18,4 +18,5 @@
     <color name="marker_blue">#4DB0FE</color>
     <color name="marker_yellow">#FEC701</color>
     <color name="marker_green">#08D976</color>
+    <color name="gray_bg">#F2F5FA</color>
 </resources>

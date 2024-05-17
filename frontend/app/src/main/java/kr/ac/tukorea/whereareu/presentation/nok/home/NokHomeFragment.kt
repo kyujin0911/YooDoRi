@@ -89,14 +89,7 @@ class NokHomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home
     }
 
     private fun initMeaningfulListRVA(){
-        binding.rv.apply {
-            adapter = meaningfulPlaceRVA
-            addItemDecoration(
-            DividerItemDecoration(
-                requireContext(),
-                LinearLayoutManager.VERTICAL
-            )
-        )}
+        binding.rv.adapter = meaningfulPlaceRVA
         meaningfulPlaceRVA.setRVAClickListener(this)
     }
 

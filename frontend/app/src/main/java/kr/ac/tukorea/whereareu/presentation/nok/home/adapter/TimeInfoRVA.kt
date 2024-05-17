@@ -11,20 +11,22 @@ import androidx.recyclerview.widget.RecyclerView
 import kr.ac.tukorea.whereareu.R
 import kr.ac.tukorea.whereareu.data.model.nok.home.TimeInfo
 import kr.ac.tukorea.whereareu.databinding.ItemTimeInfoBinding
+import kr.ac.tukorea.whereareu.domain.home.GroupedTimeInfo
+import java.lang.StringBuilder
 
-class TimeInfoRVA(): ListAdapter<TimeInfo, TimeInfoRVA.TimeInfoViewHolder>(
+class TimeInfoRVA(): ListAdapter<GroupedTimeInfo, TimeInfoRVA.TimeInfoViewHolder>(
     object :
-        DiffUtil.ItemCallback<TimeInfo>() {
+        DiffUtil.ItemCallback<GroupedTimeInfo>() {
         override fun areItemsTheSame(
-            oldItem: TimeInfo,
-            newItem: TimeInfo
+            oldItem: GroupedTimeInfo,
+            newItem: GroupedTimeInfo
         ): Boolean {
             return oldItem === newItem
         }
 
         override fun areContentsTheSame(
-            oldItem: TimeInfo,
-            newItem: TimeInfo
+            oldItem: GroupedTimeInfo,
+            newItem: GroupedTimeInfo
         ): Boolean {
             return oldItem == newItem
         }
@@ -32,10 +34,21 @@ class TimeInfoRVA(): ListAdapter<TimeInfo, TimeInfoRVA.TimeInfoViewHolder>(
     }) {
     inner class TimeInfoViewHolder(private val binding: ItemTimeInfoBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        fun bind(timeInfo: TimeInfo) {
+        fun bind(timeInfo: GroupedTimeInfo) {
             Log.d("police station info", timeInfo.toString())
             with(binding) {
                 model = timeInfo
+                val time = StringBuilder()
+                val timeList = timeInfo.timeList.sortedBy { it }
+                val last = timeList.get(timeList.lastIndex)
+                timeList.forEach {
+                    if(it == last){
+                        time.append(it)
+                    } else {
+                        time.append("$it,  ")
+                    }
+                }
+                timeTv.text = time
             }
         }
     }
