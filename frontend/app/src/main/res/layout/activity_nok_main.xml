@@ -459,6 +459,7 @@
                 android:orientation="vertical"
                 app:behavior_halfExpandedRatio="0.3"
                 app:behavior_hideable="false"
+                android:nestedScrollingEnabled="true"
                 app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
                 bind:isPredicted="@{viewModel.isPredicted}"
                 bind:navigateEvent="@{viewModel.navigateEventToString}">
