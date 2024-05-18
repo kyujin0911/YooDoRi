@@ -78,5 +78,5 @@ class police_info(Base):
 class refresh_token_info(Base):
     __tablename__ = 'refresh_token_info'
 
-    key = Column(String)
+    key = Column(String, primary_key=True)
     refresh_token = Column(String)
