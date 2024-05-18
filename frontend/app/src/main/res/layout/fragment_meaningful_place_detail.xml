@@ -45,6 +45,86 @@
             android:textAppearance="@style/TextAppearance.App.14sp.Bold"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/address_tv" />
+        
+        <RadioGroup
+            android:id="@+id/radio_group"
+            android:layout_width="match_parent"
+            android:gravity="center"
+            android:layout_marginTop="8dp"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintTop_toBottomOf="@id/timeInfo_title_tv">
+            <RadioButton
+                android:id="@+id/monday"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/selector_day_of_week_radio_button"
+                android:button="@null"
+                android:textColor="@drawable/selecor_radio_text"
+                android:textAlignment="center"
+                android:text="월"
+                android:textAppearance="@style/TextAppearance.App.12sp.ExtraBold"/>
+            <RadioButton
+                android:id="@+id/tuesday"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/selector_day_of_week_radio_button"
+                android:button="@null"
+                android:textColor="@drawable/selecor_radio_text"
+                android:textAlignment="center"
+                android:text="화"
+                android:textAppearance="@style/TextAppearance.App.12sp.ExtraBold"/>
+            <RadioButton
+                android:id="@+id/wednesday"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/selector_day_of_week_radio_button"
+                android:button="@null"
+                android:textColor="@drawable/selecor_radio_text"
+                android:textAlignment="center"
+                android:text="수"
+                android:textAppearance="@style/TextAppearance.App.12sp.ExtraBold"/>
+            <RadioButton
+                android:id="@+id/thursday"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/selector_day_of_week_radio_button"
+                android:button="@null"
+                android:textColor="@drawable/selecor_radio_text"
+                android:textAlignment="center"
+                android:text="목"
+                android:textAppearance="@style/TextAppearance.App.12sp.ExtraBold"/>
+            <RadioButton
+                android:id="@+id/friday"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/selector_day_of_week_radio_button"
+                android:button="@null"
+                android:textColor="@drawable/selecor_radio_text"
+                android:textAlignment="center"
+                android:text="금"
+                android:textAppearance="@style/TextAppearance.App.12sp.ExtraBold"/>
+            <RadioButton
+                android:id="@+id/saturday"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/selector_day_of_week_radio_button"
+                android:button="@null"
+                android:textColor="@drawable/selecor_radio_text_saturday"
+                android:textAlignment="center"
+                android:text="토"
+                android:textAppearance="@style/TextAppearance.App.12sp.ExtraBold"/>
+            <RadioButton
+                android:id="@+id/sunday"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/selector_day_of_week_radio_button"
+                android:button="@null"
+                android:textColor="@drawable/selecor_radio_text_sunday"
+                android:textAlignment="center"
+                android:text="일"
+                android:textAppearance="@style/TextAppearance.App.12sp.ExtraBold"/>
+        </RadioGroup>
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/time_info_rv"
@@ -58,7 +138,7 @@
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/timeInfo_title_tv"
+            app:layout_constraintTop_toBottomOf="@id/radio_group"
             tools:listitem="@layout/item_time_info" />
 
         <TextView
