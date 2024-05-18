@@ -6,6 +6,9 @@
         <item name="android:windowIsTranslucent">true</item>
         <!-- Customize your light theme here. -->
         <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+        <item name="android:statusBarColor">@color/white</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="colorPrimary">@color/yellow</item>
     </style>
 
     <style name="Theme.WhereAreU" parent="Base.Theme.WhereAreU" />
