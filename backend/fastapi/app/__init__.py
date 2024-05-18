@@ -14,10 +14,10 @@ session = engine.get_session()
 
 # 라우트 설정
 def create_app():
-    from . import routes
-    app.include_router(routes.router)
+    from . import routes2
+    app.include_router(routes2.router)
 
-    routes.sched.start()
+    routes2.sched.start()
 
     return app
 
