@@ -34,7 +34,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kr.ac.tukorea.whereareu.R
 import kr.ac.tukorea.whereareu.databinding.ActivityNokMainBinding
@@ -448,27 +447,23 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
             }
 
             is NokHomeViewModel.PredictEvent.PredictLocation -> {
-                naverMap?.moveCamera(
-                    CameraUpdate.scrollTo(
-                        LatLng(
-                            event.predictLocation.latitude.toDouble(),
-                            event.predictLocation.longitude.toDouble()
+                with(event.predictLocation.meaningfulPlaceInfo) {
+                    naverMap?.moveCamera(
+                        CameraUpdate.scrollTo(
+                            latLng
                         )
                     )
-                )
-                homeMarkers.add(Marker().apply {
-                    setMarkerWithInfoWindow(
-                        this@NokMainActivity,
-                        latLng = LatLng(
-                            event.predictLocation.latitude.toDouble(),
-                            event.predictLocation.longitude.toDouble()
-                        ),
-                        markerIconColor = MarkerIcons.GREEN,
-                        markerText = event.predictLocation.address,
-                        naverMap = naverMap,
-                        infoText = "예상 위치"
-                    )
-                })
+                    homeMarkers.add(Marker().apply {
+                        setMarkerWithInfoWindow(
+                            this@NokMainActivity,
+                            latLng = latLng,
+                            markerIconColor = MarkerIcons.GREEN,
+                            markerText = address,
+                            naverMap = naverMap,
+                            infoText = "예상 위치"
+                        )
+                    })
+                }
             }
 
             // 예측 기능 로딩 완료 알림
@@ -479,7 +474,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
             }
 
             // 리사이클러뷰 아이템 클릭 이벤트에 따른 bottomSheet, Naver Map 제어
-            is NokHomeViewModel.PredictEvent.RVAClick -> {
+            is NokHomeViewModel.PredictEvent.MapView -> {
                 behavior.state = event.behavior
                 naverMap?.moveCamera(CameraUpdate.scrollTo(event.coord))
             }

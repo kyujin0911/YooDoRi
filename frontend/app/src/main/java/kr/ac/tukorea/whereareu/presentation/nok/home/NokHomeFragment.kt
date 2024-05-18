@@ -1,33 +1,21 @@
 package kr.ac.tukorea.whereareu.presentation.nok.home
 
-import android.content.ClipData
-import android.content.ClipboardManager
-import android.content.Context.CLIPBOARD_SERVICE
 import android.content.pm.PackageManager
-import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.DividerItemDecoration
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.naver.maps.geometry.LatLng
 import dagger.hilt.android.AndroidEntryPoint
 import kr.ac.tukorea.whereareu.R
-import kr.ac.tukorea.whereareu.data.model.nok.home.TimeInfo
 import kr.ac.tukorea.whereareu.databinding.FragmentHomeBinding
 import kr.ac.tukorea.whereareu.domain.home.MeaningfulPlaceInfo
-import kr.ac.tukorea.whereareu.domain.home.PoliceStationInfo
 import kr.ac.tukorea.whereareu.presentation.base.BaseFragment
-import kr.ac.tukorea.whereareu.presentation.nok.home.adapter.PoliceStationRVA
 import kr.ac.tukorea.whereareu.presentation.nok.home.adapter.MeaningfulPlaceRVA
-import kr.ac.tukorea.whereareu.presentation.nok.home.adapter.TimeInfoRVA
 import kr.ac.tukorea.whereareu.util.extension.repeatOnStarted
-import kr.ac.tukorea.whereareu.util.extension.showToastShort
 
 
 @AndroidEntryPoint
@@ -77,7 +65,25 @@ class NokHomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home
                     Log.d("ds", "isNotEmpty")
                 }
             }*/
+            is NokHomeViewModel.PredictEvent.PredictLocation -> {
+                with(event.predictLocation){
+                    val address = meaningfulPlaceInfo.address
+                    meaningfulPlaceInfo.latLng
+                    binding.addressTv.text = address
+                    val meaningfulPlaceInfo = MeaningfulPlaceInfo(address, emptyList(), meaningfulPlaceInfo.latLng, false, policeStationInfo)
 
+                    binding.infoViewBtn.setOnClickListener {
+                        val action = NokHomeFragmentDirections.actionNokHomeFragmentToMeaningfulPlaceDetailFragment(
+                            meaningfulPlaceInfo
+                        )
+                        navigator.navigate(action)
+                    }
+
+                    binding.mapViewBtn.setOnClickListener {
+                        viewModel.eventPredict(NokHomeViewModel.PredictEvent.MapView(BottomSheetBehavior.STATE_COLLAPSED, meaningfulPlaceInfo.latLng))
+                    }
+                }
+            }
             else -> {}
         }
     }
@@ -134,7 +140,7 @@ class NokHomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home
 
     // inner RVA 클릭 이벤트
     override fun onClickMapView(latLng: LatLng) {
-        viewModel.eventPredict(NokHomeViewModel.PredictEvent.RVAClick(BottomSheetBehavior.STATE_COLLAPSED, latLng))
+        viewModel.eventPredict(NokHomeViewModel.PredictEvent.MapView(BottomSheetBehavior.STATE_COLLAPSED, latLng))
     }
 
     override fun onClickInfoView(meaningfulPlace: MeaningfulPlaceInfo) {

@@ -16,12 +16,9 @@ import kr.ac.tukorea.whereareu.databinding.FragmentMeaningfulPlaceDetailBinding
 import kr.ac.tukorea.whereareu.domain.home.GroupedTimeInfo
 import kr.ac.tukorea.whereareu.domain.home.PoliceStationInfo
 import kr.ac.tukorea.whereareu.presentation.base.BaseFragment
-import kr.ac.tukorea.whereareu.presentation.login.nok.NokOtpFragmentArgs
 import kr.ac.tukorea.whereareu.presentation.nok.home.adapter.PoliceStationRVA
 import kr.ac.tukorea.whereareu.presentation.nok.home.adapter.TimeInfoRVA
-import kr.ac.tukorea.whereareu.util.extension.repeatOnStarted
 import kr.ac.tukorea.whereareu.util.extension.showToastShort
-import org.threeten.bp.DayOfWeek
 
 class MeaningfulPlaceDetailFragment :
     BaseFragment<FragmentMeaningfulPlaceDetailBinding>(R.layout.fragment_meaningful_place_detail),
@@ -110,7 +107,7 @@ class MeaningfulPlaceDetailFragment :
     }
 
     override fun onClickMapView(policeStationInfo: PoliceStationInfo) {
-        viewModel.eventPredict(NokHomeViewModel.PredictEvent.RVAClick(BottomSheetBehavior.STATE_COLLAPSED, policeStationInfo.latLng))
+        viewModel.eventPredict(NokHomeViewModel.PredictEvent.MapView(BottomSheetBehavior.STATE_COLLAPSED, policeStationInfo.latLng))
     }
 
     override fun onClickCopyPhoneNumber(phoneNumber: String) {
