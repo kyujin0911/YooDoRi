@@ -217,3 +217,12 @@ class AverageWalkingSpeedResponse(BaseModel):
     status: str = Field("success")
     message: str = Field("메~시~지~")
     result: AverageAndLastLoc
+
+class RegisterSafeAreaRequest(BaseModel):
+    dementiaKey : int = Field(examples=["123456"])
+    groupName : str = Field(examples=["안심구역 그룹 1"])
+    areaName : str = Field(examples=["집"])
+    latitude : float = Field(examples=["37.123456"])
+    longitude : float = Field(examples=["127.123456"])
+    radius : int = Field(examples=["100"], description="미터 단위")
+
