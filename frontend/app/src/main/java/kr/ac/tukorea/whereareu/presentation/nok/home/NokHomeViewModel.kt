@@ -142,7 +142,7 @@ class NokHomeViewModel @Inject constructor(
 
     fun eventPredictLocation(){
         viewModelScope.launch {
-            if(tempPredictLocation.value == PredictLocation()){
+            if(tempPredictLocation.value == PredictLocation() || !_isPredicted.value){
                 return@launch
             }
             eventPredict(PredictEvent.PredictLocation(tempPredictLocation.value))
