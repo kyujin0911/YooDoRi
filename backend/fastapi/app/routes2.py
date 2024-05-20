@@ -16,7 +16,7 @@ from .config import Config
 from .schedularFunc import SchedulerFunc
 from .fcm_notification import send_push_notification
 from .user_status_convertor import convertor
-#from .LocationPredict import ForecastLSTMClassification, Preprocessing
+from .LocationPredict import ForecastLSTMClassification, Preprocessing
 
 import asyncio
 import datetime
@@ -835,8 +835,54 @@ async def predict_location(dementiaKey : str):
         
         }
 
-        time.sleep(10)
+        #time.sleep(10)
 
         return response
     finally:
         session.close()
+
+@router.post("/safeArea/register", responses = {201 : {"model" : CommonResponse, "description" : "안전 지역 등록 성공" }, 404: {"model": ErrorResponse, "description": "보호 대상자 키 조회 실패"}}, description="보호 대상자의 안전 지역을 등록")
+async def register_safe_area(request: RegisterSafeAreaRequest):
+    try:
+        _dementia_key = request.dementiaKey
+        _area_name = request.areaName
+        _group_name = request.groupName
+
+        _latitude = request.latitude
+        _longitude = request.longitude
+        _radius = request.radius
+
+        existing_group = session.query(models.safe_area_group_info).filter_by(group_name = _group_name).first()
+
+        if existing_group:
+            _group_key = existing_group.group_key
+        else:
+            rng = RandomNumberGenerator()
+            _group_key = rng.generate_unique_random_number(100000, 999999)
+
+            new_group = models.safe_area_group_info(group_key = _group_key, group_name = _group_name)
+            session.add(new_group)
+        
+        _area_key = rng.generate_unique_random_number(100000, 999999)
+
+        new_area = models.safe_area_info(area_key = _area_key, dementia_key = _dementia_key, area_name = _area_name, latitude = _latitude, longitude = _longitude, radius = _radius, group_key = _group_key)
+
+        session.add(new_area)
+        
+        session.commit()
+
+        print(f"[INFO] Safe area registered for {_dementia_key}")
+
+        response = {
+            'status': 'success',
+            'message': 'Safe area registered'
+        }
+
+        return response
+    
+    finally:
+        session.close()
+
+@sched.scheduled_job('cron', hour=11, minute=57, id = 'analyze_location_data')
+def analyzing_location_data():
+    asyncio.run(schedFunc.load_analyze_location_data(session))
