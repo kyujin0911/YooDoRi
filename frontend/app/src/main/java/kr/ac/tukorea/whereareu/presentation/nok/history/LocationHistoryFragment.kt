@@ -6,20 +6,22 @@ import android.util.DisplayMetrics
 import android.util.Log
 import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
+import android.widget.Toast
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSmoothScroller
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kr.ac.tukorea.whereareu.R
 import kr.ac.tukorea.whereareu.databinding.FragmentLocationHistoryBinding
 import kr.ac.tukorea.whereareu.domain.history.LocationHistory
 import kr.ac.tukorea.whereareu.presentation.base.BaseFragment
 import kr.ac.tukorea.whereareu.presentation.nok.history.adapter.LocationHistoryRVA
 import kr.ac.tukorea.whereareu.util.extension.repeatOnStarted
-import kr.ac.tukorea.whereareu.util.extension.showToastShort
 import org.threeten.bp.DayOfWeek
 import org.threeten.bp.LocalDate
 
@@ -56,13 +58,15 @@ class LocationHistoryFragment :
 
         repeatOnStarted {
             viewModel.locationHistoryEvent.collect { event ->
+                Log.d("locationHistoryEvent", event.toString())
                 when (event) {
                     LocationHistoryViewModel.LocationHistoryEvent.FetchFail -> {
                         dismissLoadingDialog()
-                        requireActivity().showToastShort(
+                        /*requireActivity().showToastShort(
                             requireContext(),
                             "선택한 날짜에 해당하는 위치 기록이\n존재하지 않습니다."
-                        )
+                        )*/
+                        Toast.makeText(requireContext(), "선택한 날짜에 해당하는 위치 기록이 존재하지 않습니다.", Toast.LENGTH_SHORT).show()
                         viewModel.setIsMultipleSelected(false)
                     }
 
@@ -76,7 +80,7 @@ class LocationHistoryFragment :
                     }
 
                     is LocationHistoryViewModel.LocationHistoryEvent.FetchSuccessMultiple -> {
-                        syncSeekBarWithSingleLocationHistory(event.locationHistory[0], event.locationHistory[1])
+                        syncSeekBarWithMultipleLocationHistory(event.locationHistory[0], event.locationHistory[1])
                     }
                     else -> {}
                 }
@@ -114,6 +118,12 @@ class LocationHistoryFragment :
                     delay(200)
                     dismissLoadingDialog()
                 }
+            }
+        }
+
+        repeatOnStarted {
+            viewModel.isMultipleSelected.collect{
+                Log.d("isMultip", it.toString())
             }
         }
     }
@@ -194,7 +204,7 @@ class LocationHistoryFragment :
 
     }
 
-    private fun syncSeekBarWithSingleLocationHistory(
+    private fun syncSeekBarWithMultipleLocationHistory(
         locationHistoryList: List<LocationHistory>,
         locationHistoryList2: List<LocationHistory>
     ) {
@@ -237,7 +247,10 @@ class LocationHistoryFragment :
 
     @SuppressLint("ClickableViewAccessibility")
     private fun initLocationHistoryRVA() {
+        val layoutManager = LinearLayoutManager(requireContext())
+        layoutManager.orientation = LinearLayoutManager.HORIZONTAL
         binding.rv.apply {
+            setLayoutManager(layoutManager)
             adapter = locationHistoryRVA
             addItemDecoration(
                 DividerItemDecoration(

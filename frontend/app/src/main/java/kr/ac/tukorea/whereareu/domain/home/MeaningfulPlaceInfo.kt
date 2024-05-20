@@ -11,4 +11,6 @@ data class MeaningfulPlaceInfo(
     val latLng: LatLng,
     var isExpanded: Boolean = false,
     var policeStationInfo: List<PoliceStationInfo>
-): Serializable
+): Serializable{
+    constructor(): this("", emptyList(), LatLng.INVALID, false, emptyList())
+}

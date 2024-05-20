@@ -14,6 +14,7 @@ import kr.ac.tukorea.whereareu.R
 import kr.ac.tukorea.whereareu.databinding.FragmentHomeBinding
 import kr.ac.tukorea.whereareu.domain.home.MeaningfulPlaceInfo
 import kr.ac.tukorea.whereareu.presentation.base.BaseFragment
+import kr.ac.tukorea.whereareu.presentation.login.nok.NokIdentityFragmentDirections
 import kr.ac.tukorea.whereareu.presentation.nok.home.adapter.MeaningfulPlaceRVA
 import kr.ac.tukorea.whereareu.util.extension.repeatOnStarted
 
@@ -72,15 +73,13 @@ class NokHomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home
                     binding.addressTv.text = address
                     val meaningfulPlaceInfo = MeaningfulPlaceInfo(address, emptyList(), meaningfulPlaceInfo.latLng, false, policeStationInfo)
 
-                    binding.infoViewBtn.setOnClickListener {
-                        val action = NokHomeFragmentDirections.actionNokHomeFragmentToMeaningfulPlaceDetailFragment(
-                            meaningfulPlaceInfo
-                        )
-                        navigator.navigate(action)
-                    }
-
                     binding.mapViewBtn.setOnClickListener {
                         viewModel.eventPredict(NokHomeViewModel.PredictEvent.MapView(BottomSheetBehavior.STATE_COLLAPSED, meaningfulPlaceInfo.latLng))
+                    }
+
+                    binding.infoViewBtn.setOnClickListener {
+                        val action = NokHomeFragmentDirections.actionNokHomeFragmentToMeaningfulPlaceDetailFragment(meaningfulPlaceInfo)
+                        navigator.navigate(action)
                     }
                 }
             }
@@ -102,6 +101,7 @@ class NokHomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home
     override fun onResume() {
         super.onResume()
         viewModel.eventMeaningfulPlace()
+        viewModel.eventPredictLocation()
         initMeaningfulListRVA()
     }
 

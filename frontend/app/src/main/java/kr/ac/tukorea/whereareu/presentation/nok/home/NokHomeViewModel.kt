@@ -64,7 +64,8 @@ class NokHomeViewModel @Inject constructor(
     val navigateEventToString = MutableStateFlow(NavigateEvent.Home.toString())
 
     private val _tempMeaningfulPlace = MutableStateFlow<List<MeaningfulPlaceInfo>>(emptyList())
-    val tempMeaningfulPlace = _tempMeaningfulPlace.asStateFlow()
+
+    val tempPredictLocation = MutableStateFlow<PredictLocation>(PredictLocation())
 
     private val _meaningfulPlace = MutableSharedFlow<List<MeaningfulPlaceInfo>>()
     val meaningfulPlace = _meaningfulPlace.asSharedFlow()
@@ -136,6 +137,15 @@ class NokHomeViewModel @Inject constructor(
                 return@launch
             }
             _meaningfulPlace.emit(_tempMeaningfulPlace.value)
+        }
+    }
+
+    fun eventPredictLocation(){
+        viewModelScope.launch {
+            if(tempPredictLocation.value == PredictLocation()){
+                return@launch
+            }
+            eventPredict(PredictEvent.PredictLocation(tempPredictLocation.value))
         }
     }
 
@@ -263,6 +273,7 @@ class NokHomeViewModel @Inject constructor(
                 )
                 val predictLocation = PredictLocation(meaningfulPlace, policeStationInfo)
                 eventPredict(PredictEvent.PredictLocation(predictLocation))
+                tempPredictLocation.value = predictLocation
             }
         }.onException {
             Log.d("predict exception", it.toString())
@@ -286,6 +297,7 @@ class NokHomeViewModel @Inject constructor(
                 )
                 val predictLocation = PredictLocation(meaningfulPlace, policeStationInfo)
                 eventPredict(PredictEvent.PredictLocation(predictLocation))
+                tempPredictLocation.value = predictLocation
             }
         }.onException {
             Log.d("predict exception", it.toString())

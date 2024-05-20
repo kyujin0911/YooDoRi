@@ -37,7 +37,6 @@ class LocationHistoryRVA(): ListAdapter<LocationHistory, RecyclerView.ViewHolder
     inner class LocationHistoryViewHolder(private val binding: ItemLocationHistoryBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(locationHistory: LocationHistory) {
-
             with(binding) {
                 model = locationHistory
             }

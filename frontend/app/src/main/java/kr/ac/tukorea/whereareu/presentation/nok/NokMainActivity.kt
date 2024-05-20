@@ -180,9 +180,9 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
             }
 
             NokHomeViewModel.NavigateEvent.LocationHistory -> {
-                clearSettingFragmentUI()
+                behavior.isDraggable = true
+                behavior.state = BottomSheetBehavior.STATE_COLLAPSED
                 stopHomeFragmentJob()
-
             }
 
             NokHomeViewModel.NavigateEvent.MeaningfulPlace -> {
@@ -453,16 +453,22 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                             latLng
                         )
                     )
-                    homeMarkers.add(Marker().apply {
-                        setMarkerWithInfoWindow(
-                            this@NokMainActivity,
-                            latLng = latLng,
-                            markerIconColor = MarkerIcons.GREEN,
-                            markerText = address,
-                            naverMap = naverMap,
-                            infoText = "예상 위치"
-                        )
-                    })
+
+                    val predictMarker = homeMarkers.firstOrNull { it.captionText == address && it.icon == MarkerIcons.GREEN }
+                    if (predictMarker == null){
+                        homeMarkers.add(Marker().apply {
+                            setMarkerWithInfoWindow(
+                                this@NokMainActivity,
+                                latLng = latLng,
+                                markerIconColor = MarkerIcons.GREEN,
+                                markerText = address,
+                                naverMap = naverMap,
+                                infoText = "예상 위치"
+                            )
+                        })
+                    }
+
+                    Log.d("homemarkers size", homeMarkers.size.toString())
                 }
             }
 
@@ -599,6 +605,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
 
         binding.bottomNav.setupWithNavController(navController)
         navController.addOnDestinationChangedListener { controller, destination, arguments ->
+            Log.d("destination", destination.toString())
             when (destination.id) {
                 R.id.nokHomeFragment, R.id.meaningfulPlaceDetailFragment -> {
                     homeViewModel.eventHomeState()

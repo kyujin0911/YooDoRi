@@ -117,6 +117,7 @@
                     android:layout_marginStart="12dp"
                     android:layout_marginTop="16dp"
                     android:gravity="start"
+                    android:text="@{viewModel.tempPredictLocation.meaningfulPlaceInfo.address}"
                     android:textAppearance="@style/TextAppearance.App.16sp.ExtraBold"
                     app:layout_constraintBottom_toTopOf="@id/map_view_btn"
                     app:layout_constraintEnd_toEndOf="parent"
