@@ -69,7 +69,6 @@ class police_info(Base):
     key = Column(String)
     policeName = Column(String)
     policeAddress = Column(String)
-    roadAddress = Column(String)
     policePhoneNumber = Column(String)
     distance = Column(Integer)
     latitude = Column(Double)
@@ -80,3 +79,20 @@ class refresh_token_info(Base):
 
     key = Column(String, primary_key=True)
     refresh_token = Column(String)
+
+class safe_area_info(Base):
+    __tablename__ = 'safe_area_info'
+
+    area_key = Column(String, primary_key=True)
+    group_key = Column(String)
+    area_name = Column(String)
+    dementia_key = Column(String)
+    latitude = Column(Double)
+    longitude = Column(Double)
+    radius = Column(Integer)
+
+class safe_area_group_info(Base):
+    __tablename__ = 'safe_area_group_info'
+
+    group_key = Column(String, primary_key=True)
+    group_name = Column(String)
