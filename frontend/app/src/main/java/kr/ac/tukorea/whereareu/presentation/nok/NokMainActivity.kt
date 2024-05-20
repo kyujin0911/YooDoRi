@@ -180,8 +180,9 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
             }
 
             NokHomeViewModel.NavigateEvent.LocationHistory -> {
-                behavior.isDraggable = true
-                behavior.state = BottomSheetBehavior.STATE_COLLAPSED
+                /*behavior.isDraggable = true
+                behavior.state = BottomSheetBehavior.STATE_COLLAPSED*/
+                clearSettingFragmentUI()
                 stopHomeFragmentJob()
             }
 
@@ -551,6 +552,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
 
     fun stopPredict() {
         homeViewModel.setIsPredicted(false)
+        homeViewModel.eventHomeState()
     }
 
     override fun initView() {
