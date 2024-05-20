@@ -67,10 +67,13 @@ class FCMService : FirebaseMessagingService() {
             val builder = NotificationCompat.Builder(this@FCMService, "WhereAreU")
 
                 .setContentTitle(title.toString())
+//                .setContentText(remoteMessage.data["body"].toString())
                 .setContentText(body.toString())
+                .setContentText(remoteMessage.data["이도영"].toString())
 
                 .setSmallIcon(R.drawable.ic_whereareu_logo)
                 .setContentIntent(pendingIntent)
+                .setGroupSummary(true)
                 .setAutoCancel(true)
                 .setShowWhen(true)      // 잠금화면에서 알림 보여줌
             Log.d(TAG, "using onMessageReceived_Background")
@@ -82,9 +85,9 @@ class FCMService : FirebaseMessagingService() {
 
         if(remoteMessage.data.isNotEmpty()){
             //알림생성
-            sendNotification(remoteMessage)
-            Log.d(TAG, remoteMessage.data["title"].toString())
-            Log.d(TAG, remoteMessage.data["body"].toString())
+//            sendNotification(remoteMessage)
+            Log.d(TAG, "title: ${remoteMessage.data["title"].toString()}")
+            Log.d(TAG, "body : ${remoteMessage.data["body"].toString()}")
         }else {
             Log.e(TAG, "data가 비어있습니다. 메시지를 수신하지 못했습니다.")
         }
@@ -92,76 +95,78 @@ class FCMService : FirebaseMessagingService() {
 
     }
 
-    // 백그라운드 알림 설정
-    private fun sendNotification(remoteMessage: RemoteMessage) {
-        val soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION) // 알림 소리
-        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-
-        // 오레오 버전 이후에는 채널이 필요
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val importance = NotificationManager.IMPORTANCE_HIGH // 중요도 (HIGH: 상단바 표시 가능)
-            val channel = NotificationChannel(channelId, channelName, importance).apply {
-                description = channelDescription
-            }
-            channel.lockscreenVisibility = Notification.VISIBILITY_PUBLIC
-            notificationManager.createNotificationChannel(channel)
-
-        }
-
-        // RequestCode, Id를 고유값으로 지정하여 알림이 개별 표시
-        val uniId: Int = (System.currentTimeMillis() / 7).toInt()
-
-        // 일회용 PendingIntent : Intent 의 실행 권한을 외부의 어플리케이션에게 위임
-        val intent = Intent(this, NokMainActivity::class.java)
-        //각 key, value 추가
-        for(key in remoteMessage.data.keys){
-            intent.putExtra(key, remoteMessage.data.getValue(key))
-        }
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP) // Activity Stack 을 경로만 남김(A-B-C-D-B => A-B)
-
-        //23.05.22 Android 최신버전 대응 (FLAG_MUTABLE, FLAG_IMMUTABLE)
-        //PendingIntent.FLAG_MUTABLE은 PendingIntent의 내용을 변경할 수 있도록 허용, PendingIntent.FLAG_IMMUTABLE은 PendingIntent의 내용을 변경할 수 없음
-//        val pendingIntent = PendingIntent.getActivity(this, uniId, intent, PendingIntent.FLAG_ONE_SHOT)
-        val pendingIntent = PendingIntent.getActivity(this, uniId, intent, PendingIntent.FLAG_ONE_SHOT or PendingIntent.FLAG_MUTABLE)
-
-        // 알림 소리
-//        val soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
-
-        // 알림에 대한 UI 정보, 작업
-        val notificationBuilder = NotificationCompat.Builder(this, channelId)
-            .setPriority(NotificationCompat.PRIORITY_HIGH) // 중요도 (HIGH: 상단바 표시 가능)
-            .setSmallIcon(R.drawable.ic_whereareu_logo) // 아이콘 설정
-            .setContentTitle(remoteMessage.data["title"].toString()) // 제목
-            .setContentText(remoteMessage.data["body"].toString()) // 메시지 내용
-
-            .setAutoCancel(false) // 알람클릭시 삭제여부
-            .setSound(soundUri)  // 알림 소리
-            .setContentIntent(pendingIntent) // 알림 실행 시 Intent
-            .setShowWhen(true)
-
-        Log.d(TAG, "sendNotification_Foreground")
-
-        // 오레오 버전 이후에는 채널이 필요
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(channelId, "Notice", NotificationManager.IMPORTANCE_DEFAULT)
-            notificationManager.createNotificationChannel(channel)
-        }
-
-        // Head up 알람 설정
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            notificationBuilder.setCategory(NotificationCompat.CATEGORY_MESSAGE)
-                .setPriority(NotificationCompat.PRIORITY_HIGH)
-//                .setPriority(NotificationCompat.PRIORITY_MAX)
-                .setDefaults(Notification.DEFAULT_ALL)
-                .setSmallIcon(R.drawable.ic_whereareu_logo)
-                .setFullScreenIntent(pendingIntent, true)
-            Log.d(TAG, "headUp noti")
-        }
-
-        // 백그라운드 알림 보냄
-        notificationManager.notify(uniId, notificationBuilder.build())
-
-    }
+//    // 백그라운드 알림 설정
+//    private fun sendNotification(remoteMessage: RemoteMessage) {
+//        val soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION) // 알림 소리
+//        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+//
+//        // 오레오 버전 이후에는 채널이 필요
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+//            val importance = NotificationManager.IMPORTANCE_HIGH // 중요도 (HIGH: 상단바 표시 가능)
+//            val channel = NotificationChannel(channelId, channelName, importance).apply {
+//                description = channelDescription
+//            }
+//            channel.lockscreenVisibility = Notification.VISIBILITY_PUBLIC
+//            notificationManager.createNotificationChannel(channel)
+//
+//        }
+//
+//        // RequestCode, Id를 고유값으로 지정하여 알림이 개별 표시
+//        val uniId: Int = (System.currentTimeMillis() / 7).toInt()
+//
+//        // 일회용 PendingIntent : Intent 의 실행 권한을 외부의 어플리케이션에게 위임
+//        val intent = Intent(this, NokMainActivity::class.java)
+//        //각 key, value 추가
+//        for(key in remoteMessage.data.keys){
+//            intent.putExtra(key, remoteMessage.data.getValue(key))
+//        }
+//        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP) // Activity Stack 을 경로만 남김(A-B-C-D-B => A-B)
+//
+//        //23.05.22 Android 최신버전 대응 (FLAG_MUTABLE, FLAG_IMMUTABLE)
+//        //PendingIntent.FLAG_MUTABLE은 PendingIntent의 내용을 변경할 수 있도록 허용, PendingIntent.FLAG_IMMUTABLE은 PendingIntent의 내용을 변경할 수 없음
+////        val pendingIntent = PendingIntent.getActivity(this, uniId, intent, PendingIntent.FLAG_ONE_SHOT)
+//        val pendingIntent = PendingIntent.getActivity(this, uniId, intent, PendingIntent.FLAG_ONE_SHOT or PendingIntent.FLAG_MUTABLE)
+//
+//        // 알림 소리
+////        val soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
+//
+//        // 알림에 대한 UI 정보, 작업
+//        val notificationBuilder = NotificationCompat.Builder(this, channelId)
+//            .setPriority(NotificationCompat.PRIORITY_HIGH) // 중요도 (HIGH: 상단바 표시 가능)
+//            .setSmallIcon(R.drawable.ic_whereareu_logo) // 아이콘 설정
+////            .setContentTitle(remoteMessage.data["title"].toString()) // 제목
+////            .setContentText(remoteMessage.data["body"].toString()) // 메시지 내용
+////            .setContentText(remoteMessage.data["이도영"].toString()) // data
+//            .setGroupSummary(true)
+//
+//            .setAutoCancel(false) // 알람클릭시 삭제여부
+//            .setSound(soundUri)  // 알림 소리
+//            .setContentIntent(pendingIntent) // 알림 실행 시 Intent
+//            .setShowWhen(true)
+//
+//        Log.d(TAG, "using sendNotification_Foreground")
+//
+//        // 오레오 버전 이후에는 채널이 필요
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+//            val channel = NotificationChannel(channelId, "Notice", NotificationManager.IMPORTANCE_DEFAULT)
+//            notificationManager.createNotificationChannel(channel)
+//        }
+//
+//        // Head up 알람 설정
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+//            notificationBuilder.setCategory(NotificationCompat.CATEGORY_MESSAGE)
+//                .setPriority(NotificationCompat.PRIORITY_HIGH)
+////                .setPriority(NotificationCompat.PRIORITY_MAX)
+//                .setDefaults(Notification.DEFAULT_ALL)
+//                .setSmallIcon(R.drawable.ic_whereareu_logo)
+//                .setFullScreenIntent(pendingIntent, true)
+//            Log.d(TAG, "headUp noti")
+//        }
+//
+//        // 백그라운드 알림 보냄
+//        notificationManager.notify(uniId, notificationBuilder.build())
+//
+//    }
 
 //  토큰 가져오는 함수
     fun getFirebaseToken() {
