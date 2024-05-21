@@ -226,3 +226,18 @@ class RegisterSafeAreaRequest(BaseModel):
     longitude : float = Field(examples=["127.123456"])
     radius : int = Field(examples=["100"], description="미터 단위")
 
+class safeAreaList(BaseModel):
+    areaName : str = Field(examples=["집"])
+    latitude : float = Field(examples=["37.123456"])
+    longitude : float = Field(examples=["127.123456"])
+    radius : int = Field(examples=["100"], description="미터 단위")
+
+class safeAreaGroupInfo(BaseModel):
+    groupName : str = Field(examples=["안심구역 그룹 1"])
+    safeAreaList : List[safeAreaList]
+
+
+class GetSafeAreaResponse(BaseModel):
+    status: str = Field("success")
+    message: str = Field("메~시~지~")
+    result: List[safeAreaGroupInfo]
