@@ -6,6 +6,7 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
+import android.content.Context.NOTIFICATION_SERVICE
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
@@ -15,6 +16,7 @@ import android.os.PowerManager
 import android.util.Log
 import android.widget.RemoteViews
 import androidx.core.app.NotificationCompat
+import androidx.core.content.ContextCompat.getSystemService
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.messaging.FirebaseMessagingService
@@ -96,9 +98,9 @@ class FCMService : FirebaseMessagingService() {
             val pendingIntent = PendingIntent.getActivity(this@FCMService, 0, intent, PendingIntent.FLAG_IMMUTABLE)
             val builder = NotificationCompat.Builder(this@FCMService, "WhereAreU")
 
-                .setContentTitle(title.toString())
+//                .setContentTitle(title.toString())
 //                .setContentText(remoteMessage.data["body"].toString())
-                .setContentText(body.toString())
+//                .setContentText(body.toString())
 //                .setContentText(remoteMessage.data["이도영"].toString())
 
                 .setSmallIcon(R.drawable.ic_whereareu_logo)
@@ -165,8 +167,8 @@ class FCMService : FirebaseMessagingService() {
             .setPriority(NotificationCompat.PRIORITY_HIGH) // 중요도 (HIGH: 상단바 표시 가능)
             .setSmallIcon(R.drawable.ic_whereareu_logo) // 아이콘 설정
             .setContentTitle(remoteMessage.data["title"].toString()) // 제목
-            .setContentText(remoteMessage.data["body"].toString()) // 메시지 내용
-//            .setContentText(remoteMessage.data["이도영"].toString()) // data
+//            .setContentText(remoteMessage.data["body"].toString()) // 메시지 내용
+            .setContentText(remoteMessage.data["이도영"].toString()) // data
             .setGroupSummary(true)
 
             .setAutoCancel(true) // 알람클릭시 삭제여부
