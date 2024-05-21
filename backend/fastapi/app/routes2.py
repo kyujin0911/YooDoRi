@@ -848,11 +848,15 @@ async def register_safe_area(request: RegisterSafeAreaRequest):
     try:
         _dementia_key = request.dementiaKey
         _area_name = request.areaName
-        _group_name = request.groupName
-
         _latitude = request.latitude
         _longitude = request.longitude
         _radius = request.radius
+        _group_name = request.groupName
+
+        if _group_name == '':
+            _group_name = 'notGrouped'
+        else:
+            pass
 
         existing_group = session.query(models.safe_area_group_info).filter_by(group_name = _group_name).first()
 
@@ -885,7 +889,7 @@ async def register_safe_area(request: RegisterSafeAreaRequest):
     finally:
         session.close()
 
-@router.get("/safeArea/info", responses = {200 : {"model" : GetSafeAreaResponse, "description" : "안전 지역 정보 전송 성공" }, 404: {"model": ErrorResponse, "description": "안전 지역 정보 없음"}}, description="보호 대상자의 안전 지역 정보 전달(쿼리 스트링)")
+@router.get("/safeArea/info", responses = {200 : {"model" : GetSafeAreaResponse, "description" : "안전 지역 정보 전송 성공" }, 404: {"model": ErrorResponse, "description": "안전 지역 정보 없음"}}, description="보호 대상자의 안전 지역 정보 전달(쿼리 스트링) | 그룹 미지정시 groupName은 큰따옴표로 빈 문자열로 전달할 것")
 async def get_safe_area_info(dementiaKey: str):
     try:
         _safe_area_list = session.query(models.safe_area_info).filter_by(dementia_key = dementiaKey).all()
