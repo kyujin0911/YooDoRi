@@ -1,4 +1,4 @@
-package kr.ac.tukorea.whereareu.presentation
+package kr.ac.tukorea.whereareu.presentation.nok.safearea
 
 import kr.ac.tukorea.whereareu.R
 import kr.ac.tukorea.whereareu.databinding.FragmentSafeAreaBinding

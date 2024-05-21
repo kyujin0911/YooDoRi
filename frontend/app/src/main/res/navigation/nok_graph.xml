@@ -12,7 +12,7 @@
         tools:layout="@layout/fragment_meaningful_place" />
     <fragment
         android:id="@+id/safeAreaFragment"
-        android:name="kr.ac.tukorea.whereareu.presentation.SafeAreaFragment"
+        android:name="kr.ac.tukorea.whereareu.presentation.nok.safearea.SafeAreaFragment"
         android:label="SafeAreaFragment"
         tools:layout="@layout/fragment_safe_area" />
     <fragment

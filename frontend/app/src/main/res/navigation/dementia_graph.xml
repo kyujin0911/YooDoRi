@@ -31,7 +31,7 @@
         android:label="LocationHistoryFragment" />
     <fragment
         android:id="@+id/safeAreaFragment2"
-        android:name="kr.ac.tukorea.whereareu.presentation.SafeAreaFragment"
+        android:name="kr.ac.tukorea.whereareu.presentation.nok.safearea.SafeAreaFragment"
         android:label="SafeAreaFragment" />
     <fragment
         android:id="@+id/meaningfulPlaceFragment2"
