@@ -5,6 +5,8 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from passlib.context import CryptContext
 from haversine import haversine
 from PyKakao import Local
+from datetime import datetime, timedelta
+from pytz import timezone
 
 from . import models
 from .random_generator import RandomNumberGenerator
@@ -19,7 +21,6 @@ from .user_status_convertor import convertor
 from .LocationPredict import ForecastLSTMClassification, Preprocessing
 
 import asyncio
-import datetime
 import requests
 import urllib.parse
 import pandas as pd
@@ -35,6 +36,7 @@ schedFunc = SchedulerFunc()
 sched = BackgroundScheduler(timezone="Asia/Seoul", daemon=True)
 kakao = Local(service_key=Config.kakao_service_key)
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+
 
 
 @router.post("/test/fcm", description="FCM 테스트")
@@ -543,7 +545,7 @@ async def get_user_info(nokKey : str):
         else:
             print(f"[ERROR] User information not found for nok key({_nok_key})")
 
-            raise HTTPException(status_code=404, detail="User information not found")
+            return ErrorResponse(status_code=404, message="User information not found")
 
         return response
     
@@ -841,7 +843,7 @@ async def predict_location(dementiaKey : str):
     finally:
         session.close()
 
-@router.post("/safeArea/register", responses = {201 : {"model" : CommonResponse, "description" : "안전 지역 등록 성공" }, 404: {"model": ErrorResponse, "description": "보호 대상자 키 조회 실패"}}, description="보호 대상자의 안전 지역을 등록")
+@router.post("/safeArea/register", status_code=status.HTTP_201_CREATED, responses = {201 : {"model" : CommonResponse, "description" : "안전 지역 등록 성공" }, 404: {"model": ErrorResponse, "description": "보호 대상자 키 조회 실패"}}, description="보호 대상자의 안전 지역을 등록")
 async def register_safe_area(request: RegisterSafeAreaRequest):
     try:
         _dementia_key = request.dementiaKey
@@ -858,13 +860,13 @@ async def register_safe_area(request: RegisterSafeAreaRequest):
             _group_key = existing_group.group_key
         else:
             rng = RandomNumberGenerator()
-            _group_key = rng.generate_unique_random_number(100000, 999999)
+            for _ in range(10):
+                _group_key = rng.generate_unique_random_number(100000, 999999)
 
             new_group = models.safe_area_group_info(group_key = _group_key, group_name = _group_name)
             session.add(new_group)
         
-        _area_key = rng.generate_unique_random_number(100000, 999999)
-
+        _area_key = int(_dementia_key) + datetime.timestamp(datetime.now(timezone('Asia/Seoul'))) + ord(_area_name[0])
         new_area = models.safe_area_info(area_key = _area_key, dementia_key = _dementia_key, area_name = _area_name, latitude = _latitude, longitude = _longitude, radius = _radius, group_key = _group_key)
 
         session.add(new_area)
@@ -883,6 +885,44 @@ async def register_safe_area(request: RegisterSafeAreaRequest):
     finally:
         session.close()
 
-@sched.scheduled_job('cron', hour=11, minute=57, id = 'analyze_location_data')
+@router.get("/safeArea/info", responses = {200 : {"model" : GetSafeAreaResponse, "description" : "안전 지역 정보 전송 성공" }, 404: {"model": ErrorResponse, "description": "안전 지역 정보 없음"}}, description="보호 대상자의 안전 지역 정보 전달(쿼리 스트링)")
+async def get_safe_area_info(dementiaKey: str):
+    try:
+        _safe_area_list = session.query(models.safe_area_info).filter_by(dementia_key = dementiaKey).all()
+
+        # 안심 구역 그룹 별로 분류
+        safe_area_dict = {}
+        for safe_area in _safe_area_list:
+            if safe_area.group_key not in safe_area_dict:
+                safe_area_dict[safe_area.group_key] = {
+                    'groupName': session.query(models.safe_area_group_info).filter_by(group_key = safe_area.group_key).first().group_name,
+                    'safeAreas': []
+                }
+            
+            safe_area_dict[safe_area.group_key]['safeAreas'].append({
+                'areaName': safe_area.area_name,
+                'latitude': safe_area.latitude,
+                'longitude': safe_area.longitude,
+                'radius': safe_area.radius
+            })
+
+        result = {
+            'safeAreaList': list(safe_area_dict.values())
+        }
+
+        response = {
+            'status': 'success',
+            'message': 'Safe area information sent',
+            'result': result
+        }
+
+        return response
+    
+    finally:
+        session.close()
+        
+
+
+'''@sched.scheduled_job('cron', hour=11, minute=57, id = 'analyze_location_data')
 def analyzing_location_data():
-    asyncio.run(schedFunc.load_analyze_location_data(session))
+    asyncio.run(schedFunc.load_analyze_location_data(session))'''
