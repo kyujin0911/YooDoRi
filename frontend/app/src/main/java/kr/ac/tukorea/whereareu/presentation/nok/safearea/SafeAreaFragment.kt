@@ -1,5 +1,6 @@
 package kr.ac.tukorea.whereareu.presentation.nok.safearea
 
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import dagger.hilt.android.AndroidEntryPoint
 import kr.ac.tukorea.whereareu.R
@@ -9,7 +10,7 @@ import kr.ac.tukorea.whereareu.presentation.base.BaseFragment
 
 @AndroidEntryPoint
 class SafeAreaFragment : BaseFragment<FragmentSafeAreaBinding>(R.layout.fragment_safe_area) {
-    private val viewModel: SafeAreaViewModel by viewModels()
+    private val viewModel: SafeAreaViewModel by activityViewModels()
     override fun initObserver() {
 
     }
@@ -25,5 +26,7 @@ class SafeAreaFragment : BaseFragment<FragmentSafeAreaBinding>(R.layout.fragment
                 100
             )
         )
+
+        viewModel.fetchSafeArea()
     }
 }
