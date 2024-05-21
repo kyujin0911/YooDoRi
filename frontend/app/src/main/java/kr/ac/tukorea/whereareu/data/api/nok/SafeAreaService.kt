@@ -9,5 +9,5 @@ import retrofit2.http.POST
 
 interface SafeAreaService {
     @POST("safeArea/register")
-    suspend fun registerSafeArea(@Body request: RegisterSafeAreaRequest): Response<ResponseBody<RegisterSafeAreaResponse>>
+    suspend fun registerSafeArea(@Body request: RegisterSafeAreaRequest): Response<RegisterSafeAreaResponse>
 }

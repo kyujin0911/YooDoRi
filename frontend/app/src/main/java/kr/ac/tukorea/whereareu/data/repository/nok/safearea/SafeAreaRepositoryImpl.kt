@@ -12,6 +12,6 @@ class SafeAreaRepositoryImpl @Inject constructor(
     private val api: SafeAreaService
 ): SafeAreaRepository {
     override suspend fun registerSafeArea(request: RegisterSafeAreaRequest): NetworkResult<RegisterSafeAreaResponse> {
-        return handleApi({api.registerSafeArea(request)}) {response: ResponseBody<RegisterSafeAreaResponse> -> response.result}
+        return handleApi({api.registerSafeArea(request)}) {response: RegisterSafeAreaResponse -> response}
     }
 }
