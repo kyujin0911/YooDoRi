@@ -892,26 +892,31 @@ async def register_safe_area(request: RegisterSafeAreaRequest):
 @router.get("/safeArea/info", responses = {200 : {"model" : GetSafeAreaResponse, "description" : "안전 지역 정보 전송 성공" }, 404: {"model": ErrorResponse, "description": "안전 지역 정보 없음"}}, description="보호 대상자의 안전 지역 정보 전달(쿼리 스트링) | 그룹 미지정시 groupName은 큰따옴표로 빈 문자열로 전달할 것")
 async def get_safe_area_info(dementiaKey: str):
     try:
-        _safe_area_list = session.query(models.safe_area_info).filter_by(dementia_key = dementiaKey).all()
+        group_list = session.query(models.safe_area_group_info).filter_by(dementia_key = dementiaKey).all()
 
-        # 안심 구역 그룹 별로 분류
-        safe_area_dict = {}
-        for safe_area in _safe_area_list:
-            if safe_area.group_key not in safe_area_dict:
-                safe_area_dict[safe_area.group_key] = {
-                    'groupName': session.query(models.safe_area_group_info).filter_by(group_key = safe_area.group_key).first().group_name,
-                    'safeAreas': []
-                }
+        group_lists = []
+
+        # 그룹별로 저장
+        for group in group_list:
+            safe_area_list = session.query(models.safe_area_info).filter_by(group_key = group.group_key).all()
+
+            safe_areas = []
+            for safe_area in safe_area_list:
+                safe_areas.append({
+                    'areaName': safe_area.area_name,
+                    'latitude': safe_area.latitude,
+                    'longitude': safe_area.longitude,
+                    'radius': safe_area.radius
+                })
             
-            safe_area_dict[safe_area.group_key]['safeAreas'].append({
-                'areaName': safe_area.area_name,
-                'latitude': safe_area.latitude,
-                'longitude': safe_area.longitude,
-                'radius': safe_area.radius
+            group_lists.append({
+                'groupName': group.group_name,
+                'safeAreas': safe_areas
             })
 
+        
         result = {
-            'safeAreaList': list(safe_area_dict.values())
+            'safeAreaList': group_lists
         }
 
         response = {
@@ -919,7 +924,8 @@ async def get_safe_area_info(dementiaKey: str):
             'message': 'Safe area information sent',
             'result': result
         }
-
+            
+        
         return response
     
     finally:
