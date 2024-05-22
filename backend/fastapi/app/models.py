@@ -96,3 +96,4 @@ class safe_area_group_info(Base):
 
     group_key = Column(String, primary_key=True)
     group_name = Column(String)
+    dementia_key = Column(String)
