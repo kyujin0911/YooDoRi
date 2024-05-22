@@ -925,6 +925,34 @@ async def get_safe_area_info(dementiaKey: str):
     finally:
         session.close()
         
+@router.post("/safeArea/modification/name", responses = {200 : {"model" : CommonResponse, "description" : "안전 지역 정보 수정 성공" }, 404: {"model": ErrorResponse, "description": "안전 지역 정보 없음"}}, description="보호 대상자의 안전 지역 정보 수정")
+async def modify_name_safe_area_info(request: ModifySafeAreaName):
+    try:
+        _dementaia_key = request.dementiaKey
+        _before_name = request.beforeAreaName
+        _after_name = request.afterAreaName
+
+        existing_area = session.query(models.safe_area_info).filter_by(dementia_key = _dementaia_key, area_name = _before_name).first()
+
+        if existing_area:
+            existing_area.area_name = _after_name
+            session.commit()
+
+            print(f"[INFO] Safe area name modified for {_dementaia_key}")
+
+            response = {
+                'status': 'success',
+                'message': 'Safe area name modified'
+            }
+
+            return response
+        
+
+    finally:
+        session.close()
+
+
+
 
 
 '''@sched.scheduled_job('cron', hour=11, minute=57, id = 'analyze_location_data')
