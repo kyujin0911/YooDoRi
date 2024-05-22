@@ -1035,9 +1035,34 @@ async def modify_group_safe_area_info(request: ModifySafeAreaGroup):
         
     finally:
         session.close()
+
+@router.post("/safeArea/modification/groupName", responses = {200 : {"model" : CommonResponse, "description" : "안전 지역 그룹 정보 수정 성공" }, 404: {"model": ErrorResponse, "description": "안전 지역 그룹 정보 없음"}}, description="보호 대상자의 안전 지역 그룹 이름 수정")
+async def modify_group_name_safe_area_info(request: ModifySafeAreaGroupName):
+    try:
+        _dementia_key = request.dementiaKey
+        _before_group_name = request.beforeGroupName
+        _after_group_name = request.afterGroupName
+
+        existing_group = session.query(models.safe_area_group_info).filter_by(dementia_key = _dementia_key, group_name = _before_group_name).first()
+
+        if existing_group:
+            existing_group.group_name = _after_group_name
+            session.commit()
+
+            print(f"[INFO] Safe area group name modified for {_dementia_key}")
+
+            response = {
+                'status': 'success',
+                'message': 'Safe area group name modified'
+            }
+
+            return response
         
-
-
+        else:
+            return ErrorResponse(status_code=404, message="Safe area group information not found")
+        
+    finally:
+        session.close()
 
 '''@sched.scheduled_job('cron', hour=11, minute=57, id = 'analyze_location_data')
 def analyzing_location_data():
