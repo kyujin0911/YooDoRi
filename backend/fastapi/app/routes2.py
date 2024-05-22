@@ -1064,6 +1064,34 @@ async def modify_group_name_safe_area_info(request: ModifySafeAreaGroupName):
     finally:
         session.close()
 
+@router.delete("/safeArea/delete", responses = {200 : {"model" : CommonResponse, "description" : "안전 지역 삭제 성공" }, 404: {"model": ErrorResponse, "description": "안전 지역 정보 없음"}}, description="보호 대상자의 안전 지역 삭제")
+async def delete_safe_area(request: DeleteSafeAreaRequest):
+    try:
+        _dementia_key = request.dementiaKey
+        _area_name = request.areaName
+
+        existing_area = session.query(models.safe_area_info).filter_by(dementia_key = _dementia_key, area_name = _area_name).first()
+
+        if existing_area:
+            session.delete(existing_area)
+            session.commit()
+
+            print(f"[INFO] Safe area deleted for {_dementia_key}")
+
+            response = {
+                'status': 'success',
+                'message': 'Safe area deleted'
+            }
+
+            return response
+        
+        else:
+            return ErrorResponse(status_code=404, message="Safe area information not found")
+        
+    finally:
+        session.close()
+
+
 '''@sched.scheduled_job('cron', hour=11, minute=57, id = 'analyze_location_data')
 def analyzing_location_data():
     asyncio.run(schedFunc.load_analyze_location_data(session))'''
