@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-from typing import List, Dict
+from typing import List, Dict, Optional
 
 # Define request and response models
 '''class accessToken(BaseModel):
@@ -245,3 +245,13 @@ class GetSafeAreaResponse(BaseModel):
     status: str = Field("success")
     message: str = Field("메~시~지~")
     result: List[safeAreaGroupInfo]
+
+class ModifySafeAreaName(BaseModel):
+    dementiaKey : int = Field(examples=["123456"])
+    beforeAreaName : str = Field(examples=["집1"])
+    afterAreaName : Optional[str] = Field(examples=["집2"])
+
+class ModifySafeAreaGroup(BaseModel):
+    dementiaKey : int = Field(examples=["123456"])
+    beforeGroupName : str = Field(examples=["안심구역 그룹 1"])
+    afterGroupName : Optional[str] = Field(examples=["안심구역 그룹 2"])
