@@ -61,6 +61,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
     private val settingViewModel: SettingViewModel by viewModels()
     private val locationHistoryViewModel: LocationHistoryViewModel by viewModels()
     private val safeAreaViewModel: SafeAreaViewModel by viewModels()
+
     private var updateLocationJob: Job? = null
     private var countDownJob: Job? = null
     private var naverMap: NaverMap? = null
@@ -70,6 +71,8 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
     private val homeMarkers = mutableListOf<Marker>()
     private var zoom = 14.0
     private val locationHistoryMetaData = LocationHistoryMetaData()
+    private val safeAreaMarkers = mutableListOf<Marker>()
+    private val safeAreaCircleOverlay = mutableListOf<CircleOverlay>()
     private val tag = "NokMainActivity:"
 
     private fun getUpdateLocationJob(duration: Long): Job {
@@ -163,7 +166,23 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
 
     private fun handleSafeAreaEvent(event: SafeAreaViewModel.SafeAreaEvent){
         when(event){
-            is SafeAreaViewModel.SafeAreaEvent.FetchSafeArea -> {}
+            is SafeAreaViewModel.SafeAreaEvent.FetchSafeArea -> {
+                event.safeAreas.forEach {safeArea ->
+                    with(safeArea) {
+                        safeAreaMarkers.add(
+                            Marker().apply {
+                                setMarker(
+                                    latLng = LatLng(latitude, longitude),
+                                    markerIconColor = MarkerIcons.YELLOW,
+                                    text = areaName,
+                                    naverMap = naverMap,
+                                )
+                            }
+                        )
+                    }
+                }
+
+            }
             is SafeAreaViewModel.SafeAreaEvent.MapView -> {
                 behavior.state = event.behavior
                 naverMap?.moveCamera(CameraUpdate.scrollTo(event.coord))
