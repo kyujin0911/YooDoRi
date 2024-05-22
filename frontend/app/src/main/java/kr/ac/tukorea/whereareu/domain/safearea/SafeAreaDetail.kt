@@ -1,6 +1,6 @@
-package kr.ac.tukorea.whereareu.data.model.nok.safearea
+package kr.ac.tukorea.whereareu.domain.safearea
 
-data class SafeArea(
+data class SafeAreaDetail(
     val areaName: String,
     val latitude: Double,
     val longitude: Double,

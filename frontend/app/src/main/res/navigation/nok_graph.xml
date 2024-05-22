@@ -11,11 +11,6 @@
         android:label="MeaningfulPlaceFragment"
         tools:layout="@layout/fragment_meaningful_place" />
     <fragment
-        android:id="@+id/safeAreaFragment"
-        android:name="kr.ac.tukorea.whereareu.presentation.nok.safearea.SafeAreaFragment"
-        android:label="SafeAreaFragment"
-        tools:layout="@layout/fragment_safe_area" />
-    <fragment
         android:id="@+id/locationHistoryFragment"
         android:name="kr.ac.tukorea.whereareu.presentation.nok.history.LocationHistoryFragment"
         android:label="LocationHistoryFragment"
@@ -75,5 +70,21 @@
                 android:id="@+id/action_settingUpdateTimeFragment_to_nokSettingFragment"
                 app:destination="@id/nokSettingFragment" />
         </fragment>
+    </navigation>
+    <navigation android:id="@+id/safeAreaTab"
+        app:startDestination="@id/safeAreaFragment">
+        <fragment
+            android:id="@+id/safeAreaFragment"
+            android:name="kr.ac.tukorea.whereareu.presentation.nok.safearea.SafeAreaFragment"
+            android:label="SafeAreaFragment"
+            tools:layout="@layout/fragment_safe_area" >
+            <action
+                android:id="@+id/action_safeAreaFragment_to_safeAreaDetailFragment"
+                app:destination="@id/safeAreaDetailFragment" />
+        </fragment>
+        <fragment
+            android:id="@+id/safeAreaDetailFragment"
+            android:name="kr.ac.tukorea.whereareu.presentation.nok.safearea.SafeAreaDetailFragment"
+            android:label="SafeAreaDetailFragment" />
     </navigation>
 </navigation>
