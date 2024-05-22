@@ -951,7 +951,54 @@ async def modify_name_safe_area_info(request: ModifySafeAreaName):
     finally:
         session.close()
 
+@router.post("/safeArea/modification/group", responses = {200 : {"model" : CommonResponse, "description" : "안전 지역 정보 수정 성공" }, 404: {"model": ErrorResponse, "description": "안전 지역 정보 없음"}}, description="보호 대상자의 안전 지역 그룹 정보 수정")
+async def modify_group_safe_area_info(request: ModifySafeAreaGroup):
+    try:
+        _dementia_key = request.dementiaKey
+        _area_name = request.areaName
+        _group_name = request.groupName
 
+        existing_area = session.query(models.safe_area_info).filter_by(dementia_key = _dementia_key, area_name = _area_name).first()
+
+        if existing_area:
+            before_group = session.query(models.safe_area_group_info).filter_by(group_key = existing_area.group_key).first()
+            after_group = session.query(models.safe_area_group_info).filter_by(group_name = _group_name).first()
+            
+            if after_group:
+                existing_area.group_key = after_group.group_key
+            else:
+                rng = RandomNumberGenerator()
+                for _ in range(10):
+                    _group_key = rng.generate_unique_random_number(100000, 999999)
+
+                new_group = models.safe_area_group_info(group_key = _group_key, group_name = _group_name)
+                session.add(new_group)
+                existing_area.group_key = _group_key
+            
+            if session.query(models.safe_area_info).filter_by(group_key = before_group.group_key).count() == 0:
+                session.delete(before_group)
+
+            else:
+                pass
+
+            session.commit()
+            
+            print(f"[INFO] Safe area group modified for {_dementia_key}")
+
+            response = {
+                'status': 'success',
+                'message': 'Safe area group modified'
+            }
+
+            return response
+        
+        else:
+            return ErrorResponse(status_code=404, message="Safe area information not found")
+        
+        
+    finally:
+        session.close()
+        
 
 
 
