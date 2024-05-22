@@ -8,7 +8,10 @@ import dagger.hilt.android.AndroidEntryPoint
 import kr.ac.tukorea.whereareu.R
 import kr.ac.tukorea.whereareu.data.model.nok.safearea.RegisterSafeAreaRequest
 import kr.ac.tukorea.whereareu.databinding.FragmentSafeAreaBinding
+import kr.ac.tukorea.whereareu.domain.safearea.SafeArea
 import kr.ac.tukorea.whereareu.presentation.base.BaseFragment
+import kr.ac.tukorea.whereareu.presentation.nok.safearea.adapter.SafeAreaRVA
+import kr.ac.tukorea.whereareu.util.extension.repeatOnStarted
 
 @AndroidEntryPoint
 class SafeAreaFragment : BaseFragment<FragmentSafeAreaBinding>(R.layout.fragment_safe_area) {
@@ -16,12 +19,19 @@ class SafeAreaFragment : BaseFragment<FragmentSafeAreaBinding>(R.layout.fragment
     private val navigator: NavController by lazy {
         findNavController()
     }
-    override fun initObserver() {
-
+    private val safeAreaRVA: SafeAreaRVA by lazy {
+        SafeAreaRVA()
     }
-
+    override fun initObserver() {
+        repeatOnStarted {
+            viewModel.safeAreaEvent.collect{event ->
+                handleSafeAreaEvent(event)
+            }
+        }
+    }
     override fun initView() {
-        viewModel.registerSafeArea(
+        initSafeAreaRVA()
+        /*viewModel.registerSafeArea(
             RegisterSafeAreaRequest(
                 "253050",
                 "테스트 그룹",
@@ -30,12 +40,36 @@ class SafeAreaFragment : BaseFragment<FragmentSafeAreaBinding>(R.layout.fragment
                 126.9341057,
                 100
             )
-        )
-
-        binding.tv.setOnClickListener {
+        )*/
+        /*binding.tv.setOnClickListener {
             navigator.navigate(R.id.safeAreaDetailFragment)
-        }
+        }*/
 
+    }
+
+    override fun onResume() {
+        super.onResume()
+        showLoadingDialog(requireContext(), "안심구역을 불러오고 있습니다.")
         viewModel.fetchSafeArea()
+    }
+
+    private fun initSafeAreaRVA(){
+        binding.rv.adapter = safeAreaRVA
+        /*val list = listOf(
+            SafeArea("그룹 1", "", 0.0, 0.0, 0, SafeAreaRVA.SAFE_AREA_GROUP),
+            SafeArea("그룹 2", "", 0.0, 0.0, 0, SafeAreaRVA.SAFE_AREA_GROUP),
+            SafeArea("", "안심구역 1", 37.3397811, 126.7348403, 10, SafeAreaRVA.SAFE_AREA),
+            SafeArea("", "안심구역 2", 37.3397604, 126.7349086, 50, SafeAreaRVA.SAFE_AREA),
+        )*/
+    }
+
+    private fun handleSafeAreaEvent(event: SafeAreaViewModel.SafeAreaEvent){
+        when(event){
+            is SafeAreaViewModel.SafeAreaEvent.FetchSafeArea -> {
+                safeAreaRVA.submitList(event.safeAreas, kotlinx.coroutines.Runnable {
+                    dismissLoadingDialog()
+                })
+            }
+        }
     }
 }

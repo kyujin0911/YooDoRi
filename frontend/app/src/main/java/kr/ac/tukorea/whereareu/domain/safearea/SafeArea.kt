@@ -6,4 +6,5 @@ data class SafeArea(
     val latitude: Double,
     val longitude: Double,
     val radius: Int,
+    val viewType: Int
 )
