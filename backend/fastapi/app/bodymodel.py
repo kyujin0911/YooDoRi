@@ -255,3 +255,8 @@ class ModifySafeAreaGroup(BaseModel):
     dementiaKey : int = Field(examples=["123456"])
     areaName : str = Field(examples=["집"])
     groupName : Optional[str] = Field(examples=["안심구역 그룹 2"])
+
+class GetSafeAreaGroupResponse(BaseModel):
+    status: str = Field("success")
+    message: str = Field("메~시~지~")
+    result: List[safeAreaList]
