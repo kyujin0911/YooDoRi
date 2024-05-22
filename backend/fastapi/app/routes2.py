@@ -924,7 +924,38 @@ async def get_safe_area_info(dementiaKey: str):
     
     finally:
         session.close()
-        
+
+@router.get("/safeArea/info/group", responses = {200 : {"model" : GetSafeAreaGroupResponse, "description" : "안전 지역 그룹 정보 전송 성공" }, 404: {"model": ErrorResponse, "description": "안전 지역 그룹 정보 없음"}}, description="보호 대상자의 안전 지역 그룹 정보 전달(쿼리 스트링)")
+async def get_safe_area_group_info(dementiaKey: str, groupName: str):
+    try:
+        group_key = session.query(models.safe_area_group_info).filter_by(dementia_key = dementiaKey, group_name = groupName).first().group_key
+
+        if group_key:
+            safe_area_list = session.query(models.safe_area_info).filter_by(group_key = group_key).all()
+
+            safe_areas = []
+            for safe_area in safe_area_list:
+                safe_areas.append({
+                    'areaName': safe_area.area_name,
+                    'latitude': safe_area.latitude,
+                    'longitude': safe_area.longitude,
+                    'radius': safe_area.radius
+                })
+
+            result = {
+                'safeAreas': safe_areas
+            }
+
+            response = {
+                'status': 'success',
+                'message': 'Safe area group information sent',
+                'result': result
+            }
+
+            return response
+    finally:
+        session.close()
+
 @router.post("/safeArea/modification/name", responses = {200 : {"model" : CommonResponse, "description" : "안전 지역 정보 수정 성공" }, 404: {"model": ErrorResponse, "description": "안전 지역 정보 없음"}}, description="보호 대상자의 안전 지역 정보 수정")
 async def modify_name_safe_area_info(request: ModifySafeAreaName):
     try:
