@@ -1,5 +1,6 @@
-from fastapi import APIRouter, HTTPException, status, Depends
+from fastapi import APIRouter, HTTPException, status, Depends, Request
 from fastapi.security import OAuth2PasswordRequestForm, APIKeyHeader, OAuth2PasswordBearer
+from fastapi.responses import JSONResponse
 
 from apscheduler.schedulers.background import BackgroundScheduler
 from passlib.context import CryptContext
@@ -19,6 +20,7 @@ from .schedularFunc import SchedulerFunc
 from .fcm_notification import send_push_notification
 from .user_status_convertor import convertor
 from .LocationPredict import ForecastLSTMClassification, Preprocessing
+from .exceptHandler import duplicate_error
 
 import asyncio
 import requests
@@ -545,7 +547,7 @@ async def get_user_info(nokKey : str):
         else:
             print(f"[ERROR] User information not found for nok key({_nok_key})")
 
-            return ErrorResponse(status_code=404, message="User information not found")
+            raise HTTPException(status_code=404, detail="User information not found")
 
         return response
     
@@ -678,7 +680,8 @@ async def predict_location(dementiaKey: str):
         loc_list = []
         location_list = session.query(models.location_info).filter_by(dementia_key=_key, date = "2024-05-16").all()
 
-
+        if not location_list:
+            raise HTTPException(status_code=404, detail="Location data not found")
 
         for location in location_list:
             status = convertor(location.user_status)
@@ -853,6 +856,13 @@ async def register_safe_area(request: RegisterSafeAreaRequest):
         _radius = request.radius
         _group_name = request.groupName
 
+        if not session.query(models.safe_area_info).filter_by(dementia_key = _dementia_key, area_name = _area_name).first() == None:
+            print(f"[ERROR] Safe area already exists for {_dementia_key}")
+
+            raise HTTPException(status_code=400, message="Safe area already exists")
+        else:
+            pass
+
         if _group_name == '':
             _group_name = 'notGrouped'
         else:
@@ -904,6 +914,7 @@ async def get_safe_area_info(dementiaKey: str):
             for safe_area in safe_area_list:
                 safe_areas.append({
                     'areaName': safe_area.area_name,
+                    'areaKey': safe_area.area_key,
                     'latitude': safe_area.latitude,
                     'longitude': safe_area.longitude,
                     'radius': safe_area.radius
@@ -911,6 +922,7 @@ async def get_safe_area_info(dementiaKey: str):
             
             group_lists.append({
                 'groupName': group.group_name,
+                'groupKey': group.group_key,
                 'safeAreas': safe_areas
             })
 
@@ -932,9 +944,12 @@ async def get_safe_area_info(dementiaKey: str):
         session.close()
 
 @router.get("/safeArea/info/group", responses = {200 : {"model" : GetSafeAreaGroupResponse, "description" : "안전 지역 그룹 정보 전송 성공" }, 404: {"model": ErrorResponse, "description": "안전 지역 그룹 정보 없음"}}, description="보호 대상자의 안전 지역 그룹 정보 전달(쿼리 스트링)")
-async def get_safe_area_group_info(dementiaKey: str, groupName: str):
+async def get_safe_area_group_info(dementiaKey: str, groupKey: str):
     try:
-        group_key = session.query(models.safe_area_group_info).filter_by(dementia_key = dementiaKey, group_name = groupName).first().group_key
+        group_key = session.query(models.safe_area_group_info).filter_by(dementia_key = dementiaKey, group_key = groupKey).first().group_key
+
+        if not group_key:
+            raise HTTPException(status_code=404, detail="Safe area group information not found")
 
         if group_key:
             safe_area_list = session.query(models.safe_area_info).filter_by(group_key = group_key).all()
@@ -962,59 +977,58 @@ async def get_safe_area_group_info(dementiaKey: str, groupName: str):
     finally:
         session.close()
 
-@router.post("/safeArea/modification/name", responses = {200 : {"model" : CommonResponse, "description" : "안전 지역 정보 수정 성공" }, 404: {"model": ErrorResponse, "description": "안전 지역 정보 없음"}}, description="보호 대상자의 안전 지역 정보 수정")
+@router.post("/safeArea/modification/name", responses = {200 : {"model" : CommonResponse, "description" : "안전 지역 정보 수정 성공" }, 400 : {"model" : ErrorResponse, "description" : "안심 구역 이름 중복"},404: {"model": ErrorResponse, "description": "안전 지역 정보 없음"}}, description="보호 대상자의 안전 지역 정보 수정")
 async def modify_name_safe_area_info(request: ModifySafeAreaName):
     try:
         _dementaia_key = request.dementiaKey
-        _before_name = request.beforeAreaName
+        _area_key = request.areaKey
         _after_name = request.afterAreaName
 
-        existing_area = session.query(models.safe_area_info).filter_by(dementia_key = _dementaia_key, area_name = _before_name).first()
+        existing_area = session.query(models.safe_area_info).filter_by(dementia_key = _dementaia_key, area_key = _area_key).first()
 
         if existing_area:
-            existing_area.area_name = _after_name
-            session.commit()
+            if not session.query(models.safe_area_info).filter_by(dementia_key = _dementaia_key, area_name = _after_name).first() == None:
+                print(f"[ERROR] Safe area already exists for {_dementaia_key}")
 
-            print(f"[INFO] Safe area name modified for {_dementaia_key}")
+                raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Safe area already exists")
+            else:
+                existing_area.area_name = _after_name
+                session.commit()
 
-            response = {
-                'status': 'success',
-                'message': 'Safe area name modified'
-            }
+                print(f"[INFO] Safe area name modified for {_dementaia_key}")
 
-            return response
-        
+                response = {
+                    'status': 'success',
+                    'message': 'Safe area name modified'
+                }
+
+                return response
+        else:
+            raise HTTPException(status_code=404, detail="Safe area information not found")
 
     finally:
         session.close()
 
-@router.post("/safeArea/modification/group", responses = {200 : {"model" : CommonResponse, "description" : "안전 지역 정보 수정 성공" }, 404: {"model": ErrorResponse, "description": "안전 지역 정보 없음"}}, description="보호 대상자의 안전 지역 그룹 정보 수정")
+@router.post("/safeArea/modification/group", responses = {200 : {"model" : CommonResponse, "description" : "안전 지역 정보 수정 성공" }, 404: {"model": ErrorResponse, "description": "안전 지역 정보 없음"}}, description="보호 대상자의 안전 지역 그룹 정보 수정 | areaKey : 옮기고자 하는 안심구역, groupKey : 옮길 그룹")
 async def modify_group_safe_area_info(request: ModifySafeAreaGroup):
     try:
         _dementia_key = request.dementiaKey
-        _area_name = request.areaName
-        _group_name = request.groupName
+        _area_key = request.areaKey
+        _group_key = request.groupKey
 
-        existing_area = session.query(models.safe_area_info).filter_by(dementia_key = _dementia_key, area_name = _area_name).first()
+        existing_area = session.query(models.safe_area_info).filter_by(dementia_key = _dementia_key, area_key = _area_key).first()
 
         if existing_area:
             before_group = session.query(models.safe_area_group_info).filter_by(group_key = existing_area.group_key).first()
-            after_group = session.query(models.safe_area_group_info).filter_by(group_name = _group_name, dementia_key = _dementia_key).first()
+            after_group = session.query(models.safe_area_group_info).filter_by(group_key = _group_key, dementia_key = _dementia_key).first()
             
             if after_group:
                 existing_area.group_key = after_group.group_key
             else:
-                rng = RandomNumberGenerator()
-                for _ in range(10):
-                    _group_key = rng.generate_unique_random_number(100000, 999999)
-
-                new_group = models.safe_area_group_info(group_key = _group_key, group_name = _group_name)
-                session.add(new_group)
-                existing_area.group_key = _group_key
+                raise HTTPException(status_code=404, message="Safe area group information not found")
             
             if session.query(models.safe_area_info).filter_by(group_key = before_group.group_key).count() == 0:
                 session.delete(before_group)
-
             else:
                 pass
 
@@ -1040,10 +1054,10 @@ async def modify_group_safe_area_info(request: ModifySafeAreaGroup):
 async def modify_group_name_safe_area_info(request: ModifySafeAreaGroupName):
     try:
         _dementia_key = request.dementiaKey
-        _before_group_name = request.beforeGroupName
+        _group_key = request.groupKey
         _after_group_name = request.afterGroupName
 
-        existing_group = session.query(models.safe_area_group_info).filter_by(dementia_key = _dementia_key, group_name = _before_group_name).first()
+        existing_group = session.query(models.safe_area_group_info).filter_by(dementia_key = _dementia_key, group_key = _group_key).first()
 
         if existing_group:
             existing_group.group_name = _after_group_name
@@ -1059,7 +1073,7 @@ async def modify_group_name_safe_area_info(request: ModifySafeAreaGroupName):
             return response
         
         else:
-            return ErrorResponse(status_code=404, message="Safe area group information not found")
+            raise HTTPException(status_code=404, message="Safe area group information not found")
         
     finally:
         session.close()
@@ -1068,9 +1082,9 @@ async def modify_group_name_safe_area_info(request: ModifySafeAreaGroupName):
 async def delete_safe_area(request: DeleteSafeAreaRequest):
     try:
         _dementia_key = request.dementiaKey
-        _area_name = request.areaName
+        _area_key = request.areaKey
 
-        existing_area = session.query(models.safe_area_info).filter_by(dementia_key = _dementia_key, area_name = _area_name).first()
+        existing_area = session.query(models.safe_area_info).filter_by(dementia_key = _dementia_key, area_key = _area_key).first()
 
         if existing_area:
             session.delete(existing_area)
@@ -1086,11 +1100,12 @@ async def delete_safe_area(request: DeleteSafeAreaRequest):
             return response
         
         else:
-            return ErrorResponse(status_code=404, message="Safe area information not found")
+            raise HTTPException(status_code=404, message="Safe area information not found")
         
     finally:
         session.close()
 
+#@router.delete()
 
 '''@sched.scheduled_job('cron', hour=11, minute=57, id = 'analyze_location_data')
 def analyzing_location_data():
