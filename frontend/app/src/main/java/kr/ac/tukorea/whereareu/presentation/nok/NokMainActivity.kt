@@ -169,14 +169,25 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
             is SafeAreaViewModel.SafeAreaEvent.FetchSafeArea -> {
                 event.safeAreas.forEach {safeArea ->
                     with(safeArea) {
+                        val latLng = LatLng(latitude, longitude)
                         safeAreaMarkers.add(
                             Marker().apply {
                                 setMarker(
-                                    latLng = LatLng(latitude, longitude),
+                                    latLng = latLng,
                                     markerIconColor = MarkerIcons.YELLOW,
                                     text = areaName,
                                     naverMap = naverMap,
                                 )
+                            }
+                        )
+                        safeAreaCircleOverlay.add(
+                            CircleOverlay().apply {
+                                radius = safeArea.radius.toDouble()
+                                center = latLng
+                                outlineWidth = 5
+                                outlineColor = ContextCompat.getColor(this@NokMainActivity, R.color.deep_yellow)
+                                color = ContextCompat.getColor(this@NokMainActivity, R.color.half_yellow)
+                                map = naverMap
                             }
                         )
                     }
