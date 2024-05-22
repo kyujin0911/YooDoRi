@@ -253,5 +253,5 @@ class ModifySafeAreaName(BaseModel):
 
 class ModifySafeAreaGroup(BaseModel):
     dementiaKey : int = Field(examples=["123456"])
-    beforeGroupName : str = Field(examples=["안심구역 그룹 1"])
-    afterGroupName : Optional[str] = Field(examples=["안심구역 그룹 2"])
+    areaName : str = Field(examples=["집"])
+    groupName : Optional[str] = Field(examples=["안심구역 그룹 2"])
