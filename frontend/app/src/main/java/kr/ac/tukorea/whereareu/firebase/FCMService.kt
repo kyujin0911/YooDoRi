@@ -108,6 +108,7 @@ class FCMService : FirebaseMessagingService() {
                 .setGroupSummary(true)
                 .setAutoCancel(true)
                 .setShowWhen(true)      // 잠금화면에서 알림 보여줌
+                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             Log.d(TAG, "using onMessageReceived_Background")
 
             val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
@@ -175,6 +176,7 @@ class FCMService : FirebaseMessagingService() {
             .setSound(soundUri)  // 알림 소리
             .setContentIntent(pendingIntent) // 알림 실행 시 Intent
             .setShowWhen(true)
+            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
 
         Log.d(TAG, "using sendNotification_Foreground")
 
