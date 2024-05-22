@@ -176,8 +176,7 @@ class LocHistoryResponse(BaseModel):
     result : LocHisRecord
 
 class ErrorResponse(BaseModel):
-    status: str = Field("error")
-    message: str = Field("에러 내용")
+    detail: str = Field("에러 내용")
 
 class TempResponse(BaseModel):
     status: str = Field("success")
@@ -209,7 +208,7 @@ class PredictLocationResponse(BaseModel):
     result : locpredict
 
 class AverageWalkingSpeedRequest(BaseModel):
-    dementiaKey : int = Field(examples=["123456"])
+    dementiaKey : str = Field(examples=["123456"])
 
 class AverageAndLastLoc(BaseModel):
     averageSpeed : float = Field(examples=["2.0"])
@@ -223,7 +222,7 @@ class AverageWalkingSpeedResponse(BaseModel):
     result: AverageAndLastLoc
 
 class RegisterSafeAreaRequest(BaseModel):
-    dementiaKey : int = Field(examples=["123456"])
+    dementiaKey : str = Field(examples=["123456"])
     groupName : str = Field(examples=["안심구역 그룹 1"])
     areaName : str = Field(examples=["집"])
     latitude : float = Field(examples=["37.123456"])
@@ -232,12 +231,14 @@ class RegisterSafeAreaRequest(BaseModel):
 
 class safeAreaList(BaseModel):
     areaName : str = Field(examples=["집"])
+    areaKey : str = Field(examples=["123456"])
     latitude : float = Field(examples=["37.123456"])
     longitude : float = Field(examples=["127.123456"])
     radius : int = Field(examples=["100"], description="미터 단위")
 
 class safeAreaGroupInfo(BaseModel):
     groupName : str = Field(examples=["안심구역 그룹 1"])
+    groupKey : str = Field(examples=["123456"])
     safeAreaList : List[safeAreaList]
 
 
@@ -247,14 +248,14 @@ class GetSafeAreaResponse(BaseModel):
     result: List[safeAreaGroupInfo]
 
 class ModifySafeAreaName(BaseModel):
-    dementiaKey : int = Field(examples=["123456"])
-    beforeAreaName : str = Field(examples=["집1"])
+    dementiaKey : str = Field(examples=["123456"])
+    areaKey : str = Field(examples=["123456"])
     afterAreaName : Optional[str] = Field(examples=["집2"])
 
 class ModifySafeAreaGroup(BaseModel):
-    dementiaKey : int = Field(examples=["123456"])
-    areaName : str = Field(examples=["집"])
-    groupName : Optional[str] = Field(examples=["안심구역 그룹 2"])
+    dementiaKey : str = Field(examples=["123456"])
+    areaKey : str = Field(examples=["123456"])
+    groupKey : str = Field(examples=["123456"])
 
 class GetSafeAreaGroupResponse(BaseModel):
     status: str = Field("success")
@@ -262,10 +263,10 @@ class GetSafeAreaGroupResponse(BaseModel):
     result: List[safeAreaList]
 
 class ModifySafeAreaGroupName(BaseModel):
-    dementiaKey : int = Field(examples=["123456"])
-    beforeGroupName : str = Field(examples=["안심구역 그룹 1"])
+    dementiaKey : str = Field(examples=["123456"])
+    groupKey : str = Field(examples=["123456"])
     afterGroupName : Optional[str] = Field(examples=["안심구역 그룹 2"])
 
 class DeleteSafeAreaRequest(BaseModel):
     dementiaKey : int = Field(examples=["123456"])
-    areaName : str = Field(examples=["집"])
+    areaKey : str = Field(examples=["123456"])
