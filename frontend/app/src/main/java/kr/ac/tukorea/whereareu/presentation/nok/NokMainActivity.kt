@@ -149,12 +149,27 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
         }
 
         repeatOnStarted {
+            safeAreaViewModel.safeAreaEvent.collect{ event ->
+                handleSafeAreaEvent(event)
+            }
+        }
+
+        repeatOnStarted {
             homeViewModel.isPredicted.collect{
                 Log.d("isPredicted", it.toString())
             }
         }
     }
 
+    private fun handleSafeAreaEvent(event: SafeAreaViewModel.SafeAreaEvent){
+        when(event){
+            is SafeAreaViewModel.SafeAreaEvent.FetchSafeArea -> {}
+            is SafeAreaViewModel.SafeAreaEvent.MapView -> {
+                behavior.state = event.behavior
+                naverMap?.moveCamera(CameraUpdate.scrollTo(event.coord))
+            }
+        }
+    }
     private fun handleNavigationEvent(event: NokHomeViewModel.NavigateEvent) {
         when (event) {
             NokHomeViewModel.NavigateEvent.Home -> {}

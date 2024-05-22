@@ -3,6 +3,7 @@ package kr.ac.tukorea.whereareu.presentation.nok.safearea
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.naver.maps.geometry.LatLng
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -11,6 +12,7 @@ import kotlinx.coroutines.launch
 import kr.ac.tukorea.whereareu.data.model.nok.safearea.RegisterSafeAreaRequest
 import kr.ac.tukorea.whereareu.data.repository.nok.safearea.SafeAreaRepositoryImpl
 import kr.ac.tukorea.whereareu.domain.safearea.SafeArea
+import kr.ac.tukorea.whereareu.presentation.nok.home.NokHomeViewModel
 import kr.ac.tukorea.whereareu.presentation.nok.safearea.adapter.SafeAreaRVA
 import kr.ac.tukorea.whereareu.util.network.onSuccess
 import javax.inject.Inject
@@ -26,6 +28,8 @@ class SafeAreaViewModel @Inject constructor(
     val safeAreaEvent = _safeAreaEvent.asSharedFlow()
     sealed class SafeAreaEvent{
         data class FetchSafeArea(val safeAreas: List<SafeArea>): SafeAreaEvent()
+
+        data class MapView(val behavior: Int, val coord: LatLng) : SafeAreaEvent()
     }
 
     fun setDementiaKey(dementiaKey: String) {

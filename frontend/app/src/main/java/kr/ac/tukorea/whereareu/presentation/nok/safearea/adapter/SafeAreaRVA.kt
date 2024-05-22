@@ -6,10 +6,12 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.naver.maps.geometry.LatLng
 import kr.ac.tukorea.whereareu.databinding.ItemSafeAreaBinding
 import kr.ac.tukorea.whereareu.databinding.ItemSafeAreaGroupBinding
 import kr.ac.tukorea.whereareu.databinding.ItemTimeInfoBinding
 import kr.ac.tukorea.whereareu.domain.home.GroupedTimeInfo
+import kr.ac.tukorea.whereareu.domain.home.MeaningfulPlaceInfo
 import kr.ac.tukorea.whereareu.domain.safearea.SafeArea
 import java.lang.StringBuilder
 
@@ -31,11 +33,20 @@ class SafeAreaRVA() : ListAdapter<SafeArea, RecyclerView.ViewHolder>(
         }
 
     }) {
+    private var safeRVAClickListener: SafeRVAClickListener? = null
+    fun setSafeRVAClickListener(listener: SafeRVAClickListener){
+        this.safeRVAClickListener = listener
+    }
     inner class SafeAreaViewHolder(private val binding: ItemSafeAreaBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(safeArea: SafeArea) {
             with(binding) {
                 model = safeArea
+
+                mapViewBtn.setOnClickListener {
+                    val latLng = LatLng(safeArea.latitude, safeArea.longitude)
+                    safeRVAClickListener?.onClickMapView(latLng)
+                }
             }
         }
     }
@@ -87,6 +98,11 @@ class SafeAreaRVA() : ListAdapter<SafeArea, RecyclerView.ViewHolder>(
 
     override fun getItemViewType(position: Int): Int {
         return currentList[position].viewType
+    }
+
+    interface SafeRVAClickListener{
+        fun onClickMapView(latLng: LatLng)
+        fun onClickInfoView(safeArea: SafeArea)
     }
 
     companion object{

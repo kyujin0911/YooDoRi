@@ -4,6 +4,8 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.naver.maps.geometry.LatLng
 import dagger.hilt.android.AndroidEntryPoint
 import kr.ac.tukorea.whereareu.R
 import kr.ac.tukorea.whereareu.data.model.nok.safearea.RegisterSafeAreaRequest
@@ -14,7 +16,7 @@ import kr.ac.tukorea.whereareu.presentation.nok.safearea.adapter.SafeAreaRVA
 import kr.ac.tukorea.whereareu.util.extension.repeatOnStarted
 
 @AndroidEntryPoint
-class SafeAreaFragment : BaseFragment<FragmentSafeAreaBinding>(R.layout.fragment_safe_area) {
+class SafeAreaFragment : BaseFragment<FragmentSafeAreaBinding>(R.layout.fragment_safe_area), SafeAreaRVA.SafeRVAClickListener {
     private val viewModel: SafeAreaViewModel by activityViewModels()
     private val navigator: NavController by lazy {
         findNavController()
@@ -55,6 +57,7 @@ class SafeAreaFragment : BaseFragment<FragmentSafeAreaBinding>(R.layout.fragment
 
     private fun initSafeAreaRVA(){
         binding.rv.adapter = safeAreaRVA
+        safeAreaRVA.setSafeRVAClickListener(this)
         /*val list = listOf(
             SafeArea("그룹 1", "", 0.0, 0.0, 0, SafeAreaRVA.SAFE_AREA_GROUP),
             SafeArea("그룹 2", "", 0.0, 0.0, 0, SafeAreaRVA.SAFE_AREA_GROUP),
@@ -70,6 +73,16 @@ class SafeAreaFragment : BaseFragment<FragmentSafeAreaBinding>(R.layout.fragment
                     dismissLoadingDialog()
                 })
             }
+
+            is SafeAreaViewModel.SafeAreaEvent.MapView -> {}
         }
+    }
+
+    override fun onClickMapView(latLng: LatLng) {
+        viewModel.eventSafeArea(SafeAreaViewModel.SafeAreaEvent.MapView(BottomSheetBehavior.STATE_COLLAPSED, latLng))
+    }
+
+    override fun onClickInfoView(safeArea: SafeArea) {
+
     }
 }

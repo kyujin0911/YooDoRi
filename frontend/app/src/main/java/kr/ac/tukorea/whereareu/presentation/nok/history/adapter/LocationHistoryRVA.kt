@@ -89,6 +89,10 @@ class LocationHistoryRVA(): ListAdapter<LocationHistory, RecyclerView.ViewHolder
         }
     }
 
+    override fun getItemViewType(position: Int): Int {
+        return currentList[position].viewType
+    }
+
     interface OnLoadingListener{
         fun onLoading()
     }
