@@ -20,10 +20,3 @@ def create_app():
     routes2.sched.start()
 
     return app
-
-@app.exception_handler(HTTPException)
-async def http_exception_handler(exc):
-    return JSONResponse(
-        status_code=exc.status_code,
-        content={"message": exc.detail}
-    )
