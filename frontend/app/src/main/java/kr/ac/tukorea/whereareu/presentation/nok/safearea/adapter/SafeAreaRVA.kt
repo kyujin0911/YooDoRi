@@ -90,7 +90,7 @@ class SafeAreaRVA() : ListAdapter<SafeArea, RecyclerView.ViewHolder>(
     }
 
     companion object{
-        val SAFE_AREA = 0
-        val SAFE_AREA_GROUP = 1
+        val SAFE_AREA = 1
+        val SAFE_AREA_GROUP = 0
     }
 }

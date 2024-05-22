@@ -76,6 +76,13 @@ class SafeAreaViewModel @Inject constructor(
                     }
                     list.addAll(temp)
                 }
+                list.sortWith(
+                    compareBy(
+                        {it.viewType},
+                        {it.groupName},
+                        {it.areaName}
+                    )
+                )
                 eventSafeArea(SafeAreaEvent.FetchSafeArea(list))
                 Log.d("safeArea List", list.toString())
                 Log.d("fetchSafeArea", it.toString())
