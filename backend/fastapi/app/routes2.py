@@ -999,7 +999,7 @@ async def modify_group_safe_area_info(request: ModifySafeAreaGroup):
 
         if existing_area:
             before_group = session.query(models.safe_area_group_info).filter_by(group_key = existing_area.group_key).first()
-            after_group = session.query(models.safe_area_group_info).filter_by(group_name = _group_name).first()
+            after_group = session.query(models.safe_area_group_info).filter_by(group_name = _group_name, dementia_key = _dementia_key).first()
             
             if after_group:
                 existing_area.group_key = after_group.group_key
