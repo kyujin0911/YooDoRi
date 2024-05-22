@@ -91,29 +91,29 @@ class FCMService : FirebaseMessagingService() {
         Log.d(TAG, "Message noti : ${remoteMessage.notification}")
 
         // 포그라운드 알림 설정
-        remoteMessage.notification?.apply {
-            val intent = Intent(this@FCMService, NokMainActivity::class.java).apply{
-                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-            }
-            val pendingIntent = PendingIntent.getActivity(this@FCMService, 0, intent, PendingIntent.FLAG_IMMUTABLE)
-            val builder = NotificationCompat.Builder(this@FCMService, "WhereAreU")
+//        remoteMessage.notification?.apply {
+//            val intent = Intent(this@FCMService, NokMainActivity::class.java).apply{
+//                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+//            }
+//            val pendingIntent = PendingIntent.getActivity(this@FCMService, 0, intent, PendingIntent.FLAG_IMMUTABLE)
+//            val builder = NotificationCompat.Builder(this@FCMService, "WhereAreU")
 
 //                .setContentTitle(title.toString())
 //                .setContentText(remoteMessage.data["body"].toString())
 //                .setContentText(body.toString())
 //                .setContentText(remoteMessage.data["이도영"].toString())
-
-                .setSmallIcon(R.drawable.ic_whereareu_logo)
-                .setContentIntent(pendingIntent)
-                .setGroupSummary(true)
-                .setAutoCancel(true)
-                .setShowWhen(true)      // 잠금화면에서 알림 보여줌
-                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-            Log.d(TAG, "using onMessageReceived_Background")
-
-            val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
-            notificationManager.notify(101, builder.build())
-        }
+//
+//                .setSmallIcon(R.drawable.ic_whereareu_logo)
+//                .setContentIntent(pendingIntent)
+//                .setGroupSummary(true)
+//                .setAutoCancel(true)
+//                .setShowWhen(true)      // 잠금화면에서 알림 보여줌
+//                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+//            Log.d(TAG, "using onMessageReceived_Background")
+//
+//            val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+//            notificationManager.notify(101, builder.build())
+//        }
         // ----여기까지 포그라운드 알림
 
         if(remoteMessage.data.isNotEmpty()){
