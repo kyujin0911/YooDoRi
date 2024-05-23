@@ -116,16 +116,52 @@ class FCMService : FirebaseMessagingService() {
 //        }
         // ----여기까지 포그라운드 알림
 
-        if(remoteMessage.data.isNotEmpty()){
-            //알림생성
+//        if(remoteMessage.data.isNotEmpty()){
+//            //알림생성
+//            sendNotification(remoteMessage)
+//            Log.d(TAG, "title: ${remoteMessage.data["title"].toString()}")
+//            Log.d(TAG, "body : ${remoteMessage.data["body"].toString()}")
+//        }else {
+//            Log.e(TAG, "data가 비어있습니다. 메시지를 수신하지 못했습니다.")
+//        }
+        if (remoteMessage.notification != null) {
+            // Notification 메시지를 수신할 경우
+            showNotification(remoteMessage.notification!!, remoteMessage.data)
+        } else if (remoteMessage.data.isNotEmpty()) {
+            // Data 메시지를 수신할 경우
             sendNotification(remoteMessage)
             Log.d(TAG, "title: ${remoteMessage.data["title"].toString()}")
             Log.d(TAG, "body : ${remoteMessage.data["body"].toString()}")
-        }else {
+        } else {
             Log.e(TAG, "data가 비어있습니다. 메시지를 수신하지 못했습니다.")
         }
+    }
 
+    private fun showNotification(notification: RemoteMessage.Notification, data: Map<String, String>) {
+        val soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
+        val intent = Intent(this, NokMainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        }
+        val pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE)
+        val safeAreaName = data["safeAreaName"] ?: "안심구역1"
+        val time = data["time"] ?: "알수없음"
+        val contentText = "안심구역 이름: $safeAreaName\n시간: $time"
 
+        val builder = NotificationCompat.Builder(this, "WhereAreU")
+            .setSmallIcon(R.drawable.ic_whereareu_logo)
+            .setContentTitle(notification.title ?: "어디U")
+            .setContentText(contentText)
+            .setStyle(NotificationCompat.BigTextStyle().bigText(contentText)) // 여러 줄 텍스트 설정
+            .setContentIntent(pendingIntent)
+            .setGroupSummary(true)
+            .setAutoCancel(true)
+            .setShowWhen(true)
+            .setSound(soundUri) // 소리 설정
+            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+            .setPriority(NotificationCompat.PRIORITY_HIGH) // 중요도 설정
+
+        val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.notify(101, builder.build())
     }
 
     // 백그라운드 알림 설정
@@ -163,13 +199,18 @@ class FCMService : FirebaseMessagingService() {
         // 알림 소리
 //        val soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
 
+        val safeAreaName = remoteMessage.data["safeAreaName"].toString()
+        val time = remoteMessage.data["time"].toString()
+        val contentText = "안심구역 이름 : $safeAreaName\n 시간 : $time"
         // 알림에 대한 UI 정보, 작업
         val notificationBuilder = NotificationCompat.Builder(this, channelId)
             .setPriority(NotificationCompat.PRIORITY_HIGH) // 중요도 (HIGH: 상단바 표시 가능)
             .setSmallIcon(R.drawable.ic_whereareu_logo) // 아이콘 설정
-            .setContentTitle(remoteMessage.data["title"].toString()) // 제목
+//            .setContentTitle(remoteMessage.data["title"].toString()) // 제목
+
 //            .setContentText(remoteMessage.data["body"].toString()) // 메시지 내용
-            .setContentText(remoteMessage.data["이도영"].toString()) // data
+//            .setContentText(remoteMessage.data["이도영"].toString()) // data
+            .setContentText(contentText)
             .setGroupSummary(true)
 
             .setAutoCancel(true) // 알람클릭시 삭제여부
