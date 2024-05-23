@@ -77,6 +77,7 @@ class loginRequest(BaseModel):
     isDementia : int = Field(examples=["1"], description="1 : 보호대상자, 0 : 보호자")
 
 class ReceiveLocationRequest(BaseModel):
+    dementiaKey : str = Field(examples=["123456"])
     date : str = Field(examples=["2024-03-19"], description="yyyy-mm-dd")
     time : str = Field(examples=["12:00:00"])
     latitude : float = Field(examples=["37.123456"])
@@ -109,11 +110,15 @@ class GetLocationResponse(BaseModel):
     result: LastLoc
 
 class ModifyUserInfoRequest(BaseModel):
+    key: str = Field(examples=["123456"])
+    isDementia : int = Field(examples=[1], description="1 : 보호대상자, 0 : 보호자")
     name : str = Field(examples=["김이름"])
     phoneNumber : str = Field(examples=["010-1234-5678"])
 
 class ModifyUserUpdateRateRequest(BaseModel):
-    updateRate : int = Field(examples=["15"], description="초 단위")
+    key: str = Field(examples=["123456"])
+    isDementia : int = Field(examples=[1], description="1 : 보호대상자, 0 : 보호자")
+    updateRate : int = Field(examples=[1], description="분 단위")
 
 class AverageAndLastLoc(BaseModel):
     averageSpeed : float = Field(examples=["2.0"])
@@ -277,3 +282,8 @@ class DeleteSafeAreaRequest(BaseModel):
 class DeleteSafeAreaGroupRequest(BaseModel):
     dementiaKey : str = Field(examples=["123456"])
     groupKey : str = Field(examples=["123456"])
+
+class FCMRequest(BaseModel):
+    title : str = Field(examples=["어디U"])
+    body : str = Field(examples=["안심 구역 진입"])
+    data : Dict[str, str] = Field(examples=[{"safeAreaName" : "집", "time" : "12:00:00"}])
