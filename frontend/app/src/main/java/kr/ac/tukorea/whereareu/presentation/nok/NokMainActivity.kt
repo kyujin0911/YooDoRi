@@ -7,6 +7,7 @@ import android.content.IntentFilter
 import android.graphics.PointF
 import android.util.Log
 import android.view.View
+import android.view.inputmethod.EditorInfo
 import androidx.activity.viewModels
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
@@ -47,6 +48,7 @@ import kr.ac.tukorea.whereareu.presentation.nok.history.LocationHistoryViewModel
 import kr.ac.tukorea.whereareu.presentation.nok.home.NokHomeViewModel
 import kr.ac.tukorea.whereareu.presentation.nok.safearea.SafeAreaViewModel
 import kr.ac.tukorea.whereareu.presentation.nok.setting.SettingViewModel
+import kr.ac.tukorea.whereareu.util.extension.EditTextUtil.setOnEditorActionListener
 import kr.ac.tukorea.whereareu.util.extension.getUserKey
 import kr.ac.tukorea.whereareu.util.extension.repeatOnStarted
 import kr.ac.tukorea.whereareu.util.extension.setInfoWindowText
@@ -99,7 +101,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
         }
 
         repeatOnStarted {
-            homeViewModel.navigateEventToString.collect{
+            homeViewModel.navigateEventToString.collect {
                 Log.d("naviate to string", it)
             }
         }
@@ -152,22 +154,22 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
         }
 
         repeatOnStarted {
-            safeAreaViewModel.safeAreaEvent.collect{ event ->
+            safeAreaViewModel.safeAreaEvent.collect { event ->
                 handleSafeAreaEvent(event)
             }
         }
 
         repeatOnStarted {
-            homeViewModel.isPredicted.collect{
+            homeViewModel.isPredicted.collect {
                 Log.d("isPredicted", it.toString())
             }
         }
     }
 
-    private fun handleSafeAreaEvent(event: SafeAreaViewModel.SafeAreaEvent){
-        when(event){
+    private fun handleSafeAreaEvent(event: SafeAreaViewModel.SafeAreaEvent) {
+        when (event) {
             is SafeAreaViewModel.SafeAreaEvent.FetchSafeArea -> {
-                event.safeAreas.forEach {safeArea ->
+                event.safeAreas.forEach { safeArea ->
                     with(safeArea) {
                         val latLng = LatLng(latitude, longitude)
                         safeAreMetaData.markers.add(
@@ -185,8 +187,14 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                                 radius = safeArea.radius.toDouble()
                                 center = latLng
                                 outlineWidth = 5
-                                outlineColor = ContextCompat.getColor(this@NokMainActivity, R.color.deep_yellow)
-                                color = ContextCompat.getColor(this@NokMainActivity, R.color.transparent_yellow)
+                                outlineColor = ContextCompat.getColor(
+                                    this@NokMainActivity,
+                                    R.color.deep_yellow
+                                )
+                                color = ContextCompat.getColor(
+                                    this@NokMainActivity,
+                                    R.color.transparent_yellow
+                                )
                                 map = naverMap
                             }
                         )
@@ -194,22 +202,44 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                 }
 
             }
+
             is SafeAreaViewModel.SafeAreaEvent.MapView -> {
                 behavior.state = event.behavior
                 naverMap?.moveCamera(CameraUpdate.scrollTo(event.coord))
             }
+
+            is SafeAreaViewModel.SafeAreaEvent.SettingSafeArea -> {
+                if (event.isSettingSafeArea) {
+                    with(safeAreMetaData) {
+                        isSettingSafeArea = true
+                        //behavior.isHideable = true
+                        settingMarker.isVisible = true
+                        settingCircleOverlay.isVisible = true
+                    }
+                } else {
+                    with(safeAreMetaData) {
+                        isSettingSafeArea = false
+                        settingMarker.isVisible = false
+                        settingCircleOverlay.isVisible = false
+                    }
+                    navController.popBackStack()
+                }
+                //behavior.state = BottomSheetBehavior.STATE_HIDDEN
+
+            }
         }
     }
+
     private fun handleNavigationEvent(event: NokHomeViewModel.NavigateEvent) {
         when (event) {
             NokHomeViewModel.NavigateEvent.Home -> {}
 
             is NokHomeViewModel.NavigateEvent.HomeState -> {
                 behavior.isDraggable = true
-                if(event.isPredicted){
+                if (event.isPredicted) {
                     setBottomSheetBehaviorForFirstNavigationEvent(HOME)
                 } else {
-                    if(navController.currentDestination?.id == R.id.nokHomeFragment) {
+                    if (navController.currentDestination?.id == R.id.nokHomeFragment) {
                         homeViewModel.fetchUserInfo()
                         binding.layout.translationY = 0f
                     }
@@ -226,24 +256,32 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
 
             NokHomeViewModel.NavigateEvent.SafeArea -> {
                 setBottomSheetBehaviorForFirstNavigationEvent(SAFE_AREA)
-                with(safeAreMetaData){
+                with(safeAreMetaData) {
                     settingMarker.apply {
-                        setMarker(naverMap?.cameraPosition?.target!!, MarkerIcons.YELLOW, "", naverMap)
+                        setMarker(
+                            naverMap?.cameraPosition?.target!!,
+                            MarkerIcons.YELLOW,
+                            "",
+                            naverMap
+                        )
                         isVisible = false
                     }
 
                     settingCircleOverlay.apply {
                         center = settingMarker.position
                         radius = 500.0
-                        color = ContextCompat.getColor(this@NokMainActivity, R.color.transparent_yellow)
+                        color =
+                            ContextCompat.getColor(this@NokMainActivity, R.color.transparent_yellow)
                         outlineWidth = 5
-                        outlineColor = ContextCompat.getColor(this@NokMainActivity, R.color.deep_yellow)
+                        outlineColor =
+                            ContextCompat.getColor(this@NokMainActivity, R.color.deep_yellow)
                         map = naverMap
                         isVisible = false
 
                     }
+
                     naverMap?.addOnCameraChangeListener { _, _ ->
-                        if(!isSettingSafeArea){
+                        if (!isSettingSafeArea) {
                             return@addOnCameraChangeListener
                         }
                         Log.d("change", "change")
@@ -488,7 +526,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                     countDownJob?.cancelAndJoin()
                     countDownJob = null
                 }
-                with(predictMetaData){
+                with(predictMetaData) {
                     circleOverlay.isVisible = false
                     binding.countDownT.text = "00:00"
                     behavior.expandedOffset = 0
@@ -510,8 +548,9 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                         )
                     )
 
-                    val predictMarker = predictMetaData.markers.firstOrNull { it.captionText == address && it.icon == MarkerIcons.GREEN }
-                    if (predictMarker == null){
+                    val predictMarker =
+                        predictMetaData.markers.firstOrNull { it.captionText == address && it.icon == MarkerIcons.GREEN }
+                    if (predictMarker == null) {
                         predictMetaData.markers.add(Marker().apply {
                             setMarkerWithInfoWindow(
                                 this@NokMainActivity,
@@ -611,20 +650,23 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
     override fun initView() {
         binding.view = this
         binding.viewModel = homeViewModel
+        binding.safeAreaVm = safeAreaViewModel
         homeViewModel.fetchUserInfo()
         initBottomSheet()
         initMap()
         initNavigator()
 
-        binding.safeAreaTv.setOnClickListener {
-            with(safeAreMetaData){
-                isSettingSafeArea = true
-                settingMarker.isVisible = true
-                settingCircleOverlay.isVisible = true
+        binding.setSafeAreaTv.setOnClickListener {
+            if(navController.currentDestination?.id == R.id.safeAreaFragment){
+                navController.navigate(R.id.action_safeAreaFragment_to_settingSafeAreaFragment)
+            } else {
+                navController.navigate(R.id.action_safeAreaDetailFragment_to_settingSafeAreaFragment)
             }
-            binding.safeAreaTv.isVisible = false
-            behavior.isHideable = true
-            behavior.state = BottomSheetBehavior.STATE_HIDDEN
+            safeAreaViewModel.setIsSettingSafeAreaStatus()
+        }
+
+        binding.searchAddressEt.setOnEditorActionListener(EditorInfo.IME_ACTION_DONE) {
+            Log.d("et", binding.searchAddressEt.text.toString())
         }
     }
 
@@ -654,25 +696,33 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
             override fun onSlide(bottomSheet: View, slideOffset: Float) {
                 Log.d("slide offset", slideOffset.toString())
 
-                if (slideOffset >= 0.5f){
+                if (slideOffset >= 0.5f) {
                     binding.navermapLogo.isVisible = false
                 } else {
                     binding.navermapLogo.isVisible = true
                 }
 
-                if(navController.currentDestination?.id == R.id.safeAreaFragment){
-                    if (slideOffset >= 0.5f){
-                        binding.safeAreaTv.isVisible = false
+                if (navController.currentDestination?.id in listOf(
+                        R.id.safeAreaFragment,
+                        R.id.settingSafeAreaFragment
+                    )
+                ) {
+                    /*if (slideOffset >= 0.5f) {
+                        binding.setSafeAreaTv.isVisible = false
+                        binding.cancelSafeAreaTv.isVisible = false
                     } else {
-                        binding.safeAreaTv.isVisible = true
-                    }
+                        binding.setSafeAreaTv.isVisible = true
+                        binding.cancelSafeAreaTv.isVisible = true
+                    }*/
 
-                    if (slideOffset <= 0.2f){
+                    if (slideOffset <= 0.2f) {
+                        Log.d("뭐ㅓㄴ데", "뭔데")
                         behavior.isDraggable = false
                     } else {
+                        Log.d("뭐ㅓㄴ데", "뭐냐고")
                         behavior.isDraggable = true
                     }
-                } else{
+                } else {
                     if (slideOffset <= 0.3f) {
                         binding.layout.translationY = -slideOffset * bottomSheet.height * 0.5f
                     }
@@ -690,19 +740,33 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
         navController.addOnDestinationChangedListener { _, destination, _ ->
             Log.d("destination", destination.toString())
 
-            if(navController.currentDestination?.id !in listOf(R.id.nokHomeFragment, R.id.meaningfulPlaceDetailFragment)){
+            if (navController.currentDestination?.id !in listOf(
+                    R.id.nokHomeFragment,
+                    R.id.meaningfulPlaceDetailFragment
+                )
+            ) {
                 stopHomeFragmentJob()
             }
 
-            if (destination.id !in listOf(R.id.safeAreaFragment, R.id.safeAreaDetailFragment)){
+            if (destination.id !in listOf(
+                    R.id.safeAreaFragment,
+                    R.id.safeAreaDetailFragment,
+                    R.id.settingSafeAreaFragment
+                )
+            ) {
                 isFirstNavigationEvent[SAFE_AREA] = true
             }
 
-            if (destination.id != R.id.locationHistoryFragment){
+            if (destination.id != R.id.locationHistoryFragment) {
                 clearLocationFragmentUI()
             }
 
-            if (destination.id !in listOf(R.id.nokSettingFragment, R.id.settingUpdateTimeFragment, R.id.modifyUserInfoFragment)){
+            if (destination.id !in listOf(
+                    R.id.nokSettingFragment,
+                    R.id.settingUpdateTimeFragment,
+                    R.id.modifyUserInfoFragment
+                )
+            ) {
                 behavior.isDraggable = true
             }
 
@@ -716,7 +780,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                     homeViewModel.eventNavigate(NokHomeViewModel.NavigateEvent.Setting)
                 }
 
-                R.id.safeAreaFragment -> {
+                R.id.safeAreaFragment, R.id.settingSafeAreaFragment, R.id.safeAreaDetailFragment -> {
                     homeViewModel.eventNavigate(NokHomeViewModel.NavigateEvent.SafeArea)
                 }
 
@@ -775,11 +839,11 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
         }
     }
 
-    private fun setBottomSheetBehaviorForFirstNavigationEvent(index: Int){
-        if(isFirstNavigationEvent[index]){
+    private fun setBottomSheetBehaviorForFirstNavigationEvent(index: Int) {
+        if (isFirstNavigationEvent[index]) {
             isFirstNavigationEvent[index] = false
 
-            behavior.state = if (index == HOME){
+            behavior.state = if (index == HOME) {
                 BottomSheetBehavior.STATE_COLLAPSED
             } else {
                 BottomSheetBehavior.STATE_HALF_EXPANDED

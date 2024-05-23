@@ -31,6 +31,13 @@ class SafeAreaViewModel @Inject constructor(
         data class FetchSafeArea(val safeAreas: List<SafeArea>): SafeAreaEvent()
 
         data class MapView(val behavior: Int, val coord: LatLng) : SafeAreaEvent()
+
+        data class SettingSafeArea(val isSettingSafeArea: Boolean): SafeAreaEvent()
+    }
+
+    fun setIsSettingSafeAreaStatus(){
+        isSettingSafeArea.value = isSettingSafeArea.value.not()
+        eventSafeArea(SafeAreaEvent.SettingSafeArea(this.isSettingSafeArea.value))
     }
 
     fun setDementiaKey(dementiaKey: String) {

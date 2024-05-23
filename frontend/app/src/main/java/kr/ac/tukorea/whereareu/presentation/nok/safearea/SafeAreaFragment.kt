@@ -70,6 +70,7 @@ class SafeAreaFragment : BaseFragment<FragmentSafeAreaBinding>(R.layout.fragment
             }
 
             is SafeAreaViewModel.SafeAreaEvent.MapView -> {}
+            is SafeAreaViewModel.SafeAreaEvent.SettingSafeArea -> {}
         }
     }
 

@@ -81,6 +81,9 @@
             <action
                 android:id="@+id/action_safeAreaFragment_to_safeAreaDetailFragment"
                 app:destination="@id/safeAreaDetailFragment" />
+            <action
+                android:id="@+id/action_safeAreaFragment_to_settingSafeAreaFragment"
+                app:destination="@id/settingSafeAreaFragment" />
         </fragment>
         <fragment
             android:id="@+id/safeAreaDetailFragment"
@@ -89,6 +92,13 @@
             <argument
                 android:name="groupKey"
                 app:argType="string" />
+            <action
+                android:id="@+id/action_safeAreaDetailFragment_to_settingSafeAreaFragment"
+                app:destination="@id/settingSafeAreaFragment" />
         </fragment>
+        <fragment
+            android:id="@+id/settingSafeAreaFragment"
+            android:name="kr.ac.tukorea.whereareu.presentation.nok.safearea.SettingSafeAreaFragment"
+            android:label="SettingSafeAreaFragment" />
     </navigation>
 </navigation>

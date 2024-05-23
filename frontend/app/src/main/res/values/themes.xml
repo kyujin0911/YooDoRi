@@ -7,6 +7,14 @@
         <!-- Customize your light theme here. -->
         <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
         <item name="colorPrimary">@color/yellow</item>
+        <item name="android:statusBarColor">@color/white</item>
+    </style>
+
+    <style name="Theme.Search.Address.Dialog" parent="Base.Theme.WhereAreU">
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowIsFloating">false</item>
+        <item name="android:backgroundDimEnabled">false</item>
+        <item name="android:statusBarColor">@color/white</item>
     </style>
 
     <style name="Theme.WhereAreU" parent="Base.Theme.WhereAreU" />
