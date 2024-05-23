@@ -20,7 +20,6 @@ from .schedularFunc import SchedulerFunc
 from .fcm_notification import send_push_notification
 from .user_status_convertor import convertor
 from .LocationPredict import ForecastLSTMClassification, Preprocessing
-from .exceptHandler import duplicate_error
 
 import asyncio
 import requests
@@ -46,6 +45,8 @@ async def send_fcm(title: str, body: str, token: str, data : str):
 
     return send_push_notification(token, body, title, data)
 
+
+#유저 등록
 @router.post("/noks",status_code=status.HTTP_201_CREATED, responses = {201 : {"model" : ReceiveNokInfoResponse, "description" : "유저 등록 성공" },404: {"model": ErrorResponse, "description": "보호 대상자 키 조회 실패"}}, description="보호자가 보호 대상자의 정보를 등록")
 async def receive_nok_info(request: ReceiveNokInfoRequest):
 
@@ -220,6 +221,8 @@ async def receive_user_login(request: loginRequest):
     finally:
         session.close()
 
+
+#위치 정보 전송
 @router.post("/locations/dementias", responses = {200 : {"model" : TempResponse, "description" : "위치 정보 전송 성공" }, 404: {"model": ErrorResponse, "description": "보호 대상자 키 조회 실패"}}, description="보호 대상자의 위치 정보를 전송 | isRingstoneOn : 0(무음), 1(진동), 2(벨소리)")
 async def receive_location_info(request: ReceiveLocationRequest):
 
@@ -333,6 +336,8 @@ async def send_live_location_info(dementiaKey : str):
     finally:
         session.close()
 
+
+# 유저 정보 수정
 @router.post("/users/modification/userInfo", responses = {200 : {"model" : CommonResponse, "description" : "유저 정보 수정 성공" }, 404: {"model": ErrorResponse, "description": "유저 키 조회 실패"}}, description="보호자와 보호대상자의 정보를 수정 | isDementia : 0(보호자), 1(보호대상자) | 변경하지 않는 값은 기존의 값을 그대로 수신할 것")
 async def modify_user_info(request: ModifyUserInfoRequest):
 
@@ -451,6 +456,8 @@ async def modify_updatint_rate(request: ModifyUserUpdateRateRequest):
     finally:
         session.close()
 
+
+#유저 정보 전달
 @router.post("/dementias/averageWalkingSpeed", responses = {200 : {"model" : AverageWalkingSpeedResponse, "description" : "평균 걷기 속도 계산 성공" }, 404: {"model": ErrorResponse, "description": "보호 대상자 키 조회 실패 or 위치 정보 부족"}}, description="보호 대상자의 평균 걷기 속도를 계산 및 마지막 정보 전송")
 async def caculate_dementia_average_walking_speed(requset: AverageWalkingSpeedRequest): # current_user : int = Depends(APIKeyHeader(name = "Authorization"))
 
@@ -554,6 +561,7 @@ async def get_user_info(nokKey : str):
     finally:
         session.close()
 
+#의미장소, 위치 이력, 위치 예측
 @router.get("/locations/meaningful", responses = {200 : {"model" : MeaningfulLocResponse, "description" : "의미장소 전송 성공" }, 404: {"model": ErrorResponse, "description": "의미 장소 없음"}}, description="보호 대상자의 의미 장소 정보 및 주변 경찰서 정보 전달(쿼리 스트링)")
 async def send_meaningful_location_info(dementiaKey: str):
     _key = dementiaKey
@@ -846,7 +854,9 @@ async def predict_location(dementiaKey : str):
     finally:
         session.close()
 
-@router.post("/safeArea/register", status_code=status.HTTP_201_CREATED, responses = {201 : {"model" : CommonResponse, "description" : "안전 지역 등록 성공" }, 404: {"model": ErrorResponse, "description": "보호 대상자 키 조회 실패"}}, description="보호 대상자의 안전 지역을 등록")
+
+#안심구역
+@router.post("/safeArea/register", status_code=status.HTTP_201_CREATED, responses = {201 : {"model" : CommonResponse, "description" : "안전 지역 등록 성공" }, 404: {"model": ErrorResponse, "description": "보호 대상자 키 조회 실패"}}, description="보호 대상자의 안전 지역을 등록 | groupName이 없으면 notGrouped로 저장됨")
 async def register_safe_area(request: RegisterSafeAreaRequest):
     try:
         _dementia_key = request.dementiaKey
@@ -899,7 +909,7 @@ async def register_safe_area(request: RegisterSafeAreaRequest):
     finally:
         session.close()
 
-@router.get("/safeArea/info", responses = {200 : {"model" : GetSafeAreaResponse, "description" : "안전 지역 정보 전송 성공" }, 404: {"model": ErrorResponse, "description": "안전 지역 정보 없음"}}, description="보호 대상자의 안전 지역 정보 전달(쿼리 스트링) | 그룹 미지정시 groupName은 큰따옴표로 빈 문자열로 전달할 것")
+@router.get("/safeArea/info", responses = {200 : {"model" : GetSafeAreaResponse, "description" : "안전 지역 정보 전송 성공" }, 404: {"model": ErrorResponse, "description": "안전 지역 정보 없음"}}, description="보호 대상자의 안전 지역 정보 전달(쿼리 스트링)")
 async def get_safe_area_info(dementiaKey: str):
     try:
         group_list = session.query(models.safe_area_group_info).filter_by(dementia_key = dementiaKey).all()
@@ -943,7 +953,7 @@ async def get_safe_area_info(dementiaKey: str):
     finally:
         session.close()
 
-@router.get("/safeArea/info/group", responses = {200 : {"model" : GetSafeAreaGroupResponse, "description" : "안전 지역 그룹 정보 전송 성공" }, 404: {"model": ErrorResponse, "description": "안전 지역 그룹 정보 없음"}}, description="보호 대상자의 안전 지역 그룹 정보 전달(쿼리 스트링)")
+@router.get("/safeArea/info/group", responses = {200 : {"model" : GetSafeAreaGroupResponse, "description" : "안전 지역 그룹 정보 전송 성공" }, 404: {"model": ErrorResponse, "description": "안전 지역 그룹 정보 없음"}}, description="보호 대상자의 특정 안전 지역 그룹 정보 전달(쿼리 스트링)")
 async def get_safe_area_group_info(dementiaKey: str, groupKey: str):
     try:
         group_key = session.query(models.safe_area_group_info).filter_by(dementia_key = dementiaKey, group_key = groupKey).first().group_key
@@ -1009,7 +1019,7 @@ async def modify_name_safe_area_info(request: ModifySafeAreaName):
     finally:
         session.close()
 
-@router.post("/safeArea/modification/group", responses = {200 : {"model" : CommonResponse, "description" : "안전 지역 정보 수정 성공" }, 404: {"model": ErrorResponse, "description": "안전 지역 정보 없음"}}, description="보호 대상자의 안전 지역 그룹 정보 수정 | areaKey : 옮기고자 하는 안심구역, groupKey : 옮길 그룹")
+@router.post("/safeArea/modification/group", responses = {200 : {"model" : CommonResponse, "description" : "안전 지역 정보 수정 성공" }, 404: {"model": ErrorResponse, "description": "안전 지역 정보 없음"}}, description="보호 대상자의 안전 지역 그룹 이동 | areaKey : 옮기고자 하는 안심구역, groupKey : 옮길 그룹")
 async def modify_group_safe_area_info(request: ModifySafeAreaGroup):
     try:
         _dementia_key = request.dementiaKey
@@ -1105,7 +1115,50 @@ async def delete_safe_area(request: DeleteSafeAreaRequest):
     finally:
         session.close()
 
-#@router.delete()
+@router.delete("/safeArea/delete/group", responses = {200 : {"model" : CommonResponse, "description" : "안전 지역 그룹 삭제 성공" }, 404: {"model": ErrorResponse, "description": "안전 지역 그룹 정보 없음"}}, description="보호 대상자의 안전 지역 그룹 삭제")
+async def delete_safe_area_group(request: DeleteSafeAreaGroupRequest):
+    try:
+        _dementia_key = request.dementiaKey
+        _group_key = request.groupKey
+
+        existing_group = session.query(models.safe_area_group_info).filter_by(dementia_key = _dementia_key, group_key = _group_key).first()
+
+        not_grouped = session.query(models.safe_area_group_info).filter_by(dementia_key = _dementia_key, group_name = 'notGrouped').first()
+
+        if not not_grouped:
+            rng = RandomNumberGenerator()
+            for _ in range(10):
+                _not_grouped_key = rng.generate_unique_random_number(100000, 999999)
+
+            new_group = models.safe_area_group_info(group_key = _group_key, group_name = 'notGrouped', dementia_key = _dementia_key)
+            session.add(new_group)
+        else:
+            _not_grouped_key = not_grouped.group_key
+
+        if existing_group:
+            safe_area_list = session.query(models.safe_area_info).filter_by(group_key = existing_group.group_key).all()
+            if safe_area_list:
+                for safe_area in safe_area_list:
+                    safe_area.group_key = _not_grouped_key
+            else:
+                pass
+                
+            session.delete(existing_group)
+            session.commit()
+
+            print(f"[INFO] Safe area group deleted for {_dementia_key}")
+
+            response = {
+                'status': 'success',
+                'message': 'Safe area group deleted'
+            }
+
+            return response
+        else:
+            raise HTTPException(status_code=404, message="Safe area group information not found")
+        
+    finally:
+        session.close()
 
 '''@sched.scheduled_job('cron', hour=11, minute=57, id = 'analyze_location_data')
 def analyzing_location_data():
