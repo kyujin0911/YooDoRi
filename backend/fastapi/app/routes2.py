@@ -17,9 +17,10 @@ from .bodymodel import *
 from .util import JWTService
 from .config import Config
 from .schedularFunc import SchedulerFunc
-from .fcm_notification import send_push_notification
 from .user_status_convertor import convertor
 from .LocationPredict import ForecastLSTMClassification, Preprocessing
+from .validater import validateInSafeArea
+from .fcm_notification import send_push_notification
 
 import asyncio
 import requests
@@ -35,15 +36,19 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 jwt = JWTService()
 schedFunc = SchedulerFunc()
 sched = BackgroundScheduler(timezone="Asia/Seoul", daemon=True)
+val = validateInSafeArea()
 kakao = Local(service_key=Config.kakao_service_key)
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 
 
-@router.post("/test/fcm", description="FCM 테스트")
-async def send_fcm(title: str, body: str, token: str, data : str):
 
-    return send_push_notification(token, body, title, data)
+@router.post("/test/fcm", description="FCM 테스트")
+async def send_fcm(request: FCMRequest):
+    
+    send_push_notification(Config.temp_fcm_token, request.title, request.body, request.data)
+
+    return {"status": "success", "message": "FCM sent"}
 
 
 #유저 등록
@@ -230,6 +235,9 @@ async def receive_location_info(request: ReceiveLocationRequest):
         _dementia_key = request.dementiaKey
 
         existing_dementia = session.query(models.dementia_info).filter_by(dementia_key = _dementia_key).first()
+        safe_area_list = session.query(models.safe_area_info).filter_by(dementia_key = _dementia_key).all()
+
+        current_location = (request.latitude, request.longitude)
 
         if existing_dementia:
 
@@ -241,6 +249,8 @@ async def receive_location_info(request: ReceiveLocationRequest):
 
             prediction = user_status_updater.predict(accel, gyro, direction)
 
+            _near_safe_area, _isInSafeArea = val.isinsafearea(current_location, safe_area_list)
+                
             if prediction[0]==1:
                 status = "정지"
             elif prediction[0]==2:
@@ -274,7 +284,9 @@ async def receive_location_info(request: ReceiveLocationRequest):
                 isInternetOn = request.isInternetOn,
                 isRingstoneOn = request.isRingstoneOn,
                 isGpsOn = request.isGpsOn,
-                current_speed = request.currentSpeed
+                current_speed = request.currentSpeed,
+                isInSafeArea = _isInSafeArea,
+                nearSafeArea = _near_safe_area.area_key
             )
 
             session.add(new_location)
@@ -299,15 +311,19 @@ async def receive_location_info(request: ReceiveLocationRequest):
         session.close()
 
 @router.get("/locations/noks", responses = {200 : {"model" : GetLocationResponse, "description" : "위치 정보 전송 성공" }, 404: {"model": ErrorResponse, "description": "위치 정보 없음"}}, description="보호자에게 보호 대상자의 위치 정보를 전송(쿼리 스트링) | userStatus : 1(정지), 2(도보), 3(차량), 4(지하철) | isRingstoneOn : 0(무음), 1(진동), 2(벨소리)")
-async def send_live_location_info(dementiaKey : str):
+def send_live_location_info(dementiaKey : str):
 
     try:
         
-        latest_location = session.query(models.location_info).filter_by(dementia_key = dementiaKey).order_by(models.location_info.num.desc()).first()
-        
-
+        latest_location = session.query(models.location_info).filter_by(dementia_key = dementiaKey).order_by(models.location_info.num.desc()).limit(2).all()
 
         if latest_location:
+            for index, location in enumerate(latest_location):
+                if index == 0:
+                    latest_location = location
+                elif index == 1:
+                    before_location = location
+                
             result = {
                 'latitude': latest_location.latitude,
                 'longitude': latest_location.longitude,
@@ -325,6 +341,10 @@ async def send_live_location_info(dementiaKey : str):
                 'result': result
             }
             print(f"[INFO] Live location data sent to {latest_location.dementia_key}")
+
+            safeArea = session.query(models.safe_area_info).filter_by(area_key = latest_location.nearSafeArea).first()
+
+            asyncio.run(val.pushNotification(latest_location, before_location, safeArea))
 
         else:
             print(f"[ERROR] Location data not found for Dementia key({dementiaKey})")
