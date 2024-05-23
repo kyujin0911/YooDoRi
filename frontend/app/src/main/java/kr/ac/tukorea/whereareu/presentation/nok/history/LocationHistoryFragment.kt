@@ -280,15 +280,6 @@ class LocationHistoryFragment :
         viewModel.setIsLoading(false)
     }
 
-
-    override fun onStop() {
-        super.onStop()
-        dialogViewModel.setSelectedDates(emptyList())
-        viewModel.setIsMultipleSelected(false)
-        viewModel.setMaxProgress(0)
-        viewModel.setIsLoading(true)
-    }
-
     private fun translateDayOfWeekInKorean(dayOfWeek: DayOfWeek): String {
         return when (dayOfWeek) {
             DayOfWeek.MONDAY -> "월요일"

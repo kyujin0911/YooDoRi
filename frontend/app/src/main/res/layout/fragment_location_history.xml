@@ -63,7 +63,7 @@
             android:layout_height="0dp"
             android:gravity="center"
             android:layout_marginStart="16dp"
-            android:text="2024년 3월 24일, 화요일"
+            android:text="날짜를 선택해주세요."
             android:padding="8dp"
             android:textAppearance="@style/TextAppearance.App.24sp.Bold"
             app:layout_constraintStart_toEndOf="@id/calendar_btn"

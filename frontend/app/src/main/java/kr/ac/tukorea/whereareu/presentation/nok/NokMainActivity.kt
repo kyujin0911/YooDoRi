@@ -75,6 +75,8 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
     private val safeAreaCircleOverlay = mutableListOf<CircleOverlay>()
     private val tag = "NokMainActivity:"
     private var isSetSafeArea = false
+    private val safeCircleOverlay = CircleOverlay()
+    private val safeMarker = Marker()
 
     private fun getUpdateLocationJob(duration: Long): Job {
         return lifecycleScope.launch {
@@ -203,6 +205,9 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
     }
     private fun handleNavigationEvent(event: NokHomeViewModel.NavigateEvent) {
         when (event) {
+            !is NokHomeViewModel.NavigateEvent.LocationHistory -> {
+                clearLocationFragmentUI()
+            }
             NokHomeViewModel.NavigateEvent.Home -> {}
 
             is NokHomeViewModel.NavigateEvent.HomeState -> {
@@ -237,13 +242,26 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
             NokHomeViewModel.NavigateEvent.MeaningfulPlace -> {
                 clearSettingFragmentUI()
                 stopHomeFragmentJob()
-                clearLocationFragmentUI()
+                //clearLocationFragmentUI()
             }
 
             NokHomeViewModel.NavigateEvent.SafeArea -> {
+                safeMarker.setMarker(naverMap?.cameraPosition?.target!!, MarkerIcons.YELLOW, "", naverMap)
                 clearSettingFragmentUI()
                 stopHomeFragmentJob()
-                clearLocationFragmentUI()
+                //clearLocationFragmentUI()
+                naverMap?.addOnCameraChangeListener { _, _ ->
+                    if(!isSetSafeArea){
+                        return@addOnCameraChangeListener
+                    }
+                    Log.d("change", "change")
+                    val currentPosition = naverMap?.cameraPosition?.target!!
+                    Log.d("position", currentPosition.toString())
+                    safeMarker.isVisible = true
+                    safeCircleOverlay.isVisible = true
+                    safeMarker.position = currentPosition
+                    safeCircleOverlay.center = currentPosition
+                }
             }
 
             NokHomeViewModel.NavigateEvent.Setting -> {
@@ -252,7 +270,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                 behavior.state = BottomSheetBehavior.STATE_EXPANDED
 
                 stopHomeFragmentJob()
-                clearLocationFragmentUI()
+                //clearLocationFragmentUI()
             }
         }
     }
@@ -695,30 +713,17 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
     }
 
     override fun onMapReady(p0: NaverMap) {
-        val currentPosition = naverMap?.cameraPosition?.target!!
-        val marker = Marker().apply {
-            setMarker(currentPosition, MarkerIcons.YELLOW, "", naverMap)
-            isVisible = false
-        }
-
-        val circle = CircleOverlay().apply {
-            radius = 500.0
-            center = currentPosition
-            outlineWidth = 5
-            outlineColor = ContextCompat.getColor(this@NokMainActivity, R.color.deep_yellow)
-            color = ContextCompat.getColor(this@NokMainActivity, R.color.half_yellow)
-            map = naverMap
-            isVisible = false
-        }
-
         naverMap?.addOnCameraChangeListener { _, _ ->
-            if(!isSetSafeArea){
+            /*if(!isSetSafeArea){
                 return@addOnCameraChangeListener
-            }
-            marker.isVisible = true
-            circle.isVisible = true
-            marker.position = currentPosition
-            circle.center = currentPosition
+            }*/
+            Log.d("change", "change")
+            val currentPosition = naverMap?.cameraPosition?.target!!
+            Log.d("position", currentPosition.toString())
+            safeMarker.isVisible = true
+            safeCircleOverlay.isVisible = true
+            safeMarker.position = currentPosition
+            safeCircleOverlay.center = currentPosition
         }
     }
 
@@ -739,6 +744,9 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
     }
 
     private fun clearLocationFragmentUI() {
+        locationHistoryViewModel.setIsMultipleSelected(false)
+        locationHistoryViewModel.setMaxProgress(0)
+
         with(locationHistoryMetaData) {
             paths.forEach {
                 it.map = null
@@ -757,5 +765,10 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
 
     companion object {
         const val LAST_LOCATION = 0
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        Log.d("onDestrou", "destroey")
     }
 }
