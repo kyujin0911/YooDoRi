@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kr.ac.tukorea.whereareu.data.model.DementiaKeyRequest
+import kr.ac.tukorea.whereareu.data.model.nok.home.LocationInfoResponse
 import kr.ac.tukorea.whereareu.data.repository.kakao.KakaoRepositoryImpl
 import kr.ac.tukorea.whereareu.data.repository.naver.NaverRepositoryImpl
 import kr.ac.tukorea.whereareu.data.repository.nok.home.NokHomeRepositoryImpl
@@ -36,7 +37,7 @@ class NokHomeViewModel @Inject constructor(
 ) : ViewModel() {
     private var tag = "HomeViewModel:"
 
-    private val _dementiaLocationInfo = MutableSharedFlow<LocationInfo>()
+    private val _dementiaLocationInfo = MutableSharedFlow<LocationInfoResponse>()
     val dementiaLocationInfo = _dementiaLocationInfo.asSharedFlow()
 
     val dementiaStatusInfo = MutableStateFlow(DementiaStatusInfo())
@@ -44,8 +45,7 @@ class NokHomeViewModel @Inject constructor(
     private val _updateRate = MutableSharedFlow<Long>()
     val updateRate = _updateRate.asSharedFlow()
 
-    private val _isPredicted = MutableStateFlow(false)
-    val isPredicted = _isPredicted.asStateFlow()
+    val isPredicted = MutableStateFlow(false)
 
     private val _isPredictDone = MutableStateFlow(false)
 
@@ -107,10 +107,12 @@ class NokHomeViewModel @Inject constructor(
 
     fun eventNavigate(event: NavigateEvent) {
         viewModelScope.launch {
-            if ((event is NavigateEvent.HomeState).not()) {
+            if (event !is NavigateEvent.HomeState) {
                 navigateEventToString.value = event.toString()
             }
-            _navigateEvent.emit(event)
+            if(event !is NavigateEvent.Home) {
+                _navigateEvent.emit(event)
+            }
         }
     }
 
@@ -120,13 +122,19 @@ class NokHomeViewModel @Inject constructor(
         }
     }
 
-    fun setIsPredictDone(isPredictDone: Boolean) {
+    fun eventHomeState(isPredicted: Boolean = this.isPredicted.value, isPredictDone: Boolean = _isPredictDone.value) {
+        this.isPredicted.value = isPredicted
         _isPredictDone.value = isPredictDone
-    }
 
-    fun eventHomeState() {
         viewModelScope.launch {
-            eventNavigate(NavigateEvent.HomeState(_isPredicted.value, _isPredictDone.value))
+            eventNavigate(NavigateEvent.HomeState(isPredicted, isPredictDone))
+            if(isPredicted){
+                if(!isPredictDone) {
+                    eventPredict(PredictEvent.StartPredict(true))
+                }
+            } else {
+                eventPredict(PredictEvent.StopPredict(false))
+            }
         }
     }
 
@@ -142,7 +150,7 @@ class NokHomeViewModel @Inject constructor(
 
     fun eventPredictLocation(){
         viewModelScope.launch {
-            if(tempPredictLocation.value == PredictLocation() || !_isPredicted.value){
+            if(tempPredictLocation.value == PredictLocation() || ! isPredicted.value){
                 return@launch
             }
             eventPredict(PredictEvent.PredictLocation(tempPredictLocation.value))
@@ -163,17 +171,6 @@ class NokHomeViewModel @Inject constructor(
         }
     }
 
-    fun setIsPredicted(isPredicted: Boolean) {
-        viewModelScope.launch {
-            _isPredicted.emit(isPredicted)
-            if (isPredicted) {
-                eventPredict(PredictEvent.StartPredict(isPredicted))
-            } else {
-                eventPredict(PredictEvent.StopPredict(isPredicted))
-            }
-        }
-    }
-
     fun fetchUserInfo() {
         viewModelScope.launch {
             nokHomeRepository.getUserInfo(_nokKey.value).onSuccess {
@@ -187,10 +184,10 @@ class NokHomeViewModel @Inject constructor(
     fun getDementiaLocation() {
         viewModelScope.launch {
             nokHomeRepository.getDementiaLocationInfo(_dementiaKey.value).onSuccess {
-                if (_isPredicted.value) {
+                if (isPredicted.value) {
                     return@launch
                 }
-                _dementiaLocationInfo.emit(it.toModel(_isPredicted.value))
+                _dementiaLocationInfo.emit(it)
                 dementiaStatusInfo.value = DementiaStatusInfo(
                     it.userStatus, it.battery, it.isGpsOn, it.isInternetOn, it.isRingstoneOn
                 )
@@ -213,6 +210,7 @@ class NokHomeViewModel @Inject constructor(
                 async { getMeaningfulPlaces() }
                 async { fetchPredictInfoGura() }.await()
                 eventPredict(PredictEvent.PredictDone)
+                eventHomeState(isPredicted = true, isPredictDone = true)
             }
             Log.d("after refactor time", time.toString())
         }

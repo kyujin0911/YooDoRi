@@ -8,13 +8,17 @@ import android.graphics.PointF
 import android.util.Log
 import android.view.View
 import androidx.activity.viewModels
+import androidx.annotation.NavigationRes
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.navigation.NavController
+import androidx.navigation.NavDirections
+import androidx.navigation.Navigation
 import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.ui.NavigationUI
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetBehavior.BottomSheetCallback
@@ -34,6 +38,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kr.ac.tukorea.whereareu.R
 import kr.ac.tukorea.whereareu.databinding.ActivityNokMainBinding
@@ -77,6 +82,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
     private var isSetSafeArea = false
     private val safeCircleOverlay = CircleOverlay()
     private val safeMarker = Marker()
+    private val isFirstNavigationEvent = mutableListOf(true, true, true)
 
     private fun getUpdateLocationJob(duration: Long): Job {
         return lifecycleScope.launch {
@@ -205,51 +211,32 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
     }
     private fun handleNavigationEvent(event: NokHomeViewModel.NavigateEvent) {
         when (event) {
-            !is NokHomeViewModel.NavigateEvent.LocationHistory -> {
-                clearLocationFragmentUI()
-            }
             NokHomeViewModel.NavigateEvent.Home -> {}
 
             is NokHomeViewModel.NavigateEvent.HomeState -> {
                 behavior.isDraggable = true
                 if(event.isPredicted){
-                    if(event.isPredictDone == false){
-                        behavior.state = BottomSheetBehavior.STATE_COLLAPSED
-                    }
+                    setBottomSheetBehaviorForFirstNavigationEvent(HOME)
                 } else {
-                    homeViewModel.fetchUserInfo()
-                    binding.layout.translationY = 0f
+                    if(navController.currentDestination?.id == R.id.nokHomeFragment) {
+                        homeViewModel.fetchUserInfo()
+                        binding.layout.translationY = 0f
+                    }
                 }
-
-
-                if (!event.isPredicted && !event.isPredictDone) {
-                    homeViewModel.fetchUserInfo()
-                    binding.layout.translationY = 0f
-                }
-                if (event.isPredicted && !event.isPredictDone) {
-                    behavior.state = BottomSheetBehavior.STATE_COLLAPSED
-                }
-                clearLocationFragmentUI()
             }
 
             NokHomeViewModel.NavigateEvent.LocationHistory -> {
-                /*behavior.isDraggable = true
-                behavior.state = BottomSheetBehavior.STATE_COLLAPSED*/
-                clearSettingFragmentUI()
-                stopHomeFragmentJob()
+                behavior.state = BottomSheetBehavior.STATE_HALF_EXPANDED
             }
 
             NokHomeViewModel.NavigateEvent.MeaningfulPlace -> {
-                clearSettingFragmentUI()
-                stopHomeFragmentJob()
-                //clearLocationFragmentUI()
+                behavior.state = BottomSheetBehavior.STATE_HALF_EXPANDED
             }
 
             NokHomeViewModel.NavigateEvent.SafeArea -> {
+                setBottomSheetBehaviorForFirstNavigationEvent(SAFE_AREA)
                 safeMarker.setMarker(naverMap?.cameraPosition?.target!!, MarkerIcons.YELLOW, "", naverMap)
-                clearSettingFragmentUI()
-                stopHomeFragmentJob()
-                //clearLocationFragmentUI()
+
                 naverMap?.addOnCameraChangeListener { _, _ ->
                     if(!isSetSafeArea){
                         return@addOnCameraChangeListener
@@ -268,9 +255,6 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                 binding.navermapLogo.isVisible = false
                 behavior.isDraggable = false
                 behavior.state = BottomSheetBehavior.STATE_EXPANDED
-
-                stopHomeFragmentJob()
-                //clearLocationFragmentUI()
             }
         }
     }
@@ -509,8 +493,6 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                 }
                 homeMarkers.clear()
                 binding.layout.translationY = 0f
-                homeViewModel.setIsPredictDone(false)
-                //homeViewModel.eventHomeState()
             }
 
             is NokHomeViewModel.PredictEvent.PredictLocation -> {
@@ -542,8 +524,6 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
             // 예측 기능 로딩 완료 알림
             NokHomeViewModel.PredictEvent.PredictDone -> {
                 dismissLoadingDialog()
-                homeViewModel.setIsPredictDone(true)
-                homeViewModel.eventHomeState()
             }
 
             // 리사이클러뷰 아이템 클릭 이벤트에 따른 bottomSheet, Naver Map 제어
@@ -612,13 +592,13 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
     }
 
     fun predict() {
-        homeViewModel.setIsPredicted(true)
-        homeViewModel.eventHomeState()
+        //homeViewModel.setIsPredicted(true)
+        isFirstNavigationEvent[HOME] = true
+        homeViewModel.eventHomeState(isPredicted = true, isPredictDone = false)
     }
 
     fun stopPredict() {
-        homeViewModel.setIsPredicted(false)
-        homeViewModel.eventHomeState()
+        homeViewModel.eventHomeState(isPredicted = false)
     }
 
     override fun initView() {
@@ -642,7 +622,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
             }
         mapFragment.getMapAsync { map ->
             map.uiSettings.isZoomControlEnabled = false
-            val zoomControlView = findViewById(R.id.zoom) as ZoomControlView
+            val zoomControlView: ZoomControlView = findViewById(R.id.zoom)
             zoomControlView.map = map
             naverMap = map
         }
@@ -676,12 +656,29 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
         navController = navHostFragment.navController
 
         binding.bottomNav.setupWithNavController(navController)
-        navController.addOnDestinationChangedListener { controller, destination, arguments ->
+        navController.addOnDestinationChangedListener { _, destination, _ ->
             Log.d("destination", destination.toString())
+
+            if(navController.currentDestination?.id !in listOf(R.id.nokHomeFragment, R.id.meaningfulPlaceDetailFragment)){
+                stopHomeFragmentJob()
+            }
+
+            if (destination.id !in listOf(R.id.safeAreaFragment, R.id.safeAreaDetailFragment)){
+                isFirstNavigationEvent[SAFE_AREA] = true
+            }
+
+            if (destination.id != R.id.locationHistoryFragment){
+                clearLocationFragmentUI()
+            }
+
+            if (destination.id !in listOf(R.id.nokSettingFragment, R.id.settingUpdateTimeFragment, R.id.modifyUserInfoFragment)){
+                behavior.isDraggable = true
+            }
+
             when (destination.id) {
                 R.id.nokHomeFragment, R.id.meaningfulPlaceDetailFragment -> {
-                    homeViewModel.eventHomeState()
                     homeViewModel.eventNavigate(NokHomeViewModel.NavigateEvent.Home)
+                    homeViewModel.eventHomeState()
                 }
 
                 R.id.nokSettingFragment, R.id.modifyUserInfoFragment, R.id.settingUpdateTimeFragment -> {
@@ -713,18 +710,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
     }
 
     override fun onMapReady(p0: NaverMap) {
-        naverMap?.addOnCameraChangeListener { _, _ ->
-            /*if(!isSetSafeArea){
-                return@addOnCameraChangeListener
-            }*/
-            Log.d("change", "change")
-            val currentPosition = naverMap?.cameraPosition?.target!!
-            Log.d("position", currentPosition.toString())
-            safeMarker.isVisible = true
-            safeCircleOverlay.isVisible = true
-            safeMarker.position = currentPosition
-            safeCircleOverlay.center = currentPosition
-        }
+
     }
 
     private fun saveUserKeys() {
@@ -740,7 +726,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
 
     private fun stopHomeFragmentJob() {
         stopGetDementiaLocation()
-        homeViewModel.setIsPredicted(false)
+        homeViewModel.eventHomeState(isPredicted = false)
     }
 
     private fun clearLocationFragmentUI() {
@@ -758,17 +744,22 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
         }
     }
 
-    private fun clearSettingFragmentUI() {
-        behavior.isDraggable = true
-        behavior.state = BottomSheetBehavior.STATE_HALF_EXPANDED
+    private fun setBottomSheetBehaviorForFirstNavigationEvent(index: Int){
+        if(isFirstNavigationEvent[index]){
+            isFirstNavigationEvent[index] = false
+
+            behavior.state = if (index == HOME){
+                BottomSheetBehavior.STATE_COLLAPSED
+            } else {
+                BottomSheetBehavior.STATE_HALF_EXPANDED
+            }
+        }
     }
 
     companion object {
         const val LAST_LOCATION = 0
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        Log.d("onDestrou", "destroey")
+        const val MEANINGFUL_PLACE = 0
+        const val HOME = 1
+        const val SAFE_AREA = 2
     }
 }

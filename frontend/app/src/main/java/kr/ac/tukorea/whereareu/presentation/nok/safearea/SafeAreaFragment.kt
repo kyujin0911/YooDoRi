@@ -54,14 +54,11 @@ class SafeAreaFragment : BaseFragment<FragmentSafeAreaBinding>(R.layout.fragment
     }
 
     private fun initSafeAreaRVA(){
-        binding.rv.adapter = safeAreaRVA
+        binding.rv.apply {
+            adapter = safeAreaRVA
+            itemAnimator = null
+        }
         safeAreaRVA.setSafeRVAClickListener(this)
-        /*val list = listOf(
-            SafeArea("그룹 1", "", 0.0, 0.0, 0, SafeAreaRVA.SAFE_AREA_GROUP),
-            SafeArea("그룹 2", "", 0.0, 0.0, 0, SafeAreaRVA.SAFE_AREA_GROUP),
-            SafeArea("", "안심구역 1", 37.3397811, 126.7348403, 10, SafeAreaRVA.SAFE_AREA),
-            SafeArea("", "안심구역 2", 37.3397604, 126.7349086, 50, SafeAreaRVA.SAFE_AREA),
-        )*/
     }
 
     private fun handleSafeAreaEvent(event: SafeAreaViewModel.SafeAreaEvent){
