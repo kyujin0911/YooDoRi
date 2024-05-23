@@ -239,7 +239,7 @@ class safeAreaList(BaseModel):
 class safeAreaGroupInfo(BaseModel):
     groupName : str = Field(examples=["안심구역 그룹 1"])
     groupKey : str = Field(examples=["123456"])
-    safeAreaList : List[safeAreaList]
+    safeAreas : List[safeAreaList]
 
 
 class GetSafeAreaResponse(BaseModel):
@@ -257,10 +257,13 @@ class ModifySafeAreaGroup(BaseModel):
     areaKey : str = Field(examples=["123456"])
     groupKey : str = Field(examples=["123456"])
 
+class safeAreaGruop(BaseModel):
+    safeAreas : List[safeAreaList]
+
 class GetSafeAreaGroupResponse(BaseModel):
     status: str = Field("success")
     message: str = Field("메~시~지~")
-    result: List[safeAreaList]
+    result: safeAreaGruop
 
 class ModifySafeAreaGroupName(BaseModel):
     dementiaKey : str = Field(examples=["123456"])
@@ -268,5 +271,9 @@ class ModifySafeAreaGroupName(BaseModel):
     afterGroupName : Optional[str] = Field(examples=["안심구역 그룹 2"])
 
 class DeleteSafeAreaRequest(BaseModel):
-    dementiaKey : int = Field(examples=["123456"])
+    dementiaKey : str = Field(examples=["123456"])
     areaKey : str = Field(examples=["123456"])
+
+class DeleteSafeAreaGroupRequest(BaseModel):
+    dementiaKey : str = Field(examples=["123456"])
+    groupKey : str = Field(examples=["123456"])
