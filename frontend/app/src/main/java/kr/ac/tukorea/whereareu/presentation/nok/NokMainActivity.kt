@@ -74,6 +74,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
     private val safeAreaMarkers = mutableListOf<Marker>()
     private val safeAreaCircleOverlay = mutableListOf<CircleOverlay>()
     private val tag = "NokMainActivity:"
+    private var isSetSafeArea = false
 
     private fun getUpdateLocationJob(duration: Long): Job {
         return lifecycleScope.launch {
@@ -609,6 +610,10 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
         initBottomSheet()
         initMap()
         initNavigator()
+
+        binding.safeAreaTv.setOnClickListener {
+            isSetSafeArea = true
+        }
     }
 
     private fun initMap() {
@@ -690,6 +695,31 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
     }
 
     override fun onMapReady(p0: NaverMap) {
+        val currentPosition = naverMap?.cameraPosition?.target!!
+        val marker = Marker().apply {
+            setMarker(currentPosition, MarkerIcons.YELLOW, "", naverMap)
+            isVisible = false
+        }
+
+        val circle = CircleOverlay().apply {
+            radius = 500.0
+            center = currentPosition
+            outlineWidth = 5
+            outlineColor = ContextCompat.getColor(this@NokMainActivity, R.color.deep_yellow)
+            color = ContextCompat.getColor(this@NokMainActivity, R.color.half_yellow)
+            map = naverMap
+            isVisible = false
+        }
+
+        naverMap?.addOnCameraChangeListener { _, _ ->
+            if(!isSetSafeArea){
+                return@addOnCameraChangeListener
+            }
+            marker.isVisible = true
+            circle.isVisible = true
+            marker.position = currentPosition
+            circle.center = currentPosition
+        }
     }
 
     private fun saveUserKeys() {

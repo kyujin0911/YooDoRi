@@ -85,6 +85,10 @@
         <fragment
             android:id="@+id/safeAreaDetailFragment"
             android:name="kr.ac.tukorea.whereareu.presentation.nok.safearea.SafeAreaDetailFragment"
-            android:label="SafeAreaDetailFragment" />
+            android:label="SafeAreaDetailFragment" >
+            <argument
+                android:name="groupKey"
+                app:argType="string" />
+        </fragment>
     </navigation>
 </navigation>

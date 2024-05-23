@@ -1,5 +1,6 @@
 package kr.ac.tukorea.whereareu.data.repository.nok.safearea
 
+import kr.ac.tukorea.whereareu.data.model.nok.safearea.GetSafeAreaGroupResponse
 import kr.ac.tukorea.whereareu.data.model.nok.safearea.GetSafeAreaResponse
 import kr.ac.tukorea.whereareu.data.model.nok.safearea.RegisterSafeAreaRequest
 import kr.ac.tukorea.whereareu.data.model.nok.safearea.RegisterSafeAreaResponse
@@ -7,5 +8,7 @@ import kr.ac.tukorea.whereareu.util.network.NetworkResult
 
 interface SafeAreaRepository {
     suspend fun registerSafeArea(request: RegisterSafeAreaRequest): NetworkResult<RegisterSafeAreaResponse>
-    suspend fun fetchSafeArea(dementiaKey: String): NetworkResult<GetSafeAreaResponse>
+    suspend fun fetchSafeAreaAll(dementiaKey: String): NetworkResult<GetSafeAreaResponse>
+
+    suspend fun fetSafeAreaGroup(dementiaKey: String, groupKey: String): NetworkResult<GetSafeAreaGroupResponse>
 }

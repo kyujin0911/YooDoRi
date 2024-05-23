@@ -56,6 +56,9 @@ class SafeAreaRVA() : ListAdapter<SafeArea, RecyclerView.ViewHolder>(
         fun bind(safeArea: SafeArea) {
             with(binding) {
                 model = safeArea
+                infoViewBtn.setOnClickListener {
+                    safeRVAClickListener?.onClickInfoView(safeArea.groupKey)
+                }
             }
         }
     }
@@ -102,7 +105,7 @@ class SafeAreaRVA() : ListAdapter<SafeArea, RecyclerView.ViewHolder>(
 
     interface SafeRVAClickListener{
         fun onClickMapView(latLng: LatLng)
-        fun onClickInfoView(safeArea: SafeArea)
+        fun onClickInfoView(groupKey: String)
     }
 
     companion object{

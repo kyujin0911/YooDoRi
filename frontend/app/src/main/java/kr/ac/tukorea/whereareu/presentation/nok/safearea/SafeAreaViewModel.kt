@@ -12,7 +12,6 @@ import kotlinx.coroutines.launch
 import kr.ac.tukorea.whereareu.data.model.nok.safearea.RegisterSafeAreaRequest
 import kr.ac.tukorea.whereareu.data.repository.nok.safearea.SafeAreaRepositoryImpl
 import kr.ac.tukorea.whereareu.domain.safearea.SafeArea
-import kr.ac.tukorea.whereareu.presentation.nok.home.NokHomeViewModel
 import kr.ac.tukorea.whereareu.presentation.nok.safearea.adapter.SafeAreaRVA
 import kr.ac.tukorea.whereareu.util.network.onSuccess
 import javax.inject.Inject
@@ -50,15 +49,17 @@ class SafeAreaViewModel @Inject constructor(
         }
     }
 
-    fun fetchSafeArea() {
+    fun fetchSafeAreaAll() {
         viewModelScope.launch {
-            repository.fetchSafeArea(_dementiaKey.value).onSuccess {
+            repository.fetchSafeAreaAll(_dementiaKey.value).onSuccess {
                 val list = mutableListOf<SafeArea>()
                 it.safeAreaList.forEach { safeAreaList ->
                     val temp = if (safeAreaList.groupName == "notGrouped") {
                         safeAreaList.safeAreas.map { safeArea ->
                             SafeArea(
                                 "",
+                                safeAreaList.groupKey,
+                                safeArea.areaKey,
                                 safeArea.areaName,
                                 safeArea.latitude,
                                 safeArea.longitude,
@@ -70,6 +71,8 @@ class SafeAreaViewModel @Inject constructor(
                         safeAreaList.safeAreas.map {
                             SafeArea(
                                 safeAreaList.groupName,
+                                safeAreaList.groupKey,
+                                "",
                                 "",
                                 0.0,
                                 0.0,
@@ -90,6 +93,14 @@ class SafeAreaViewModel @Inject constructor(
                 eventSafeArea(SafeAreaEvent.FetchSafeArea(list))
                 Log.d("safeArea List", list.toString())
                 Log.d("fetchSafeArea", it.toString())
+            }
+        }
+    }
+
+    fun fetchSafeAreaGroup(groupKey: String){
+        viewModelScope.launch {
+            repository.fetSafeAreaGroup(_dementiaKey.value, groupKey).onSuccess {
+                Log.d("fetchSafeAreaGroup", it.toString())
             }
         }
     }

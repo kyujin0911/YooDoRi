@@ -1,14 +1,12 @@
 package kr.ac.tukorea.whereareu.presentation.nok.safearea
 
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
 import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.naver.maps.geometry.LatLng
 import dagger.hilt.android.AndroidEntryPoint
 import kr.ac.tukorea.whereareu.R
-import kr.ac.tukorea.whereareu.data.model.nok.safearea.RegisterSafeAreaRequest
 import kr.ac.tukorea.whereareu.databinding.FragmentSafeAreaBinding
 import kr.ac.tukorea.whereareu.domain.safearea.SafeArea
 import kr.ac.tukorea.whereareu.presentation.base.BaseFragment
@@ -52,7 +50,7 @@ class SafeAreaFragment : BaseFragment<FragmentSafeAreaBinding>(R.layout.fragment
     override fun onResume() {
         super.onResume()
         showLoadingDialog(requireContext(), "안심구역을 불러오고 있습니다.")
-        viewModel.fetchSafeArea()
+        viewModel.fetchSafeAreaAll()
     }
 
     private fun initSafeAreaRVA(){
@@ -82,7 +80,8 @@ class SafeAreaFragment : BaseFragment<FragmentSafeAreaBinding>(R.layout.fragment
         viewModel.eventSafeArea(SafeAreaViewModel.SafeAreaEvent.MapView(BottomSheetBehavior.STATE_COLLAPSED, latLng))
     }
 
-    override fun onClickInfoView(safeArea: SafeArea) {
-
+    override fun onClickInfoView(groupKey: String) {
+        val action = SafeAreaFragmentDirections.actionSafeAreaFragmentToSafeAreaDetailFragment(groupKey)
+        navigator.navigate(action)
     }
 }
