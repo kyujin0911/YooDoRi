@@ -622,6 +622,9 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                 settingMarker.isVisible = true
                 settingCircleOverlay.isVisible = true
             }
+            binding.safeAreaTv.isVisible = false
+            behavior.isHideable = true
+            behavior.state = BottomSheetBehavior.STATE_HIDDEN
         }
     }
 
@@ -649,13 +652,30 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
             }
 
             override fun onSlide(bottomSheet: View, slideOffset: Float) {
-                binding.navermapLogo.isVisible = if (slideOffset >= 0.5f) {
-                    false
+                Log.d("slide offset", slideOffset.toString())
+
+                if (slideOffset >= 0.5f){
+                    binding.navermapLogo.isVisible = false
                 } else {
-                    true
+                    binding.navermapLogo.isVisible = true
                 }
-                if (slideOffset <= 0.3f) {
-                    binding.layout.translationY = -slideOffset * bottomSheet.height * 0.5f
+
+                if(navController.currentDestination?.id == R.id.safeAreaFragment){
+                    if (slideOffset >= 0.5f){
+                        binding.safeAreaTv.isVisible = false
+                    } else {
+                        binding.safeAreaTv.isVisible = true
+                    }
+
+                    if (slideOffset <= 0.2f){
+                        behavior.isDraggable = false
+                    } else {
+                        behavior.isDraggable = true
+                    }
+                } else{
+                    if (slideOffset <= 0.3f) {
+                        binding.layout.translationY = -slideOffset * bottomSheet.height * 0.5f
+                    }
                 }
             }
         })

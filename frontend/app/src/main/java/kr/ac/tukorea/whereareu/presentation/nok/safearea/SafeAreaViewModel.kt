@@ -25,6 +25,8 @@ class SafeAreaViewModel @Inject constructor(
 
     private val _safeAreaEvent = MutableSharedFlow<SafeAreaEvent>()
     val safeAreaEvent = _safeAreaEvent.asSharedFlow()
+
+    val isSettingSafeArea = MutableStateFlow(false)
     sealed class SafeAreaEvent{
         data class FetchSafeArea(val safeAreas: List<SafeArea>): SafeAreaEvent()
 
