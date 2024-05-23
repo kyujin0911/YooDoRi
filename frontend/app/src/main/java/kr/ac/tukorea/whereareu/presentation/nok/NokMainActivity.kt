@@ -8,17 +8,13 @@ import android.graphics.PointF
 import android.util.Log
 import android.view.View
 import androidx.activity.viewModels
-import androidx.annotation.NavigationRes
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.navigation.NavController
-import androidx.navigation.NavDirections
-import androidx.navigation.Navigation
 import androidx.navigation.fragment.NavHostFragment
-import androidx.navigation.ui.NavigationUI
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetBehavior.BottomSheetCallback
@@ -38,13 +34,14 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kr.ac.tukorea.whereareu.R
 import kr.ac.tukorea.whereareu.databinding.ActivityNokMainBinding
 import kr.ac.tukorea.whereareu.databinding.IconLocationOverlayLayoutBinding
 import kr.ac.tukorea.whereareu.domain.history.LocationHistory
 import kr.ac.tukorea.whereareu.domain.history.LocationHistoryMetaData
+import kr.ac.tukorea.whereareu.domain.home.PredictMetaData
+import kr.ac.tukorea.whereareu.domain.safearea.SafeAreaMetaData
 import kr.ac.tukorea.whereareu.presentation.base.BaseActivity
 import kr.ac.tukorea.whereareu.presentation.nok.history.LocationHistoryViewModel
 import kr.ac.tukorea.whereareu.presentation.nok.home.NokHomeViewModel
@@ -70,18 +67,12 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
     private var updateLocationJob: Job? = null
     private var countDownJob: Job? = null
     private var naverMap: NaverMap? = null
-    private val circleOverlay = CircleOverlay()
     private lateinit var behavior: BottomSheetBehavior<ConstraintLayout>
     private lateinit var navController: NavController
-    private val homeMarkers = mutableListOf<Marker>()
-    private var zoom = 14.0
+    private val predictMetaData = PredictMetaData()
     private val locationHistoryMetaData = LocationHistoryMetaData()
-    private val safeAreaMarkers = mutableListOf<Marker>()
-    private val safeAreaCircleOverlay = mutableListOf<CircleOverlay>()
+    private val safeAreMetaData = SafeAreaMetaData()
     private val tag = "NokMainActivity:"
-    private var isSetSafeArea = false
-    private val safeCircleOverlay = CircleOverlay()
-    private val safeMarker = Marker()
     private val isFirstNavigationEvent = mutableListOf(true, true, true)
 
     private fun getUpdateLocationJob(duration: Long): Job {
@@ -179,7 +170,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                 event.safeAreas.forEach {safeArea ->
                     with(safeArea) {
                         val latLng = LatLng(latitude, longitude)
-                        safeAreaMarkers.add(
+                        safeAreMetaData.markers.add(
                             Marker().apply {
                                 setMarker(
                                     latLng = latLng,
@@ -189,13 +180,13 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                                 )
                             }
                         )
-                        safeAreaCircleOverlay.add(
+                        safeAreMetaData.circleOverlays.add(
                             CircleOverlay().apply {
                                 radius = safeArea.radius.toDouble()
                                 center = latLng
                                 outlineWidth = 5
                                 outlineColor = ContextCompat.getColor(this@NokMainActivity, R.color.deep_yellow)
-                                color = ContextCompat.getColor(this@NokMainActivity, R.color.half_yellow)
+                                color = ContextCompat.getColor(this@NokMainActivity, R.color.transparent_yellow)
                                 map = naverMap
                             }
                         )
@@ -235,19 +226,33 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
 
             NokHomeViewModel.NavigateEvent.SafeArea -> {
                 setBottomSheetBehaviorForFirstNavigationEvent(SAFE_AREA)
-                safeMarker.setMarker(naverMap?.cameraPosition?.target!!, MarkerIcons.YELLOW, "", naverMap)
-
-                naverMap?.addOnCameraChangeListener { _, _ ->
-                    if(!isSetSafeArea){
-                        return@addOnCameraChangeListener
+                with(safeAreMetaData){
+                    settingMarker.apply {
+                        setMarker(naverMap?.cameraPosition?.target!!, MarkerIcons.YELLOW, "", naverMap)
+                        isVisible = false
                     }
-                    Log.d("change", "change")
-                    val currentPosition = naverMap?.cameraPosition?.target!!
-                    Log.d("position", currentPosition.toString())
-                    safeMarker.isVisible = true
-                    safeCircleOverlay.isVisible = true
-                    safeMarker.position = currentPosition
-                    safeCircleOverlay.center = currentPosition
+
+                    settingCircleOverlay.apply {
+                        center = settingMarker.position
+                        radius = 500.0
+                        color = ContextCompat.getColor(this@NokMainActivity, R.color.transparent_yellow)
+                        outlineWidth = 5
+                        outlineColor = ContextCompat.getColor(this@NokMainActivity, R.color.deep_yellow)
+                        map = naverMap
+                        isVisible = false
+
+                    }
+                    naverMap?.addOnCameraChangeListener { _, _ ->
+                        if(!isSettingSafeArea){
+                            return@addOnCameraChangeListener
+                        }
+                        Log.d("change", "change")
+
+                        val currentPosition = naverMap?.cameraPosition?.target!!
+                        Log.d("position", currentPosition.toString())
+                        settingMarker.position = currentPosition
+                        settingCircleOverlay.center = currentPosition
+                    }
                 }
             }
 
@@ -355,7 +360,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
             marker.setInfoWindowText(this, list[progress].time)
             if (progress == 0) {
                 naverMap?.moveCamera(
-                    CameraUpdate.scrollAndZoomTo(latLng, zoom)
+                    CameraUpdate.scrollAndZoomTo(latLng, locationHistoryMetaData.zoom)
                         .animate(animation, duration)
                 )
             } else {
@@ -402,7 +407,6 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                     CameraUpdate.scrollTo(latLng)
                         .animate(CameraAnimation.Easing, duration)
                 )
-                Log.d("zoom", zoom.toString())
                 Log.d("distance", distance.toString())
             }
         } catch (e: IndexOutOfBoundsException) {
@@ -433,7 +437,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
             // 의미장소 마커 지도에 표시
             is NokHomeViewModel.PredictEvent.MeaningFulPlace -> {
                 event.meaningfulPlaceForList.forEach { meaningfulPlace ->
-                    homeMarkers.add(
+                    predictMetaData.markers.add(
                         Marker().apply {
                             setMarker(
                                 latLng = meaningfulPlace.latLng,
@@ -449,7 +453,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
             // 의미장소 주변 경찰서 마커 지도에 표시
             is NokHomeViewModel.PredictEvent.SearchNearbyPoliceStation -> {
                 event.policeStationList.forEach { policeStation ->
-                    homeMarkers.add(Marker().apply {
+                    predictMetaData.markers.add(Marker().apply {
                         setMarker(
                             latLng = policeStation.latLng,
                             MarkerIcons.BLUE,
@@ -463,7 +467,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
             // 보호대상자 마지막 위치 마커 지도에 표시
             is NokHomeViewModel.PredictEvent.DisplayDementiaLastLocation -> {
                 binding.lastLocationTv.text = event.lastLocation.address
-                homeMarkers.add(LAST_LOCATION, Marker().apply {
+                predictMetaData.markers.add(LAST_LOCATION, Marker().apply {
                     setMarkerWithInfoWindow(
                         context = this@NokMainActivity,
                         latLng = event.lastLocation.latLng,
@@ -474,7 +478,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                     )
                 })
                 binding.mapViewBtn.setOnClickListener {
-                    naverMap?.moveCamera(CameraUpdate.scrollTo(homeMarkers[LAST_LOCATION].position))
+                    naverMap?.moveCamera(CameraUpdate.scrollTo(predictMetaData.markers[LAST_LOCATION].position))
                 }
             }
 
@@ -483,16 +487,19 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                 lifecycleScope.launch {
                     countDownJob?.cancelAndJoin()
                     countDownJob = null
+                }
+                with(predictMetaData){
                     circleOverlay.isVisible = false
                     binding.countDownT.text = "00:00"
+                    behavior.expandedOffset = 0
+
+                    markers.forEach { marker ->
+                        marker.map = null
+                        marker.isVisible = false
+                    }
+                    markers.clear()
+                    binding.layout.translationY = 0f
                 }
-                behavior.expandedOffset = 0
-                homeMarkers.forEach { marker ->
-                    marker.map = null
-                    marker.isVisible = false
-                }
-                homeMarkers.clear()
-                binding.layout.translationY = 0f
             }
 
             is NokHomeViewModel.PredictEvent.PredictLocation -> {
@@ -503,9 +510,9 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                         )
                     )
 
-                    val predictMarker = homeMarkers.firstOrNull { it.captionText == address && it.icon == MarkerIcons.GREEN }
+                    val predictMarker = predictMetaData.markers.firstOrNull { it.captionText == address && it.icon == MarkerIcons.GREEN }
                     if (predictMarker == null){
-                        homeMarkers.add(Marker().apply {
+                        predictMetaData.markers.add(Marker().apply {
                             setMarkerWithInfoWindow(
                                 this@NokMainActivity,
                                 latLng = latLng,
@@ -517,7 +524,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                         })
                     }
 
-                    Log.d("homemarkers size", homeMarkers.size.toString())
+                    Log.d("homemarkers size", predictMetaData.markers.size.toString())
                 }
             }
 
@@ -556,7 +563,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
     }
 
     private fun startCountDownJob(averageSpeed: Double, coord: LatLng) {
-        with(circleOverlay) {
+        with(predictMetaData.circleOverlay) {
             center = coord
             color = ContextCompat.getColor(this@NokMainActivity, R.color.purple)
             outlineWidth = 5
@@ -570,8 +577,8 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
             var minute = 0
             while (true) {
                 second += 1
-                circleOverlay.radius += averageSpeed
-                circleOverlay.map = naverMap
+                predictMetaData.circleOverlay.radius += averageSpeed
+                predictMetaData.circleOverlay.map = naverMap
                 if (second % 60 == 0) {
                     minute += 1
                     second = 0
@@ -610,7 +617,11 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
         initNavigator()
 
         binding.safeAreaTv.setOnClickListener {
-            isSetSafeArea = true
+            with(safeAreMetaData){
+                isSettingSafeArea = true
+                settingMarker.isVisible = true
+                settingCircleOverlay.isVisible = true
+            }
         }
     }
 
