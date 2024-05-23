@@ -5,7 +5,7 @@ push_service = FCMNotification(Config.fcm_server_key)
 
 
 
-def send_push_notification(token, body, title, data):
+def send_push_notification(token, title, body, data):
     
     #result = push_service.notify_single_device(registration_id=token, message_title=title, message_body=body)
 
@@ -13,9 +13,7 @@ def send_push_notification(token, body, title, data):
         registration_id=token,
         message_title=title,
         message_body=body,
-        data_message={
-            "이도영": data
-        }
+        data_message=data
     )
 
     return result
