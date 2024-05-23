@@ -159,6 +159,7 @@ class FCMService : FirebaseMessagingService() {
             .setSound(soundUri) // 소리 설정
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             .setPriority(NotificationCompat.PRIORITY_HIGH) // 중요도 설정
+            .setColor(resources.getColor(R.color.yellow))
 
         val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.notify(101, builder.build())
