@@ -48,6 +48,8 @@ class location_info(Base):
     isRingstoneOn = Column(Integer)
     isGpsOn = Column(Boolean)
     current_speed = Column(String)
+    isInSafeArea = Column(Boolean)
+    nearSafeArea = Column(String)
 
 class meaningful_location_info(Base):
     __tablename__ = 'meaningful_location_info'
