@@ -46,7 +46,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 @router.post("/test/fcm", description="FCM 테스트")
 async def send_fcm(request: FCMRequest):
     
-    send_push_notification(Config.temp_fcm_token, request.title, request.body, request.data)
+    send_push_notification(request.token, request.title, request.body, request.data)
 
     return {"status": "success", "message": "FCM sent"}
 
@@ -343,9 +343,12 @@ def send_live_location_info(dementiaKey : str):
             print(f"[INFO] Live location data sent to {latest_location.dementia_key}")
 
             safeArea = session.query(models.safe_area_info).filter_by(area_key = latest_location.nearSafeArea).first()
-
-            asyncio.run(val.pushNotification(latest_location, before_location, safeArea))
-
+            fcm_token = session.query(models.refresh_token_info).filter_by(key = latest_location.dementia_key).first().fcm_token
+            if fcm_token:
+                asyncio.run(val.pushNotification(fcm_token, latest_location, before_location, safeArea))
+            else:
+                pass
+            
         else:
             print(f"[ERROR] Location data not found for Dementia key({dementiaKey})")
 
@@ -1179,6 +1182,69 @@ async def delete_safe_area_group(request: DeleteSafeAreaGroupRequest):
         
     finally:
         session.close()
+
+
+#유틸
+@router.post("/address/conversion", responses = {200 : {"model" : AddressConversionResponse, "description" : "주소 변환 성공" }, 404: {"model": ErrorResponse, "description": "주소 변환 실패"}}, description="주소를 위경도로 변환")
+async def address_conversion(request: AddressConversionRequest):
+    try:
+        _address = request.address
+
+        xy = kakao.search_address(_address)
+
+        latitude = xy['documents'][0]['y']
+        longitude = xy['documents'][0]['x']
+
+        result = {
+            'latitude': latitude,
+            'longitude': longitude
+        }
+
+        response = {
+            'status': 'success',
+            'message': 'Address conversion complete',
+            'result': result
+        }
+    
+        return response
+    
+    except Exception as e:
+        print(f"[ERROR] Address conversion failed: {e}")
+
+        raise HTTPException(status_code=404, detail="Address conversion failed")
+
+    finally:
+        session.close()
+
+
+
+
+
+
+
+'''@router.post("/asdasd")
+async def test():
+    try:
+        loc_list = session.query(models.location_info).filter_by(isInSafeArea = None).all()
+
+        #가장 가까운 안심구역을 찾고 isInSafeArea, nearSafeArea 업데이트
+        for loc in loc_list:
+            current_location = (loc.latitude, loc.longitude)
+            safe_area_list = session.query(models.safe_area_info).filter_by(dementia_key = loc.dementia_key).all()
+            _near_safe_area, _isInSafeArea = val.isinsafearea(current_location, safe_area_list)
+            loc.isInSafeArea = _near_safe_area
+            loc.nearSafeArea = _isInSafeArea
+        
+        session.commit()
+
+            
+    finally:
+        session.close()'''
+
+
+
+
+
 
 '''@sched.scheduled_job('cron', hour=11, minute=57, id = 'analyze_location_data')
 def analyzing_location_data():
