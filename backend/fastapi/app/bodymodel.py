@@ -284,6 +284,20 @@ class DeleteSafeAreaGroupRequest(BaseModel):
     groupKey : str = Field(examples=["123456"])
 
 class FCMRequest(BaseModel):
+    token : str = Field(examples=["ksjdnfjkdasnfljsknafljansdfjlsakn"])
     title : str = Field(examples=["어디U"])
     body : str = Field(examples=["안심 구역 진입"])
     data : Dict[str, str] = Field(examples=[{"safeAreaName" : "집", "time" : "12:00:00"}])
+
+
+class AddressConversionRequest(BaseModel):
+    address : str = Field(examples=["서울특별시 강남구 니가 사는 그 집"])
+
+class latilongi(BaseModel):
+    latitude : float = Field(examples=["37.123456"])
+    longitude : float = Field(examples=["127.123456"])
+
+class AddressConversionResponse(BaseModel):
+    status: str = Field("success")
+    message: str = Field("메~시~지~")
+    result: Dict[str, float] = latilongi
