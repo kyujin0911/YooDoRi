@@ -81,6 +81,7 @@ class refresh_token_info(Base):
 
     key = Column(String, primary_key=True)
     refresh_token = Column(String)
+    fcm_token = Column(String)
 
 class safe_area_info(Base):
     __tablename__ = 'safe_area_info'
