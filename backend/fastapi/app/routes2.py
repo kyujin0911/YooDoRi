@@ -229,15 +229,17 @@ async def receive_user_login(request: loginRequest):
 
 #위치 정보 전송
 @router.post("/locations/dementias", responses = {200 : {"model" : TempResponse, "description" : "위치 정보 전송 성공" }, 404: {"model": ErrorResponse, "description": "보호 대상자 키 조회 실패"}}, description="보호 대상자의 위치 정보를 전송 | isRingstoneOn : 0(무음), 1(진동), 2(벨소리)")
-async def receive_location_info(request: ReceiveLocationRequest):
+def receive_location_info(request: ReceiveLocationRequest):
 
     try:
         _dementia_key = request.dementiaKey
 
         existing_dementia = session.query(models.dementia_info).filter_by(dementia_key = _dementia_key).first()
         safe_area_list = session.query(models.safe_area_info).filter_by(dementia_key = _dementia_key).all()
+        latest_loc = session.query(models.location_info).filter_by(dementia_key = _dementia_key).order_by(models.location_info.num.desc()).first()
 
         current_location = (request.latitude, request.longitude)
+        
 
         if existing_dementia:
 
@@ -261,7 +263,7 @@ async def receive_location_info(request: ReceiveLocationRequest):
                 status = "지하철"
             else:
                 pass
-
+            
             new_location = models.location_info(
                 dementia_key = _dementia_key,
                 date = request.date,
@@ -292,6 +294,12 @@ async def receive_location_info(request: ReceiveLocationRequest):
             session.add(new_location)
             session.commit()
 
+            fcm_token = session.query(models.refresh_token_info).filter_by(key = _dementia_key).first().fcm_token
+            if fcm_token:
+                asyncio.run(val.pushNotification(fcm_token, new_location, latest_loc, _near_safe_area))
+            else:
+                pass
+
             print(f"[INFO] Location data received from {existing_dementia.dementia_name}({existing_dementia.dementia_key})")
 
             response = {
@@ -315,14 +323,9 @@ def send_live_location_info(dementiaKey : str):
 
     try:
         
-        latest_location = session.query(models.location_info).filter_by(dementia_key = dementiaKey).order_by(models.location_info.num.desc()).limit(2).all()
+        latest_location = session.query(models.location_info).filter_by(dementia_key = dementiaKey).order_by(models.location_info.num.desc()).first()
 
         if latest_location:
-            for index, location in enumerate(latest_location):
-                if index == 0:
-                    latest_location = location
-                elif index == 1:
-                    before_location = location
                 
             result = {
                 'latitude': latest_location.latitude,
@@ -341,13 +344,6 @@ def send_live_location_info(dementiaKey : str):
                 'result': result
             }
             print(f"[INFO] Live location data sent to {latest_location.dementia_key}")
-
-            safeArea = session.query(models.safe_area_info).filter_by(area_key = latest_location.nearSafeArea).first()
-            fcm_token = session.query(models.refresh_token_info).filter_by(key = latest_location.dementia_key).first().fcm_token
-            if fcm_token:
-                asyncio.run(val.pushNotification(fcm_token, latest_location, before_location, safeArea))
-            else:
-                pass
             
         else:
             print(f"[ERROR] Location data not found for Dementia key({dementiaKey})")
