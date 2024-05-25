@@ -44,7 +44,7 @@ class SafeAreaFragment : BaseFragment<FragmentSafeAreaBinding>(R.layout.fragment
         /*binding.tv.setOnClickListener {
             navigator.navigate(R.id.safeAreaDetailFragment)
         }*/
-
+        viewModel.fetchCoord("대림대학교")
     }
 
     override fun onResume() {
@@ -71,6 +71,8 @@ class SafeAreaFragment : BaseFragment<FragmentSafeAreaBinding>(R.layout.fragment
 
             is SafeAreaViewModel.SafeAreaEvent.MapView -> {}
             is SafeAreaViewModel.SafeAreaEvent.SettingSafeArea -> {}
+            is SafeAreaViewModel.SafeAreaEvent.RadiusChange -> {
+            }
         }
     }
 

@@ -227,6 +227,10 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                 //behavior.state = BottomSheetBehavior.STATE_HIDDEN
 
             }
+
+            is SafeAreaViewModel.SafeAreaEvent.RadiusChange -> {
+                safeAreMetaData.settingCircleOverlay.radius = event.radius.toDouble().times(1000)
+            }
         }
     }
 
@@ -657,6 +661,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
         initNavigator()
 
         binding.setSafeAreaTv.setOnClickListener {
+            behavior.isDraggable = false
             if(navController.currentDestination?.id == R.id.safeAreaFragment){
                 navController.navigate(R.id.action_safeAreaFragment_to_settingSafeAreaFragment)
             } else {
@@ -720,7 +725,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                         behavior.isDraggable = false
                     } else {
                         Log.d("뭐ㅓㄴ데", "뭐냐고")
-                        behavior.isDraggable = true
+                        //behavior.isDraggable = true
                     }
                 } else {
                     if (slideOffset <= 0.3f) {

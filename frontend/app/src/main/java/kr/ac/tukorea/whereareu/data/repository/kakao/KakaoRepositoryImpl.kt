@@ -14,10 +14,8 @@ class KakaoRepositoryImpl @Inject constructor(
         return handleApi({api.getAddress(x, y)}) {response: AddressResponse -> response}
     }
 
-    override suspend fun searchWithKeyword(
-        x: String,
-        y: String,
+    override suspend fun searchWithKeyword(keyword: String
     ): NetworkResult<KeywordResponse> {
-        return handleApi({api.searchPoliceStationNearby(x, y)}) {response: KeywordResponse -> response}
+        return handleApi({api.searchPoliceStationNearby(keyword)}) {response: KeywordResponse -> response}
     }
 }

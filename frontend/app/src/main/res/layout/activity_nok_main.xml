@@ -235,8 +235,6 @@
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="40dp"
-                    android:layout_marginHorizontal="16dp"
                     android:padding="12dp"
                     android:minHeight="30dp"
                     android:maxHeight="400dp"
@@ -251,6 +249,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         app:errorEnabled="false"
+                        android:layout_marginTop="40dp"
                         app:layout_constraintTop_toTopOf="parent">
 
                         <com.google.android.material.textfield.TextInputEditText

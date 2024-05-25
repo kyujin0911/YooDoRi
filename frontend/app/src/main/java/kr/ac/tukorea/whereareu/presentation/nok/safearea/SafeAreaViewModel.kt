@@ -9,7 +9,9 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
+import kr.ac.tukorea.whereareu.data.model.nok.safearea.GetCoordRequest
 import kr.ac.tukorea.whereareu.data.model.nok.safearea.RegisterSafeAreaRequest
+import kr.ac.tukorea.whereareu.data.repository.kakao.KakaoRepositoryImpl
 import kr.ac.tukorea.whereareu.data.repository.nok.safearea.SafeAreaRepositoryImpl
 import kr.ac.tukorea.whereareu.domain.safearea.SafeArea
 import kr.ac.tukorea.whereareu.presentation.nok.safearea.adapter.SafeAreaRVA
@@ -18,7 +20,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SafeAreaViewModel @Inject constructor(
-    private val repository: SafeAreaRepositoryImpl
+    private val repository: SafeAreaRepositoryImpl,
+    private val kakao: KakaoRepositoryImpl
 ) : ViewModel() {
 
     private val _dementiaKey = MutableStateFlow("")
@@ -27,10 +30,15 @@ class SafeAreaViewModel @Inject constructor(
     val safeAreaEvent = _safeAreaEvent.asSharedFlow()
 
     val isSettingSafeArea = MutableStateFlow(false)
+
+    private val _safeAreaRadius = MutableSharedFlow<Double>()
+    val safeAreaRadius = _safeAreaRadius.asSharedFlow()
     sealed class SafeAreaEvent{
         data class FetchSafeArea(val safeAreas: List<SafeArea>): SafeAreaEvent()
 
         data class MapView(val behavior: Int, val coord: LatLng) : SafeAreaEvent()
+
+        data class RadiusChange(val radius: String): SafeAreaEvent()
 
         data class SettingSafeArea(val isSettingSafeArea: Boolean): SafeAreaEvent()
     }
@@ -42,6 +50,10 @@ class SafeAreaViewModel @Inject constructor(
 
     fun setDementiaKey(dementiaKey: String) {
         _dementiaKey.value = dementiaKey
+    }
+
+    fun setSafeAreaRadius(radius: String){
+        eventSafeArea(SafeAreaEvent.RadiusChange(radius))
     }
 
     fun eventSafeArea(event: SafeAreaEvent){
@@ -108,9 +120,25 @@ class SafeAreaViewModel @Inject constructor(
 
     fun fetchSafeAreaGroup(groupKey: String){
         viewModelScope.launch {
-            repository.fetSafeAreaGroup(_dementiaKey.value, groupKey).onSuccess {
+            repository.fetchSafeAreaGroup(_dementiaKey.value, groupKey).onSuccess {
                 Log.d("fetchSafeAreaGroup", it.toString())
             }
         }
     }
+
+    fun fetchCoord(address: String){
+        viewModelScope.launch {
+            repository.fetchCoord(GetCoordRequest(address)).onSuccess {
+                Log.d("fetchCoord", it.toString())
+            }
+        }
+    }
+
+    /*fun fetchKeyword(){
+        viewModelScope.launch {
+            kakao.searchWithKeyword("안양시 동안구 비산로 22").onSuccess {
+                Log.d("fetchKeyword", it.toString())
+            }
+        }
+    }*/
 }
