@@ -1186,7 +1186,7 @@ async def address_conversion(request: AddressConversionRequest):
     try:
         _address = request.address
 
-        xy = kakao.search_address(_address)
+        xy = kakao.search_keyword(_address)
 
         latitude = xy['documents'][0]['y']
         longitude = xy['documents'][0]['x']
