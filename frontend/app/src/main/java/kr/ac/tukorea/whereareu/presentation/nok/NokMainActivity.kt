@@ -229,6 +229,16 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
             }
 
             is SafeAreaViewModel.SafeAreaEvent.RadiusChange -> {
+                val zoom = when(event.radius){
+                    "0.5" -> 14.0
+                    "1" -> 13.5
+                    "1.5" -> 13.0
+                    "2" -> 12.5
+                    "2.5" -> 12.0
+                    "3" -> 11.5
+                    else -> 14.0
+                }
+                naverMap?.moveCamera(CameraUpdate.zoomTo(zoom))
                 safeAreMetaData.settingCircleOverlay.radius = event.radius.toDouble().times(1000)
             }
         }
