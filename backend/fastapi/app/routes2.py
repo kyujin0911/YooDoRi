@@ -8,6 +8,7 @@ from haversine import haversine
 from PyKakao import Local
 from datetime import datetime, timedelta
 from pytz import timezone
+from sqlalchemy import and_, func
 
 from . import models
 from .random_generator import RandomNumberGenerator
@@ -699,13 +700,26 @@ async def send_location_history(date: str, dementiaKey: str):
 
     return response
 
-@router.get("/locations/predict", responses = {200 : {"model" : PredictLocationResponse, "description" : "위치 예측 성공" }, 404: {"model": ErrorResponse, "description": "위치 정보 부족"}}, description="보호 대상자의 다음 위치 예측(쿼리 스트링) | 경찰서 정보는 아직임")
+@router.get("/locations/predict", responses = {200 : {"model" : PredictLocationResponse, "description" : "위치 예측 성공" }, 404: {"model": ErrorResponse, "description": "위치 정보 부족"}}, description="보호 대상자의 다음 위치 예측(쿼리 스트링) | 2주치 위치 데이터 사용(임시)")
 async def predict_location(dementiaKey: str):
     _key = dementiaKey
 
     try:
         loc_list = []
-        location_list = session.query(models.location_info).filter_by(dementia_key=_key, date = "2024-05-16").all()
+        today = datetime.today()
+
+        # 2주 전 날짜
+        two_weeks_ago = today - timedelta(weeks=2)
+
+        # 쿼리문 수정
+        # 쿼리문 수정 (MySQL에서 문자열을 날짜로 변환할 때)
+        location_list = session.query(models.location_info).filter(
+            and_(
+                models.location_info.dementia_key == _key,
+                func.STR_TO_DATE(models.location_info.date, '%Y-%m-%d') >= two_weeks_ago,
+                func.STR_TO_DATE(models.location_info.date, '%Y-%m-%d') <= today
+            )
+        ).all()
 
         if not location_list:
             raise HTTPException(status_code=404, detail="Location data not found")
@@ -722,22 +736,7 @@ async def predict_location(dementiaKey: str):
         # dataframe으로 변환
         
         loc_list_df = pd.DataFrame(loc_list, columns=['date', 'time', 'latitude', 'longitude', 'user_status'])
-
-        '''meaningful_list = session.query(models.meaningful_location_info).filter_by(dementia_key = _key).all()
-
-        mean_list = []
-
-        for location in meaningful_list:
-            mean_list.append({
-                'date' : location.date,
-                'time': location.time,
-                'latitude': location.latitude,
-                'longitude': location.longitude,
-                'address' : location.address,
-                'key' : location.key
-            })'''
         
-        #meaningful_df = pd.DataFrame(mean_list, columns=['date', 'time', 'latitude', 'longitude', 'address', 'key'])
         pr = Preprocessing(loc_list_df)
         df, meaningful_df= pr.run_analysis()
 
@@ -790,7 +789,7 @@ async def predict_location(dementiaKey: str):
 
         police = kakao.search_keyword("경찰서", x = pred_loc.longitude, y = pred_loc.latitude, sort = 'distance')\
         
-        '''police_list = []
+        police_list = []
         if police['meta']['total_count'] == 0:
             print(f"[INFO] No police station found near {xy2addr}")
         else:
@@ -807,16 +806,8 @@ async def predict_location(dementiaKey: str):
                     
                     police_list.append(new_police)
                 else:
-                    pass'''
+                    pass
         
-        pol_info = {
-            "policeName" : "이름",
-            "policeAddress" : "주소",
-            "policePhoneNumber" : "전번",
-            "distance" : "거리",
-            "latitude" : "위도",
-            "longitude" : "경도"
-        }
         pred_loc = {
             "latitude" : pred_loc.latitude,
             "longitude" : pred_loc.longitude,
@@ -824,7 +815,7 @@ async def predict_location(dementiaKey: str):
         }
         result = {
             "predictLocation" : pred_loc,
-            "policeInfo" : pol_info
+            "policeInfo" : police_list[:3]
 
         }
         response = {
@@ -1213,35 +1204,15 @@ async def address_conversion(request: AddressConversionRequest):
         session.close()
 
 
+                
 
 
 
 
-
-'''@router.post("/asdasd")
-async def test():
-    try:
-        loc_list = session.query(models.location_info).filter_by(isInSafeArea = None).all()
-
-        #가장 가까운 안심구역을 찾고 isInSafeArea, nearSafeArea 업데이트
-        for loc in loc_list:
-            current_location = (loc.latitude, loc.longitude)
-            safe_area_list = session.query(models.safe_area_info).filter_by(dementia_key = loc.dementia_key).all()
-            _near_safe_area, _isInSafeArea = val.isinsafearea(current_location, safe_area_list)
-            loc.isInSafeArea = _near_safe_area
-            loc.nearSafeArea = _isInSafeArea
-        
-        session.commit()
-
-            
-    finally:
-        session.close()'''
-
-
-
-
-
-
-'''@sched.scheduled_job('cron', hour=11, minute=57, id = 'analyze_location_data')
+'''@sched.scheduled_job('cron', hour=0, minute=0, id = 'analyze_location_data')
 def analyzing_location_data():
-    asyncio.run(schedFunc.load_analyze_location_data(session))'''
+    asyncio.run(schedFunc.load_analyze_location_data(session))
+
+@sched.scheduled_job('cron', hour=1, minute=0, id = 'geocoding')
+def geocoding():
+    asyncio.run(schedFunc.load_kakao_api(session))'''
