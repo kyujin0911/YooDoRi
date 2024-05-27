@@ -53,6 +53,6 @@
             app:menu="@menu/nok_main_menu"
             android:visibility="@{viewModel.isPredicted ? View.GONE : View.VISIBLE}"/>
 
-
     </androidx.constraintlayout.widget.ConstraintLayout>
+
 </layout>

@@ -4,7 +4,12 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.os.Build
+import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
+import android.view.View
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -125,11 +130,5 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
             Log.d("location log", "${location?.get(0)}, ${location?.get(1)}")
             // Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
         }
-    }
-
-    companion object{
-        private const val CHANNEL_NAME = "Where are U Test"
-        private const val CHANNEL_DESCRIPTION = "어디U 테스트 채널"
-        private const val CHANNEL_ID = "채널 ID"
     }
 }
