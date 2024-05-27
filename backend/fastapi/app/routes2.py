@@ -53,7 +53,7 @@ async def send_fcm(request: FCMRequest):
 
 
 #유저 등록
-@router.post("/noks",status_code=status.HTTP_201_CREATED, responses = {201 : {"model" : ReceiveNokInfoResponse, "description" : "유저 등록 성공" },404: {"model": ErrorResponse, "description": "보호 대상자 키 조회 실패"}}, description="보호자가 보호 대상자의 정보를 등록")
+@router.post("/noks",status_code=status.HTTP_201_CREATED, responses = {201 : {"model" : ReceiveNokInfoResponse, "description" : "유저 등록 성공" },404: {"model": ErrorResponse, "description": "보호 대상자 키 조회 실패"}}, description="보호자가 보호 대상자의 정보를 등록 | fcmToken 없으면 그냥 빈칸으로 보낼 것")
 async def receive_nok_info(request: ReceiveNokInfoRequest):
 
     _key_from_dementia = request.keyFromDementia
@@ -65,6 +65,12 @@ async def receive_nok_info(request: ReceiveNokInfoRequest):
         if existing_dementia:
             _nok_name = request.nokName
             _nok_phonenumber = request.nokPhoneNumber
+            if request.fcmToken == '':
+                new_token = models.refresh_token_info(key = _key_from_dementia, fcm_token = request.fcmToken)
+                session.add(new_token)
+                session.commit()
+            else:
+                pass
             
             duplication_check = session.query(models.nok_info).filter(models.nok_info.nok_name == _nok_name, models.nok_info.nok_phonenumber == _nok_phonenumber, models.nok_info.dementia_info_key == _key_from_dementia).first()
 
@@ -110,7 +116,7 @@ async def receive_nok_info(request: ReceiveNokInfoRequest):
     finally:
         session.close()
 
-@router.post("/dementias", status_code=status.HTTP_201_CREATED, responses = {201 : {"model" : ReceiveDementiaInfoResponse, "description" : "유저 등록 성공" }}, description="보호 대상자의 정보를 등록")
+@router.post("/dementias", status_code=status.HTTP_201_CREATED, responses = {201 : {"model" : ReceiveDementiaInfoResponse, "description" : "유저 등록 성공" }}, description="보호 대상자의 정보를 등록 | fcmToken 없으면 그냥 빈칸으로 보낼 것")
 async def receive_dementia_info(request: ReceiveDementiaInfoRequest):
 
     rng = RandomNumberGenerator()
@@ -118,6 +124,12 @@ async def receive_dementia_info(request: ReceiveDementiaInfoRequest):
     try:
         _dementia_name = request.name
         _dementia_phonenumber = request.phoneNumber
+        if request.fcmToken == '':
+            new_token = models.refresh_token_info(key = _dementia_name, fcm_token = request.fcmToken)
+            session.add(new_token)
+            session.commit()
+        else:
+            pass
 
         duplication_check = session.query(models.dementia_info).filter(models.dementia_info.dementia_name == _dementia_name, models.dementia_info.dementia_phonenumber == _dementia_phonenumber).first()
 
