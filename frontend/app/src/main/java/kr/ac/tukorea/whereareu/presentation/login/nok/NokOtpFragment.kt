@@ -1,6 +1,7 @@
 package kr.ac.tukorea.whereareu.presentation.login.nok
 
 import android.content.Context.MODE_PRIVATE
+import android.util.Log
 import android.view.inputmethod.EditorInfo
 import androidx.core.content.edit
 import androidx.fragment.app.activityViewModels
@@ -87,7 +88,11 @@ class NokOtpFragment : BaseFragment<FragmentNokOtpBinding>(R.layout.fragment_nok
         }
 
         val key = binding.otpEt.text.toString()
-        viewModel.sendNokIdentity(NokIdentityRequest(key, args.name, args.phone))
+
+        val _fcmtoken = requireActivity().getSharedPreferences("FCMtoken", MODE_PRIVATE)
+        val fcmtoken = _fcmtoken.getString("FCMtoken","")
+        viewModel.sendNokIdentity(NokIdentityRequest(key, args.name, args.phone, fcmtoken!!))
+        Log.d("NokOtp_FCMTOken",fcmtoken)
     }
 
     private fun validOtp() = !binding.otpEt.text.isNullOrBlank()

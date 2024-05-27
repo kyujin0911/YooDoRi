@@ -70,9 +70,9 @@ class FCMService : FirebaseMessagingService() {
         Log.d(TAG, "new Token: $token")
 
         // 토큰 값을 따로 저장
-        val pref = this.getSharedPreferences("token", Context.MODE_PRIVATE)
+        val pref = this.getSharedPreferences("FCMtoken", Context.MODE_PRIVATE)
         val editor = pref.edit()
-        editor.putString("token", token).apply()
+        editor.putString("FCMtoken", token).apply()
         editor.commit()
         Log.i(TAG, "토큰 저장")
     }
