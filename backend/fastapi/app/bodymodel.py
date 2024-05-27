@@ -40,6 +40,7 @@ class ReceiveNokInfoRequest(BaseModel):
     keyFromDementia : int = Field(examples=["123456"])
     nokName : str = Field(examples=["홍길동"])
     nokPhoneNumber : str = Field(examples=["010-1234-5678"])
+    fcmToken : str = Field(examples=["ksjdnfjkdasnfljsknafljansdfjlsakn"])
 
 class ReceiveNokInfoResponse(BaseModel):
     status: str = Field("success")
@@ -53,6 +54,7 @@ class dementiaResult(BaseModel):
 class ReceiveDementiaInfoRequest(BaseModel):
     name : str = Field(examples=["성춘향"])
     phoneNumber : str = Field(examples=["010-1234-5678"])
+    fcmToken : str = Field(examples=["ksjdnfjkdasnfljsknafljansdfjlsakn"])
 
 class ReceiveDementiaInfoResponse(BaseModel):
     status: str = Field("success")
