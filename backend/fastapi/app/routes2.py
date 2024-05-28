@@ -65,9 +65,15 @@ async def receive_nok_info(request: ReceiveNokInfoRequest):
         if existing_dementia:
             _nok_name = request.nokName
             _nok_phonenumber = request.nokPhoneNumber
-            if request.fcmToken == '':
-                new_token = models.refresh_token_info(key = _key_from_dementia, fcm_token = request.fcmToken)
-                session.add(new_token)
+            if not request.fcmToken == '':
+                existing_token = session.query(models.refresh_token_info).filter_by(key = _key_from_dementia).first()
+                if existing_token:
+                    existing_token.fcm_token = request.fcmToken
+                else:
+
+                    new_token = models.refresh_token_info(key = _key_from_dementia, fcm_token = request.fcmToken)
+                    session.add(new_token)
+
                 session.commit()
             else:
                 pass
@@ -124,9 +130,13 @@ async def receive_dementia_info(request: ReceiveDementiaInfoRequest):
     try:
         _dementia_name = request.name
         _dementia_phonenumber = request.phoneNumber
-        if request.fcmToken == '':
-            new_token = models.refresh_token_info(key = _dementia_name, fcm_token = request.fcmToken)
-            session.add(new_token)
+        if not request.fcmToken == '':
+            existing_token = session.query(models.refresh_token_info).filter_by(key = _dementia_name).first()
+            if existing_token:
+                existing_token.fcm_token = request.fcmToken
+            else:
+                new_token = models.refresh_token_info(key = _dementia_name, fcm_token = request.fcmToken)
+                session.add(new_token)
             session.commit()
         else:
             pass
@@ -1210,13 +1220,12 @@ async def address_conversion(request: AddressConversionRequest):
     except Exception as e:
         print(f"[ERROR] Address conversion failed: {e}")
 
-        raise HTTPException(status_code=404, detail="Address conversion failed")
+        raise HTTPException(status_code=404, detail=f"{e}")
 
     finally:
         session.close()
 
 
-                
 
 
 
