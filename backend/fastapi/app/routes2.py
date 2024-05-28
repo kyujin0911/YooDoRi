@@ -65,18 +65,7 @@ async def receive_nok_info(request: ReceiveNokInfoRequest):
         if existing_dementia:
             _nok_name = request.nokName
             _nok_phonenumber = request.nokPhoneNumber
-            if not request.fcmToken == '':
-                existing_token = session.query(models.refresh_token_info).filter_by(key = _key_from_dementia).first()
-                if existing_token:
-                    existing_token.fcm_token = request.fcmToken
-                else:
-
-                    new_token = models.refresh_token_info(key = _key_from_dementia, fcm_token = request.fcmToken)
-                    session.add(new_token)
-
-                session.commit()
-            else:
-                pass
+            
             
             duplication_check = session.query(models.nok_info).filter(models.nok_info.nok_name == _nok_name, models.nok_info.nok_phonenumber == _nok_phonenumber, models.nok_info.dementia_info_key == _key_from_dementia).first()
 
@@ -93,6 +82,19 @@ async def receive_nok_info(request: ReceiveNokInfoRequest):
                 new_nok = models.nok_info(nok_key=_key, nok_name=_nok_name, nok_phonenumber=_nok_phonenumber, dementia_info_key=_key_from_dementia, update_rate=1) # update_rate는 기본값 1분으로 설정
                 session.add(new_nok)
                 session.commit()
+
+            if not request.fcmToken == '':
+                existing_token = session.query(models.refresh_token_info).filter_by(key = _key).first()
+                if existing_token:
+                    existing_token.fcm_token = request.fcmToken
+                else:
+
+                    new_token = models.refresh_token_info(key = _key, fcm_token = request.fcmToken)
+                    session.add(new_token)
+
+                session.commit()
+            else:
+                pass
 
             result = {
                 'dementiaInfoRecord' : {
@@ -130,16 +132,7 @@ async def receive_dementia_info(request: ReceiveDementiaInfoRequest):
     try:
         _dementia_name = request.name
         _dementia_phonenumber = request.phoneNumber
-        if not request.fcmToken == '':
-            existing_token = session.query(models.refresh_token_info).filter_by(key = _dementia_name).first()
-            if existing_token:
-                existing_token.fcm_token = request.fcmToken
-            else:
-                new_token = models.refresh_token_info(key = _dementia_name, fcm_token = request.fcmToken)
-                session.add(new_token)
-            session.commit()
-        else:
-            pass
+        
 
         duplication_check = session.query(models.dementia_info).filter(models.dementia_info.dementia_name == _dementia_name, models.dementia_info.dementia_phonenumber == _dementia_phonenumber).first()
 
@@ -157,6 +150,17 @@ async def receive_dementia_info(request: ReceiveDementiaInfoRequest):
             new_dementia = models.dementia_info(dementia_key=_key, dementia_name=_dementia_name, dementia_phonenumber=_dementia_phonenumber, update_rate=1) # update_rate는 기본값 1분으로 설정
             session.add(new_dementia)
             session.commit()
+
+        if not request.fcmToken == '':
+            existing_token = session.query(models.refresh_token_info).filter_by(key = _key).first()
+            if existing_token:
+                existing_token.fcm_token = request.fcmToken
+            else:
+                new_token = models.refresh_token_info(key = _key, fcm_token = request.fcmToken)
+                session.add(new_token)
+            session.commit()
+        else:
+            pass
 
         result = {
             'dementiaKey': _key
