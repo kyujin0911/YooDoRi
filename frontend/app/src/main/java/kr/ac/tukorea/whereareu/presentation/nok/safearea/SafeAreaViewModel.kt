@@ -34,7 +34,7 @@ class SafeAreaViewModel @Inject constructor(
     private val _safeAreaRadius = MutableSharedFlow<Double>()
     val safeAreaRadius = _safeAreaRadius.asSharedFlow()
     sealed class SafeAreaEvent{
-        data class FetchSafeArea(val safeAreas: List<SafeArea>): SafeAreaEvent()
+        data class FetchSafeArea(val safeAreas: List<SafeArea>, val groupNames: List<String>): SafeAreaEvent()
 
         data class MapView(val behavior: Int, val coord: LatLng) : SafeAreaEvent()
 
@@ -72,14 +72,16 @@ class SafeAreaViewModel @Inject constructor(
 
     fun fetchSafeAreaAll() {
         viewModelScope.launch {
-            repository.fetchSafeAreaAll(_dementiaKey.value).onSuccess {
-                val list = mutableListOf<SafeArea>()
-                it.safeAreaList.forEach { safeAreaList ->
-                    val temp = if (safeAreaList.groupName == "notGrouped") {
-                        safeAreaList.safeAreas.map { safeArea ->
+            repository.fetchSafeAreaAll(_dementiaKey.value).onSuccess {response ->
+                val safeAreaList = mutableListOf<SafeArea>()
+                val groupNameList = response.safeAreaList.map { it.groupName}.filterNot { it == "notGrouped" }
+
+                response.safeAreaList.forEach { _safeAreaList ->
+                    val temp = if (_safeAreaList.groupName == "notGrouped") {
+                        _safeAreaList.safeAreas.map { safeArea ->
                             SafeArea(
                                 "",
-                                safeAreaList.groupKey,
+                                _safeAreaList.groupKey,
                                 safeArea.areaKey,
                                 safeArea.areaName,
                                 safeArea.latitude,
@@ -89,10 +91,10 @@ class SafeAreaViewModel @Inject constructor(
                             )
                         }
                     } else {
-                        safeAreaList.safeAreas.map {
+                        _safeAreaList.safeAreas.map {
                             SafeArea(
-                                safeAreaList.groupName,
-                                safeAreaList.groupKey,
+                                _safeAreaList.groupName,
+                                _safeAreaList.groupKey,
                                 "",
                                 "",
                                 0.0,
@@ -102,18 +104,18 @@ class SafeAreaViewModel @Inject constructor(
                             )
                         }
                     }
-                    list.addAll(temp)
+                    safeAreaList.addAll(temp)
                 }
-                list.sortWith(
+                safeAreaList.sortWith(
                     compareBy(
                         {it.viewType},
                         {it.groupName},
                         {it.areaName}
                     )
                 )
-                eventSafeArea(SafeAreaEvent.FetchSafeArea(list))
-                Log.d("safeArea List", list.toString())
-                Log.d("fetchSafeArea", it.toString())
+                eventSafeArea(SafeAreaEvent.FetchSafeArea(safeAreaList, groupNameList))
+                Log.d("safeArea List", safeAreaList.toString())
+                Log.d("fetchSafeArea", response.toString())
             }
         }
     }

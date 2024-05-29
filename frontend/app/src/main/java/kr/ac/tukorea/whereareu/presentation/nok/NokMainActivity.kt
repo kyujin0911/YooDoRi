@@ -211,6 +211,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
             is SafeAreaViewModel.SafeAreaEvent.SettingSafeArea -> {
                 if (event.isSettingSafeArea) {
                     with(safeAreMetaData) {
+                        binding.bottomSheetTopIv.isVisible = false
                         isSettingSafeArea = true
                         //behavior.isHideable = true
                         settingMarker.isVisible = true
@@ -218,6 +219,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                     }
                 } else {
                     with(safeAreMetaData) {
+                        binding.bottomSheetTopIv.isVisible = true
                         isSettingSafeArea = false
                         settingMarker.isVisible = false
                         settingCircleOverlay.isVisible = false
