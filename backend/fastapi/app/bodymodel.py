@@ -33,8 +33,8 @@ class UserRecord(BaseModel):
 class nokResult(BaseModel):
     dementiaInfoRecord: dementiaInfoRecord
     nokKey: str = Field(examples=["123456"])
-    accessToken: str = Field(examples=["ksjdnfjkdasnfljsknafljansdfjlsakn"])
-    refreshToken: str = Field(examples=["ksjdnfjkdasnfljsknafljansdfjlsakn"])
+    #accessToken: str = Field(examples=["ksjdnfjkdasnfljsknafljansdfjlsakn"])
+    #refreshToken: str = Field(examples=["ksjdnfjkdasnfljsknafljansdfjlsakn"])
 
 class ReceiveNokInfoRequest(BaseModel):
     keyFromDementia : int = Field(examples=["123456"])
@@ -63,8 +63,8 @@ class ReceiveDementiaInfoResponse(BaseModel):
 
 class connectionResult(BaseModel):
     nokInfoRecord: nokInfoRecord
-    accessToken: str = Field(examples=["ksjdnfjkdasnfljsknafljansdfjlsakn"])
-    refreshToken: str = Field(examples=["ksjdnfjkdasnfljsknafljansdfjlsakn"])
+    #accessToken: str = Field(examples=["ksjdnfjkdasnfljsknafljansdfjlsakn"])
+    #refreshToken: str = Field(examples=["ksjdnfjkdasnfljsknafljansdfjlsakn"])
 
 class ConnectionRequest(BaseModel):
     dementiaKey : int = Field(examples=["123456"])
@@ -234,14 +234,14 @@ class RegisterSafeAreaRequest(BaseModel):
     areaName : str = Field(examples=["집"])
     latitude : float = Field(examples=["37.123456"])
     longitude : float = Field(examples=["127.123456"])
-    radius : int = Field(examples=["100"], description="미터 단위")
+    radius : float = Field(examples=["0.5"], description="킬로미터 단위")
 
 class safeAreaList(BaseModel):
     areaName : str = Field(examples=["집"])
     areaKey : str = Field(examples=["123456"])
     latitude : float = Field(examples=["37.123456"])
     longitude : float = Field(examples=["127.123456"])
-    radius : int = Field(examples=["100"], description="미터 단위")
+    radius : float = Field(examples=["0.5"], description="킬로미터 단위")
 
 class safeAreaGroupInfo(BaseModel):
     groupName : str = Field(examples=["안심구역 그룹 1"])
