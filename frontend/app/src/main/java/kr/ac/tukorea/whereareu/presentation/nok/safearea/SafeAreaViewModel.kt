@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import kr.ac.tukorea.whereareu.data.model.nok.safearea.GetCoordRequest
 import kr.ac.tukorea.whereareu.data.model.nok.safearea.RegisterSafeAreaRequest
+import kr.ac.tukorea.whereareu.data.model.nok.safearea.SafeAreaDto
 import kr.ac.tukorea.whereareu.data.repository.kakao.KakaoRepositoryImpl
 import kr.ac.tukorea.whereareu.data.repository.nok.safearea.SafeAreaRepositoryImpl
 import kr.ac.tukorea.whereareu.domain.safearea.SafeArea
@@ -35,6 +36,8 @@ class SafeAreaViewModel @Inject constructor(
     val safeAreaRadius = _safeAreaRadius.asSharedFlow()
     sealed class SafeAreaEvent{
         data class FetchSafeArea(val safeAreas: List<SafeArea>, val groupNames: List<String>): SafeAreaEvent()
+
+        data class FetchSafeAreaGroup(val safeAreas: List<SafeAreaDto>): SafeAreaEvent()
 
         data class MapView(val behavior: Int, val coord: LatLng) : SafeAreaEvent()
 
@@ -123,6 +126,7 @@ class SafeAreaViewModel @Inject constructor(
     fun fetchSafeAreaGroup(groupKey: String){
         viewModelScope.launch {
             repository.fetchSafeAreaGroup(_dementiaKey.value, groupKey).onSuccess {
+                eventSafeArea(SafeAreaEvent.FetchSafeAreaGroup(it.safeAreas))
                 Log.d("fetchSafeAreaGroup", it.toString())
             }
         }

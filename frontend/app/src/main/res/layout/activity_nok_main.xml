@@ -332,6 +332,10 @@
                             android:background="@null"/>
                     </LinearLayout>
 
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="그룹 선택"/>
 
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
@@ -560,13 +564,13 @@
                 </androidx.constraintlayout.widget.ConstraintLayout>
             </androidx.constraintlayout.widget.ConstraintLayout>
 
-
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/bottom_sheet"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="vertical"
                 app:behavior_halfExpandedRatio="0.3"
+                android:nestedScrollingEnabled="false"
                 app:behavior_hideable="false"
                 app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
                 bind:isPredicted="@{viewModel.isPredicted}"
@@ -659,12 +663,23 @@
                         app:layout_constraintTop_toBottomOf="@id/bottom_sheet_top_iv"
                         app:navGraph="@navigation/nok_graph" />
 
-
                 </androidx.constraintlayout.widget.ConstraintLayout>
             </androidx.constraintlayout.widget.ConstraintLayout>
 
 
         </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="새 그룹 추가"
+            android:layout_marginHorizontal="8dp"
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/rectangle_corner_10_white_stroke_yellow"
+            app:layout_constraintBottom_toTopOf="@id/bottomNav"
+            android:textAppearance="@style/TextAppearance.App.14sp.ExtraBold"
+            android:textColor="@color/yellow"
+            />
 
         <com.google.android.material.bottomnavigation.BottomNavigationView
             android:id="@+id/bottomNav"

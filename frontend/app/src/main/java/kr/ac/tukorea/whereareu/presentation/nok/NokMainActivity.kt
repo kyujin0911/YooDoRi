@@ -243,6 +243,8 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                 naverMap?.moveCamera(CameraUpdate.zoomTo(zoom))
                 safeAreMetaData.settingCircleOverlay.radius = event.radius.toDouble().times(1000)
             }
+
+            else -> {}
         }
     }
 
@@ -737,7 +739,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                         behavior.isDraggable = false
                     } else {
                         Log.d("뭐ㅓㄴ데", "뭐냐고")
-                        //behavior.isDraggable = true
+                        behavior.isDraggable = true
                     }
                 } else {
                     if (slideOffset <= 0.3f) {
@@ -785,6 +787,10 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                 )
             ) {
                 behavior.isDraggable = true
+            }
+
+            if (destination.id == R.id.safeAreaFragment){
+                behavior.setPeekHeight(300, true)
             }
 
             when (destination.id) {

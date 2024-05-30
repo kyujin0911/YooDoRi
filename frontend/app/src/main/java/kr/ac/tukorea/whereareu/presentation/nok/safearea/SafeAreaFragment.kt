@@ -73,6 +73,8 @@ class SafeAreaFragment : BaseFragment<FragmentSafeAreaBinding>(R.layout.fragment
             is SafeAreaViewModel.SafeAreaEvent.SettingSafeArea -> {}
             is SafeAreaViewModel.SafeAreaEvent.RadiusChange -> {
             }
+
+            else -> {}
         }
     }
 
