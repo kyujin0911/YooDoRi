@@ -11,7 +11,7 @@ class validateInSafeArea:
         distance_list = []
         for safe_area in safe_area_list:
             safe_area_location = (safe_area.latitude, safe_area.longitude)
-            distance = haversine(current_loc, safe_area_location, unit='m')
+            distance = haversine(current_loc, safe_area_location, unit='km')
             distance_list.append(distance)
             
         min_distance = min(distance_list)

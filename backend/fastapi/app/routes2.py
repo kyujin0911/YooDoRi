@@ -892,7 +892,7 @@ async def predict_location(dementiaKey : str):
 
 
 #안심구역
-@router.post("/safeArea/register", status_code=status.HTTP_201_CREATED, responses = {201 : {"model" : CommonResponse, "description" : "안전 지역 등록 성공" }, 404: {"model": ErrorResponse, "description": "보호 대상자 키 조회 실패"}}, description="보호 대상자의 안전 지역을 등록 | groupName이 없으면 notGrouped로 저장됨")
+@router.post("/safeArea/register", status_code=status.HTTP_201_CREATED, responses = {201 : {"model" : CommonResponse, "description" : "안전 지역 등록 성공" }, 404: {"model": ErrorResponse, "description": "보호 대상자 키 조회 실패"}}, description="보호 대상자의 안전 지역을 등록 | 단위는 km | groupName이 없으면 notGrouped로 저장됨")
 async def register_safe_area(request: RegisterSafeAreaRequest):
     try:
         _dementia_key = request.dementiaKey
