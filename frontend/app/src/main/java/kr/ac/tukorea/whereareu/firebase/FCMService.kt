@@ -151,7 +151,8 @@ class FCMService : FirebaseMessagingService() {
                 .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
                 .build()
 
-            val channel = NotificationChannel(channelId, channelName, importance).apply {
+//            val channel = NotificationChannel(channelId, channelName, importance).apply {
+            val channel = NotificationChannel(channelId, channelName, NotificationManager.IMPORTANCE_HIGH).apply {
                 description = channelDescription
                 lockscreenVisibility = Notification.VISIBILITY_PUBLIC
                 setSound(soundUri, audioAttributes)
