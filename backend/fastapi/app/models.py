@@ -92,7 +92,7 @@ class safe_area_info(Base):
     dementia_key = Column(String)
     latitude = Column(Double)
     longitude = Column(Double)
-    radius = Column(Integer)
+    radius = Column(Double)
 
 class safe_area_group_info(Base):
     __tablename__ = 'safe_area_group_info'
