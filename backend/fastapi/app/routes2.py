@@ -910,7 +910,7 @@ async def register_safe_area(request: RegisterSafeAreaRequest):
             pass
 
         if _group_name == '':
-            _group_name = 'notGrouped'
+            _group_name = '기본 그룹'
         else:
             pass
 
@@ -1159,14 +1159,14 @@ async def delete_safe_area_group(request: DeleteSafeAreaGroupRequest):
 
         existing_group = session.query(models.safe_area_group_info).filter_by(dementia_key = _dementia_key, group_key = _group_key).first()
 
-        not_grouped = session.query(models.safe_area_group_info).filter_by(dementia_key = _dementia_key, group_name = 'notGrouped').first()
+        not_grouped = session.query(models.safe_area_group_info).filter_by(dementia_key = _dementia_key, group_name = '기본 그룹').first()
 
         if not not_grouped:
             rng = RandomNumberGenerator()
             for _ in range(10):
                 _not_grouped_key = rng.generate_unique_random_number(100000, 999999)
 
-            new_group = models.safe_area_group_info(group_key = _group_key, group_name = 'notGrouped', dementia_key = _dementia_key)
+            new_group = models.safe_area_group_info(group_key = _group_key, group_name = '기본 그룹', dementia_key = _dementia_key)
             session.add(new_group)
         else:
             _not_grouped_key = not_grouped.group_key
