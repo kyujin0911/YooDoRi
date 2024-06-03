@@ -18,3 +18,4 @@ bcrypt==4.1.2
 haversine==2.8.1
 pyfcm==1.5.4
 folium==0.16.0
+openai==1.30.5
