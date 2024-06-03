@@ -303,3 +303,7 @@ class AddressConversionResponse(BaseModel):
     status: str = Field("success")
     message: str = Field("메~시~지~")
     result: Dict[str, float] = latilongi
+
+class GPTRequest(BaseModel):
+    dementiaKey : str = Field(examples=["123456"])
+    date : str = Field(examples=["2024-03-19"], description="yyyy-mm-dd")
