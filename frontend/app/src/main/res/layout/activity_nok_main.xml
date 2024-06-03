@@ -581,6 +581,7 @@
                     app:layout_constraintTop_toTopOf="parent"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
+
                 <com.naver.maps.map.widget.LogoView
                     android:id="@+id/navermap_logo"
                     android:layout_width="wrap_content"
@@ -589,44 +590,6 @@
                     android:layout_marginBottom="8dp"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintBottom_toBottomOf="parent"/>
-
-                <TextView
-                    android:id="@+id/set_safe_area_tv"
-                    android:layout_width="60dp"
-                    android:layout_height="60dp"
-                    android:layout_marginEnd="16dp"
-                    android:layout_marginBottom="24dp"
-                    android:background="@drawable/oval_yellow"
-                    android:elevation="8dp"
-                    android:fontFamily="@font/suite_extrabold"
-                    android:textColor="@color/white"
-                    android:gravity="center"
-                    android:text='@{safeAreaVm.isSettingSafeArea ? "설정\n완료" : "구역\n설정"}'
-                    android:textSize="16sp"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    android:visibility='@{viewModel.navigateEventToString == "SafeArea" ? View.VISIBLE : View.GONE}'
-                    />
-
-                    <TextView
-                        android:id="@+id/cancel_safe_area_tv"
-                        android:layout_width="60dp"
-                        android:layout_height="60dp"
-                        android:layout_marginStart="16dp"
-                        android:layout_marginBottom="24dp"
-                        android:background="@drawable/oval_red"
-                        android:elevation="8dp"
-                        android:fontFamily="@font/suite_extrabold"
-                        android:gravity="center"
-                        android:text="취소"
-                        android:textColor="@color/white"
-                        android:textSize="16sp"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        android:visibility='@{safeAreaVm.isSettingSafeArea ? View.VISIBLE : View.GONE}'
-                        />
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -663,23 +626,12 @@
                         app:layout_constraintTop_toBottomOf="@id/bottom_sheet_top_iv"
                         app:navGraph="@navigation/nok_graph" />
 
+
                 </androidx.constraintlayout.widget.ConstraintLayout>
             </androidx.constraintlayout.widget.ConstraintLayout>
 
 
         </androidx.coordinatorlayout.widget.CoordinatorLayout>
-
-        <androidx.appcompat.widget.AppCompatButton
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="새 그룹 추가"
-            android:layout_marginHorizontal="8dp"
-            android:layout_marginBottom="16dp"
-            android:background="@drawable/rectangle_corner_10_white_stroke_yellow"
-            app:layout_constraintBottom_toTopOf="@id/bottomNav"
-            android:textAppearance="@style/TextAppearance.App.14sp.ExtraBold"
-            android:textColor="@color/yellow"
-            />
 
         <com.google.android.material.bottomnavigation.BottomNavigationView
             android:id="@+id/bottomNav"

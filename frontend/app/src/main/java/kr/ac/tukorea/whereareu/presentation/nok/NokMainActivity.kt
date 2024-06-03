@@ -674,7 +674,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
         initMap()
         initNavigator()
 
-        binding.setSafeAreaTv.setOnClickListener {
+       /* binding.setSafeAreaTv.setOnClickListener {
             behavior.isDraggable = false
             if(navController.currentDestination?.id == R.id.safeAreaFragment){
                 navController.navigate(R.id.action_safeAreaFragment_to_settingSafeAreaFragment)
@@ -682,7 +682,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                 navController.navigate(R.id.action_safeAreaDetailFragment_to_settingSafeAreaFragment)
             }
             safeAreaViewModel.setIsSettingSafeAreaStatus()
-        }
+        }*/
 
         binding.searchAddressEt.setOnEditorActionListener(EditorInfo.IME_ACTION_DONE) {
             Log.d("et", binding.searchAddressEt.text.toString())
@@ -736,10 +736,10 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
 
                     if (slideOffset <= 0.2f) {
                         Log.d("뭐ㅓㄴ데", "뭔데")
-                        behavior.isDraggable = false
+                        //behavior.isDraggable = false
                     } else {
                         Log.d("뭐ㅓㄴ데", "뭐냐고")
-                        behavior.isDraggable = true
+                        //behavior.isDraggable = true
                     }
                 } else {
                     if (slideOffset <= 0.3f) {

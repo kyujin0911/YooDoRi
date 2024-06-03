@@ -7,7 +7,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import kr.ac.tukorea.whereareu.data.model.nok.safearea.SafeAreaDto
 import kr.ac.tukorea.whereareu.databinding.ItemSafeAreaBinding
-import kr.ac.tukorea.whereareu.databinding.ItemSateAreaDetailBinding
+import kr.ac.tukorea.whereareu.databinding.ItemSafeAreaDetailBinding
 import kr.ac.tukorea.whereareu.domain.safearea.SafeArea
 import kr.ac.tukorea.whereareu.domain.safearea.SafeAreaDetail
 
@@ -29,7 +29,7 @@ class SafeAreaDetailRVA() : ListAdapter<SafeAreaDto, SafeAreaDetailRVA.SafeAreaD
         }
 
     }) {
-    inner class SafeAreaDetailViewHolder(private val binding: ItemSafeAreaBinding) :
+    inner class SafeAreaDetailViewHolder(private val binding: ItemSafeAreaDetailBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(safeAreaDetail: SafeAreaDto) {
             with(binding) {
@@ -43,7 +43,7 @@ class SafeAreaDetailRVA() : ListAdapter<SafeAreaDto, SafeAreaDetailRVA.SafeAreaD
         viewType: Int
     ): SafeAreaDetailViewHolder {
         return SafeAreaDetailViewHolder(
-            ItemSafeAreaBinding.inflate(
+            ItemSafeAreaDetailBinding.inflate(
                 LayoutInflater.from(parent.context),
                 parent,
                 false

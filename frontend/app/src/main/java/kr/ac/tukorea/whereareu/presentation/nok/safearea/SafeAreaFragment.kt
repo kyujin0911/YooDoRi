@@ -44,7 +44,10 @@ class SafeAreaFragment : BaseFragment<FragmentSafeAreaBinding>(R.layout.fragment
         /*binding.tv.setOnClickListener {
             navigator.navigate(R.id.safeAreaDetailFragment)
         }*/
-        viewModel.fetchCoord("대림대학교")
+        binding.createGroupBtn.setOnClickListener {
+            val dialog = CreateSafeAreaGroupDialog()
+            dialog.show(childFragmentManager, dialog.tag)
+        }
     }
 
     override fun onResume() {
