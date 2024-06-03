@@ -28,6 +28,7 @@ import requests
 import urllib.parse
 import pandas as pd
 import time
+from openai import OpenAI
 
 
 router = APIRouter()
@@ -40,6 +41,9 @@ sched = BackgroundScheduler(timezone="Asia/Seoul", daemon=True)
 val = validateInSafeArea()
 kakao = Local(service_key=Config.kakao_service_key)
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+client = OpenAI(
+    api_key=Config.GPT_API_KEY,
+)
 
 
 
@@ -1228,6 +1232,39 @@ async def address_conversion(request: AddressConversionRequest):
 
     finally:
         session.close()
+
+#gpt test
+@router.post("/gpt")
+async def gpt_test(request: GPTRequest):
+    _key = request.dementiaKey
+    _date = request.date
+
+    loc_list = session.query(models.location_info).filter_by(dementia_key = _key, date = _date).all()
+
+    if not loc_list:
+        raise HTTPException(status_code=404, detail="Location data not found")
+    
+    route_descriptions = [f"({loc.latitude}, {loc.longitude})" for loc in loc_list]
+    route_prompt = "User's travel route: " + " -> ".join(route_descriptions)
+
+    try: 
+        response = client.chat.completions.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {"role": "system", "content": "You are a helpful assistant."},
+                {"role": "user", "content": route_prompt}
+            ]
+        )
+
+        return {"summary": response.choices[0].message['content'].strip()}
+    except Exception as e:
+        print(f"[ERROR] GPT-3 failed: {e}")
+
+        raise HTTPException(status_code=404, detail=f"{e}")
+    
+    finally:
+        session.close()
+
 
 
 
