@@ -904,34 +904,40 @@ async def register_safe_area(request: RegisterSafeAreaRequest):
         _latitude = request.latitude
         _longitude = request.longitude
         _radius = request.radius
-        _group_name = request.groupName
+        _group_key = request.groupKey
 
-        if not session.query(models.safe_area_info).filter_by(dementia_key = _dementia_key, area_name = _area_name).first() == None:
+        if not session.query(models.safe_area_info).filter_by(dementia_key = _dementia_key, group_key = _group_key, area_name = _area_name).first() == None:
             print(f"[ERROR] Safe area already exists for {_dementia_key}")
 
-            raise HTTPException(status_code=400, message="Safe area already exists")
+            raise HTTPException(status_code=400, detail="Safe area already exists in group")
         else:
             pass
 
-        if _group_name == '':
-            _group_name = '기본 그룹'
+        if _group_key == '':
+            _default_group = session.query(models.safe_area_group_info).filter_by(dementia_key = _dementia_key, group_name = '기본 그룹').first()
+            if _default_group:
+                _group_key = _default_group.group_key
+            else:
+                rng = RandomNumberGenerator()
+                for _ in range(10):
+                    _group_key = rng.generate_unique_random_number(100000, 999999)
+                
+                new_group = models.safe_area_group_info(group_key = _group_key, group_name = '기본 그룹', dementia_key = _dementia_key)
+                session.add(new_group)
         else:
             pass
 
-        existing_group = session.query(models.safe_area_group_info).filter_by(group_name = _group_name).first()
-
-        if existing_group:
-            _group_key = existing_group.group_key
-        else:
-            rng = RandomNumberGenerator()
-            for _ in range(10):
-                _group_key = rng.generate_unique_random_number(100000, 999999)
-
-            new_group = models.safe_area_group_info(group_key = _group_key, group_name = _group_name)
-            session.add(new_group)
-        
         _area_key = int(_dementia_key) + datetime.timestamp(datetime.now(timezone('Asia/Seoul'))) + ord(_area_name[0])
-        new_area = models.safe_area_info(area_key = _area_key, dementia_key = _dementia_key, area_name = _area_name, latitude = _latitude, longitude = _longitude, radius = _radius, group_key = _group_key)
+
+        new_area = models.safe_area_info(
+            dementia_key = _dementia_key,
+            area_key = _area_key,
+            area_name = _area_name,
+            latitude = _latitude,
+            longitude = _longitude,
+            radius = _radius,
+            group_key = _group_key
+        )
 
         session.add(new_area)
         
