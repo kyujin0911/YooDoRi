@@ -307,3 +307,12 @@ class AddressConversionResponse(BaseModel):
 class GPTRequest(BaseModel):
     dementiaKey : str = Field(examples=["123456"])
     date : str = Field(examples=["2024-03-19"], description="yyyy-mm-dd")
+
+class safeAreaGroupInfo(BaseModel):
+    groupName : str = Field(examples=["안심구역 그룹 1"])
+    groupKey : str = Field(examples=["123456"])
+    
+class GetSafeAreaGroupKeyResponse(BaseModel):
+    status: str = Field("success")
+    message: str = Field("메~시~지~")
+    result: safeAreaGroupInfo
