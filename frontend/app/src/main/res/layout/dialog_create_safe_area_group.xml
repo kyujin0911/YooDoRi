@@ -9,41 +9,34 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:minWidth="300dp"
-        android:padding="16dp"
         android:background="@drawable/rectangle_corner_10_white"
-        >
+        android:minWidth="300dp">
 
         <TextView
             android:id="@+id/title_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textAppearance="@style/TextAppearance.App.16sp.ExtraBold"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="20dp"
             android:text="새 그룹 만들기"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent"/>
+            android:textAppearance="@style/TextAppearance.App.16sp.ExtraBold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/name_textInputLayout"
-            style="@style/Widget.App.TextInputLayout.corner10"
+        <EditText
+            android:id="@+id/group_name_et"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:backgroundTint="@color/gray60"
+            android:hint="그룹 이름을 입력해주세요."
             android:layout_marginHorizontal="24dp"
-            android:layout_marginTop="12dp"
-            app:layout_constraintTop_toBottomOf="@id/title_tv"
+            android:layout_marginTop="24dp"
+            android:textAppearance="@style/TextAppearance.App.16sp.SemiBold"
+            android:textColorHint="@color/gray60"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent">
+            app:layout_constraintTop_toBottomOf="@id/title_tv" />
 
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/name_et"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="그룹 이름을 입력해주세요"
-                android:inputType="text"
-                android:textAppearance="@style/TextAppearance.App.16sp.SemiBold"
-                android:textColorHint="@color/gray60" />
-
-        </com.google.android.material.textfield.TextInputLayout>
 
         <TextView
             android:id="@+id/cancel_btn"
@@ -55,11 +48,10 @@
             android:padding="10dp"
             android:text="취소"
             android:textAppearance="@style/TextAppearance.App.16sp.SemiBold"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/done_btn"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/name_textInputLayout"
-            app:layout_constraintBottom_toBottomOf="parent"
-            />
+            app:layout_constraintTop_toBottomOf="@id/group_name_et" />
 
         <TextView
             android:id="@+id/done_btn"

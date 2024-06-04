@@ -44,6 +44,8 @@ class SafeAreaViewModel @Inject constructor(
         data class RadiusChange(val radius: String): SafeAreaEvent()
 
         data class SettingSafeArea(val isSettingSafeArea: Boolean): SafeAreaEvent()
+
+        data class CreateSafeAreaGroup(val groupName: String): SafeAreaEvent()
     }
 
     fun setIsSettingSafeAreaStatus(){
@@ -147,4 +149,8 @@ class SafeAreaViewModel @Inject constructor(
             }
         }
     }*/
+
+    fun createSafeAreaGroup(groupName: String){
+        eventSafeArea(SafeAreaEvent.CreateSafeAreaGroup(groupName))
+    }
 }

@@ -31,6 +31,7 @@ class SafeAreaFragment : BaseFragment<FragmentSafeAreaBinding>(R.layout.fragment
     }
     override fun initView() {
         initSafeAreaRVA()
+        showCreateSafeAreaGroupDialog()
         /*viewModel.registerSafeArea(
             RegisterSafeAreaRequest(
                 "253050",
@@ -44,10 +45,7 @@ class SafeAreaFragment : BaseFragment<FragmentSafeAreaBinding>(R.layout.fragment
         /*binding.tv.setOnClickListener {
             navigator.navigate(R.id.safeAreaDetailFragment)
         }*/
-        binding.createGroupBtn.setOnClickListener {
-            val dialog = CreateSafeAreaGroupDialog()
-            dialog.show(childFragmentManager, dialog.tag)
-        }
+
     }
 
     override fun onResume() {
@@ -76,8 +74,21 @@ class SafeAreaFragment : BaseFragment<FragmentSafeAreaBinding>(R.layout.fragment
             is SafeAreaViewModel.SafeAreaEvent.SettingSafeArea -> {}
             is SafeAreaViewModel.SafeAreaEvent.RadiusChange -> {
             }
+            is SafeAreaViewModel.SafeAreaEvent.CreateSafeAreaGroup -> {
+                val newGroup = SafeArea(event.groupName, "", "", "", 0.0, 0.0, 0,SafeAreaRVA.SAFE_AREA_GROUP)
+                safeAreaRVA.submitList(safeAreaRVA.currentList.toMutableList().apply {
+                    add(newGroup)
+                })
+            }
 
             else -> {}
+        }
+    }
+
+    private fun showCreateSafeAreaGroupDialog(){
+        binding.createGroupBtn.setOnClickListener {
+            val dialog = CreateSafeAreaGroupDialogFragment()
+            dialog.show(childFragmentManager, dialog.tag)
         }
     }
 
