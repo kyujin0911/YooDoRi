@@ -230,7 +230,7 @@ class AverageWalkingSpeedResponse(BaseModel):
 
 class RegisterSafeAreaRequest(BaseModel):
     dementiaKey : str = Field(examples=["123456"])
-    groupName : str = Field(examples=["안심구역 그룹 1"])
+    groupKey : str = Field(examples=["123456"])
     areaName : str = Field(examples=["집"])
     latitude : float = Field(examples=["37.123456"])
     longitude : float = Field(examples=["127.123456"])
@@ -311,7 +311,7 @@ class GPTRequest(BaseModel):
 class safeAreaGroupInfo(BaseModel):
     groupName : str = Field(examples=["안심구역 그룹 1"])
     groupKey : str = Field(examples=["123456"])
-    
+
 class GetSafeAreaGroupKeyResponse(BaseModel):
     status: str = Field("success")
     message: str = Field("메~시~지~")
