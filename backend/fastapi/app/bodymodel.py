@@ -250,13 +250,14 @@ class safeAreaList(BaseModel):
 class safeAreaGroupInfo(BaseModel):
     groupName : str = Field(examples=["안심구역 그룹 1"])
     groupKey : str = Field(examples=["123456"])
-    safeAreas : List[safeAreaList]
 
+class groupList(BaseModel):
+    groupList : List[safeAreaGroupInfo]
 
 class GetSafeAreaResponse(BaseModel):
     status: str = Field("success")
     message: str = Field("메~시~지~")
-    result: List[safeAreaGroupInfo]
+    result: groupList
 
 class ModifySafeAreaName(BaseModel):
     dementiaKey : str = Field(examples=["123456"])
