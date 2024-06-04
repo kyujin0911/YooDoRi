@@ -993,6 +993,28 @@ async def get_safe_area_info(dementiaKey: str):
     finally:
         session.close()
 
+@router.get("/safeArea/group/key", responses = {200 : {"model" : GetSafeAreaGroupKeyResponse, "description" : "안전 지역 그룹 키 전송 성공" }, 404: {"model": ErrorResponse, "description": "안전 지역 그룹 키 없음"}}, description="보호 대상자의 안전 지역 그룹 키 전달(쿼리 스트링)")
+async def get_safe_area_group_key(dementiaKey: str, groupName: str):
+    try:
+        group_key = session.query(models.safe_area_group_info).filter_by(dementia_key = dementiaKey, group_name = groupName).first().group_key
+
+        if not group_key:
+            raise HTTPException(status_code=404, detail="Safe area group key not found")
+
+        response = {
+            'status': 'success',
+            'message': 'Safe area group key sent',
+            'result': {
+                'groupName': groupName, # '기본 그룹' or '사용자 지정 그룹
+                'groupKey': group_key
+            }
+        }
+
+        return response
+    
+    finally:
+        session.close()
+
 @router.get("/safeArea/info/group", responses = {200 : {"model" : GetSafeAreaGroupResponse, "description" : "안전 지역 그룹 정보 전송 성공" }, 404: {"model": ErrorResponse, "description": "안전 지역 그룹 정보 없음"}}, description="보호 대상자의 특정 안전 지역 그룹 정보 전달(쿼리 스트링)")
 async def get_safe_area_group_info(dementiaKey: str, groupKey: str):
     try:
