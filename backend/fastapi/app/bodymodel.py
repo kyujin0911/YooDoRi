@@ -236,6 +236,10 @@ class RegisterSafeAreaRequest(BaseModel):
     longitude : float = Field(examples=["127.123456"])
     radius : float = Field(examples=["0.5"], description="킬로미터 단위")
 
+class RegisterSafeAreaGroupRequest(BaseModel):
+    dementiaKey : str = Field(examples=["123456"])
+    groupName : str = Field(examples=["안심구역 그룹 1"])
+
 class safeAreaList(BaseModel):
     areaName : str = Field(examples=["집"])
     areaKey : str = Field(examples=["123456"])
