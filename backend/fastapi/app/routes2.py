@@ -992,7 +992,6 @@ async def register_safe_area_group(request: RegisterSafeAreaGroupRequest):
     finally:
         session.close()
 
-
 @router.get("/safeArea/info", responses = {200 : {"model" : GetSafeAreaResponse, "description" : "안전 지역 정보 전송 성공" }, 404: {"model": ErrorResponse, "description": "안전 지역 정보 없음"}}, description="보호 대상자의 안전 지역 정보 전달(쿼리 스트링)")
 async def get_safe_area_info(dementiaKey: str):
     try:
@@ -1002,27 +1001,15 @@ async def get_safe_area_info(dementiaKey: str):
 
         # 그룹별로 저장
         for group in group_list:
-            safe_area_list = session.query(models.safe_area_info).filter_by(group_key = group.group_key).all()
-
-            safe_areas = []
-            for safe_area in safe_area_list:
-                safe_areas.append({
-                    'areaName': safe_area.area_name,
-                    'areaKey': safe_area.area_key,
-                    'latitude': safe_area.latitude,
-                    'longitude': safe_area.longitude,
-                    'radius': safe_area.radius
-                })
             
             group_lists.append({
                 'groupName': group.group_name,
-                'groupKey': group.group_key,
-                'safeAreas': safe_areas
+                'groupKey': group.group_key
             })
 
         
         result = {
-            'safeAreaList': group_lists
+            'groupList': group_lists
         }
 
         response = {
