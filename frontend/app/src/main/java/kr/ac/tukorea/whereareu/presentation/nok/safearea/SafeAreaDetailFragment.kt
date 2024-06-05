@@ -39,10 +39,18 @@ class SafeAreaDetailFragment: BaseFragment<FragmentSafeAreaDetailBinding>(R.layo
     }
 
     override fun initView() {
+        initRVA()
         viewModel.fetchSafeAreaGroup(args.groupKey)
         binding.backBtn.setOnClickListener {
             navigator.popBackStack()
         }
 
+    }
+
+    private fun initRVA(){
+        binding.rv.apply {
+            adapter = safeAreaRVA
+            itemAnimator = null
+        }
     }
 }

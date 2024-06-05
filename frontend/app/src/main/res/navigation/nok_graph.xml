@@ -99,6 +99,11 @@
         <fragment
             android:id="@+id/settingSafeAreaFragment"
             android:name="kr.ac.tukorea.whereareu.presentation.nok.safearea.SettingSafeAreaFragment"
-            android:label="SettingSafeAreaFragment" />
+            android:label="SettingSafeAreaFragment" >
+            <argument
+                android:name="groupName"
+                app:argType="string"
+                android:defaultValue="기본 그룹" />
+        </fragment>
     </navigation>
 </navigation>

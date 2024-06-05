@@ -46,6 +46,7 @@ import kr.ac.tukorea.whereareu.domain.safearea.SafeAreaMetaData
 import kr.ac.tukorea.whereareu.presentation.base.BaseActivity
 import kr.ac.tukorea.whereareu.presentation.nok.history.LocationHistoryViewModel
 import kr.ac.tukorea.whereareu.presentation.nok.home.NokHomeViewModel
+import kr.ac.tukorea.whereareu.presentation.nok.safearea.SafeAreaDetailFragmentDirections
 import kr.ac.tukorea.whereareu.presentation.nok.safearea.SafeAreaViewModel
 import kr.ac.tukorea.whereareu.presentation.nok.setting.SettingViewModel
 import kr.ac.tukorea.whereareu.util.extension.EditTextUtil.setOnEditorActionListener
@@ -214,6 +215,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                     if(navController.currentDestination?.id == R.id.safeAreaFragment){
                         navController.navigate(R.id.action_safeAreaFragment_to_settingSafeAreaFragment)
                     } else {
+                        val action = SafeAreaDetailFragmentDirections.actionSafeAreaDetailFragmentToSettingSafeAreaFragment()
                         navController.navigate(R.id.action_safeAreaDetailFragment_to_settingSafeAreaFragment)
                     }
 
