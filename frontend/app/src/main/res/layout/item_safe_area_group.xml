@@ -6,7 +6,7 @@
     <data>
         <variable
             name="model"
-            type="kr.ac.tukorea.whereareu.domain.safearea.SafeArea" />
+            type="kr.ac.tukorea.whereareu.data.model.nok.safearea.SafeAreaGroup" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

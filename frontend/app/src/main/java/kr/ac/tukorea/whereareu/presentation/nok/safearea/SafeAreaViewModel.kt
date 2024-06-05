@@ -10,8 +10,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import kr.ac.tukorea.whereareu.data.model.nok.safearea.GetCoordRequest
+import kr.ac.tukorea.whereareu.data.model.nok.safearea.RegisterSafeAreaGroupRequest
 import kr.ac.tukorea.whereareu.data.model.nok.safearea.RegisterSafeAreaRequest
 import kr.ac.tukorea.whereareu.data.model.nok.safearea.SafeAreaDto
+import kr.ac.tukorea.whereareu.data.model.nok.safearea.SafeAreaGroup
 import kr.ac.tukorea.whereareu.data.repository.kakao.KakaoRepositoryImpl
 import kr.ac.tukorea.whereareu.data.repository.nok.safearea.SafeAreaRepositoryImpl
 import kr.ac.tukorea.whereareu.domain.safearea.SafeArea
@@ -35,7 +37,7 @@ class SafeAreaViewModel @Inject constructor(
     private val _safeAreaRadius = MutableSharedFlow<Double>()
     val safeAreaRadius = _safeAreaRadius.asSharedFlow()
     sealed class SafeAreaEvent{
-        data class FetchSafeArea(val safeAreas: List<SafeArea>, val groupNames: List<String>): SafeAreaEvent()
+        data class FetchSafeArea(val groupList: List<SafeAreaGroup>): SafeAreaEvent()
 
         data class FetchSafeAreaGroup(val safeAreas: List<SafeAreaDto>): SafeAreaEvent()
 
@@ -75,13 +77,23 @@ class SafeAreaViewModel @Inject constructor(
         }
     }
 
+    fun registerSafeAreaGroup(groupName: String){
+        viewModelScope.launch {
+            repository.registerSafeAreaGroup(RegisterSafeAreaGroupRequest(_dementiaKey.value, groupName)).onSuccess {
+                eventSafeArea(SafeAreaEvent.CreateSafeAreaGroup(groupName))
+                Log.d("registerSafeAreaGroup", it.toString())
+            }
+        }
+    }
+
     fun fetchSafeAreaAll() {
         viewModelScope.launch {
             repository.fetchSafeAreaAll(_dementiaKey.value).onSuccess {response ->
-                val safeAreaList = mutableListOf<SafeArea>()
-                val groupNameList = response.safeAreaList.map { it.groupName}.filterNot { it == "notGrouped" }
+                val groupList = response.groupList.sortedBy { it.groupName }
+                //val safeAreaList = mutableListOf<SafeArea>()
+                //val groupNameList = response.safeAreaList.map { it.groupName}.filterNot { it == "notGrouped" }
 
-                response.safeAreaList.forEach { _safeAreaList ->
+                /*response.safeAreaList.forEach { _safeAreaList ->
                     val temp = if (_safeAreaList.groupName == "notGrouped") {
                         _safeAreaList.safeAreas.map { safeArea ->
                             SafeArea(
@@ -117,9 +129,9 @@ class SafeAreaViewModel @Inject constructor(
                         {it.groupName},
                         {it.areaName}
                     )
-                )
-                eventSafeArea(SafeAreaEvent.FetchSafeArea(safeAreaList, groupNameList))
-                Log.d("safeArea List", safeAreaList.toString())
+                )*/
+                eventSafeArea(SafeAreaEvent.FetchSafeArea(groupList))
+                //Log.d("safeArea List", safeAreaList.toString())
                 Log.d("fetchSafeArea", response.toString())
             }
         }

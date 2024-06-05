@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.naver.maps.geometry.LatLng
+import kr.ac.tukorea.whereareu.data.model.nok.safearea.SafeAreaGroup
 import kr.ac.tukorea.whereareu.databinding.ItemSafeAreaBinding
 import kr.ac.tukorea.whereareu.databinding.ItemSafeAreaGroupBinding
 import kr.ac.tukorea.whereareu.databinding.ItemTimeInfoBinding
@@ -15,19 +16,19 @@ import kr.ac.tukorea.whereareu.domain.home.MeaningfulPlaceInfo
 import kr.ac.tukorea.whereareu.domain.safearea.SafeArea
 import java.lang.StringBuilder
 
-class SafeAreaRVA() : ListAdapter<SafeArea, RecyclerView.ViewHolder>(
+class SafeAreaRVA() : ListAdapter<SafeAreaGroup, RecyclerView.ViewHolder>(
     object :
-        DiffUtil.ItemCallback<SafeArea>() {
+        DiffUtil.ItemCallback<SafeAreaGroup>() {
         override fun areItemsTheSame(
-            oldItem: SafeArea,
-            newItem: SafeArea
+            oldItem: SafeAreaGroup,
+            newItem: SafeAreaGroup
         ): Boolean {
             return oldItem === newItem
         }
 
         override fun areContentsTheSame(
-            oldItem: SafeArea,
-            newItem: SafeArea
+            oldItem: SafeAreaGroup,
+            newItem: SafeAreaGroup
         ): Boolean {
             return oldItem == newItem
         }
@@ -37,9 +38,9 @@ class SafeAreaRVA() : ListAdapter<SafeArea, RecyclerView.ViewHolder>(
     fun setSafeRVAClickListener(listener: SafeRVAClickListener){
         this.safeRVAClickListener = listener
     }
-    inner class SafeAreaViewHolder(private val binding: ItemSafeAreaBinding) :
+    /*inner class SafeAreaViewHolder(private val binding: ItemSafeAreaBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        fun bind(safeArea: SafeArea) {
+        fun bind(safeAreaGroup: SafeAreaGroup) {
             with(binding) {
                 model = safeArea
 
@@ -49,15 +50,15 @@ class SafeAreaRVA() : ListAdapter<SafeArea, RecyclerView.ViewHolder>(
                 }
             }
         }
-    }
+    }*/
 
     inner class SafeAreaGroupViewHolder(private val binding: ItemSafeAreaGroupBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        fun bind(safeArea: SafeArea) {
+        fun bind(safeAreaGroup: SafeAreaGroup) {
             with(binding) {
-                model = safeArea
+                model = safeAreaGroup
                 infoViewBtn.setOnClickListener {
-                    safeRVAClickListener?.onClickInfoView(safeArea.groupKey)
+                    safeRVAClickListener?.onClickInfoView(safeAreaGroup.groupKey)
                 }
             }
         }
@@ -67,7 +68,7 @@ class SafeAreaRVA() : ListAdapter<SafeArea, RecyclerView.ViewHolder>(
         viewType: Int
     ): RecyclerView.ViewHolder {
         return when(viewType) {
-            SAFE_AREA -> {
+            /*SAFE_AREA -> {
                 SafeAreaViewHolder(
                     ItemSafeAreaBinding.inflate(
                         LayoutInflater.from(parent.context),
@@ -75,7 +76,7 @@ class SafeAreaRVA() : ListAdapter<SafeArea, RecyclerView.ViewHolder>(
                         false
                     )
                 )
-            }
+            }*/
             else -> {
                 SafeAreaGroupViewHolder(
                     ItemSafeAreaGroupBinding.inflate(
@@ -90,18 +91,18 @@ class SafeAreaRVA() : ListAdapter<SafeArea, RecyclerView.ViewHolder>(
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when(holder.itemViewType){
-            SAFE_AREA -> {
+            /*SAFE_AREA -> {
                 (holder as SafeAreaViewHolder).bind(currentList[position])
-            }
+            }*/
             SAFE_AREA_GROUP -> {
                 (holder as SafeAreaGroupViewHolder).bind(currentList[position])
             }
         }
     }
 
-    override fun getItemViewType(position: Int): Int {
+    /*override fun getItemViewType(position: Int): Int {
         return currentList[position].viewType
-    }
+    }*/
 
     interface SafeRVAClickListener{
         fun onClickMapView(latLng: LatLng)

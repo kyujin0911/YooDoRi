@@ -169,7 +169,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
     private fun handleSafeAreaEvent(event: SafeAreaViewModel.SafeAreaEvent) {
         when (event) {
             is SafeAreaViewModel.SafeAreaEvent.FetchSafeArea -> {
-                event.safeAreas.forEach { safeArea ->
+                /*event.safeAreas.forEach { safeArea ->
                     with(safeArea) {
                         val latLng = LatLng(latitude, longitude)
                         safeAreMetaData.markers.add(
@@ -199,7 +199,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                             }
                         )
                     }
-                }
+                }*/
 
             }
 

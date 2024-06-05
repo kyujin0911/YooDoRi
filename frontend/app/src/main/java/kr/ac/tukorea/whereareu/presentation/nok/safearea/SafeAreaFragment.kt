@@ -7,6 +7,7 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.naver.maps.geometry.LatLng
 import dagger.hilt.android.AndroidEntryPoint
 import kr.ac.tukorea.whereareu.R
+import kr.ac.tukorea.whereareu.data.model.nok.safearea.SafeAreaGroup
 import kr.ac.tukorea.whereareu.databinding.FragmentSafeAreaBinding
 import kr.ac.tukorea.whereareu.domain.safearea.SafeArea
 import kr.ac.tukorea.whereareu.presentation.base.BaseFragment
@@ -65,7 +66,7 @@ class SafeAreaFragment : BaseFragment<FragmentSafeAreaBinding>(R.layout.fragment
     private fun handleSafeAreaEvent(event: SafeAreaViewModel.SafeAreaEvent){
         when(event){
             is SafeAreaViewModel.SafeAreaEvent.FetchSafeArea -> {
-                safeAreaRVA.submitList(event.safeAreas, kotlinx.coroutines.Runnable {
+                safeAreaRVA.submitList(event.groupList, kotlinx.coroutines.Runnable {
                     dismissLoadingDialog()
                 })
             }
@@ -75,7 +76,7 @@ class SafeAreaFragment : BaseFragment<FragmentSafeAreaBinding>(R.layout.fragment
             is SafeAreaViewModel.SafeAreaEvent.RadiusChange -> {
             }
             is SafeAreaViewModel.SafeAreaEvent.CreateSafeAreaGroup -> {
-                val newGroup = SafeArea(event.groupName, "", "", "", 0.0, 0.0, 0,SafeAreaRVA.SAFE_AREA_GROUP)
+                val newGroup = SafeAreaGroup(event.groupName, "")
                 safeAreaRVA.submitList(safeAreaRVA.currentList.toMutableList().apply {
                     add(newGroup)
                 })
