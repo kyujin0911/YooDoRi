@@ -61,8 +61,8 @@ class SafeAreaViewModel@Inject constructor(
         _isSafeAreaGroupChanged.value = isSafeAreaGroupChanged
     }
 
-    fun setIsSettingSafeAreaStatus(){
-        isSettingSafeArea.value = isSettingSafeArea.value.not()
+    fun setIsSettingSafeAreaStatus(isSettingSafeArea: Boolean){
+        this.isSettingSafeArea.value = isSettingSafeArea
         eventSafeArea(SafeAreaEvent.SettingSafeArea(this.isSettingSafeArea.value))
     }
 

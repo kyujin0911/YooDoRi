@@ -76,6 +76,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
     private val safeAreMetaData = SafeAreaMetaData()
     private val tag = "NokMainActivity:"
     private val isFirstNavigationEvent = mutableListOf(true, true, true)
+    private var isRequireStopHomeFragmentJob = true
 
     private fun getUpdateLocationJob(duration: Long): Job {
         return lifecycleScope.launch {
@@ -210,10 +211,15 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
 
             is SafeAreaViewModel.SafeAreaEvent.SettingSafeArea -> {
                 if (event.isSettingSafeArea) {
+                    if(navController.currentDestination?.id == R.id.safeAreaFragment){
+                        navController.navigate(R.id.action_safeAreaFragment_to_settingSafeAreaFragment)
+                    } else {
+                        navController.navigate(R.id.action_safeAreaDetailFragment_to_settingSafeAreaFragment)
+                    }
+
                     with(safeAreMetaData) {
                         binding.bottomSheetTopIv.isVisible = false
                         isSettingSafeArea = true
-                        //behavior.isHideable = true
                         settingMarker.isVisible = true
                         settingCircleOverlay.isVisible = true
                     }
@@ -226,8 +232,6 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                     }
                     navController.popBackStack()
                 }
-                //behavior.state = BottomSheetBehavior.STATE_HIDDEN
-
             }
 
             is SafeAreaViewModel.SafeAreaEvent.RadiusChange -> {
@@ -677,6 +681,15 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
         homeViewModel.eventHomeState(isPredicted = false)
     }
 
+    private fun setSafeArea(){
+        /*if(navController.currentDestination?.id == R.id.safeAreaFragment){
+            navController.navigate(R.id.action_safeAreaFragment_to_settingSafeAreaFragment)
+        } else {
+            navController.navigate(R.id.action_safeAreaDetailFragment_to_settingSafeAreaFragment)
+        }*/
+        safeAreaViewModel.setIsSettingSafeAreaStatus(true)
+    }
+
     override fun initView() {
         binding.view = this
         binding.viewModel = homeViewModel
@@ -687,12 +700,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
         initNavigator()
 
         binding.setSafeAreaTv.setOnClickListener {
-             if(navController.currentDestination?.id == R.id.safeAreaFragment){
-                 navController.navigate(R.id.action_safeAreaFragment_to_settingSafeAreaFragment)
-             } else {
-                 navController.navigate(R.id.action_safeAreaDetailFragment_to_settingSafeAreaFragment)
-             }
-             safeAreaViewModel.setIsSettingSafeAreaStatus()
+             setSafeArea()
          }
 
         binding.searchAddressEt.setOnEditorActionListener(EditorInfo.IME_ACTION_DONE) {
@@ -773,7 +781,10 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                     R.id.meaningfulPlaceDetailFragment
                 )
             ) {
-                stopHomeFragmentJob()
+                if(isRequireStopHomeFragmentJob) {
+                    isRequireStopHomeFragmentJob = false
+                    stopHomeFragmentJob()
+                }
             }
 
             if (destination.id !in listOf(
@@ -784,7 +795,6 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
             ) {
                 isFirstNavigationEvent[SAFE_AREA] = true
                 safeAreaViewModel.setIsSafeAreaGroupChanged(true)
-                behavior.halfExpandedRatio = 0.3f
             }
 
             if (destination.id != R.id.locationHistoryFragment) {
@@ -806,6 +816,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
 
             when (destination.id) {
                 R.id.nokHomeFragment, R.id.meaningfulPlaceDetailFragment -> {
+                    isRequireStopHomeFragmentJob = true
                     homeViewModel.eventNavigate(NokHomeViewModel.NavigateEvent.Home)
                     homeViewModel.eventHomeState()
                 }
@@ -822,6 +833,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                 }
                 R.id.safeAreaDetailFragment -> {
                     homeViewModel.eventNavigate(NokHomeViewModel.NavigateEvent.SafeAreaInner)
+                    behavior.halfExpandedRatio = 0.3f
                 }
 
                 R.id.meaningfulPlaceFragment -> {

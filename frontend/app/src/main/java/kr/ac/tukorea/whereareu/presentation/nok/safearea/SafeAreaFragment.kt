@@ -33,6 +33,7 @@ class SafeAreaFragment : BaseFragment<FragmentSafeAreaBinding>(R.layout.fragment
     override fun initView() {
         initSafeAreaRVA()
         showCreateSafeAreaGroupDialog()
+        setSafeArea()
         /*viewModel.registerSafeArea(
             RegisterSafeAreaRequest(
                 "253050",
@@ -90,6 +91,12 @@ class SafeAreaFragment : BaseFragment<FragmentSafeAreaBinding>(R.layout.fragment
         binding.createGroupBtn.setOnClickListener {
             val dialog = CreateSafeAreaGroupDialogFragment()
             dialog.show(childFragmentManager, dialog.tag)
+        }
+    }
+
+    private fun setSafeArea(){
+        binding.setSafeAreaTv.setOnClickListener {
+            viewModel.setIsSettingSafeAreaStatus(true)
         }
     }
 
