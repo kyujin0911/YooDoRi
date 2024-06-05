@@ -113,4 +113,5 @@ object BindingAdapter {
         }
         view.background = ContextCompat.getDrawable(view.context, drawable)
     }
+
 }

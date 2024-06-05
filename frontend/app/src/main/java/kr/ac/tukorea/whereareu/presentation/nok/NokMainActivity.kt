@@ -273,7 +273,11 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
             }
 
             NokHomeViewModel.NavigateEvent.SafeArea -> {
-                behavior.state = BottomSheetBehavior.STATE_EXPANDED
+                if(navController.currentDestination?.id == R.id.safeAreaFragment) {
+                    behavior.state = BottomSheetBehavior.STATE_EXPANDED
+                } else {
+                    behavior.state = BottomSheetBehavior.STATE_HALF_EXPANDED
+                }
                 behavior.isDraggable = false
             }
 
@@ -285,7 +289,6 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
 
             NokHomeViewModel.NavigateEvent.SafeAreaInner -> {
                 behavior.state = BottomSheetBehavior.STATE_HALF_EXPANDED
-                behavior.isDraggable = true
                 with(safeAreMetaData) {
                     settingMarker.apply {
                         setMarker(
@@ -683,15 +686,14 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
         initMap()
         initNavigator()
 
-        /* binding.setSafeAreaTv.setOnClickListener {
-             behavior.isDraggable = false
+        binding.setSafeAreaTv.setOnClickListener {
              if(navController.currentDestination?.id == R.id.safeAreaFragment){
                  navController.navigate(R.id.action_safeAreaFragment_to_settingSafeAreaFragment)
              } else {
                  navController.navigate(R.id.action_safeAreaDetailFragment_to_settingSafeAreaFragment)
              }
              safeAreaViewModel.setIsSettingSafeAreaStatus()
-         }*/
+         }
 
         binding.searchAddressEt.setOnEditorActionListener(EditorInfo.IME_ACTION_DONE) {
             Log.d("et", binding.searchAddressEt.text.toString())
@@ -716,6 +718,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
         behavior = BottomSheetBehavior.from(binding.bottomSheet)
         behavior.state = BottomSheetBehavior.STATE_COLLAPSED
         behavior.isFitToContents = false
+        behavior.halfExpandedRatio = 0.3f
         behavior.setPeekHeight(200, true)
         behavior.addBottomSheetCallback(object : BottomSheetCallback() {
             override fun onStateChanged(bottomSheet: View, newState: Int) {
@@ -732,7 +735,6 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
 
                 if (navController.currentDestination?.id in listOf(
                         R.id.safeAreaDetailFragment,
-                        R.id.settingSafeAreaFragment
                     )
                 ) {
                     if (slideOffset >= 0.5f) {
@@ -782,6 +784,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
             ) {
                 isFirstNavigationEvent[SAFE_AREA] = true
                 safeAreaViewModel.setIsSafeAreaGroupChanged(true)
+                behavior.halfExpandedRatio = 0.3f
             }
 
             if (destination.id != R.id.locationHistoryFragment) {
@@ -811,10 +814,13 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                     homeViewModel.eventNavigate(NokHomeViewModel.NavigateEvent.Setting)
                 }
 
-                R.id.safeAreaFragment -> {
+                R.id.safeAreaFragment, R.id.settingSafeAreaFragment -> {
                     homeViewModel.eventNavigate(NokHomeViewModel.NavigateEvent.SafeArea)
+                    if (destination.id == R.id.settingSafeAreaFragment){
+                        behavior.halfExpandedRatio = 0.2f
+                    }
                 }
-                R.id.settingSafeAreaFragment, R.id.safeAreaDetailFragment -> {
+                R.id.safeAreaDetailFragment -> {
                     homeViewModel.eventNavigate(NokHomeViewModel.NavigateEvent.SafeAreaInner)
                 }
 
