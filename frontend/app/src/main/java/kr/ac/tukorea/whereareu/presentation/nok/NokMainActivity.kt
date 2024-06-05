@@ -231,7 +231,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
             }
 
             is SafeAreaViewModel.SafeAreaEvent.RadiusChange -> {
-                val zoom = when(event.radius){
+                val zoom = when (event.radius) {
                     "0.5" -> 14.0
                     "1" -> 13.5
                     "1.5" -> 13.0
@@ -674,15 +674,15 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
         initMap()
         initNavigator()
 
-       /* binding.setSafeAreaTv.setOnClickListener {
-            behavior.isDraggable = false
-            if(navController.currentDestination?.id == R.id.safeAreaFragment){
-                navController.navigate(R.id.action_safeAreaFragment_to_settingSafeAreaFragment)
-            } else {
-                navController.navigate(R.id.action_safeAreaDetailFragment_to_settingSafeAreaFragment)
-            }
-            safeAreaViewModel.setIsSettingSafeAreaStatus()
-        }*/
+        /* binding.setSafeAreaTv.setOnClickListener {
+             behavior.isDraggable = false
+             if(navController.currentDestination?.id == R.id.safeAreaFragment){
+                 navController.navigate(R.id.action_safeAreaFragment_to_settingSafeAreaFragment)
+             } else {
+                 navController.navigate(R.id.action_safeAreaDetailFragment_to_settingSafeAreaFragment)
+             }
+             safeAreaViewModel.setIsSettingSafeAreaStatus()
+         }*/
 
         binding.searchAddressEt.setOnEditorActionListener(EditorInfo.IME_ACTION_DONE) {
             Log.d("et", binding.searchAddressEt.text.toString())
@@ -726,13 +726,11 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                         R.id.settingSafeAreaFragment
                     )
                 ) {
-                    /*if (slideOffset >= 0.5f) {
+                    if (slideOffset >= 0.5f) {
                         binding.setSafeAreaTv.isVisible = false
-                        binding.cancelSafeAreaTv.isVisible = false
                     } else {
                         binding.setSafeAreaTv.isVisible = true
-                        binding.cancelSafeAreaTv.isVisible = true
-                    }*/
+                    }
 
                     if (slideOffset <= 0.2f) {
                         Log.d("뭐ㅓㄴ데", "뭔데")
@@ -789,7 +787,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                 behavior.isDraggable = true
             }
 
-            if (destination.id == R.id.safeAreaFragment){
+            if (destination.id == R.id.safeAreaFragment) {
                 behavior.setPeekHeight(300, true)
             }
 

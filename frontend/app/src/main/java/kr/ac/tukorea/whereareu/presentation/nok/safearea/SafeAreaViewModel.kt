@@ -1,6 +1,7 @@
 package kr.ac.tukorea.whereareu.presentation.nok.safearea
 
 import android.util.Log
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.naver.maps.geometry.LatLng
@@ -8,6 +9,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kr.ac.tukorea.whereareu.data.model.nok.safearea.GetCoordRequest
 import kr.ac.tukorea.whereareu.data.model.nok.safearea.RegisterSafeAreaGroupRequest
@@ -16,15 +18,12 @@ import kr.ac.tukorea.whereareu.data.model.nok.safearea.SafeAreaDto
 import kr.ac.tukorea.whereareu.data.model.nok.safearea.SafeAreaGroup
 import kr.ac.tukorea.whereareu.data.repository.kakao.KakaoRepositoryImpl
 import kr.ac.tukorea.whereareu.data.repository.nok.safearea.SafeAreaRepositoryImpl
-import kr.ac.tukorea.whereareu.domain.safearea.SafeArea
-import kr.ac.tukorea.whereareu.presentation.nok.safearea.adapter.SafeAreaRVA
 import kr.ac.tukorea.whereareu.util.network.onSuccess
 import javax.inject.Inject
 
 @HiltViewModel
-class SafeAreaViewModel @Inject constructor(
+class SafeAreaViewModel@Inject constructor(
     private val repository: SafeAreaRepositoryImpl,
-    private val kakao: KakaoRepositoryImpl
 ) : ViewModel() {
 
     private val _dementiaKey = MutableStateFlow("")
@@ -36,6 +35,12 @@ class SafeAreaViewModel @Inject constructor(
 
     private val _safeAreaRadius = MutableSharedFlow<Double>()
     val safeAreaRadius = _safeAreaRadius.asSharedFlow()
+
+    private val _isSafeAreaGroupChanged = MutableStateFlow(true)
+    val isSafeAreaGroupChanged = _isSafeAreaGroupChanged.asStateFlow()
+
+
+
     sealed class SafeAreaEvent{
         data class FetchSafeArea(val groupList: List<SafeAreaGroup>): SafeAreaEvent()
 
@@ -80,6 +85,7 @@ class SafeAreaViewModel @Inject constructor(
     fun registerSafeAreaGroup(groupName: String){
         viewModelScope.launch {
             repository.registerSafeAreaGroup(RegisterSafeAreaGroupRequest(_dementiaKey.value, groupName)).onSuccess {
+                _isSafeAreaGroupChanged.value = true
                 eventSafeArea(SafeAreaEvent.CreateSafeAreaGroup(groupName))
                 Log.d("registerSafeAreaGroup", it.toString())
             }
@@ -89,6 +95,7 @@ class SafeAreaViewModel @Inject constructor(
     fun fetchSafeAreaAll() {
         viewModelScope.launch {
             repository.fetchSafeAreaAll(_dementiaKey.value).onSuccess {response ->
+                _isSafeAreaGroupChanged.value = false
                 val groupList = response.groupList.sortedBy { it.groupName }
                 //val safeAreaList = mutableListOf<SafeArea>()
                 //val groupNameList = response.safeAreaList.map { it.groupName}.filterNot { it == "notGrouped" }
@@ -130,6 +137,7 @@ class SafeAreaViewModel @Inject constructor(
                         {it.areaName}
                     )
                 )*/
+                //savedStateHandle["safeAreaGroupList"] = groupList
                 eventSafeArea(SafeAreaEvent.FetchSafeArea(groupList))
                 //Log.d("safeArea List", safeAreaList.toString())
                 Log.d("fetchSafeArea", response.toString())
@@ -153,14 +161,6 @@ class SafeAreaViewModel @Inject constructor(
             }
         }
     }
-
-    /*fun fetchKeyword(){
-        viewModelScope.launch {
-            kakao.searchWithKeyword("안양시 동안구 비산로 22").onSuccess {
-                Log.d("fetchKeyword", it.toString())
-            }
-        }
-    }*/
 
     fun createSafeAreaGroup(groupName: String){
         eventSafeArea(SafeAreaEvent.CreateSafeAreaGroup(groupName))

@@ -9,7 +9,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import kr.ac.tukorea.whereareu.R
 import kr.ac.tukorea.whereareu.data.model.nok.safearea.SafeAreaGroup
 import kr.ac.tukorea.whereareu.databinding.FragmentSafeAreaBinding
-import kr.ac.tukorea.whereareu.domain.safearea.SafeArea
 import kr.ac.tukorea.whereareu.presentation.base.BaseFragment
 import kr.ac.tukorea.whereareu.presentation.nok.safearea.adapter.SafeAreaRVA
 import kr.ac.tukorea.whereareu.util.extension.repeatOnStarted
@@ -29,6 +28,16 @@ class SafeAreaFragment : BaseFragment<FragmentSafeAreaBinding>(R.layout.fragment
                 handleSafeAreaEvent(event)
             }
         }
+
+        repeatOnStarted {
+            viewModel.isSafeAreaGroupChanged.collect{
+                if(it){
+                    //showLoadingDialog(requireContext(), "안심구역을 불러오고 있습니다.")
+                    viewModel.fetchSafeAreaAll()
+                }
+            }
+        }
+
     }
     override fun initView() {
         initSafeAreaRVA()
@@ -51,8 +60,8 @@ class SafeAreaFragment : BaseFragment<FragmentSafeAreaBinding>(R.layout.fragment
 
     override fun onResume() {
         super.onResume()
-        showLoadingDialog(requireContext(), "안심구역을 불러오고 있습니다.")
-        viewModel.fetchSafeAreaAll()
+        //showLoadingDialog(requireContext(), "안심구역을 불러오고 있습니다.")
+        //viewModel.fetchSafeAreaAll()
     }
 
     private fun initSafeAreaRVA(){
@@ -75,12 +84,12 @@ class SafeAreaFragment : BaseFragment<FragmentSafeAreaBinding>(R.layout.fragment
             is SafeAreaViewModel.SafeAreaEvent.SettingSafeArea -> {}
             is SafeAreaViewModel.SafeAreaEvent.RadiusChange -> {
             }
-            is SafeAreaViewModel.SafeAreaEvent.CreateSafeAreaGroup -> {
+            /*is SafeAreaViewModel.SafeAreaEvent.CreateSafeAreaGroup -> {
                 val newGroup = SafeAreaGroup(event.groupName, "")
                 safeAreaRVA.submitList(safeAreaRVA.currentList.toMutableList().apply {
                     add(newGroup)
                 })
-            }
+            }*/
 
             else -> {}
         }

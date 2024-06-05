@@ -6,6 +6,7 @@ import kr.ac.tukorea.whereareu.data.model.nok.safearea.GetCoordRequest
 import kr.ac.tukorea.whereareu.data.model.nok.safearea.GetSafeAreaGroupResponse
 import kr.ac.tukorea.whereareu.data.model.nok.safearea.GetSafeAreaResponse
 import kr.ac.tukorea.whereareu.data.model.nok.safearea.RegisterSafeAreaGroupRequest
+import kr.ac.tukorea.whereareu.data.model.nok.safearea.RegisterSafeAreaGroupResponse
 import kr.ac.tukorea.whereareu.data.model.nok.safearea.RegisterSafeAreaRequest
 import kr.ac.tukorea.whereareu.data.model.nok.safearea.RegisterSafeAreaResponse
 import retrofit2.Response
@@ -19,7 +20,7 @@ interface SafeAreaService {
     suspend fun registerSafeArea(@Body request: RegisterSafeAreaRequest): Response<RegisterSafeAreaResponse>
 
     @POST("safeArea/register/group")
-    suspend fun registerSafeAreaGroup(@Body request: RegisterSafeAreaGroupRequest): Response<ResponseBody<RegisterSafeAreaResponse>>
+    suspend fun registerSafeAreaGroup(@Body request: RegisterSafeAreaGroupRequest): Response<ResponseBody<RegisterSafeAreaGroupResponse>>
 
     @GET("safeArea/info")
     suspend fun getSafeAreaAll(@Query("dementiaKey") dementiaKey: String): Response<ResponseBody<GetSafeAreaResponse>>

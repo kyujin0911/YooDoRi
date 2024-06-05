@@ -70,7 +70,6 @@ class NokHomeViewModel @Inject constructor(
     private val _meaningfulPlace = MutableSharedFlow<List<MeaningfulPlaceInfo>>()
     val meaningfulPlace = _meaningfulPlace.asSharedFlow()
 
-
     sealed class PredictEvent {
         data class StartPredict(val isPredicted: Boolean) : PredictEvent()
         data class MeaningFulPlace(

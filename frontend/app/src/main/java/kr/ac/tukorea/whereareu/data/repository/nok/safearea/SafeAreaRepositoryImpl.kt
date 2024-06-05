@@ -1,12 +1,12 @@
 package kr.ac.tukorea.whereareu.data.repository.nok.safearea
 
 import kr.ac.tukorea.whereareu.data.api.nok.SafeAreaService
-import kr.ac.tukorea.whereareu.data.model.CommonResponse
 import kr.ac.tukorea.whereareu.data.model.ResponseBody
 import kr.ac.tukorea.whereareu.data.model.nok.safearea.GetCoordRequest
 import kr.ac.tukorea.whereareu.data.model.nok.safearea.GetSafeAreaGroupResponse
 import kr.ac.tukorea.whereareu.data.model.nok.safearea.GetSafeAreaResponse
 import kr.ac.tukorea.whereareu.data.model.nok.safearea.RegisterSafeAreaGroupRequest
+import kr.ac.tukorea.whereareu.data.model.nok.safearea.RegisterSafeAreaGroupResponse
 import kr.ac.tukorea.whereareu.data.model.nok.safearea.RegisterSafeAreaRequest
 import kr.ac.tukorea.whereareu.data.model.nok.safearea.RegisterSafeAreaResponse
 import kr.ac.tukorea.whereareu.util.network.NetworkResult
@@ -20,8 +20,8 @@ class SafeAreaRepositoryImpl @Inject constructor(
         return handleApi({api.registerSafeArea(request)}) {response: RegisterSafeAreaResponse -> response}
     }
 
-    override suspend fun registerSafeAreaGroup(request: RegisterSafeAreaGroupRequest): NetworkResult<RegisterSafeAreaResponse> {
-        return handleApi({api.registerSafeAreaGroup(request)}) {response: ResponseBody<RegisterSafeAreaResponse> -> response.result}
+    override suspend fun registerSafeAreaGroup(request: RegisterSafeAreaGroupRequest): NetworkResult<RegisterSafeAreaGroupResponse> {
+        return handleApi({api.registerSafeAreaGroup(request)}) {response: ResponseBody<RegisterSafeAreaGroupResponse> -> response.result}
     }
 
     override suspend fun fetchSafeAreaAll(dementiaKey: String): NetworkResult<GetSafeAreaResponse> {
