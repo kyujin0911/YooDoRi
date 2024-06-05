@@ -29,15 +29,6 @@ class SafeAreaFragment : BaseFragment<FragmentSafeAreaBinding>(R.layout.fragment
             }
         }
 
-        repeatOnStarted {
-            viewModel.isSafeAreaGroupChanged.collect{
-                if(it){
-                    //showLoadingDialog(requireContext(), "안심구역을 불러오고 있습니다.")
-                    viewModel.fetchSafeAreaAll()
-                }
-            }
-        }
-
     }
     override fun initView() {
         initSafeAreaRVA()
@@ -61,7 +52,7 @@ class SafeAreaFragment : BaseFragment<FragmentSafeAreaBinding>(R.layout.fragment
     override fun onResume() {
         super.onResume()
         //showLoadingDialog(requireContext(), "안심구역을 불러오고 있습니다.")
-        //viewModel.fetchSafeAreaAll()
+        viewModel.fetchSafeAreaAll()
     }
 
     private fun initSafeAreaRVA(){

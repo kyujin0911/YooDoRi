@@ -36,6 +36,8 @@ class SafeAreaViewModel@Inject constructor(
     private val _safeAreaRadius = MutableSharedFlow<Double>()
     val safeAreaRadius = _safeAreaRadius.asSharedFlow()
 
+    private val _safeAreaGroupList = MutableStateFlow<List<SafeAreaGroup>>(emptyList())
+
     private val _isSafeAreaGroupChanged = MutableStateFlow(true)
     val isSafeAreaGroupChanged = _isSafeAreaGroupChanged.asStateFlow()
 
@@ -53,6 +55,10 @@ class SafeAreaViewModel@Inject constructor(
         data class SettingSafeArea(val isSettingSafeArea: Boolean): SafeAreaEvent()
 
         data class CreateSafeAreaGroup(val groupName: String): SafeAreaEvent()
+    }
+
+    fun setIsSafeAreaGroupChanged(isSafeAreaGroupChanged: Boolean){
+        _isSafeAreaGroupChanged.value = isSafeAreaGroupChanged
     }
 
     fun setIsSettingSafeAreaStatus(){
@@ -93,9 +99,11 @@ class SafeAreaViewModel@Inject constructor(
     }
 
     fun fetchSafeAreaAll() {
+        if(!_isSafeAreaGroupChanged.value){
+            return
+        }
         viewModelScope.launch {
             repository.fetchSafeAreaAll(_dementiaKey.value).onSuccess {response ->
-                _isSafeAreaGroupChanged.value = false
                 val groupList = response.groupList.sortedBy { it.groupName }
                 //val safeAreaList = mutableListOf<SafeArea>()
                 //val groupNameList = response.safeAreaList.map { it.groupName}.filterNot { it == "notGrouped" }
@@ -141,6 +149,7 @@ class SafeAreaViewModel@Inject constructor(
                 eventSafeArea(SafeAreaEvent.FetchSafeArea(groupList))
                 //Log.d("safeArea List", safeAreaList.toString())
                 Log.d("fetchSafeArea", response.toString())
+                _isSafeAreaGroupChanged.value = false
             }
         }
     }

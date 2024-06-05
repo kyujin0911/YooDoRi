@@ -273,7 +273,19 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
             }
 
             NokHomeViewModel.NavigateEvent.SafeArea -> {
-                setBottomSheetBehaviorForFirstNavigationEvent(SAFE_AREA)
+                behavior.state = BottomSheetBehavior.STATE_EXPANDED
+                behavior.isDraggable = false
+            }
+
+            NokHomeViewModel.NavigateEvent.Setting -> {
+                binding.navermapLogo.isVisible = false
+                behavior.isDraggable = false
+                behavior.state = BottomSheetBehavior.STATE_EXPANDED
+            }
+
+            NokHomeViewModel.NavigateEvent.SafeAreaInner -> {
+                behavior.state = BottomSheetBehavior.STATE_HALF_EXPANDED
+                behavior.isDraggable = true
                 with(safeAreMetaData) {
                     settingMarker.apply {
                         setMarker(
@@ -289,7 +301,10 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                         center = settingMarker.position
                         radius = 500.0
                         color =
-                            ContextCompat.getColor(this@NokMainActivity, R.color.transparent_yellow)
+                            ContextCompat.getColor(
+                                this@NokMainActivity,
+                                R.color.transparent_yellow
+                            )
                         outlineWidth = 5
                         outlineColor =
                             ContextCompat.getColor(this@NokMainActivity, R.color.deep_yellow)
@@ -310,12 +325,6 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                         settingCircleOverlay.center = currentPosition
                     }
                 }
-            }
-
-            NokHomeViewModel.NavigateEvent.Setting -> {
-                binding.navermapLogo.isVisible = false
-                behavior.isDraggable = false
-                behavior.state = BottomSheetBehavior.STATE_EXPANDED
             }
         }
     }
@@ -722,7 +731,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                 }
 
                 if (navController.currentDestination?.id in listOf(
-                        R.id.safeAreaFragment,
+                        R.id.safeAreaDetailFragment,
                         R.id.settingSafeAreaFragment
                     )
                 ) {
@@ -772,6 +781,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                 )
             ) {
                 isFirstNavigationEvent[SAFE_AREA] = true
+                safeAreaViewModel.setIsSafeAreaGroupChanged(true)
             }
 
             if (destination.id != R.id.locationHistoryFragment) {
@@ -801,8 +811,11 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                     homeViewModel.eventNavigate(NokHomeViewModel.NavigateEvent.Setting)
                 }
 
-                R.id.safeAreaFragment, R.id.settingSafeAreaFragment, R.id.safeAreaDetailFragment -> {
+                R.id.safeAreaFragment -> {
                     homeViewModel.eventNavigate(NokHomeViewModel.NavigateEvent.SafeArea)
+                }
+                R.id.settingSafeAreaFragment, R.id.safeAreaDetailFragment -> {
+                    homeViewModel.eventNavigate(NokHomeViewModel.NavigateEvent.SafeAreaInner)
                 }
 
                 R.id.meaningfulPlaceFragment -> {

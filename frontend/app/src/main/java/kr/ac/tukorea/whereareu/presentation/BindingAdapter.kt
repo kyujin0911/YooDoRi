@@ -75,7 +75,8 @@ object BindingAdapter {
             "LocationHistory" -> R.color.white
             "MeaningfulPlace" -> R.color.gray40
             "Setting" -> R.color.white
-            "SafeArea" -> R.color.gray40
+            "SafeArea" -> R.color.white
+            "SafeAreaInner" -> R.color.gray40
             else -> R.color.white
         }
         view.setColorFilter(ContextCompat.getColor(view.context, color))

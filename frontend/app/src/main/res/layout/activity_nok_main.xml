@@ -588,6 +588,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
                     android:layout_marginBottom="8dp"
+                    android:visibility='@{viewModel.navigateEventToString == "SafeAreaInner" ? View.VISIBLE : View.GONE}'
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintBottom_toBottomOf="parent"/>
 
@@ -607,7 +608,7 @@
                         app:layout_constraintTop_toTopOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintBottom_toBottomOf="parent"
-                        android:visibility='@{viewModel.navigateEventToString == "SafeArea" ? View.VISIBLE : View.GONE}'
+                        android:visibility='@{viewModel.navigateEventToString == "SafeAreaInner" ? View.VISIBLE : View.GONE}'
                         />
 
                 </androidx.constraintlayout.widget.ConstraintLayout>

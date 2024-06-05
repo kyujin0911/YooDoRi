@@ -101,6 +101,8 @@ class NokHomeViewModel @Inject constructor(
         data object MeaningfulPlace : NavigateEvent
         data object LocationHistory : NavigateEvent
         data object SafeArea : NavigateEvent
+
+        data object SafeAreaInner: NavigateEvent
         data class HomeState(val isPredicted: Boolean, val isPredictDone: Boolean) : NavigateEvent
     }
 
