@@ -48,6 +48,7 @@ import kr.ac.tukorea.whereareu.presentation.nok.history.LocationHistoryViewModel
 import kr.ac.tukorea.whereareu.presentation.nok.home.NokHomeViewModel
 import kr.ac.tukorea.whereareu.presentation.nok.safearea.SafeAreaDetailFragmentDirections
 import kr.ac.tukorea.whereareu.presentation.nok.safearea.SafeAreaViewModel
+import kr.ac.tukorea.whereareu.presentation.nok.safearea.SelectGroupDialogFragment
 import kr.ac.tukorea.whereareu.presentation.nok.setting.SettingViewModel
 import kr.ac.tukorea.whereareu.util.extension.EditTextUtil.setOnEditorActionListener
 import kr.ac.tukorea.whereareu.util.extension.getUserKey
@@ -707,6 +708,12 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
 
         binding.searchAddressEt.setOnEditorActionListener(EditorInfo.IME_ACTION_DONE) {
             Log.d("et", binding.searchAddressEt.text.toString())
+        }
+
+        binding.changeGroupBtn.setOnClickListener {
+            val dialog = SelectGroupDialogFragment()
+
+            dialog.show(supportFragmentManager, dialog.tag)
         }
     }
 

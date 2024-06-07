@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 import kr.ac.tukorea.whereareu.data.model.nok.safearea.GetCoordRequest
 import kr.ac.tukorea.whereareu.data.model.nok.safearea.RegisterSafeAreaGroupRequest
@@ -40,6 +41,9 @@ class SafeAreaViewModel@Inject constructor(
 
     private val _isSafeAreaGroupChanged = MutableStateFlow(true)
     val isSafeAreaGroupChanged = _isSafeAreaGroupChanged.asStateFlow()
+
+    private val _selectedSafeAreaGroup = MutableStateFlow<SafeAreaGroup>(SafeAreaGroup("", ""))
+    val selectedSafeAreaGroup = _selectedSafeAreaGroup.asStateFlow()
 
 
 
@@ -146,6 +150,7 @@ class SafeAreaViewModel@Inject constructor(
                     )
                 )*/
                 //savedStateHandle["safeAreaGroupList"] = groupList
+                _safeAreaGroupList.value = groupList
                 eventSafeArea(SafeAreaEvent.FetchSafeArea(groupList))
                 //Log.d("safeArea List", safeAreaList.toString())
                 Log.d("fetchSafeArea", response.toString())
@@ -173,5 +178,13 @@ class SafeAreaViewModel@Inject constructor(
 
     fun createSafeAreaGroup(groupName: String){
         eventSafeArea(SafeAreaEvent.CreateSafeAreaGroup(groupName))
+    }
+
+    fun getSafeAreaGroupList(): List<SafeAreaGroup>{
+        return _safeAreaGroupList.value
+    }
+
+    fun setSelectedSafeAreaGroup(groupName: String){
+        _selectedSafeAreaGroup.value = _safeAreaGroupList.value.find { it.groupName == groupName }!!
     }
 }

@@ -8,21 +8,24 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:minWidth="300dp"
+        android:background="@drawable/rectangle_corner_10_white">
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rv"
+        <RadioGroup
+            android:padding="16dp"
+            android:id="@+id/radio_group"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            android:orientation="vertical"
-            app:layout_constraintTop_toTopOf="parent"/>
+            app:layout_constraintTop_toTopOf="parent">
+
+        </RadioGroup>
 
         <TextView
             android:id="@+id/cancel_btn"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
+            android:layout_marginTop="24dp"
             android:background="@drawable/bg_dialog_cancel_btn"
             android:gravity="center"
             android:padding="10dp"
@@ -30,7 +33,7 @@
             android:textAppearance="@style/TextAppearance.App.16sp.SemiBold"
             app:layout_constraintEnd_toStartOf="@id/done_btn"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/rv" />
+            app:layout_constraintTop_toBottomOf="@id/radio_group" />
 
         <TextView
             android:id="@+id/done_btn"
@@ -39,7 +42,7 @@
             android:background="@drawable/bg_dialog_done_btn"
             android:gravity="center"
             android:padding="10dp"
-            android:text="선택완료"
+            android:text="만들기"
             android:textAppearance="@style/TextAppearance.App.16sp.SemiBold"
             app:layout_constraintBottom_toBottomOf="@id/cancel_btn"
             app:layout_constraintEnd_toEndOf="parent"
