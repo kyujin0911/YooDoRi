@@ -42,7 +42,7 @@
             android:background="@drawable/bg_dialog_done_btn"
             android:gravity="center"
             android:padding="10dp"
-            android:text="만들기"
+            android:text="변경하기"
             android:textAppearance="@style/TextAppearance.App.16sp.SemiBold"
             app:layout_constraintBottom_toBottomOf="@id/cancel_btn"
             app:layout_constraintEnd_toEndOf="parent"

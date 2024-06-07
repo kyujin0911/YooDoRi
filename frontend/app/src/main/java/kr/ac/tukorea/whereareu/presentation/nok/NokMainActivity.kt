@@ -251,6 +251,10 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                 safeAreMetaData.settingCircleOverlay.radius = event.radius.toDouble().times(1000)
             }
 
+            is SafeAreaViewModel.SafeAreaEvent.ChangeSafeAreaGroup -> {
+                binding.groupTv.text = event.groupName
+            }
+
             else -> {}
         }
     }

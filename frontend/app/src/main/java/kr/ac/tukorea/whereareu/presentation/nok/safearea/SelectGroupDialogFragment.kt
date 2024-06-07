@@ -1,6 +1,7 @@
 package kr.ac.tukorea.whereareu.presentation.nok.safearea
 
 import android.content.res.ColorStateList
+import android.util.Log
 import android.view.View
 import android.widget.RadioButton
 import android.widget.RadioGroup
@@ -27,7 +28,13 @@ class SelectGroupDialogFragment: BaseDialogFragment<DialogSelectGroupBinding>(R.
         addRadioButtons(list)
         binding.radioGroup.check(defaultGroupId)
         binding.doneBtn.setOnClickListener {
-            val id = binding.radioGroup.checkedRadioButtonId
+            val checkedButton = view?.findViewById<RadioButton>(binding.radioGroup.checkedRadioButtonId)!!
+            viewModel.setSelectedSafeAreaGroup(checkedButton.text.toString())
+            dismiss()
+        }
+
+        binding.cancelBtn.setOnClickListener {
+            dismiss()
         }
     }
 
@@ -40,6 +47,7 @@ class SelectGroupDialogFragment: BaseDialogFragment<DialogSelectGroupBinding>(R.
                 RadioGroup.LayoutParams.WRAP_CONTENT
             )
             params.setMargins(0, 4, 0, 4)
+            radioButton.id = View.generateViewId()
             binding.radioGroup.addView(radioButton)
             radioButton.buttonTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.yellow))
             if(it.groupName == "기본 그룹")
