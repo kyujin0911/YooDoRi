@@ -19,7 +19,6 @@ import kr.ac.tukorea.whereareu.data.repository.nok.home.NokHomeRepositoryImpl
 import kr.ac.tukorea.whereareu.domain.home.LastLocation
 import kr.ac.tukorea.whereareu.domain.home.MeaningfulPlaceInfo
 import kr.ac.tukorea.whereareu.domain.home.DementiaStatusInfo
-import kr.ac.tukorea.whereareu.domain.home.LocationInfo
 import kr.ac.tukorea.whereareu.domain.home.PoliceStationInfo
 import kr.ac.tukorea.whereareu.domain.home.PredictLocation
 import kr.ac.tukorea.whereareu.util.network.onError
@@ -102,7 +101,9 @@ class NokHomeViewModel @Inject constructor(
         data object LocationHistory : NavigateEvent
         data object SafeArea : NavigateEvent
 
-        data object SafeAreaInner: NavigateEvent
+        data object SafeAreaDetail: NavigateEvent
+
+        data object SafeAreaSetting: NavigateEvent
         data class HomeState(val isPredicted: Boolean, val isPredictDone: Boolean) : NavigateEvent
     }
 

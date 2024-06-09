@@ -6,5 +6,5 @@ data class RegisterSafeAreaRequest(
     val areaName: String,
     val latitude: Double,
     val longitude: Double,
-    val radius: Int,
+    val radius: Float,
 )

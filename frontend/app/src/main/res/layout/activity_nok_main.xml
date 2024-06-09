@@ -291,6 +291,7 @@
                             android:layout_height="wrap_content"
                             android:hint="안심구역 이름을 입력해주세요."
                             android:inputType="text"
+                            android:text="@={safeAreaVm.settingSafeAreaName}"
                             android:textAppearance="@style/TextAppearance.App.16sp.ExtraBold"
                             android:textColorHint="@color/gray60" />
 
@@ -330,7 +331,7 @@
                             android:imeOptions="actionDone"
                             app:layout_constraintTop_toTopOf="parent"
                             android:textAppearance="@style/TextAppearance.App.14sp.Bold"
-                            android:hint="주소를 입력해주세요."
+                            android:hint="주소로 설정할 구역 찾기"
                             android:background="@null"/>
                     </LinearLayout>
 

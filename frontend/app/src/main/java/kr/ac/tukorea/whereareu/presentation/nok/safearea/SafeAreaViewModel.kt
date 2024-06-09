@@ -45,6 +45,10 @@ class SafeAreaViewModel@Inject constructor(
     private val _selectedSafeAreaGroup = MutableStateFlow<SafeAreaGroup>(SafeAreaGroup("", ""))
     val selectedSafeAreaGroup = _selectedSafeAreaGroup.asStateFlow()
 
+    val settingSafeAreaName = MutableStateFlow("")
+
+    private val _settingSafeAreaRadius = MutableStateFlow(0.5f)
+    val settingSafeAreaRadius = _settingSafeAreaRadius.asStateFlow()
 
 
     sealed class SafeAreaEvent{
@@ -78,6 +82,7 @@ class SafeAreaViewModel@Inject constructor(
 
     fun setSafeAreaRadius(radius: String){
         eventSafeArea(SafeAreaEvent.RadiusChange(radius))
+        _settingSafeAreaRadius.value = radius.toFloat()
     }
 
     fun eventSafeArea(event: SafeAreaEvent){
@@ -86,13 +91,16 @@ class SafeAreaViewModel@Inject constructor(
         }
     }
 
-    fun registerSafeArea(request: RegisterSafeAreaRequest) {
+    /*fun registerSafeArea() {
         viewModelScope.launch {
-            repository.registerSafeArea(request).onSuccess {
+            repository.registerSafeArea(RegisterSafeAreaRequest(
+                _dementiaKey.value,
+
+            )).onSuccess {
                 Log.d("registerSafeArea", it.toString())
             }
         }
-    }
+    }*/
 
     fun registerSafeAreaGroup(groupName: String){
         viewModelScope.launch {

@@ -25,7 +25,6 @@ import com.naver.maps.map.CameraUpdate
 import com.naver.maps.map.MapFragment
 import com.naver.maps.map.NaverMap
 import com.naver.maps.map.OnMapReadyCallback
-import com.naver.maps.map.overlay.CircleOverlay
 import com.naver.maps.map.overlay.Marker
 import com.naver.maps.map.overlay.OverlayImage
 import com.naver.maps.map.overlay.PathOverlay
@@ -213,6 +212,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
 
             is SafeAreaViewModel.SafeAreaEvent.SettingSafeArea -> {
                 if (event.isSettingSafeArea) {
+                    behavior.isDraggable = false
                     if(navController.currentDestination?.id == R.id.safeAreaFragment){
                         navController.navigate(R.id.action_safeAreaFragment_to_settingSafeAreaFragment)
                     } else {
@@ -227,6 +227,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                         settingCircleOverlay.isVisible = true
                     }
                 } else {
+                    behavior.isDraggable = true
                     with(safeAreMetaData) {
                         binding.bottomSheetTopIv.isVisible = true
                         isSettingSafeArea = false
@@ -298,7 +299,11 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                 behavior.state = BottomSheetBehavior.STATE_EXPANDED
             }
 
-            NokHomeViewModel.NavigateEvent.SafeAreaInner -> {
+            NokHomeViewModel.NavigateEvent.SafeAreaDetail -> {
+                behavior.state = BottomSheetBehavior.STATE_HALF_EXPANDED
+            }
+
+            NokHomeViewModel.NavigateEvent.SafeAreaSetting -> {
                 behavior.state = BottomSheetBehavior.STATE_HALF_EXPANDED
                 with(safeAreMetaData) {
                     settingMarker.apply {
@@ -308,7 +313,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                             "",
                             naverMap
                         )
-                        isVisible = false
+                        isVisible = true
                     }
 
                     settingCircleOverlay.apply {
@@ -323,7 +328,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                         outlineColor =
                             ContextCompat.getColor(this@NokMainActivity, R.color.deep_yellow)
                         map = naverMap
-                        isVisible = false
+                        isVisible = true
 
                     }
 
@@ -746,7 +751,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
             }
 
             override fun onSlide(bottomSheet: View, slideOffset: Float) {
-                Log.d("slide offset", slideOffset.toString())
+                //Log.d("slide offset", slideOffset.toString())
 
                 if (slideOffset >= 0.5f) {
                     binding.navermapLogo.isVisible = false
@@ -780,6 +785,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
         })
     }
 
+    //viewModel과 binding Adapter로 refactoring ㅇ정
     private fun initNavigator() {
         val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.fragmentContainer) as NavHostFragment
@@ -817,7 +823,8 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
             if (destination.id !in listOf(
                     R.id.nokSettingFragment,
                     R.id.settingUpdateTimeFragment,
-                    R.id.modifyUserInfoFragment
+                    R.id.modifyUserInfoFragment,
+                R.id.settingSafeAreaFragment
                 )
             ) {
                 behavior.isDraggable = true
@@ -838,15 +845,17 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                     homeViewModel.eventNavigate(NokHomeViewModel.NavigateEvent.Setting)
                 }
 
-                R.id.safeAreaFragment, R.id.settingSafeAreaFragment -> {
+                R.id.safeAreaFragment-> {
                     homeViewModel.eventNavigate(NokHomeViewModel.NavigateEvent.SafeArea)
-                    if (destination.id == R.id.settingSafeAreaFragment){
-                        behavior.halfExpandedRatio = 0.2f
-                    }
                 }
                 R.id.safeAreaDetailFragment -> {
-                    homeViewModel.eventNavigate(NokHomeViewModel.NavigateEvent.SafeAreaInner)
+                    homeViewModel.eventNavigate(NokHomeViewModel.NavigateEvent.SafeAreaDetail)
                     behavior.halfExpandedRatio = 0.3f
+                }
+
+                R.id.settingSafeAreaFragment -> {
+                    homeViewModel.eventNavigate(NokHomeViewModel.NavigateEvent.SafeAreaSetting)
+                    behavior.halfExpandedRatio = 0.2f
                 }
 
                 R.id.meaningfulPlaceFragment -> {
