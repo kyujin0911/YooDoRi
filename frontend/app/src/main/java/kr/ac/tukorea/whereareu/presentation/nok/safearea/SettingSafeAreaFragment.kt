@@ -57,5 +57,4 @@ class SettingSafeAreaFragment :
             viewModel.setIsSettingSafeAreaStatus(false)
         }
     }
-
 }

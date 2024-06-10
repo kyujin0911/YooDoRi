@@ -26,7 +26,7 @@ class SelectGroupDialogFragment: BaseDialogFragment<DialogSelectGroupBinding>(R.
     override fun initView() {
         val list = viewModel.getSafeAreaGroupList()
         addRadioButtons(list)
-        binding.radioGroup.check(defaultGroupId)
+        //binding.radioGroup.check(defaultGroupId)
         binding.doneBtn.setOnClickListener {
             val checkedButton = view?.findViewById<RadioButton>(binding.radioGroup.checkedRadioButtonId)!!
             viewModel.setSelectedSafeAreaGroup(checkedButton.text.toString())

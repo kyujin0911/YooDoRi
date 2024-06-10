@@ -233,6 +233,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                         isSettingSafeArea = false
                         settingMarker.isVisible = false
                         settingCircleOverlay.isVisible = false
+                        safeAreaViewModel.setSelectedSafeAreaGroup("기본 그룹")
                     }
                     navController.popBackStack()
                 }
