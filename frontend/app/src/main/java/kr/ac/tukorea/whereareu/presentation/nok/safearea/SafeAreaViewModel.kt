@@ -50,6 +50,9 @@ class SafeAreaViewModel@Inject constructor(
     private val _settingSafeAreaRadius = MutableStateFlow(0.5f)
     val settingSafeAreaRadius = _settingSafeAreaRadius.asStateFlow()
 
+    private val _settingSafeAreaLatLng = MutableStateFlow(LatLng(0.0,0.0))
+    val settingSafeAreaLatLng = _settingSafeAreaLatLng.asStateFlow()
+
 
     sealed class SafeAreaEvent{
         data class FetchSafeArea(val groupList: List<SafeAreaGroup>): SafeAreaEvent()
@@ -65,6 +68,9 @@ class SafeAreaViewModel@Inject constructor(
         data class SettingSafeArea(val isSettingSafeArea: Boolean): SafeAreaEvent()
 
         data class CreateSafeAreaGroup(val groupName: String): SafeAreaEvent()
+
+        data object SuccessRegisterSafeArea: SafeAreaEvent()
+        data class FailRegisterSafeArea(val message: String): SafeAreaEvent()
     }
 
     fun setIsSafeAreaGroupChanged(isSafeAreaGroupChanged: Boolean){
@@ -85,22 +91,37 @@ class SafeAreaViewModel@Inject constructor(
         _settingSafeAreaRadius.value = radius.toFloat()
     }
 
+    fun setSettingSafeAreaLatLng(coord: LatLng){
+        _settingSafeAreaLatLng.value = coord
+    }
+
     fun eventSafeArea(event: SafeAreaEvent){
         viewModelScope.launch{
             _safeAreaEvent.emit(event)
         }
     }
 
-    /*fun registerSafeArea() {
+    fun registerSafeArea() {
         viewModelScope.launch {
+            if (settingSafeAreaName.value.isEmpty()){
+                eventSafeArea(SafeAreaEvent.FailRegisterSafeArea("안심구역 이름을 입력해주세요."))
+                return@launch
+            }
             repository.registerSafeArea(RegisterSafeAreaRequest(
                 _dementiaKey.value,
-
+                _selectedSafeAreaGroup.value.groupKey,
+                settingSafeAreaName.value,
+                _settingSafeAreaLatLng.value.latitude,
+                _settingSafeAreaLatLng.value.longitude,
+                _settingSafeAreaRadius.value
             )).onSuccess {
                 Log.d("registerSafeArea", it.toString())
+                eventSafeArea(SafeAreaEvent.SuccessRegisterSafeArea)
+                eventSafeArea(SafeAreaEvent.SettingSafeArea(false))
+                isSettingSafeArea.value = false
             }
         }
-    }*/
+    }
 
     fun registerSafeAreaGroup(groupName: String){
         viewModelScope.launch {

@@ -332,7 +332,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                         isVisible = true
 
                     }
-
+                    safeAreaViewModel.setSettingSafeAreaLatLng(naverMap?.cameraPosition?.target!!)
                     naverMap?.addOnCameraChangeListener { _, _ ->
                         if (!isSettingSafeArea) {
                             return@addOnCameraChangeListener
@@ -340,6 +340,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                         Log.d("change", "change")
 
                         val currentPosition = naverMap?.cameraPosition?.target!!
+                        safeAreaViewModel.setSettingSafeAreaLatLng(currentPosition)
                         Log.d("position", currentPosition.toString())
                         settingMarker.position = currentPosition
                         settingCircleOverlay.center = currentPosition
