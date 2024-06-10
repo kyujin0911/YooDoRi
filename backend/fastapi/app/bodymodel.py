@@ -312,3 +312,11 @@ class AddressConversionResponse(BaseModel):
 class GPTRequest(BaseModel):
     dementiaKey : str = Field(examples=["123456"])
     date : str = Field(examples=["2024-03-19"], description="yyyy-mm-dd")
+
+class groupKey(BaseModel):
+    groupKey : str = Field(examples=["123456"])
+
+class RegisterSafeAreaGroupResponse(BaseModel):
+    status: str = Field("success")
+    message: str = Field("메~시~지~")
+    result: groupKey
