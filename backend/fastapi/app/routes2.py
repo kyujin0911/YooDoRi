@@ -955,7 +955,7 @@ async def register_safe_area(request: RegisterSafeAreaRequest):
     finally:
         session.close()
 
-@router.post("/safeArea/register/group", status_code=status.HTTP_201_CREATED, responses = {201 : {"model" : CommonResponse, "description" : "안전 지역 그룹 등록 성공" }, 404: {"model": ErrorResponse, "description": "보호 대상자 키 조회 실패"}}, description="보호 대상자의 안전 지역 그룹을 등록")
+@router.post("/safeArea/register/group", status_code=status.HTTP_201_CREATED, responses = {201 : {"model" : RegisterSafeAreaGroupResponse, "description" : "안전 지역 그룹 등록 성공" }, 404: {"model": ErrorResponse, "description": "보호 대상자 키 조회 실패"}}, description="보호 대상자의 안전 지역 그룹을 등록")
 async def register_safe_area_group(request: RegisterSafeAreaGroupRequest):
     try:
         _dementia_key = request.dementiaKey
@@ -982,9 +982,14 @@ async def register_safe_area_group(request: RegisterSafeAreaGroupRequest):
         
         print(f"[INFO] Safe area group registered for {_dementia_key}")
 
+        result = {
+            'groupKey': _group_key
+        }
+
         response = {
             'status': 'success',
-            'message': 'Safe area group registered'
+            'message': 'Safe area group registered',
+            'result' : result
         }
 
         return response
