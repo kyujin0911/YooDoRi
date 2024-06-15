@@ -1,90 +1,71 @@
 package kr.ac.tukorea.whereareu.presentation.nok.meaningfulplace
 
 import android.os.Bundle
+import android.util.Log
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
-import androidx.navigation.NavController
-import androidx.navigation.fragment.findNavController
+import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.naver.maps.geometry.LatLng
-import kotlinx.coroutines.flow.collect
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import kr.ac.tukorea.whereareu.R
 import kr.ac.tukorea.whereareu.databinding.FragmentMeaningfulPlaceBinding
 import kr.ac.tukorea.whereareu.domain.home.MeaningfulPlaceInfo
 import kr.ac.tukorea.whereareu.presentation.base.BaseFragment
 import kr.ac.tukorea.whereareu.presentation.nok.home.NokHomeViewModel
-import kr.ac.tukorea.whereareu.presentation.nok.home.adapter.MeaningfulPlaceRVA
 import kr.ac.tukorea.whereareu.util.extension.repeatOnStarted
 
+@AndroidEntryPoint
 class MeaningfulPlaceFragment :
     BaseFragment<FragmentMeaningfulPlaceBinding>(R.layout.fragment_meaningful_place),
-    MeaningfulPlaceRVA.MeaningfulPlaceRVAClickListener {
-        private val viewModel: NokHomeViewModel by activityViewModels()
+    MeaningfulPlaceRVAForPage.MeaningfulPlaceRVAClickListener {
 
-    private val LOCATION_PERMISSION_REQUEST_CODE = 1001
-    private val meaningfulPlaceRVA by lazy{
-        MeaningfulPlaceRVA()
-    }
-    private val navigator: NavController by lazy{
-        findNavController()
-    }
+    private val homeViewModel: NokHomeViewModel by activityViewModels()
+    private val tag = "MeaningfulPlaceFragment:"
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?){
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        initRecyclerView()
         initObserver()
-        initView()
+        homeViewModel.eventMeaningfulPlace()
     }
-//    override fun initObserver() {
-//        repeatOnStarted {
-//            viewModel.predictEvent.collect{predictEvent ->
-//                handlePredictEvent(predictEvent)
-//            }
-//        }
-//
-//    }
 
-//    private fun handlePredictEvent(event: NokHomeViewModel.PredictEvent){
-//        when(event){
-//            is NokHomeViewModel.PredictEvent.StartPredict -> {
-//                initMeaningfulListRVA()
-//            }
-//            is NokHomeViewModel.PredictEvent.PredictLocation ->{
-//                with(event.predictLocation){
-//                    val address = meaningfulPlaceInfo.address
-//                    meaningfulPlaceInfo.latLng
-//                    binding.addressTV.text = address
-//                }
-//            }
-//        }
-//    }
+    private fun initRecyclerView() {
+        val meaningfulPlaceAdapter = MeaningfulPlaceRVAForPage()
+        binding.rv.apply {
+            layoutManager = LinearLayoutManager(context)
+            adapter = meaningfulPlaceAdapter
+        }
+
+        meaningfulPlaceAdapter.setRVAClickListener(this)
+    }
 
     override fun initObserver() {
-        repeatOnStarted {
-            viewModel.meaningfulPlace.collect {
-                meaningfulPlaceRVA.submitList(it)
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnStarted {
+                homeViewModel.meaningfulPlace.collect { meaningfulPlaces ->
+                    Log.d("$tag meaningfulPlace collect", meaningfulPlaces.toString())
+                    (binding.rv.adapter as MeaningfulPlaceRVAForPage).submitList(meaningfulPlaces)
+                }
             }
         }
     }
 
     override fun initView() {
-        binding.view = this
-        binding.viewModel = viewModel
-        initMeaningfulListRVA()
-    }
-
-    private fun initMeaningfulListRVA(){
-        binding.rv.adapter = meaningfulPlaceRVA
-        meaningfulPlaceRVA.setRVAClickListener(this)
     }
 
     override fun onClickMapView(latLng: LatLng) {
-        viewModel.eventPredict(NokHomeViewModel.PredictEvent.MapView(BottomSheetBehavior.STATE_COLLAPSED, latLng))
+        Log.d(tag, "MapView button clicked: $latLng")
+        homeViewModel.eventPredict(NokHomeViewModel.PredictEvent.MapView(BottomSheetBehavior.STATE_COLLAPSED, latLng))
     }
 
     override fun onClickInfoView(meaningfulPlace: MeaningfulPlaceInfo) {
-        val action = MeaningfulPlaceFragmentDirections.actionMeaningfulPlaceFragmentToMeaningfulPlaceDetailFragmentForPage(
-            meaningfulPlace
-        )
-        navigator.navigate(action)
+//        Log.d(tag, "InfoView button clicked: ${meaningfulPlace.address}")
+//        val action = MeaningfulPlaceFragmentDirections.actionMeaningfulPlaceFragmentToMeaningfulPlaceDetailFragment(meaningfulPlace)
+//        findNavController().navigate(action)
     }
 }
