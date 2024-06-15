@@ -95,7 +95,7 @@ class MeaningfulPlaceFragment :
     }
 
     override fun onClickInfoView(meaningfulPlace: MeaningfulPlaceInfo) {
-        val action = NokMeaningfulPlaceFragmentDirections.actionNokMeaningfulPlaceFragmentToMeaningfulPlaceDetailFragment(
+        val action = MeaningfulPlaceFragmentDirections.actionMeaningfulPlaceFragmentToMeaningfulPlaceDetailFragmentForPage(
             meaningfulPlace
         )
         navigator.navigate(action)
