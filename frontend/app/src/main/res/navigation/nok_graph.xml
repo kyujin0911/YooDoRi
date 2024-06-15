@@ -17,7 +17,7 @@
         tools:layout="@layout/fragment_location_history" />
     <navigation
         android:id="@+id/homeTab"
-        app:startDestination="@id/nokHomeFragment">
+        app:startDestination="@+id/nokHomeFragment">
         <fragment
             android:id="@+id/nokHomeFragment"
             android:name="kr.ac.tukorea.whereareu.presentation.nok.home.NokHomeFragment"
@@ -25,7 +25,7 @@
             tools:layout="@layout/fragment_home">
             <action
                 android:id="@+id/action_nokHomeFragment_to_meaningfulPlaceDetailFragment"
-                app:destination="@id/meaningfulPlaceDetailFragment" />
+                app:destination="@+id/meaningfulPlaceDetailFragment" />
         </fragment>
         <fragment
             android:id="@+id/meaningfulPlaceDetailFragment"
@@ -38,7 +38,7 @@
         </fragment>
     </navigation>
     <navigation android:id="@+id/meaningfulTab"
-        app:startDestination="@id/meaningfulPlaceFragment">
+        app:startDestination="@+id/meaningfulPlaceFragment">
         <fragment
             android:id="@+id/meaningfulPlaceFragment"
             android:name="kr.ac.tukorea.whereareu.presentation.nok.meaningfulplace.MeaningfulPlaceFragment"
@@ -46,7 +46,7 @@
             tools:layout="@layout/fragment_meaningful_place" >
             <action
                 android:id="@+id/action_meaningfulPlaceFragment_to_meaningfulPlaceDetailFragmentForPage"
-                app:destination="@id/meaningfulPlaceDetailFragmentForPage" />
+                app:destination="@+id/meaningfulPlaceDetailFragmentForPage" />
         </fragment>
 
         <fragment
