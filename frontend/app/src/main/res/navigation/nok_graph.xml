@@ -59,6 +59,30 @@
                 app:argType="kr.ac.tukorea.whereareu.domain.home.MeaningfulPlaceInfo"/>
         </fragment>
     </navigation>
+
+    <navigation android:id="@+id/navigation"
+        app:startDestination="@id/meaningfulPlaceFragment">
+        <fragment
+            android:id="@+id/meaningfulPlaceFragment"
+            android:name="kr.ac.tukorea.whereareu.presentation.nok.meaningfulplace.MeaningfulPlaceFragment"
+            android:label="MeaningfulPlaceFragment"
+            tools:layout="@layout/fragment_meaningful_place" >
+            <action
+                android:id="@+id/action_meaningfulPlaceFragment_to_meaningfulPlaceDetailFragmentForPage"
+                app:destination="@id/meaningfulPlaceDetailFragmentForPage" />
+        </fragment>
+
+        <fragment
+            android:id="@+id/meaningfulPlaceDetailFragmentForPage"
+            android:name="kr.ac.tukorea.whereareu.presentation.nok.home.MeaningfulPlaceDetailFragment"
+            android:label="MeaningfulPlaceDetailFragmentForPage"
+            tools:layout="@layout/fragment_meaningful_place_detail">
+            <argument
+                android:name="meaningfulPlace"
+                app:argType="kr.ac.tukorea.whereareu.domain.home.MeaningfulPlaceInfo"/>
+        </fragment>
+    </navigation>
+
     <navigation
         android:id="@+id/settingTab"
         app:startDestination="@id/nokSettingFragment">

@@ -34,7 +34,6 @@ class MeaningfulPlaceFragment :
         initObserver()
         initView()
     }
-
 //    override fun initObserver() {
 //        repeatOnStarted {
 //            viewModel.predictEvent.collect{predictEvent ->
@@ -57,18 +56,6 @@ class MeaningfulPlaceFragment :
 //                }
 //            }
 //        }
-//    }
-
-//    override fun initView() {
-//
-//    }
-//
-//    override fun onClickMapView(latLng: LatLng) {
-//
-//    }
-//
-//    override fun onClickInfoView(meaningfulPlace: MeaningfulPlaceInfo) {
-//
 //    }
 
     override fun initObserver() {
@@ -95,7 +82,7 @@ class MeaningfulPlaceFragment :
     }
 
     override fun onClickInfoView(meaningfulPlace: MeaningfulPlaceInfo) {
-        val action = MeaningfulPlaceFragmentDirections.actionMeaningfulPlaceFragmentToMeaningfulPlaceDetailFragment(
+        val action = MeaningfulPlaceFragmentDirections.actionMeaningfulPlaceFragmentToMeaningfulPlaceDetailFragmentForPage(
             meaningfulPlace
         )
         navigator.navigate(action)
