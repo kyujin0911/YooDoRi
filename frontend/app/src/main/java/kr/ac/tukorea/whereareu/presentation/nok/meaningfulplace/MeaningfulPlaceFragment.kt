@@ -5,6 +5,7 @@ import android.view.View
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.naver.maps.geometry.LatLng
 import kotlinx.coroutines.flow.collect
 import kr.ac.tukorea.whereareu.R
@@ -34,9 +35,6 @@ class MeaningfulPlaceFragment :
         initView()
     }
 
-    override fun initObserver() {
-
-    }
 //    override fun initObserver() {
 //        repeatOnStarted {
 //            viewModel.predictEvent.collect{predictEvent ->
@@ -61,15 +59,45 @@ class MeaningfulPlaceFragment :
 //        }
 //    }
 
-    override fun initView() {
+//    override fun initView() {
+//
+//    }
+//
+//    override fun onClickMapView(latLng: LatLng) {
+//
+//    }
+//
+//    override fun onClickInfoView(meaningfulPlace: MeaningfulPlaceInfo) {
+//
+//    }
 
+    override fun initObserver() {
+        repeatOnStarted {
+            viewModel.meaningfulPlace.collect {
+                meaningfulPlaceRVA.submitList(it)
+            }
+        }
+    }
+
+    override fun initView() {
+        binding.view = this
+        binding.viewModel = viewModel
+        initMeaningfulListRVA()
+    }
+
+    private fun initMeaningfulListRVA(){
+        binding.rv.adapter = meaningfulPlaceRVA
+        meaningfulPlaceRVA.setRVAClickListener(this)
     }
 
     override fun onClickMapView(latLng: LatLng) {
-
+        viewModel.eventPredict(NokHomeViewModel.PredictEvent.MapView(BottomSheetBehavior.STATE_COLLAPSED, latLng))
     }
 
     override fun onClickInfoView(meaningfulPlace: MeaningfulPlaceInfo) {
-
+        val action = NokMeaningfulPlaceFragmentDirections.actionNokMeaningfulPlaceFragmentToMeaningfulPlaceDetailFragment(
+            meaningfulPlace
+        )
+        navigator.navigate(action)
     }
 }
