@@ -622,7 +622,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                     homeViewModel.eventNavigate(NokHomeViewModel.NavigateEvent.SafeArea)
                 }
 
-                R.id.meaningfulPlaceFragment -> {
+                R.id.meaningfulPlaceFragment, R.id.meaningfulPlaceDetailFragment -> {
                     homeViewModel.eventNavigate(NokHomeViewModel.NavigateEvent.MeaningfulPlace)
                 }
 

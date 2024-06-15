@@ -5,6 +5,9 @@
 
     <data>
         <variable
+            name="view"
+            type="kr.ac.tukorea.whereareu.presentation.nok.meaningfulplace.MeaningfulPlaceFragment" />
+        <variable
             name="viewModel"
             type="kr.ac.tukorea.whereareu.presentation.nok.home.NokHomeViewModel" />
     </data>
