@@ -50,9 +50,9 @@
         </fragment>
 
         <fragment
-            android:id="@+id/meaningfulPlaceDetailFragmentForPage"
-            android:name="kr.ac.tukorea.whereareu.presentation.nok.home.MeaningfulPlaceDetailFragment"
-            android:label="MeaningfulPlaceDetailFragmentForPage"
+            android:id="@+id/meaningfulPlaceDetailForPageFragment"
+            android:name="kr.ac.tukorea.whereareu.presentation.nok.home.MeaningfulPlaceDetailForPageFragment"
+            android:label="MeaningfulPlaceDetailForPageFragment"
             tools:layout="@layout/fragment_meaningful_place_detail">
             <argument
                 android:name="meaningfulPlaceForPage"

@@ -1,4 +1,4 @@
-package kr.ac.tukorea.whereareu.presentation.nok.meaningfulplace
+package kr.ac.tukorea.whereareu.presentation.nok.meaningfulplace.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -12,7 +12,7 @@ import kr.ac.tukorea.whereareu.domain.home.GroupedTimeInfo
 import kr.ac.tukorea.whereareu.domain.home.MeaningfulPlaceInfo
 
 class MeaningfulPlaceRVAForPage :
-    ListAdapter<MeaningfulPlaceInfo, MeaningfulPlaceRVAForPage.MeaningfulPlaceViewHolder>
+    ListAdapter<MeaningfulPlaceInfo, MeaningfulPlaceRVAForPage.MeaningfulPlaceForPageViewHolder>
         (object : DiffUtil.ItemCallback<MeaningfulPlaceInfo>() {
         override fun areItemsTheSame(
             oldItem: MeaningfulPlaceInfo,
@@ -29,25 +29,25 @@ class MeaningfulPlaceRVAForPage :
         }
 
     }) {
-    private var meaningfulPlaceRVAClickListener: MeaningfulPlaceRVAClickListener? = null
+    private var meaningfulPlaceRVAForPageClickListener: MeaningfulPlaceRVAForPageClickListener? = null
 
     //RVA 클릭 리스너 초기화
-    fun setRVAClickListener(outerListener: MeaningfulPlaceRVAClickListener){
-        meaningfulPlaceRVAClickListener = outerListener
+    fun setRVAForPageClickListener(outerListener: MeaningfulPlaceRVAForPageClickListener){
+        meaningfulPlaceRVAForPageClickListener = outerListener
     }
 
-    inner class MeaningfulPlaceViewHolder(private val binding: ItemMeaningfulPlaceBinding) :
+    inner class MeaningfulPlaceForPageViewHolder(private val binding: ItemMeaningfulPlaceBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(meaningfulPlace: MeaningfulPlaceInfo) {
             with(binding) {
                 model = meaningfulPlace
 
                 mapViewBtn.setOnClickListener {
-                    meaningfulPlaceRVAClickListener?.onClickMapView(meaningfulPlace.latLng)
+                    meaningfulPlaceRVAForPageClickListener?.onClickMapView(meaningfulPlace.latLng)
                 }
 
                 infoViewBtn.setOnClickListener {
-                    meaningfulPlaceRVAClickListener?.onClickInfoView(meaningfulPlace)
+                    meaningfulPlaceRVAForPageClickListener?.onClickInfoView(meaningfulPlace)
                 }
 
             }
@@ -72,15 +72,15 @@ class MeaningfulPlaceRVAForPage :
         return groupedTimeInfoList
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MeaningfulPlaceViewHolder {
-        return MeaningfulPlaceViewHolder(
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MeaningfulPlaceForPageViewHolder {
+        return MeaningfulPlaceForPageViewHolder(
             ItemMeaningfulPlaceBinding.inflate(
                 LayoutInflater.from(parent.context), parent, false
             )
         )
     }
 
-    override fun onBindViewHolder(holder: MeaningfulPlaceViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: MeaningfulPlaceForPageViewHolder, position: Int) {
         holder.bind(currentList[position])
     }
 
@@ -101,7 +101,7 @@ class MeaningfulPlaceRVAForPage :
         return "${time.substring(0 until 2)}시~${time.substring(2 until 4)}시"
     }
 
-    interface MeaningfulPlaceRVAClickListener{
+    interface MeaningfulPlaceRVAForPageClickListener{
         fun onClickMapView(latLng: LatLng)
         fun onClickInfoView(meaningfulPlace: MeaningfulPlaceInfo)
     }

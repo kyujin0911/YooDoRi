@@ -18,33 +18,35 @@ import kr.ac.tukorea.whereareu.domain.home.PoliceStationInfo
 import kr.ac.tukorea.whereareu.presentation.base.BaseFragment
 import kr.ac.tukorea.whereareu.presentation.nok.home.adapter.PoliceStationRVA
 import kr.ac.tukorea.whereareu.presentation.nok.home.adapter.TimeInfoRVA
+import kr.ac.tukorea.whereareu.presentation.nok.meaningfulplace.adapter.PoliceStationRVAForPage
+import kr.ac.tukorea.whereareu.presentation.nok.meaningfulplace.adapter.TimeInfoRVAForPage
 import kr.ac.tukorea.whereareu.util.extension.showToastShort
 import java.util.Calendar
 import java.util.Date
 
 class MeaningfulPlaceDetailForPageFragment :
     BaseFragment<FragmentMeaningfulPlaceDetailBinding>(R.layout.fragment_meaningful_place_detail_for_page),
-    PoliceStationRVA.PoliceStationRVAClickListener {
+    PoliceStationRVAForPage.PoliceStationRVAForPageClickListener {
     private val navigator: NavController by lazy {
         findNavController()
     }
-    private val args: MeaningfulPlaceDetailFragmentArgs by navArgs()
+    private val args: MeaningfulPlaceDetailForPageFragmentArgs by navArgs()
     private val viewModel: NokHomeViewModel by activityViewModels()
-    private val policeStationRVA = PoliceStationRVA()
-    private val timeInfoRVA = TimeInfoRVA()
+    private val policeStationRVAForPage = PoliceStationRVAForPage()
+    private val timeInfoRVAForPage = TimeInfoRVAForPage()
     override fun initObserver() {
     }
 
     override fun initView() {
-        Log.d("args meanigfulPlace", args.meaningfulPlace.toString())
+        Log.d("args meanigfulPlace", args.meaningfulPlaceForPage.toString())
         binding.backBtn.setOnClickListener {
             navigator.popBackStack()
         }
 
-        binding.addressTv.text = args.meaningfulPlace.address
+        binding.addressTv.text = args.meaningfulPlaceForPage.address
 
         val timeInfoList =
-            groupTimeInfoList(args.meaningfulPlace.timeInfo.groupBy { it.dayOfTheWeek })
+            groupTimeInfoList(args.meaningfulPlaceForPage.timeInfo.groupBy { it.dayOfTheWeek })
         Log.d("timeInfoList", timeInfoList.toString())
 
         initRVA()
@@ -53,17 +55,17 @@ class MeaningfulPlaceDetailForPageFragment :
 
     private fun initRVA() {
         with(binding) {
-            policeStationRVA.setPoliceStationRVAClickListener(this@MeaningfulPlaceDetailForPageFragment)
-            policeRv.adapter = policeStationRVA
-            policeStationRVA.submitList(args.meaningfulPlace.policeStationInfo)
-            args.meaningfulPlace.timeInfo
+            policeStationRVAForPage.setPoliceStationRVAForPageClickListener(this@MeaningfulPlaceDetailForPageFragment)
+            policeRv.adapter = policeStationRVAForPage
+            policeStationRVAForPage.submitList(args.meaningfulPlaceForPage.policeStationInfo)
+            args.meaningfulPlaceForPage.timeInfo
 
         }
     }
 
     private fun initRadioGroup() {
         val timeInfoList =
-            groupTimeInfoList(args.meaningfulPlace.timeInfo.groupBy { it.dayOfTheWeek })
+            groupTimeInfoList(args.meaningfulPlaceForPage.timeInfo.groupBy { it.dayOfTheWeek })
         val dayOfWeek = getCurrentWeek()
         Log.d("dayOfWeek", dayOfWeek.toString())
         binding.radioGroup.check(dayOfWeek)

@@ -2,9 +2,7 @@ package kr.ac.tukorea.whereareu.presentation.nok.meaningfulplace
 
 import android.os.Bundle
 import android.util.Log
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -17,12 +15,13 @@ import kr.ac.tukorea.whereareu.databinding.FragmentMeaningfulPlaceBinding
 import kr.ac.tukorea.whereareu.domain.home.MeaningfulPlaceInfo
 import kr.ac.tukorea.whereareu.presentation.base.BaseFragment
 import kr.ac.tukorea.whereareu.presentation.nok.home.NokHomeViewModel
+import kr.ac.tukorea.whereareu.presentation.nok.meaningfulplace.adapter.MeaningfulPlaceRVAForPage
 import kr.ac.tukorea.whereareu.util.extension.repeatOnStarted
 
 @AndroidEntryPoint
 class MeaningfulPlaceFragment :
     BaseFragment<FragmentMeaningfulPlaceBinding>(R.layout.fragment_meaningful_place),
-    MeaningfulPlaceRVAForPage.MeaningfulPlaceRVAClickListener {
+    MeaningfulPlaceRVAForPage.MeaningfulPlaceRVAForPageClickListener {
 
     private val homeViewModel: NokHomeViewModel by activityViewModels()
     private val tag = "MeaningfulPlaceFragment:"
@@ -41,7 +40,7 @@ class MeaningfulPlaceFragment :
             adapter = meaningfulPlaceAdapter
         }
 
-        meaningfulPlaceAdapter.setRVAClickListener(this)
+        meaningfulPlaceAdapter.setRVAForPageClickListener(this)
     }
 
     override fun initObserver() {
