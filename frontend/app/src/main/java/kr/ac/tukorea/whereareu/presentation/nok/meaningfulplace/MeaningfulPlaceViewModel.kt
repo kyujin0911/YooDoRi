@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kr.ac.tukorea.whereareu.data.repository.nok.meaningfulplace.MeaningfulPlaceRepositoryImpl
 import kr.ac.tukorea.whereareu.domain.home.MeaningfulPlaceInfo
+import kr.ac.tukorea.whereareu.domain.home.PoliceStationInfo
 import kr.ac.tukorea.whereareu.domain.home.PredictLocation
 import kr.ac.tukorea.whereareu.presentation.nok.home.NokHomeViewModel
 import javax.inject.Inject
@@ -48,6 +49,10 @@ class MeaningfulPlaceViewModel @Inject constructor(
             val meaningfulPlaceForListForPage: List<MeaningfulPlaceInfo>
         ): PredictEvent()
 
-
     }
+
+    data class SearchNearbyPoliceStationForPage(val policeStationList: List<PoliceStationInfo>):
+            PredictEvent()
+
+
 }
