@@ -9,7 +9,7 @@
             type="kr.ac.tukorea.whereareu.presentation.nok.meaningfulplace.MeaningfulPlaceFragment" />
         <variable
             name="viewModel"
-            type="kr.ac.tukorea.whereareu.presentation.nok.home.NokHomeViewModel" />
+            type="kr.ac.tukorea.whereareu.presentation.nok.meaningfulplace.MeaningfulPlaceViewModel" />
     </data>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
