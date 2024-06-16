@@ -1,14 +1,241 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".presentation.nok.meaningfulplace.MeaningfulPlaceDetailForPageFragment">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <data>
+
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+        android:padding="16dp"
+        android:background="@color/white">
 
-</FrameLayout>
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageView
+                android:id="@+id/back_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_arrow_back_24"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/address_tv"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="의미 장소"
+                android:textAppearance="@style/TextAppearance.App.20sp.ExtraBold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="@id/back_btn"
+                app:layout_constraintTop_toBottomOf="@id/back_btn" />
+
+            <View
+                android:id="@+id/line2"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="24dp"
+                android:background="@color/gray20"
+                app:layout_constraintTop_toBottomOf="@id/address_tv" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.coordinatorlayout.widget.CoordinatorLayout
+            app:layout_constraintTop_toBottomOf="@id/layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/white">
+
+            <com.google.android.material.appbar.AppBarLayout
+                android:id="@+id/appBarLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/white"
+                android:outlineAmbientShadowColor="@color/white"
+                android:elevation="0dp"
+                android:stateListAnimator="@null">
+
+                <com.google.android.material.appbar.CollapsingToolbarLayout
+                    android:id="@+id/collapsing_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:layout_scrollFlags="scroll|exitUntilCollapsed"
+                    android:background="@android:color/transparent"
+                    app:contentScrim="@android:color/transparent"
+                    android:elevation="0dp"
+                    android:shadowColor="@color/white"
+                    android:stateListAnimator="@null">
+
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <TextView
+                            android:id="@+id/timeInfo_title_tv"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="24dp"
+                            android:text="방문 시간 정보"
+                            android:textAppearance="@style/TextAppearance.App.16sp.Bold"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <RadioGroup
+                            android:id="@+id/radio_group"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="16dp"
+                            android:gravity="center"
+                            android:orientation="horizontal"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@id/timeInfo_title_tv">
+
+                            <RadioButton
+                                android:id="@+id/monday"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:background="@drawable/selector_day_of_week_radio_button"
+                                android:button="@null"
+                                android:text="월"
+                                android:textAlignment="center"
+                                android:textAppearance="@style/TextAppearance.App.14sp.ExtraBold"
+                                android:textColor="@drawable/selecor_radio_text" />
+
+                            <RadioButton
+                                android:id="@+id/tuesday"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:background="@drawable/selector_day_of_week_radio_button"
+                                android:button="@null"
+                                android:text="화"
+                                android:textAlignment="center"
+                                android:textAppearance="@style/TextAppearance.App.14sp.ExtraBold"
+                                android:textColor="@drawable/selecor_radio_text" />
+
+                            <RadioButton
+                                android:id="@+id/wednesday"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:background="@drawable/selector_day_of_week_radio_button"
+                                android:button="@null"
+                                android:text="수"
+                                android:textAlignment="center"
+                                android:textAppearance="@style/TextAppearance.App.14sp.ExtraBold"
+                                android:textColor="@drawable/selecor_radio_text" />
+
+                            <RadioButton
+                                android:id="@+id/thursday"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:background="@drawable/selector_day_of_week_radio_button"
+                                android:button="@null"
+                                android:text="목"
+                                android:textAlignment="center"
+                                android:textAppearance="@style/TextAppearance.App.14sp.ExtraBold"
+                                android:textColor="@drawable/selecor_radio_text" />
+
+                            <RadioButton
+                                android:id="@+id/friday"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:background="@drawable/selector_day_of_week_radio_button"
+                                android:button="@null"
+                                android:text="금"
+                                android:textAlignment="center"
+                                android:textAppearance="@style/TextAppearance.App.14sp.ExtraBold"
+                                android:textColor="@drawable/selecor_radio_text" />
+
+                            <RadioButton
+                                android:id="@+id/saturday"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:background="@drawable/selector_day_of_week_radio_button"
+                                android:button="@null"
+                                android:text="토"
+                                android:textAlignment="center"
+                                android:textAppearance="@style/TextAppearance.App.14sp.ExtraBold"
+                                android:textColor="@drawable/selecor_radio_text_saturday" />
+
+                            <RadioButton
+                                android:id="@+id/sunday"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:background="@drawable/selector_day_of_week_radio_button"
+                                android:button="@null"
+                                android:text="일"
+                                android:textAlignment="center"
+                                android:textAppearance="@style/TextAppearance.App.14sp.ExtraBold"
+                                android:textColor="@drawable/selecor_radio_text_sunday" />
+                        </RadioGroup>
+
+                        <TextView
+                            android:id="@+id/time_info_tv"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="16dp"
+                            android:gravity="start"
+                            android:textAppearance="@style/TextAppearance.App.14sp.SemiBold"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@id/radio_group" />
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                </com.google.android.material.appbar.CollapsingToolbarLayout>
+            </com.google.android.material.appbar.AppBarLayout>
+
+
+            <androidx.core.widget.NestedScrollView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:fillViewport="true"
+                app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <View
+                        android:id="@+id/line"
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginTop="24dp"
+                        android:background="@color/gray20"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <TextView
+                        android:id="@+id/police_station_title_tv"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="24dp"
+                        android:text="인근 경찰서"
+                        android:textAppearance="@style/TextAppearance.App.16sp.Bold"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/line" />
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/police_rv"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_marginTop="8dp"
+                        android:nestedScrollingEnabled="false"
+                        android:overScrollMode="never"
+                        android:paddingBottom="310dp"
+                        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                        app:layout_constraintTop_toBottomOf="@id/police_station_title_tv"
+                        tools:listitem="@layout/item_police_station" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+            </androidx.core.widget.NestedScrollView>
+        </androidx.coordinatorlayout.widget.CoordinatorLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

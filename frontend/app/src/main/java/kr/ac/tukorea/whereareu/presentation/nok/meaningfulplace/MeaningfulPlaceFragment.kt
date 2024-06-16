@@ -23,14 +23,14 @@ class MeaningfulPlaceFragment :
     BaseFragment<FragmentMeaningfulPlaceBinding>(R.layout.fragment_meaningful_place),
     MeaningfulPlaceRVAForPage.MeaningfulPlaceRVAForPageClickListener {
 
-    private val homeViewModel: NokHomeViewModel by activityViewModels()
+    private val viewModel: MeaningfulPlaceViewModel by activityViewModels()
     private val tag = "MeaningfulPlaceFragment:"
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initRecyclerView()
         initObserver()
-        homeViewModel.eventMeaningfulPlace()
+        viewModel.eventMeaningfulPlaceForPage()
     }
 
     private fun initRecyclerView() {
@@ -46,12 +46,28 @@ class MeaningfulPlaceFragment :
     override fun initObserver() {
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnStarted {
-                homeViewModel.meaningfulPlace.collect { meaningfulPlaces ->
+                viewModel.predictEvent.collect{predictEvent ->
+                    handlePredictEvent(predictEvent)
+                }
+            }
+            repeatOnStarted {
+                viewModel.meaningfulPlace.collect { meaningfulPlaces ->
                     Log.d("$tag meaningfulPlace collect", meaningfulPlaces.toString())
                     (binding.rv.adapter as MeaningfulPlaceRVAForPage).submitList(meaningfulPlaces)
                 }
             }
         }
+    }
+
+    private fun handlePredictEvent(event: MeaningfulPlaceViewModel.PredictEvent){
+        when(event){
+            is MeaningfulPlaceViewModel.PredictEvent.StartPredict ->{
+                initMeaningfulListRVAForPage()
+            }
+        }
+//        MeaningfulPlaceViewModel.PredictEvent.StartPredict -> {
+//            initMeaninfulListRVAForPage()
+//        }
     }
 
     override fun initView() {

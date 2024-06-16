@@ -79,7 +79,7 @@ class MeaningfulPlaceViewModel @Inject constructor(
         _isPredictDone.value = isPredictDone
     }
 
-    fun eventHomeState(){
+    fun eventMeaningfulPlaceForPage(){
         viewModelScope.launch{
             if(_tempMeaningfulPlace.value.isEmpty()){
                 Log.d("$tag eventMeaningfulPlace", "_meaningfulPlace isEmpty")
