@@ -43,5 +43,11 @@ class MeaningfulPlaceViewModel @Inject constructor(
     val meaningfulPlace = _meaningfulPlace.asSharedFlow()
 
 
-    sealed
+    sealed class PredictEvent{
+        data class MeaningfulPlaceForPage(
+            val meaningfulPlaceForListForPage: List<MeaningfulPlaceInfo>
+        ): PredictEvent()
+
+
+    }
 }
