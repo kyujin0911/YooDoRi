@@ -10,6 +10,7 @@ import kr.ac.tukorea.whereareu.data.api.NaverService
 import kr.ac.tukorea.whereareu.data.api.SettingService
 import kr.ac.tukorea.whereareu.data.api.dementia.DementiaHomeService
 import kr.ac.tukorea.whereareu.data.api.nok.LocationHistoryService
+import kr.ac.tukorea.whereareu.data.api.nok.MeaningfulPlaceService
 import kr.ac.tukorea.whereareu.data.api.nok.NokHomeService
 import retrofit2.Retrofit
 import javax.inject.Singleton
@@ -60,6 +61,12 @@ object ServiceModule {
     @Provides
     @Singleton
     fun provideLocationHistoryAPI(@NetworkModule.BaseRetrofit retrofit: Retrofit): LocationHistoryService {
+        return retrofit.buildService()
+    }
+
+    @Provides
+    @Singleton
+    fun provideMeaningfulPlaceAPI(@NetworkModule.BaseRetrofit retrofit: Retrofit): MeaningfulPlaceService{
         return retrofit.buildService()
     }
 }
