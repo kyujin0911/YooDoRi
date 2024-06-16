@@ -12,6 +12,7 @@ import kr.ac.tukorea.whereareu.data.api.NaverService
 import kr.ac.tukorea.whereareu.data.api.nok.NokHomeService
 import kr.ac.tukorea.whereareu.data.api.SettingService
 import kr.ac.tukorea.whereareu.data.api.nok.LocationHistoryService
+import kr.ac.tukorea.whereareu.data.api.nok.MeaningfulPlaceService
 import kr.ac.tukorea.whereareu.data.repository.dementia.home.DementiaHomeRepository
 import kr.ac.tukorea.whereareu.data.repository.dementia.home.DementiaHomeRepositoryImpl
 import kr.ac.tukorea.whereareu.data.repository.kakao.KakaoRepository
@@ -24,6 +25,8 @@ import kr.ac.tukorea.whereareu.data.repository.nok.history.LocationHistoryReposi
 import kr.ac.tukorea.whereareu.data.repository.nok.history.LocationHistoryRepositoryImpl
 import kr.ac.tukorea.whereareu.data.repository.nok.home.NokHomeRepository
 import kr.ac.tukorea.whereareu.data.repository.nok.home.NokHomeRepositoryImpl
+import kr.ac.tukorea.whereareu.data.repository.nok.meaningfulplace.MeaningfulPlaceRepository
+import kr.ac.tukorea.whereareu.data.repository.nok.meaningfulplace.MeaningfulPlaceRepositoryImpl
 import kr.ac.tukorea.whereareu.data.repository.setting.SettingRepository
 import kr.ac.tukorea.whereareu.data.repository.setting.SettingRepositoryImpl
 
@@ -73,4 +76,9 @@ object RepositoryModule {
         locationHistoryService: LocationHistoryService
     ): LocationHistoryRepository = LocationHistoryRepositoryImpl(locationHistoryService)
 
+    @ViewModelScoped
+    @Provides
+    fun providesMeaningfulPlaceRepository(
+        meaningfulPlaceService: MeaningfulPlaceService
+    ): MeaningfulPlaceRepository = MeaningfulPlaceRepositoryImpl(meaningfulPlaceService)
 }
