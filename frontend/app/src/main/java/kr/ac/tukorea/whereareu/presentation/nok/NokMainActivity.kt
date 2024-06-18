@@ -43,6 +43,7 @@ import kr.ac.tukorea.whereareu.domain.history.LocationHistoryMetaData
 import kr.ac.tukorea.whereareu.presentation.base.BaseActivity
 import kr.ac.tukorea.whereareu.presentation.nok.history.LocationHistoryViewModel
 import kr.ac.tukorea.whereareu.presentation.nok.home.NokHomeViewModel
+import kr.ac.tukorea.whereareu.presentation.nok.meaningfulplace.MeaningfulPlaceViewModel
 import kr.ac.tukorea.whereareu.presentation.nok.setting.SettingViewModel
 import kr.ac.tukorea.whereareu.util.extension.getUserKey
 import kr.ac.tukorea.whereareu.util.extension.repeatOnStarted
@@ -59,6 +60,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
     private val homeViewModel: NokHomeViewModel by viewModels()
     private val settingViewModel: SettingViewModel by viewModels()
     private val locationHistoryViewModel: LocationHistoryViewModel by viewModels()
+    private val meaningfulViewModel: MeaningfulPlaceViewModel by viewModels()
     private var updateLocationJob: Job? = null
     private var countDownJob: Job? = null
     private var naverMap: NaverMap? = null
@@ -622,7 +624,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                     homeViewModel.eventNavigate(NokHomeViewModel.NavigateEvent.SafeArea)
                 }
 
-                R.id.meaningfulPlaceFragment, R.id.meaningfulPlaceDetailFragment -> {
+                R.id.meaningfulPlaceFragment, R.id.meaningfulPlaceDetailForPageFragment -> {
                     homeViewModel.eventNavigate(NokHomeViewModel.NavigateEvent.MeaningfulPlace)
                 }
 
@@ -649,6 +651,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
         val dementiaKey = getUserKey("dementia")
         homeViewModel.setDementiaKey(dementiaKey)
         locationHistoryViewModel.setDementiaKey(dementiaKey)
+        meaningfulViewModel.setDementiaKey(dementiaKey)
 
         val nokKey = getUserKey("nok")
         homeViewModel.setNokKey(nokKey)

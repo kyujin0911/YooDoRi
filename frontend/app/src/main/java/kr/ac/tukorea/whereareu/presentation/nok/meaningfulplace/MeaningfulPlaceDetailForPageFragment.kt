@@ -38,7 +38,7 @@ class MeaningfulPlaceDetailForPageFragment :
     }
 
     override fun initView() {
-        Log.d("args meanigfulPlace", args.meaningfulPlaceForPage.toString())
+        Log.d("args meanigfulPlaceForPage", args.meaningfulPlaceForPage.toString())
         binding.backBtn.setOnClickListener {
             navigator.popBackStack()
         }

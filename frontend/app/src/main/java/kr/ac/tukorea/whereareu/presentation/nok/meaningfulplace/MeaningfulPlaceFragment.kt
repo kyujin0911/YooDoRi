@@ -5,6 +5,7 @@ import android.util.Log
 import android.view.View
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -27,6 +28,9 @@ class MeaningfulPlaceFragment :
     private val viewModel: MeaningfulPlaceViewModel by activityViewModels()
     private val meaningfulPlaceRVAForPage by lazy{
         MeaningfulPlaceRVAForPage()
+    }
+    private val navigator: NavController by lazy {
+        findNavController()
     }
     private val tag = "MeaningfulPlaceFragment:"
 
@@ -89,6 +93,10 @@ class MeaningfulPlaceFragment :
     }
 
     override fun onClickInfoView(meaningfulPlace: MeaningfulPlaceInfo) {
-        val action = MeaningfulPlaceFragmentDirections.actionMeaningfulPlaceFragmentToMeaningfulPlaceDetailFragmentForPage()
+        val action = MeaningfulPlaceFragmentDirections.actionMeaningfulPlaceFragmentToMeaningfulPlaceDetailForPageFragment(
+            meaningfulPlace
+        )
+        navigator.navigate(action)
     }
+
 }
