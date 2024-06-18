@@ -169,6 +169,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
 //                stopHomeFragmentJob()
                 // 이 코드를 넣지 않으면 의미 장소 -> 홈 화면 이동 시 마커가 안사라짐
                 // 이 코드로 인해 위치 예측 -> 상세 정보를 보면 작업이 종료됨
+                initMarker()
             }
 
             is NokHomeViewModel.NavigateEvent.HomeState -> {
@@ -740,5 +741,11 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
 
     companion object {
         const val LAST_LOCATION = 0
+    }
+
+    private fun initMarker() {
+        homeMarkers.forEach { marker ->
+            marker.map = null
+        }
     }
 }
