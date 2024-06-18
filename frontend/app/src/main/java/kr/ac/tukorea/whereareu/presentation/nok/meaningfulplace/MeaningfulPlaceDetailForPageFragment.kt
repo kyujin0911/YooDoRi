@@ -18,6 +18,7 @@ import kr.ac.tukorea.whereareu.domain.home.PoliceStationInfo
 import kr.ac.tukorea.whereareu.presentation.base.BaseFragment
 import kr.ac.tukorea.whereareu.presentation.nok.home.adapter.PoliceStationRVA
 import kr.ac.tukorea.whereareu.presentation.nok.home.adapter.TimeInfoRVA
+import kr.ac.tukorea.whereareu.presentation.nok.meaningfulplace.MeaningfulPlaceViewModel
 import kr.ac.tukorea.whereareu.presentation.nok.meaningfulplace.adapter.PoliceStationRVAForPage
 import kr.ac.tukorea.whereareu.presentation.nok.meaningfulplace.adapter.TimeInfoRVAForPage
 import kr.ac.tukorea.whereareu.util.extension.showToastShort
@@ -31,7 +32,7 @@ class MeaningfulPlaceDetailForPageFragment :
         findNavController()
     }
     private val args: MeaningfulPlaceDetailForPageFragmentArgs by navArgs()
-    private val viewModel: NokHomeViewModel by activityViewModels()
+    private val viewModel: MeaningfulPlaceViewModel by activityViewModels()
     private val policeStationRVAForPage = PoliceStationRVAForPage()
     private val timeInfoRVAForPage = TimeInfoRVAForPage()
     override fun initObserver() {
@@ -162,7 +163,7 @@ class MeaningfulPlaceDetailForPageFragment :
 
     override fun onClickMapView(policeStationInfo: PoliceStationInfo) {
         viewModel.eventPredict(
-            NokHomeViewModel.PredictEvent.MapView(
+            MeaningfulPlaceViewModel.MeaningfulEvent.MapView(
                 BottomSheetBehavior.STATE_COLLAPSED,
                 policeStationInfo.latLng
             )

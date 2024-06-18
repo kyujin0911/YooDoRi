@@ -153,6 +153,13 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                 Log.d("isPredicted", it.toString())
             }
         }
+
+        repeatOnStarted {
+            meaningfulViewModel.meaningEvent.collect { event ->
+                Log.d("$tag meaningfulEvent collect", event.toString())
+                handleMeaningfulEvent(event)
+            }
+        }
     }
 
     private fun handleNavigationEvent(event: NokHomeViewModel.NavigateEvent) {
@@ -160,6 +167,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
             NokHomeViewModel.NavigateEvent.Home -> {}
 
             is NokHomeViewModel.NavigateEvent.HomeState -> {
+                clearLocationFragmentUI()
                 behavior.isDraggable = true
                 if(event.isPredicted){
                     if(event.isPredictDone == false){
@@ -178,7 +186,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                 if (event.isPredicted && !event.isPredictDone) {
                     behavior.state = BottomSheetBehavior.STATE_COLLAPSED
                 }
-                clearLocationFragmentUI()
+//                clearLocationFragmentUI()
             }
 
             NokHomeViewModel.NavigateEvent.LocationHistory -> {
@@ -488,6 +496,43 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                 naverMap?.moveCamera(CameraUpdate.scrollTo(event.coord))
             }
         }
+    }
+
+    private fun handleMeaningfulEvent(event: MeaningfulPlaceViewModel.MeaningfulEvent){
+        when(event){
+            is MeaningfulPlaceViewModel.MeaningfulEvent.StartMeaningful ->{
+                meaningfulViewModel.meaningful()
+            }
+            is MeaningfulPlaceViewModel.MeaningfulEvent.MeaningfulPlaceForPage ->{
+                event.meaningfulPlaceForListForPage.forEach { meaningfulPlace ->
+                    homeMarkers.add(
+                        Marker().apply{
+                            setMarker(
+                                latLng = meaningfulPlace.latLng,
+                                markerIconColor = MarkerIcons.YELLOW,
+                                text = meaningfulPlace.address,
+                                naverMap = naverMap
+                            )
+                        }
+                    )
+                }
+            }
+
+            is MeaningfulPlaceViewModel.MeaningfulEvent.SearchNearbyPoliceStationForPage -> {
+                event.policeStationList.forEach { policeStation ->
+                    homeMarkers.add(Marker().apply {
+                        setMarker(
+                            latLng = policeStation.latLng,
+                            MarkerIcons.BLUE,
+                            policeStation.policeName,
+                            naverMap
+                        )
+                    })
+                }
+            }
+            else -> {}
+        }
+
     }
 
     private fun initLocationOverlay(coord: LatLng, speed: Float) {

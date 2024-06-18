@@ -38,6 +38,7 @@ class MeaningfulPlaceFragment :
         super.onViewCreated(view, savedInstanceState)
         initRecyclerView()
         initObserver()
+        viewModel.meaningful()
         viewModel.eventMeaningfulPlaceForPage()
     }
 
@@ -54,8 +55,8 @@ class MeaningfulPlaceFragment :
     override fun initObserver() {
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnStarted {
-                viewModel.predictEvent.collect{predictEvent ->
-                    handlePredictEvent(predictEvent)
+                viewModel.meaningEvent.collect{meaningfulEvent ->
+                    handlePredictEvent(meaningfulEvent)
                 }
             }
             repeatOnStarted {
@@ -66,9 +67,9 @@ class MeaningfulPlaceFragment :
         }
     }
 
-    private fun handlePredictEvent(event: MeaningfulPlaceViewModel.PredictEvent){
+    private fun handlePredictEvent(event: MeaningfulPlaceViewModel.MeaningfulEvent){
         when(event){
-            is MeaningfulPlaceViewModel.PredictEvent.StartPredict ->{
+            is MeaningfulPlaceViewModel.MeaningfulEvent.StartMeaningful ->{
                 initMeaningfulListRVAForPage()
             }
             else -> {}
@@ -89,7 +90,7 @@ class MeaningfulPlaceFragment :
 
     override fun onClickMapView(latLng: LatLng) {
         Log.d(tag, "MapView button clicked: $latLng")
-        viewModel.eventPredict(MeaningfulPlaceViewModel.PredictEvent.MapView(BottomSheetBehavior.STATE_COLLAPSED, latLng))
+        viewModel.eventPredict(MeaningfulPlaceViewModel.MeaningfulEvent.MapView(BottomSheetBehavior.STATE_COLLAPSED, latLng))
     }
 
     override fun onClickInfoView(meaningfulPlace: MeaningfulPlaceInfo) {

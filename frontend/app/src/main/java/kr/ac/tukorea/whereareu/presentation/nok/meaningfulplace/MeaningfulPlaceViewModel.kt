@@ -28,21 +28,21 @@ class MeaningfulPlaceViewModel @Inject constructor(
 
     private var tag = "MeaningfulPlaceViewModel"
 
-    private val _isPredicted = MutableStateFlow(true)
-    val isPredicted = _isPredicted.asStateFlow()
+    private val _isMeaningful = MutableStateFlow(true)
+    val isMeaningful = _isMeaningful.asStateFlow()
 
     private val _isPredictDone = MutableStateFlow(false)
 
     private val _dementiaKey = MutableStateFlow("")
     private val _nokKey = MutableStateFlow("")
 
-    private val _predictEvent = MutableSharedFlow<MeaningfulPlaceViewModel.PredictEvent>()
-    val predictEvent = _predictEvent.asSharedFlow()
+    private val _meaningfulEvent = MutableSharedFlow<MeaningfulEvent>()
+    val meaningEvent = _meaningfulEvent.asSharedFlow()
 
-//    private val _navigateEvent = MutableSharedFlow<MeaningfulPlaceViewModel.NavigateEvent>()
+//    private val _navigateEvent = MutableSharedFlow<NavigateEvent>()
 //    val navigateEvent = _navigateEvent.asSharedFlow()
 
-    val navigateEventToString = MutableStateFlow(NokHomeViewModel.NavigateEvent.Home.toString())
+//    val navigateEventToString = MutableStateFlow(NavigateEvent.Home.toString())
 
     private val _tempMeaningfulPlace = MutableStateFlow<List<MeaningfulPlaceInfo>>(emptyList())
 
@@ -52,26 +52,26 @@ class MeaningfulPlaceViewModel @Inject constructor(
     val meaningfulPlace = _meaningfulPlace.asSharedFlow()
 
 
-    sealed class PredictEvent{
-        data class StartPredict(val isPredicted: Boolean) : PredictEvent()
+    sealed class MeaningfulEvent{
+        data class StartMeaningful(val isMeaningful: Boolean) : MeaningfulEvent()
 
         data class MeaningfulPlaceForPage(
             val meaningfulPlaceForListForPage: List<MeaningfulPlaceInfo>
-        ): PredictEvent()
+        ): MeaningfulEvent()
 
         data class SearchNearbyPoliceStationForPage(val policeStationList: List<PoliceStationInfo>):
-            PredictEvent()
+            MeaningfulEvent()
 
-        data object PredictDone : PredictEvent()
+        data object PredictDone : MeaningfulEvent()
 
-        data class MapView(val behavior: Int, val coord: LatLng) : PredictEvent()
+        data class MapView(val behavior: Int, val coord: LatLng) : MeaningfulEvent()
 
-        data class StopPredict(val isPredicted: Boolean) : PredictEvent()
+        data class StopPredict(val isPredicted: Boolean) : MeaningfulEvent()
 
     }
-    fun eventPredict(event: PredictEvent){
+    fun eventPredict(event: MeaningfulEvent){
         viewModelScope.launch {
-            _predictEvent.emit(event)
+            _meaningfulEvent.emit(event)
         }
     }
 
@@ -99,20 +99,20 @@ class MeaningfulPlaceViewModel @Inject constructor(
 
     fun setIsPredicted(isPredicted: Boolean) {
         viewModelScope.launch {
-            _isPredicted.emit(isPredicted)
+            _isMeaningful.emit(isPredicted)
             if (isPredicted) {
-                eventPredict(PredictEvent.StartPredict(isPredicted))
+                eventPredict(MeaningfulEvent.StartMeaningful(isPredicted))
             } else {
-                eventPredict(PredictEvent.StopPredict(isPredicted))
+                eventPredict(MeaningfulEvent.StopPredict(isPredicted))
             }
         }
     }
 
-    fun predict(){
+    fun meaningful(){
         viewModelScope.launch{
             val time = measureTimeMillis{
                 async{getMeaningfulPlaces()}
-                eventPredict(PredictEvent.PredictDone)
+                eventPredict(MeaningfulEvent.PredictDone)
             }
         }
     }
@@ -124,11 +124,11 @@ class MeaningfulPlaceViewModel @Inject constructor(
                 val policeStationInfo = meaningfulPlace.policeStationInfo.map { policeStation ->
                     policeStation.toModel()
                 }
-                eventPredict(PredictEvent.SearchNearbyPoliceStationForPage(policeStationInfo))
+                eventPredict(MeaningfulEvent.SearchNearbyPoliceStationForPage(policeStationInfo))
                 meaningfulPlace.toModel(policeStationInfo)
             }
 
-            eventPredict(PredictEvent.MeaningfulPlaceForPage(meaningfulPlaceInfo))
+            eventPredict(MeaningfulEvent.MeaningfulPlaceForPage(meaningfulPlaceInfo))
             _tempMeaningfulPlace.value = meaningfulPlaceInfo
             _meaningfulPlace.emit(meaningfulPlaceInfo)
         }.onException {
