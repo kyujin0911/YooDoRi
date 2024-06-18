@@ -30,7 +30,7 @@ class validateInSafeArea:
                 "safeAreaName" : safeArea.area_name,
                 "time" : latest_location.time
             }
-            send_push_notification(Config.temp_fcm_token, "어디U", "안심 구역 이탈", data)
+            send_push_notification(fcm_token, "어디U", "안심 구역 이탈", data)
         elif latest_location.isInSafeArea == 1 and before_location.isInSafeArea == 0:
             data = {
                 "safeAreaName" : safeArea.area_name,
