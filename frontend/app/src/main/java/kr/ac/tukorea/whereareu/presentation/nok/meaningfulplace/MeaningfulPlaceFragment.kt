@@ -56,7 +56,7 @@ class MeaningfulPlaceFragment :
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnStarted {
                 viewModel.meaningEvent.collect{meaningfulEvent ->
-                    handlePredictEvent(meaningfulEvent)
+                    handleMeaningfulEvent(meaningfulEvent)
                 }
             }
             repeatOnStarted {
@@ -67,7 +67,7 @@ class MeaningfulPlaceFragment :
         }
     }
 
-    private fun handlePredictEvent(event: MeaningfulPlaceViewModel.MeaningfulEvent){
+    private fun handleMeaningfulEvent(event: MeaningfulPlaceViewModel.MeaningfulEvent){
         when(event){
             is MeaningfulPlaceViewModel.MeaningfulEvent.StartMeaningful ->{
                 initMeaningfulListRVAForPage()
@@ -86,6 +86,12 @@ class MeaningfulPlaceFragment :
     private fun initMeaningfulListRVAForPage(){
         binding.rv.adapter = meaningfulPlaceRVAForPage
         meaningfulPlaceRVAForPage.setRVAForPageClickListener(this)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.eventMeaningfulPlaceForPage()
+        initMeaningfulListRVAForPage()
     }
 
     override fun onClickMapView(latLng: LatLng) {
