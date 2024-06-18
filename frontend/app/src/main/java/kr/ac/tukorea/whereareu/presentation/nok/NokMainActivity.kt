@@ -96,7 +96,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
         }
 
         repeatOnStarted {
-            homeViewModel.navigateEventToString.collect{
+            homeViewModel.navigateEventToString.collect {
                 Log.d("naviate to string", it)
             }
         }
@@ -149,7 +149,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
         }
 
         repeatOnStarted {
-            homeViewModel.isPredicted.collect{
+            homeViewModel.isPredicted.collect {
                 Log.d("isPredicted", it.toString())
             }
         }
@@ -165,13 +165,15 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
     private fun handleNavigationEvent(event: NokHomeViewModel.NavigateEvent) {
         when (event) {
             NokHomeViewModel.NavigateEvent.Home -> {
-                stopHomeFragmentJob()
+//                stopHomeFragmentJob()
+                // 이 코드를 넣지 않으면 의미 장소 -> 홈 화면 이동 시 마커가 안사라짐
+                // 이 코드로 인해 위치 예측 -> 상세 정보를 보면 작업이 종료됨
             }
 
             is NokHomeViewModel.NavigateEvent.HomeState -> {
                 behavior.isDraggable = true
-                if(event.isPredicted){
-                    if(event.isPredictDone == false){
+                if (event.isPredicted) {
+                    if (event.isPredictDone == false) {
                         behavior.state = BottomSheetBehavior.STATE_COLLAPSED
                     }
                 } else {
@@ -466,8 +468,9 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                         )
                     )
 
-                    val predictMarker = homeMarkers.firstOrNull { it.captionText == address && it.icon == MarkerIcons.GREEN }
-                    if (predictMarker == null){
+                    val predictMarker =
+                        homeMarkers.firstOrNull { it.captionText == address && it.icon == MarkerIcons.GREEN }
+                    if (predictMarker == null) {
                         homeMarkers.add(Marker().apply {
                             setMarkerWithInfoWindow(
                                 this@NokMainActivity,
@@ -499,15 +502,16 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
         }
     }
 
-    private fun handleMeaningfulEvent(event: MeaningfulPlaceViewModel.MeaningfulEvent){
-        when(event){
-            is MeaningfulPlaceViewModel.MeaningfulEvent.StartMeaningful ->{
+    private fun handleMeaningfulEvent(event: MeaningfulPlaceViewModel.MeaningfulEvent) {
+        when (event) {
+            is MeaningfulPlaceViewModel.MeaningfulEvent.StartMeaningful -> {
                 meaningfulViewModel.meaningful()
             }
-            is MeaningfulPlaceViewModel.MeaningfulEvent.MeaningfulPlaceForPage ->{
+
+            is MeaningfulPlaceViewModel.MeaningfulEvent.MeaningfulPlaceForPage -> {
                 event.meaningfulPlaceForListForPage.forEach { meaningfulPlace ->
                     homeMarkers.add(
-                        Marker().apply{
+                        Marker().apply {
                             setMarker(
                                 latLng = meaningfulPlace.latLng,
                                 markerIconColor = MarkerIcons.YELLOW,
@@ -531,6 +535,12 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                     })
                 }
             }
+
+            is MeaningfulPlaceViewModel.MeaningfulEvent.MapView -> {
+                behavior.state = event.behavior
+                naverMap?.moveCamera(CameraUpdate.scrollTo(event.coord))
+            }
+
             else -> {}
         }
 

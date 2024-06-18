@@ -13,6 +13,7 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import kr.ac.tukorea.whereareu.R
 import kr.ac.tukorea.whereareu.data.model.nok.home.TimeInfo
 import kr.ac.tukorea.whereareu.databinding.FragmentMeaningfulPlaceDetailBinding
+import kr.ac.tukorea.whereareu.databinding.FragmentMeaningfulPlaceDetailForPageBinding
 import kr.ac.tukorea.whereareu.domain.home.GroupedTimeInfo
 import kr.ac.tukorea.whereareu.domain.home.PoliceStationInfo
 import kr.ac.tukorea.whereareu.presentation.base.BaseFragment
@@ -26,7 +27,7 @@ import java.util.Calendar
 import java.util.Date
 
 class MeaningfulPlaceDetailForPageFragment :
-    BaseFragment<FragmentMeaningfulPlaceDetailBinding>(R.layout.fragment_meaningful_place_detail_for_page),
+    BaseFragment<FragmentMeaningfulPlaceDetailForPageBinding>(R.layout.fragment_meaningful_place_detail_for_page),
     PoliceStationRVAForPage.PoliceStationRVAForPageClickListener {
     private val navigator: NavController by lazy {
         findNavController()
@@ -60,7 +61,6 @@ class MeaningfulPlaceDetailForPageFragment :
             policeRv.adapter = policeStationRVAForPage
             policeStationRVAForPage.submitList(args.meaningfulPlaceForPage.policeStationInfo)
             args.meaningfulPlaceForPage.timeInfo
-
         }
     }
 
@@ -162,7 +162,7 @@ class MeaningfulPlaceDetailForPageFragment :
     }
 
     override fun onClickMapView(policeStationInfo: PoliceStationInfo) {
-        viewModel.eventPredict(
+        viewModel.eventMeaningful(
             MeaningfulPlaceViewModel.MeaningfulEvent.MapView(
                 BottomSheetBehavior.STATE_COLLAPSED,
                 policeStationInfo.latLng

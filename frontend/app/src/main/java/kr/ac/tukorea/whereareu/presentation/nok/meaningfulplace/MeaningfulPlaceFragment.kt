@@ -72,6 +72,9 @@ class MeaningfulPlaceFragment :
             is MeaningfulPlaceViewModel.MeaningfulEvent.StartMeaningful ->{
                 initMeaningfulListRVAForPage()
             }
+
+//            is MeaningfulPlaceViewModel.MeaningfulEvent.
+
             else -> {}
         }
     }
@@ -96,7 +99,7 @@ class MeaningfulPlaceFragment :
 
     override fun onClickMapView(latLng: LatLng) {
         Log.d(tag, "MapView button clicked: $latLng")
-        viewModel.eventPredict(MeaningfulPlaceViewModel.MeaningfulEvent.MapView(BottomSheetBehavior.STATE_COLLAPSED, latLng))
+        viewModel.eventMeaningful(MeaningfulPlaceViewModel.MeaningfulEvent.MapView(BottomSheetBehavior.STATE_COLLAPSED, latLng))
     }
 
     override fun onClickInfoView(meaningfulPlace: MeaningfulPlaceInfo) {

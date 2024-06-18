@@ -69,7 +69,7 @@ class MeaningfulPlaceViewModel @Inject constructor(
         data class StopPredict(val isPredicted: Boolean) : MeaningfulEvent()
 
     }
-    fun eventPredict(event: MeaningfulEvent){
+    fun eventMeaningful(event: MeaningfulEvent){
         viewModelScope.launch {
             _meaningfulEvent.emit(event)
         }
@@ -101,9 +101,9 @@ class MeaningfulPlaceViewModel @Inject constructor(
         viewModelScope.launch {
             _isMeaningful.emit(isPredicted)
             if (isPredicted) {
-                eventPredict(MeaningfulEvent.StartMeaningful(isPredicted))
+                eventMeaningful(MeaningfulEvent.StartMeaningful(isPredicted))
             } else {
-                eventPredict(MeaningfulEvent.StopPredict(isPredicted))
+                eventMeaningful(MeaningfulEvent.StopPredict(isPredicted))
             }
         }
     }
@@ -112,7 +112,7 @@ class MeaningfulPlaceViewModel @Inject constructor(
         viewModelScope.launch{
             val time = measureTimeMillis{
                 async{getMeaningfulPlaces()}
-                eventPredict(MeaningfulEvent.PredictDone)
+                eventMeaningful(MeaningfulEvent.PredictDone)
             }
         }
     }
@@ -124,11 +124,11 @@ class MeaningfulPlaceViewModel @Inject constructor(
                 val policeStationInfo = meaningfulPlace.policeStationInfo.map { policeStation ->
                     policeStation.toModel()
                 }
-                eventPredict(MeaningfulEvent.SearchNearbyPoliceStationForPage(policeStationInfo))
+                eventMeaningful(MeaningfulEvent.SearchNearbyPoliceStationForPage(policeStationInfo))
                 meaningfulPlace.toModel(policeStationInfo)
             }
 
-            eventPredict(MeaningfulEvent.MeaningfulPlaceForPage(meaningfulPlaceInfo))
+            eventMeaningful(MeaningfulEvent.MeaningfulPlaceForPage(meaningfulPlaceInfo))
             _tempMeaningfulPlace.value = meaningfulPlaceInfo
             _meaningfulPlace.emit(meaningfulPlaceInfo)
         }.onException {
