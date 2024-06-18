@@ -31,7 +31,6 @@ class MeaningfulPlaceViewModel @Inject constructor(
     private val _isMeaningful = MutableStateFlow(true)
     val isMeaningful = _isMeaningful.asStateFlow()
 
-    private val _isPredictDone = MutableStateFlow(false)
 
     private val _dementiaKey = MutableStateFlow("")
     private val _nokKey = MutableStateFlow("")
@@ -73,10 +72,6 @@ class MeaningfulPlaceViewModel @Inject constructor(
         viewModelScope.launch {
             _meaningfulEvent.emit(event)
         }
-    }
-
-    fun setIsPredictDone(isPredictDone: Boolean){
-        _isPredictDone.value = isPredictDone
     }
 
     fun eventMeaningfulPlaceForPage(){

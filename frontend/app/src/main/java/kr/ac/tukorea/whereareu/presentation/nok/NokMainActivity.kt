@@ -165,6 +165,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
     private fun handleNavigationEvent(event: NokHomeViewModel.NavigateEvent) {
         when (event) {
             NokHomeViewModel.NavigateEvent.Home -> {
+//                clearLocationFragmentUI()
 //                stopHomeFragmentJob()
                 // 이 코드를 넣지 않으면 의미 장소 -> 홈 화면 이동 시 마커가 안사라짐
                 // 이 코드로 인해 위치 예측 -> 상세 정보를 보면 작업이 종료됨
@@ -201,7 +202,8 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
 
             NokHomeViewModel.NavigateEvent.MeaningfulPlace -> {
                 clearSettingFragmentUI()
-                stopHomeFragmentJob()
+//                stopHomeFragmentJob()
+                // 이걸 지워야 상세보기 시 마커가 사라지지 않음
                 clearLocationFragmentUI()
             }
 
