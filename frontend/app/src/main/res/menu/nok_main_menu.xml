@@ -7,7 +7,7 @@
         android:title="위치기록" />
 
     <item
-        android:id="@+id/meaningfulPlaceFragment"
+        android:id="@+id/meaningfulTab"
         android:icon="@drawable/ic_meaning_place"
         android:title="의미장소" />
 
