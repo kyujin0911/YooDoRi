@@ -325,14 +325,13 @@
                             android:maxHeight="100dp"
                             android:paddingVertical="8dp"
                             android:paddingHorizontal="4dp"
-                            android:inputType="textMultiLine"
-                            android:maxLines="3"
-                            android:maxLength="200"
+                            android:inputType="text"
                             android:imeOptions="actionDone"
                             app:layout_constraintTop_toTopOf="parent"
                             android:textAppearance="@style/TextAppearance.App.14sp.Bold"
                             android:hint="주소로 설정할 구역 찾기"
-                            android:background="@null"/>
+                            android:background="@null"
+                            bind:searchAddress="@{safeAreaVm}"/>
                     </LinearLayout>
 
                     <TextView

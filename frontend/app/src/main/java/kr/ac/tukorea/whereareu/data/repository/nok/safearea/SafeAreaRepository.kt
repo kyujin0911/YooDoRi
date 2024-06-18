@@ -1,12 +1,13 @@
 package kr.ac.tukorea.whereareu.data.repository.nok.safearea
 
 import kr.ac.tukorea.whereareu.data.model.nok.safearea.GetCoordRequest
-import kr.ac.tukorea.whereareu.data.model.nok.safearea.GetSafeAreaGroupResponse
-import kr.ac.tukorea.whereareu.data.model.nok.safearea.GetSafeAreaResponse
+import kr.ac.tukorea.whereareu.data.model.nok.safearea.response.GetSafeAreaGroupResponse
+import kr.ac.tukorea.whereareu.data.model.nok.safearea.response.GetSafeAreaResponse
 import kr.ac.tukorea.whereareu.data.model.nok.safearea.RegisterSafeAreaGroupRequest
-import kr.ac.tukorea.whereareu.data.model.nok.safearea.RegisterSafeAreaGroupResponse
+import kr.ac.tukorea.whereareu.data.model.nok.safearea.response.RegisterSafeAreaGroupResponse
 import kr.ac.tukorea.whereareu.data.model.nok.safearea.RegisterSafeAreaRequest
-import kr.ac.tukorea.whereareu.data.model.nok.safearea.RegisterSafeAreaResponse
+import kr.ac.tukorea.whereareu.data.model.nok.safearea.response.GetCoordResponse
+import kr.ac.tukorea.whereareu.data.model.nok.safearea.response.RegisterSafeAreaResponse
 import kr.ac.tukorea.whereareu.util.network.NetworkResult
 
 interface SafeAreaRepository {
@@ -17,5 +18,5 @@ interface SafeAreaRepository {
 
     suspend fun fetchSafeAreaGroup(dementiaKey: String, groupKey: String): NetworkResult<GetSafeAreaGroupResponse>
 
-    suspend fun fetchCoord(request: GetCoordRequest): NetworkResult<RegisterSafeAreaResponse>
+    suspend fun fetchCoord(request: GetCoordRequest): NetworkResult<GetCoordResponse>
 }

@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.naver.maps.geometry.LatLng
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -19,6 +20,7 @@ import kr.ac.tukorea.whereareu.data.model.nok.safearea.SafeAreaDto
 import kr.ac.tukorea.whereareu.data.model.nok.safearea.SafeAreaGroup
 import kr.ac.tukorea.whereareu.data.repository.kakao.KakaoRepositoryImpl
 import kr.ac.tukorea.whereareu.data.repository.nok.safearea.SafeAreaRepositoryImpl
+import kr.ac.tukorea.whereareu.util.network.onException
 import kr.ac.tukorea.whereareu.util.network.onSuccess
 import javax.inject.Inject
 
@@ -68,9 +70,10 @@ class SafeAreaViewModel@Inject constructor(
         data class SettingSafeArea(val isSettingSafeArea: Boolean): SafeAreaEvent()
 
         data class CreateSafeAreaGroup(val groupName: String): SafeAreaEvent()
-
         data object SuccessRegisterSafeArea: SafeAreaEvent()
         data class FailRegisterSafeArea(val message: String): SafeAreaEvent()
+
+        data class FetchCoord(val coord: LatLng): SafeAreaEvent()
     }
 
     fun setIsSafeAreaGroupChanged(isSafeAreaGroupChanged: Boolean){
@@ -128,6 +131,8 @@ class SafeAreaViewModel@Inject constructor(
             repository.registerSafeAreaGroup(RegisterSafeAreaGroupRequest(_dementiaKey.value, groupName)).onSuccess {
                 _isSafeAreaGroupChanged.value = true
                 eventSafeArea(SafeAreaEvent.CreateSafeAreaGroup(groupName))
+                Log.d("registerSafeAreaGroup", it.toString())
+            }.onException {
                 Log.d("registerSafeAreaGroup", it.toString())
             }
         }
@@ -202,6 +207,8 @@ class SafeAreaViewModel@Inject constructor(
     fun fetchCoord(address: String){
         viewModelScope.launch {
             repository.fetchCoord(GetCoordRequest(address)).onSuccess {
+                val latLng = LatLng(it.latitude.toDouble(), it.longitude.toDouble())
+                eventSafeArea(SafeAreaEvent.FetchCoord(latLng))
                 Log.d("fetchCoord", it.toString())
             }
         }

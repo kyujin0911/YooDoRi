@@ -257,6 +257,11 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                 binding.groupTv.text = event.groupName
             }
 
+            is SafeAreaViewModel.SafeAreaEvent.FetchCoord -> {
+                naverMap?.moveCamera(CameraUpdate.scrollTo(event.coord))
+
+            }
+
             else -> {}
         }
     }
@@ -717,10 +722,6 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
              setSafeArea()
          }
 
-        binding.searchAddressEt.setOnEditorActionListener(EditorInfo.IME_ACTION_DONE) {
-            Log.d("et", binding.searchAddressEt.text.toString())
-        }
-
         binding.changeGroupBtn.setOnClickListener {
             val dialog = SelectGroupDialogFragment()
 
@@ -771,13 +772,13 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                         binding.setSafeAreaTv.isVisible = true
                     }
 
-                    if (slideOffset <= 0.2f) {
+                    /*if (slideOffset <= 0.2f) {
                         Log.d("뭐ㅓㄴ데", "뭔데")
                         //behavior.isDraggable = false
                     } else {
                         Log.d("뭐ㅓㄴ데", "뭐냐고")
                         //behavior.isDraggable = true
-                    }
+                    }*/
                 } else {
                     if (slideOffset <= 0.3f) {
                         binding.layout.translationY = -slideOffset * bottomSheet.height * 0.5f

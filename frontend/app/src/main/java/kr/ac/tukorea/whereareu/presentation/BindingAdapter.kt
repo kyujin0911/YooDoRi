@@ -3,6 +3,8 @@ package kr.ac.tukorea.whereareu.presentation
 import android.content.Context
 import android.util.Log
 import android.view.View
+import android.view.inputmethod.EditorInfo
+import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -13,6 +15,8 @@ import androidx.databinding.BindingAdapter
 import com.bumptech.glide.Glide
 import kr.ac.tukorea.whereareu.R
 import kr.ac.tukorea.whereareu.presentation.nok.home.NokHomeViewModel
+import kr.ac.tukorea.whereareu.presentation.nok.safearea.SafeAreaViewModel
+import kr.ac.tukorea.whereareu.util.extension.EditTextUtil.setOnEditorActionListener
 import kr.ac.tukorea.whereareu.util.extension.setRingtoneImage
 
 object BindingAdapter {
@@ -112,6 +116,14 @@ object BindingAdapter {
             else -> R.drawable.oval_black
         }
         view.background = ContextCompat.getDrawable(view.context, drawable)
+    }
+
+    @BindingAdapter("bind:searchAddress")
+    @JvmStatic
+    fun EditText.searchAddress(viewModel: SafeAreaViewModel){
+        this.setOnEditorActionListener(EditorInfo.IME_ACTION_DONE){
+            viewModel.fetchCoord(this.text.toString())
+        }
     }
 
 }

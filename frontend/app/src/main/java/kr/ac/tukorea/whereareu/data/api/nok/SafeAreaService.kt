@@ -1,14 +1,14 @@
 package kr.ac.tukorea.whereareu.data.api.nok
 
-import kr.ac.tukorea.whereareu.data.model.CommonResponse
 import kr.ac.tukorea.whereareu.data.model.ResponseBody
 import kr.ac.tukorea.whereareu.data.model.nok.safearea.GetCoordRequest
-import kr.ac.tukorea.whereareu.data.model.nok.safearea.GetSafeAreaGroupResponse
-import kr.ac.tukorea.whereareu.data.model.nok.safearea.GetSafeAreaResponse
+import kr.ac.tukorea.whereareu.data.model.nok.safearea.response.GetSafeAreaGroupResponse
+import kr.ac.tukorea.whereareu.data.model.nok.safearea.response.GetSafeAreaResponse
 import kr.ac.tukorea.whereareu.data.model.nok.safearea.RegisterSafeAreaGroupRequest
-import kr.ac.tukorea.whereareu.data.model.nok.safearea.RegisterSafeAreaGroupResponse
+import kr.ac.tukorea.whereareu.data.model.nok.safearea.response.RegisterSafeAreaGroupResponse
 import kr.ac.tukorea.whereareu.data.model.nok.safearea.RegisterSafeAreaRequest
-import kr.ac.tukorea.whereareu.data.model.nok.safearea.RegisterSafeAreaResponse
+import kr.ac.tukorea.whereareu.data.model.nok.safearea.response.GetCoordResponse
+import kr.ac.tukorea.whereareu.data.model.nok.safearea.response.RegisterSafeAreaResponse
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -29,5 +29,5 @@ interface SafeAreaService {
     suspend fun getSafeAreaGroup(@Query("dementiaKey") dementiaKey: String, @Query("groupKey") groupKey: String): Response<ResponseBody<GetSafeAreaGroupResponse>>
 
     @POST("address/conversion")
-    suspend fun getCoord(@Body request: GetCoordRequest): Response<ResponseBody<RegisterSafeAreaResponse>>
+    suspend fun getCoord(@Body request: GetCoordRequest): Response<ResponseBody<GetCoordResponse>>
 }
