@@ -24,7 +24,7 @@ fun Marker.setMarker(
     }
     val zIndex = when(markerIconColor){
         MarkerIcons.YELLOW -> 10
-        MarkerIcons.PINK -> 8
+        MarkerIcons.PINK -> 12
         MarkerIcons.GREEN -> 20
         MarkerIcons.BLUE -> 5
         MarkerIcons.RED -> 15

@@ -137,6 +137,7 @@ class SafeAreaViewModel@Inject constructor(
             repository.registerSafeAreaGroup(RegisterSafeAreaGroupRequest(_dementiaKey.value, groupName)).onSuccess {
                 _isSafeAreaGroupChanged.value = true
                 eventSafeArea(SafeAreaEvent.CreateSafeAreaGroup(groupName))
+                fetchSafeAreaAll()
                 Log.d("registerSafeAreaGroup", it.toString())
             }.onException {
                 Log.d("registerSafeAreaGroup", it.toString())
@@ -231,7 +232,7 @@ class SafeAreaViewModel@Inject constructor(
         return _safeAreaGroupList.value
     }
 
-    fun getSafeAreaName(groupKey: String): String{
+    private fun getSafeAreaName(groupKey: String): String{
         val groupName = _safeAreaGroupList.value.find { it.groupKey == groupKey }?.groupName
         Log.d("groupName", groupName.toString())
         return groupName ?: ""
