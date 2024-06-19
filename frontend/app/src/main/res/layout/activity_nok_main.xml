@@ -631,7 +631,7 @@
                         android:fontFamily="@font/suite_extrabold"
                         android:textColor="@color/white"
                         android:gravity="center"
-                        android:text='@{safeAreaVm.isSettingSafeArea ? "설정\n완료" : "구역\n생성"}'
+                        android:text="구역\n생성"
                         android:textSize="16sp"
                         app:layout_constraintTop_toTopOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"

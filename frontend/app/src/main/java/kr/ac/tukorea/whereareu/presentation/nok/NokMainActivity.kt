@@ -873,12 +873,20 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                     }
                 }*/
 
-                if (slideOffset >= 0.5f) {
-                    binding.navermapLogo.isVisible = false
-                    binding.setSafeAreaTv.isVisible = false
+                if (navController.currentDestination?.id == R.id.settingSafeAreaFragment){
+                    if (slideOffset >= 0.5f) {
+                        binding.navermapLogo.isVisible = false
+                    } else {
+                        binding.navermapLogo.isVisible = true
+                    }
                 } else {
-                    binding.navermapLogo.isVisible = true
-                    binding.setSafeAreaTv.isVisible = true
+                    if (slideOffset >= 0.5f) {
+                        binding.navermapLogo.isVisible = false
+                        binding.setSafeAreaTv.isVisible = false
+                    } else {
+                        binding.navermapLogo.isVisible = true
+                        binding.setSafeAreaTv.isVisible = true
+                    }
                 }
 
                 //} else {

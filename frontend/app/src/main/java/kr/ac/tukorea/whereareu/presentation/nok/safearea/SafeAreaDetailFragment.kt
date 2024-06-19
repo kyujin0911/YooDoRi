@@ -51,6 +51,7 @@ class SafeAreaDetailFragment :
     override fun initView() {
         binding.viewModel = viewModel
         initRVA()
+        setSafeArea()
         viewModel.fetchSafeAreaGroup(args.groupKey)
         binding.backBtn.setOnClickListener {
             viewModel.eventSafeArea(SafeAreaViewModel.SafeAreaEvent.ExitDetailFragment)
@@ -72,6 +73,12 @@ class SafeAreaDetailFragment :
             itemAnimator = null
         }
         safeAreaRVA.setSafeRVAClickListener(this)
+    }
+
+    private fun setSafeArea(){
+        binding.setSafeAreaTv.setOnClickListener {
+            viewModel.setIsSettingSafeAreaStatus(true)
+        }
     }
 
     override fun onClickMapView(latLng: LatLng) {
