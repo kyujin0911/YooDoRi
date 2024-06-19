@@ -75,6 +75,11 @@ async def receive_nok_info(request: ReceiveNokInfoRequest):
 
             if duplication_check:
                 _key = duplication_check.nok_key
+                if not duplication_check.fcm_token == request.fcmToken:
+                    duplication_check.fcm_token = request.fcmToken
+                    session.commit()
+                else:
+                    pass
                 
             else:
                 unique_key = None
@@ -83,11 +88,11 @@ async def receive_nok_info(request: ReceiveNokInfoRequest):
                 
                 _key = str(unique_key)
 
-                new_nok = models.nok_info(nok_key=_key, nok_name=_nok_name, nok_phonenumber=_nok_phonenumber, dementia_info_key=_key_from_dementia, update_rate=1) # update_rate는 기본값 1분으로 설정
+                new_nok = models.nok_info(nok_key=_key, nok_name=_nok_name, nok_phonenumber=_nok_phonenumber, dementia_info_key=_key_from_dementia, update_rate=1, fcm_token = request.fcmToken) # update_rate는 기본값 1분으로 설정
                 session.add(new_nok)
                 session.commit()
 
-            if not request.fcmToken == '':
+            '''if not request.fcmToken == '':
                 existing_token = session.query(models.refresh_token_info).filter_by(key = _key).first()
                 if existing_token:
                     existing_token.fcm_token = request.fcmToken
@@ -98,7 +103,7 @@ async def receive_nok_info(request: ReceiveNokInfoRequest):
 
                 session.commit()
             else:
-                pass
+                pass'''
 
             result = {
                 'dementiaInfoRecord' : {
@@ -155,7 +160,7 @@ async def receive_dementia_info(request: ReceiveDementiaInfoRequest):
             session.add(new_dementia)
             session.commit()
 
-        if not request.fcmToken == '':
+        '''if not request.fcmToken == '':
             existing_token = session.query(models.refresh_token_info).filter_by(key = _key).first()
             if existing_token:
                 existing_token.fcm_token = request.fcmToken
@@ -164,7 +169,7 @@ async def receive_dementia_info(request: ReceiveDementiaInfoRequest):
                 session.add(new_token)
             session.commit()
         else:
-            pass
+            pass'''
 
         result = {
             'dementiaKey': _key
@@ -325,9 +330,14 @@ def receive_location_info(request: ReceiveLocationRequest):
             session.add(new_location)
             session.commit()
 
-            fcm_token = session.query(models.refresh_token_info).filter_by(key = _dementia_key).first().fcm_token
-            if fcm_token:
-                asyncio.run(val.pushNotification(fcm_token, new_location, latest_loc, _near_safe_area))
+            nok_info = session.query(models.nok_info).filter_by(dementia_info_key = _dementia_key).all()
+
+            if nok_info:
+                for nok in nok_info:
+                    if nok.fcm_token == None:
+                        pass
+                    else:
+                        asyncio.run(val.pushNotification(nok.fcm_token, new_location, latest_loc, _near_safe_area))
             else:
                 pass
 
