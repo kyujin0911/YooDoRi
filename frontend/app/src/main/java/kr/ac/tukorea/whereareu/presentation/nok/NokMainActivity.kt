@@ -5,14 +5,8 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.graphics.PointF
-import android.os.Build
-import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.util.Log
 import android.view.View
-import android.view.inputmethod.EditorInfo
-import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
@@ -30,19 +24,18 @@ import com.naver.maps.map.CameraUpdate
 import com.naver.maps.map.MapFragment
 import com.naver.maps.map.NaverMap
 import com.naver.maps.map.OnMapReadyCallback
+import com.naver.maps.map.overlay.CircleOverlay
 import com.naver.maps.map.overlay.Marker
 import com.naver.maps.map.overlay.OverlayImage
 import com.naver.maps.map.overlay.PathOverlay
 import com.naver.maps.map.util.MarkerIcons
 import com.naver.maps.map.widget.ZoomControlView
-import com.google.firebase.messaging.FirebaseMessaging
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kr.ac.tukorea.whereareu.R
-import kr.ac.tukorea.whereareu.firebase.FCMService
 import kr.ac.tukorea.whereareu.databinding.ActivityNokMainBinding
 import kr.ac.tukorea.whereareu.databinding.IconLocationOverlayLayoutBinding
 import kr.ac.tukorea.whereareu.domain.history.LocationHistory
@@ -57,7 +50,6 @@ import kr.ac.tukorea.whereareu.presentation.nok.safearea.SafeAreaViewModel
 import kr.ac.tukorea.whereareu.presentation.nok.safearea.SelectGroupDialogFragment
 import kr.ac.tukorea.whereareu.presentation.nok.meaningfulplace.MeaningfulPlaceViewModel
 import kr.ac.tukorea.whereareu.presentation.nok.setting.SettingViewModel
-import kr.ac.tukorea.whereareu.util.extension.EditTextUtil.setOnEditorActionListener
 import kr.ac.tukorea.whereareu.util.extension.getUserKey
 import kr.ac.tukorea.whereareu.util.extension.repeatOnStarted
 import kr.ac.tukorea.whereareu.util.extension.setInfoWindowText
@@ -75,10 +67,11 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
     private val locationHistoryViewModel: LocationHistoryViewModel by viewModels()
     private val meaningfulViewModel: MeaningfulPlaceViewModel by viewModels()
     private val safeAreaViewModel: SafeAreaViewModel by viewModels()
+
     private var updateLocationJob: Job? = null
     private var countDownJob: Job? = null
     private var naverMap: NaverMap? = null
-    private val homeMarkers = mutableListOf<Marker>()
+    private val meaningulPlaceMarkers = mutableListOf<Marker>()
     private lateinit var behavior: BottomSheetBehavior<ConstraintLayout>
     private lateinit var navController: NavController
     private val predictMetaData = PredictMetaData()
@@ -278,6 +271,46 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
 
             }
 
+            is SafeAreaViewModel.SafeAreaEvent.FetchSafeAreaGroup -> {
+                naverMap?.moveCamera(CameraUpdate.scrollTo(event.firstLatLng))
+
+                event.safeAreas.forEach {safeArea ->
+                    val latLng = LatLng(safeArea.latitude, safeArea.longitude)
+                    safeAreMetaData.markers.add(Marker().apply {
+                        setMarker(latLng, MarkerIcons.YELLOW, safeArea.areaName, naverMap)
+                    })
+                    safeAreMetaData.circleOverlays.add(
+                        CircleOverlay().apply {
+                            radius = safeArea.radius.times(1000)
+                            center = latLng
+                            outlineWidth = 5
+                            outlineColor = ContextCompat.getColor(
+                                this@NokMainActivity,
+                                R.color.deep_yellow
+                            )
+                            color = ContextCompat.getColor(
+                                this@NokMainActivity,
+                                R.color.transparent_yellow
+                            )
+                            map = naverMap
+                        }
+                    )
+                }
+            }
+
+            is SafeAreaViewModel.SafeAreaEvent.ExitDetailFragment -> {
+                with(safeAreMetaData){
+                    markers.forEach {
+                        it.map = null
+                    }
+                    circleOverlays.forEach {
+                        it.map = null
+                    }
+                    markers.clear()
+                    circleOverlays.clear()
+                }
+            }
+
             else -> {}
         }
     }
@@ -285,7 +318,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
     private fun handleNavigationEvent(event: NokHomeViewModel.NavigateEvent) {
         when (event) {
             NokHomeViewModel.NavigateEvent.Home -> {
-                initMarker()
+                //removeMeaningfulPlaceMarker()
             }
 
             is NokHomeViewModel.NavigateEvent.HomeState -> {
@@ -337,7 +370,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                     settingMarker.apply {
                         setMarker(
                             naverMap?.cameraPosition?.target!!,
-                            MarkerIcons.YELLOW,
+                            MarkerIcons.PINK,
                             "",
                             naverMap
                         )
@@ -350,11 +383,11 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                         color =
                             ContextCompat.getColor(
                                 this@NokMainActivity,
-                                R.color.transparent_yellow
+                                R.color.purple
                             )
                         outlineWidth = 5
                         outlineColor =
-                            ContextCompat.getColor(this@NokMainActivity, R.color.deep_yellow)
+                            ContextCompat.getColor(this@NokMainActivity, R.color.deep_purple)
                         map = naverMap
                         isVisible = true
 
@@ -662,8 +695,9 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
             }
 
             is MeaningfulPlaceViewModel.MeaningfulEvent.MeaningfulPlaceForPage -> {
+                naverMap?.moveCamera(CameraUpdate.scrollTo(event.firstLatLng))
                 event.meaningfulPlaceForListForPage.forEach { meaningfulPlace ->
-                    homeMarkers.add(
+                    meaningulPlaceMarkers.add(
                         Marker().apply {
                             setMarker(
                                 latLng = meaningfulPlace.latLng,
@@ -678,7 +712,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
 
             is MeaningfulPlaceViewModel.MeaningfulEvent.SearchNearbyPoliceStationForPage -> {
                 event.policeStationList.forEach { policeStation ->
-                    homeMarkers.add(Marker().apply {
+                    meaningulPlaceMarkers.add(Marker().apply {
                         setMarker(
                             latLng = policeStation.latLng,
                             MarkerIcons.BLUE,
@@ -814,7 +848,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
         behavior.state = BottomSheetBehavior.STATE_COLLAPSED
         behavior.isFitToContents = false
         behavior.halfExpandedRatio = 0.3f
-        behavior.setPeekHeight(200, true)
+        behavior.setPeekHeight(300, true)
         behavior.addBottomSheetCallback(object : BottomSheetCallback() {
             override fun onStateChanged(bottomSheet: View, newState: Int) {
             }
@@ -854,7 +888,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
         })
     }
 
-    //viewModel과 binding Adapter로 refactoring ㅇ정
+    //viewModel과 binding Adapter로 refactoring 예정
     private fun initNavigator() {
         val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.fragmentContainer) as NavHostFragment
@@ -890,6 +924,12 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
             }
 
             if (destination.id !in listOf(
+                R.id.meaningfulPlaceFragment, R.id.meaningfulPlaceDetailForPageFragment
+            )){
+                removeMeaningfulPlaceMarker()
+            }
+
+            if (destination.id !in listOf(
                     R.id.nokSettingFragment,
                     R.id.settingUpdateTimeFragment,
                     R.id.modifyUserInfoFragment,
@@ -919,7 +959,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                 }
                 R.id.safeAreaDetailFragment -> {
                     homeViewModel.eventNavigate(NokHomeViewModel.NavigateEvent.SafeAreaDetail)
-                    behavior.halfExpandedRatio = 0.3f
+                    behavior.halfExpandedRatio = 0.4f
                 }
 
                 R.id.settingSafeAreaFragment -> {
@@ -1002,8 +1042,8 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
         const val SAFE_AREA = 2
     }
 
-    private fun initMarker() {
-        homeMarkers.forEach { marker ->
+    private fun removeMeaningfulPlaceMarker() {
+        meaningulPlaceMarkers.forEach { marker ->
             marker.map = null
         }
     }

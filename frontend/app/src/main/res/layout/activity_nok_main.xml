@@ -350,7 +350,7 @@
                         android:layout_height="wrap_content"
                         app:layout_constraintStart_toEndOf="@id/group_title_tv"
                         android:layout_marginStart="8dp"
-                        android:text="기본 그룹"
+                        android:text="@{safeAreaVm.currentGroup}"
                         android:textAppearance="@style/TextAppearance.App.16sp.Regular"
                         app:layout_constraintBaseline_toBaselineOf="@id/group_title_tv"/>
 
@@ -361,6 +361,7 @@
                         app:layout_constraintEnd_toEndOf="parent"
                         android:layout_marginStart="8dp"
                         android:text="그룹 변경하기"
+                        android:visibility='@{safeAreaVm.currentGroup == "기본 그룹" ? View.VISIBLE : View.GONE}'
                         android:textColor="@color/blue"
                         android:textAppearance="@style/TextAppearance.App.16sp.SemiBold"
                         app:layout_constraintBaseline_toBaselineOf="@id/group_title_tv"/>
@@ -615,7 +616,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
                     android:layout_marginBottom="8dp"
-                    android:visibility='@{viewModel.navigateEventToString == "SafeAreaInner" ? View.VISIBLE : View.GONE}'
+                    android:visibility='@{viewModel.navigateEventToString == "SafeArea" ? View.GONE : View.VISIBLE}'
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintBottom_toBottomOf="parent"/>
 
@@ -635,7 +636,7 @@
                         app:layout_constraintTop_toTopOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintBottom_toBottomOf="parent"
-                        android:visibility='@{viewModel.navigateEventToString == "SafeAreaInner" ? View.VISIBLE : View.GONE}'
+                        android:visibility='@{viewModel.navigateEventToString == "SafeAreaDetail" ? View.VISIBLE : View.GONE}'
                         />
 
                 </androidx.constraintlayout.widget.ConstraintLayout>

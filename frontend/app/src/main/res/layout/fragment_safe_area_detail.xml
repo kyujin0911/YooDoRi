@@ -4,7 +4,9 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-
+        <variable
+            name="viewModel"
+            type="kr.ac.tukorea.whereareu.presentation.nok.safearea.SafeAreaViewModel" />
     </data>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
@@ -33,6 +35,17 @@
                     android:src="@drawable/ic_arrow_back_24"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/group_name_tv"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="@{viewModel.currentGroup}"
+                    android:textAppearance="@style/TextAppearance.App.20sp.ExtraBold"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="@id/back_btn"
+                    app:layout_constraintTop_toBottomOf="@id/back_btn" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
