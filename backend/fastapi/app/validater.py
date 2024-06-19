@@ -25,17 +25,16 @@ class validateInSafeArea:
             return nearest_safe_area, True
     
     async def pushNotification(self, fcm_token, latest_location, before_location, safeArea):
+        
         if latest_location.isInSafeArea == 0 and before_location.isInSafeArea == 1:
             data = {
                 "safeAreaName" : safeArea.area_name,
                 "time" : latest_location.time
             }
-            send_push_notification(fcm_token, "안심 구역 이탈", "",data)
+            await send_push_notification(fcm_token, "안심 구역 이탈", "", data)
         elif latest_location.isInSafeArea == 1 and before_location.isInSafeArea == 0:
             data = {
                 "safeAreaName" : safeArea.area_name,
                 "time" : latest_location.time
             }
-            send_push_notification(fcm_token, "안심 구역 진입", "",data)
-    
-
+            await send_push_notification(fcm_token, "안심 구역 진입", "", data)
