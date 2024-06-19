@@ -55,6 +55,7 @@ import kr.ac.tukorea.whereareu.presentation.nok.home.NokHomeViewModel
 import kr.ac.tukorea.whereareu.presentation.nok.safearea.SafeAreaDetailFragmentDirections
 import kr.ac.tukorea.whereareu.presentation.nok.safearea.SafeAreaViewModel
 import kr.ac.tukorea.whereareu.presentation.nok.safearea.SelectGroupDialogFragment
+import kr.ac.tukorea.whereareu.presentation.nok.meaningfulplace.MeaningfulPlaceViewModel
 import kr.ac.tukorea.whereareu.presentation.nok.setting.SettingViewModel
 import kr.ac.tukorea.whereareu.util.extension.EditTextUtil.setOnEditorActionListener
 import kr.ac.tukorea.whereareu.util.extension.getUserKey
@@ -72,6 +73,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
     private val homeViewModel: NokHomeViewModel by viewModels()
     private val settingViewModel: SettingViewModel by viewModels()
     private val locationHistoryViewModel: LocationHistoryViewModel by viewModels()
+    private val meaningfulViewModel: MeaningfulPlaceViewModel by viewModels()
     private val safeAreaViewModel: SafeAreaViewModel by viewModels()
 
     private var updateLocationJob: Job? = null
@@ -171,6 +173,13 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
         repeatOnStarted {
             homeViewModel.isPredicted.collect {
                 Log.d("isPredicted", it.toString())
+            }
+        }
+
+        repeatOnStarted {
+            meaningfulViewModel.meaningEvent.collect { event ->
+                Log.d("$tag meaningfulEvent collect", event.toString())
+                handleMeaningfulEvent(event)
             }
         }
     }
@@ -275,7 +284,9 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
 
     private fun handleNavigationEvent(event: NokHomeViewModel.NavigateEvent) {
         when (event) {
-            NokHomeViewModel.NavigateEvent.Home -> {}
+            NokHomeViewModel.NavigateEvent.Home -> {
+                initMarker()
+            }
 
             is NokHomeViewModel.NavigateEvent.HomeState -> {
                 behavior.isDraggable = true
@@ -294,7 +305,11 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
             }
 
             NokHomeViewModel.NavigateEvent.MeaningfulPlace -> {
-                behavior.state = BottomSheetBehavior.STATE_HALF_EXPANDED
+                clearSettingFragmentUI()
+//                stopHomeFragmentJob()
+                // 이걸 지워야 상세보기 시 마커가 사라지지 않음
+                stopGetDementiaLocation()
+                clearLocationFragmentUI()
             }
 
             NokHomeViewModel.NavigateEvent.SafeArea -> {
@@ -640,6 +655,50 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
         }
     }
 
+    private fun handleMeaningfulEvent(event: MeaningfulPlaceViewModel.MeaningfulEvent) {
+        when (event) {
+            is MeaningfulPlaceViewModel.MeaningfulEvent.StartMeaningful -> {
+                meaningfulViewModel.meaningful()
+            }
+
+            is MeaningfulPlaceViewModel.MeaningfulEvent.MeaningfulPlaceForPage -> {
+                event.meaningfulPlaceForListForPage.forEach { meaningfulPlace ->
+                    homeMarkers.add(
+                        Marker().apply {
+                            setMarker(
+                                latLng = meaningfulPlace.latLng,
+                                markerIconColor = MarkerIcons.YELLOW,
+                                text = meaningfulPlace.address,
+                                naverMap = naverMap
+                            )
+                        }
+                    )
+                }
+            }
+
+            is MeaningfulPlaceViewModel.MeaningfulEvent.SearchNearbyPoliceStationForPage -> {
+                event.policeStationList.forEach { policeStation ->
+                    homeMarkers.add(Marker().apply {
+                        setMarker(
+                            latLng = policeStation.latLng,
+                            MarkerIcons.BLUE,
+                            policeStation.policeName,
+                            naverMap
+                        )
+                    })
+                }
+            }
+
+            is MeaningfulPlaceViewModel.MeaningfulEvent.MapView -> {
+                behavior.state = event.behavior
+                naverMap?.moveCamera(CameraUpdate.scrollTo(event.coord))
+            }
+
+            else -> {}
+        }
+
+    }
+
     private fun initLocationOverlay(coord: LatLng, speed: Float) {
         val binding = IconLocationOverlayLayoutBinding.inflate(layoutInflater)
         val view = binding.layout
@@ -863,6 +922,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                     behavior.halfExpandedRatio = 0.3f
                 }
 
+                R.id.meaningfulPlaceFragment, R.id.meaningfulPlaceDetailForPageFragment -> {
                 R.id.settingSafeAreaFragment -> {
                     homeViewModel.eventNavigate(NokHomeViewModel.NavigateEvent.SafeAreaSetting)
                     behavior.halfExpandedRatio = 0.2f
@@ -897,6 +957,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
         homeViewModel.setDementiaKey(dementiaKey)
         locationHistoryViewModel.setDementiaKey(dementiaKey)
         safeAreaViewModel.setDementiaKey(dementiaKey)
+        meaningfulViewModel.setDementiaKey(dementiaKey)
 
         val nokKey = getUserKey("nok")
         homeViewModel.setNokKey(nokKey)
@@ -940,5 +1001,11 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
         const val MEANINGFUL_PLACE = 0
         const val HOME = 1
         const val SAFE_AREA = 2
+    }
+
+    private fun initMarker() {
+        homeMarkers.forEach { marker ->
+            marker.map = null
+        }
     }
 }

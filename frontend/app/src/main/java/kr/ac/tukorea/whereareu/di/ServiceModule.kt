@@ -10,6 +10,7 @@ import kr.ac.tukorea.whereareu.data.api.NaverService
 import kr.ac.tukorea.whereareu.data.api.SettingService
 import kr.ac.tukorea.whereareu.data.api.dementia.DementiaHomeService
 import kr.ac.tukorea.whereareu.data.api.nok.LocationHistoryService
+import kr.ac.tukorea.whereareu.data.api.nok.MeaningfulPlaceService
 import kr.ac.tukorea.whereareu.data.api.nok.NokHomeService
 import kr.ac.tukorea.whereareu.data.api.nok.SafeAreaService
 import kr.ac.tukorea.whereareu.data.api.nok.NokMeaningfulPlaceService
