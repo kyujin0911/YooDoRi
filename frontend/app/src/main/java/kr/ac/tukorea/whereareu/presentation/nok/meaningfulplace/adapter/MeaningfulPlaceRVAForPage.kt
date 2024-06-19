@@ -31,7 +31,6 @@ class MeaningfulPlaceRVAForPage :
     }) {
     private var meaningfulPlaceRVAForPageClickListener: MeaningfulPlaceRVAForPageClickListener? = null
 
-    //RVA 클릭 리스너 초기화
     fun setRVAForPageClickListener(outerListener: MeaningfulPlaceRVAForPageClickListener){
         meaningfulPlaceRVAForPageClickListener = outerListener
     }
@@ -45,16 +44,13 @@ class MeaningfulPlaceRVAForPage :
                 mapViewBtn.setOnClickListener {
                     meaningfulPlaceRVAForPageClickListener?.onClickMapView(meaningfulPlace.latLng)
                 }
-
                 infoViewBtn.setOnClickListener {
                     meaningfulPlaceRVAForPageClickListener?.onClickInfoView(meaningfulPlace)
                 }
-
             }
         }
     }
 
-    // 요일을 기준으로 시간 정보 그룹화
     private fun groupTimeInfoList(timeInfoMap: Map<String, List<TimeInfo>>): List<GroupedTimeInfo>{
         val groupedTimeInfoList = mutableListOf<GroupedTimeInfo>()
 
@@ -68,7 +64,6 @@ class MeaningfulPlaceRVAForPage :
             }
             groupedTimeInfoList.add(GroupedTimeInfo(dayOfWeekInKorean, timeList!!))
         }
-
         return groupedTimeInfoList
     }
 

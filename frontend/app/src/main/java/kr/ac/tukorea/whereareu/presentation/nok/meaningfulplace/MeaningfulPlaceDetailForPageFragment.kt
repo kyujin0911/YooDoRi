@@ -44,7 +44,6 @@ class MeaningfulPlaceDetailForPageFragment :
         binding.backBtn.setOnClickListener {
             navigator.popBackStack()
         }
-
         binding.addressTv.text = args.meaningfulPlaceForPage.address
 
         val timeInfoList =
@@ -71,7 +70,6 @@ class MeaningfulPlaceDetailForPageFragment :
         Log.d("dayOfWeek", dayOfWeek.toString())
         binding.radioGroup.check(dayOfWeek)
         binding.timeInfoTv.text = getTimeInfoOfDayOfWeek(timeInfoList, dayOfWeek)
-
         binding.radioGroup.setOnCheckedChangeListener { group, checkedId ->
             binding.timeInfoTv.text = getTimeInfoOfDayOfWeek(timeInfoList, checkedId)
         }
@@ -107,7 +105,6 @@ class MeaningfulPlaceDetailForPageFragment :
             }
             "시간  $text"
         }
-
     }
 
     private fun getCurrentWeek(): Int {
@@ -127,7 +124,6 @@ class MeaningfulPlaceDetailForPageFragment :
     }
 
     private fun convertDayOfWeekInKorean(day: String): String {
-
         return when (day) {
             "Monday" -> "월"
             "Tuesday" -> "화"
@@ -157,7 +153,6 @@ class MeaningfulPlaceDetailForPageFragment :
             }
             groupedTimeInfoList.add(GroupedTimeInfo(dayOfWeek, timeList!!))
         }
-
         return groupedTimeInfoList
     }
 

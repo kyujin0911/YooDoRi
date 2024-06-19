@@ -48,7 +48,6 @@ class MeaningfulPlaceFragment :
             layoutManager = LinearLayoutManager(context)
             adapter = meaningfulPlaceAdapter
         }
-
         meaningfulPlaceAdapter.setRVAForPageClickListener(this)
     }
 
@@ -72,9 +71,6 @@ class MeaningfulPlaceFragment :
             is MeaningfulPlaceViewModel.MeaningfulEvent.StartMeaningful ->{
                 initMeaningfulListRVAForPage()
             }
-
-//            is MeaningfulPlaceViewModel.MeaningfulEvent.
-
             else -> {}
         }
     }
@@ -82,7 +78,6 @@ class MeaningfulPlaceFragment :
     override fun initView() {
         binding.view = this
         binding.viewModel = viewModel
-//        checkLocationPermission()
     }
 
 
@@ -108,5 +103,4 @@ class MeaningfulPlaceFragment :
         )
         navigator.navigate(action)
     }
-
 }

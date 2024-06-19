@@ -31,7 +31,6 @@ class MeaningfulPlaceViewModel @Inject constructor(
     private val _isMeaningful = MutableStateFlow(true)
     val isMeaningful = _isMeaningful.asStateFlow()
 
-
     private val _dementiaKey = MutableStateFlow("")
     private val _nokKey = MutableStateFlow("")
 
@@ -39,8 +38,6 @@ class MeaningfulPlaceViewModel @Inject constructor(
     val meaningEvent = _meaningfulEvent.asSharedFlow()
 
     private val _tempMeaningfulPlace = MutableStateFlow<List<MeaningfulPlaceInfo>>(emptyList())
-
-    val tempPredictLocation = MutableStateFlow<PredictLocation>(PredictLocation())
 
     private val _meaningfulPlace = MutableSharedFlow<List<MeaningfulPlaceInfo>>()
     val meaningfulPlace = _meaningfulPlace.asSharedFlow()
@@ -57,12 +54,11 @@ class MeaningfulPlaceViewModel @Inject constructor(
         data class SearchNearbyPoliceStationForPage(val policeStationList: List<PoliceStationInfo>):
             MeaningfulEvent()
 
-        data object PredictDone : MeaningfulEvent()
+        data object MeaningfulDone : MeaningfulEvent()
 
         data class MapView(val behavior: Int, val coord: LatLng) : MeaningfulEvent()
 
-        data class StopPredict(val isPredicted: Boolean) : MeaningfulEvent()
-
+        data class StopMeaningful(val isMeaningful: Boolean) : MeaningfulEvent()
     }
     fun eventMeaningful(event: MeaningfulEvent){
         viewModelScope.launch {
@@ -88,22 +84,11 @@ class MeaningfulPlaceViewModel @Inject constructor(
         _nokKey.value = nokKey
     }
 
-    fun setIsPredicted(isPredicted: Boolean) {
-        viewModelScope.launch {
-            _isMeaningful.emit(isPredicted)
-            if (isPredicted) {
-                eventMeaningful(MeaningfulEvent.StartMeaningful(isPredicted))
-            } else {
-                eventMeaningful(MeaningfulEvent.StopPredict(isPredicted))
-            }
-        }
-    }
-
     fun meaningful(){
         viewModelScope.launch{
             val time = measureTimeMillis{
                 async{getMeaningfulPlaces()}
-                eventMeaningful(MeaningfulEvent.PredictDone)
+                eventMeaningful(MeaningfulEvent.MeaningfulDone)
             }
         }
     }
