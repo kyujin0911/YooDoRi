@@ -75,10 +75,10 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
     private val locationHistoryViewModel: LocationHistoryViewModel by viewModels()
     private val meaningfulViewModel: MeaningfulPlaceViewModel by viewModels()
     private val safeAreaViewModel: SafeAreaViewModel by viewModels()
-
     private var updateLocationJob: Job? = null
     private var countDownJob: Job? = null
     private var naverMap: NaverMap? = null
+    private val homeMarkers = mutableListOf<Marker>()
     private lateinit var behavior: BottomSheetBehavior<ConstraintLayout>
     private lateinit var navController: NavController
     private val predictMetaData = PredictMetaData()
@@ -305,7 +305,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
             }
 
             NokHomeViewModel.NavigateEvent.MeaningfulPlace -> {
-                clearSettingFragmentUI()
+                //clearSettingFragmentUI()
 //                stopHomeFragmentJob()
                 // 이걸 지워야 상세보기 시 마커가 사라지지 않음
                 stopGetDementiaLocation()
@@ -922,13 +922,12 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                     behavior.halfExpandedRatio = 0.3f
                 }
 
-                R.id.meaningfulPlaceFragment, R.id.meaningfulPlaceDetailForPageFragment -> {
                 R.id.settingSafeAreaFragment -> {
                     homeViewModel.eventNavigate(NokHomeViewModel.NavigateEvent.SafeAreaSetting)
                     behavior.halfExpandedRatio = 0.2f
                 }
 
-                R.id.meaningfulPlaceFragment -> {
+                R.id.meaningfulPlaceFragment, R.id.meaningfulPlaceDetailForPageFragment -> {
                     homeViewModel.eventNavigate(NokHomeViewModel.NavigateEvent.MeaningfulPlace)
                 }
 

@@ -13,7 +13,6 @@ import kr.ac.tukorea.whereareu.data.api.nok.LocationHistoryService
 import kr.ac.tukorea.whereareu.data.api.nok.MeaningfulPlaceService
 import kr.ac.tukorea.whereareu.data.api.nok.NokHomeService
 import kr.ac.tukorea.whereareu.data.api.nok.SafeAreaService
-import kr.ac.tukorea.whereareu.data.api.nok.NokMeaningfulPlaceService
 import retrofit2.Retrofit
 import javax.inject.Singleton
 
@@ -74,7 +73,7 @@ object ServiceModule {
 
     @Provides
     @Singleton
-    fun provideNokMeaningfulPlaceApi(@NetworkModule.BaseRetrofit retrofit: Retrofit): NokMeaningfulPlaceService{
+    fun provideNokMeaningfulPlaceApi(@NetworkModule.BaseRetrofit retrofit: Retrofit): MeaningfulPlaceService {
         return retrofit.buildService()
     }
 }
