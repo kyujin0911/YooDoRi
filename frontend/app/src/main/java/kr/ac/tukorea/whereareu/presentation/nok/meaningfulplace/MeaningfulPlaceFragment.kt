@@ -8,21 +8,20 @@ import dagger.hilt.android.AndroidEntryPoint
 import kr.ac.tukorea.whereareu.R
 import kr.ac.tukorea.whereareu.databinding.FragmentMeaningfulPlaceBinding
 import kr.ac.tukorea.whereareu.presentation.base.BaseFragment
-import kr.ac.tukorea.whereareu.presentation.nok.meaningfulplace.adapter.UserMeaningfulListRVA
 import kr.ac.tukorea.whereareu.util.extension.repeatOnStarted
 
 @AndroidEntryPoint
 class MeaningfulPlaceFragment :
     BaseFragment<FragmentMeaningfulPlaceBinding>(R.layout.fragment_meaningful_place) {
     private val viewModel: MeaningfulPlaceViewModel by activityViewModels()
-    private lateinit var userMeaningfulListRVA: UserMeaningfulListRVA
+    //private lateinit var userMeaningfulListRVA: UserMeaningfulListRVA
 
     //    private var naverMap: NaverMap? = null
 
     override fun initObserver() {
         repeatOnStarted {
             viewModel.userMeaningfulPlaceList.collect {
-                userMeaningfulListRVA.submitList(it)
+                //userMeaningfulListRVA.submitList(it)
                 Log.d("MeaningfulPlaceFragment", "collect")
             }
         }
@@ -36,10 +35,10 @@ class MeaningfulPlaceFragment :
     }
 
     private fun initUserMeaningfulListRVA(){
-        binding.bottomSheetLayout.innerRv.layoutManager = LinearLayoutManager(context)
-        userMeaningfulListRVA = UserMeaningfulListRVA()
+        //binding.bottomSheetLayout.innerRv.layoutManager = LinearLayoutManager(context)
+        //userMeaningfulListRVA = UserMeaningfulListRVA()
 
-        binding.bottomSheetLayout.innerRv.adapter = userMeaningfulListRVA
+        //binding.bottomSheetLayout.innerRv.adapter = userMeaningfulListRVA
     }
 
     private fun getUserMeaningfulPlaces(){
