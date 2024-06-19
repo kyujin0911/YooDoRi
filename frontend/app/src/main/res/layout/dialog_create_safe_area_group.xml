@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/rectangle_corner_10_white"
+        android:minWidth="300dp">
+
+        <TextView
+            android:id="@+id/title_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="20dp"
+            android:text="새 그룹 만들기"
+            android:textAppearance="@style/TextAppearance.App.16sp.ExtraBold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <EditText
+            android:id="@+id/group_name_et"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/gray60"
+            android:hint="그룹 이름을 입력해주세요."
+            android:layout_marginHorizontal="24dp"
+            android:layout_marginTop="24dp"
+            android:textAppearance="@style/TextAppearance.App.16sp.SemiBold"
+            android:textColorHint="@color/gray60"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/title_tv" />
+
+
+        <TextView
+            android:id="@+id/cancel_btn"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:background="@drawable/bg_dialog_cancel_btn"
+            android:gravity="center"
+            android:padding="10dp"
+            android:text="취소"
+            android:textAppearance="@style/TextAppearance.App.16sp.SemiBold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/done_btn"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/group_name_et" />
+
+        <TextView
+            android:id="@+id/done_btn"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_dialog_done_btn"
+            android:gravity="center"
+            android:padding="10dp"
+            android:text="만들기"
+            android:textAppearance="@style/TextAppearance.App.16sp.SemiBold"
+            app:layout_constraintBottom_toBottomOf="@id/cancel_btn"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/cancel_btn"
+            app:layout_constraintTop_toTopOf="@id/cancel_btn" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

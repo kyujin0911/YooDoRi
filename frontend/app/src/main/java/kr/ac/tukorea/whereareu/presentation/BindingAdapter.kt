@@ -1,7 +1,10 @@
 package kr.ac.tukorea.whereareu.presentation
 
 import android.content.Context
+import android.util.Log
 import android.view.View
+import android.view.inputmethod.EditorInfo
+import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -12,6 +15,8 @@ import androidx.databinding.BindingAdapter
 import com.bumptech.glide.Glide
 import kr.ac.tukorea.whereareu.R
 import kr.ac.tukorea.whereareu.presentation.nok.home.NokHomeViewModel
+import kr.ac.tukorea.whereareu.presentation.nok.safearea.SafeAreaViewModel
+import kr.ac.tukorea.whereareu.util.extension.EditTextUtil.setOnEditorActionListener
 import kr.ac.tukorea.whereareu.util.extension.setRingtoneImage
 
 object BindingAdapter {
@@ -55,10 +60,14 @@ object BindingAdapter {
     @BindingAdapter("bind:navigateEvent", "bind:isPredicted")
     @JvmStatic
     fun setBottomSheetVisible(view: ConstraintLayout, navigateEvent: String, isPredicted: Boolean) {
-        view.isVisible = if (navigateEvent == "Home" && !isPredicted) {
-            false
+        if(navigateEvent == "Home"){
+            view.isVisible = if(isPredicted){
+                true
+            } else {
+                false
+            }
         } else {
-            true
+            view.isVisible = true
         }
     }
 
@@ -66,11 +75,12 @@ object BindingAdapter {
     @JvmStatic
     fun setBottomSheetIconVisible(view: ImageView, navigateEvent: String){
         val color = when(navigateEvent){
-            NokHomeViewModel.NavigateEvent.Home.toString() -> R.color.gray40
-            NokHomeViewModel.NavigateEvent.LocationHistory.toString() -> R.color.white
-            NokHomeViewModel.NavigateEvent.MeaningfulPlace.toString() -> R.color.gray40
-            NokHomeViewModel.NavigateEvent.Setting.toString() -> R.color.white
-            NokHomeViewModel.NavigateEvent.SafeArea.toString() -> R.color.gray40
+            "Home" -> R.color.gray40
+            "LocationHistory" -> R.color.white
+            "MeaningfulPlace" -> R.color.gray40
+            "Setting" -> R.color.white
+            "SafeArea" -> R.color.white
+            "SafeAreaInner" -> R.color.gray40
             else -> R.color.white
         }
         view.setColorFilter(ContextCompat.getColor(view.context, color))
@@ -81,4 +91,39 @@ object BindingAdapter {
     fun setStopStatusPeriod(view: TextView, stopStatusPeriod: String){
         view.text = stopStatusPeriod.replace(",", " ~ ")
     }
+
+    @BindingAdapter("bind:navigateEvent", "bind:isPredicted")
+    @JvmStatic
+    fun setHomeComponentBtnVisible(view: TextView, navigateEvent: String, isPredicted: Boolean){
+        Log.d("binding adapter djs", isPredicted.toString())
+        if(navigateEvent == "Home"){
+            view.isVisible = if(isPredicted){
+                false
+            } else {
+                true
+            }
+        } else {
+            view.isVisible = false
+        }
+    }
+
+    @BindingAdapter("bind:dayOfWeek")
+    @JvmStatic
+    fun setDayOfWeekColor(view: TextView, dayOfWeek: String){
+        val drawable = when(dayOfWeek){
+            "토" -> R.drawable.oval_blue
+            "일" -> R.drawable.oval_red
+            else -> R.drawable.oval_black
+        }
+        view.background = ContextCompat.getDrawable(view.context, drawable)
+    }
+
+    @BindingAdapter("bind:searchAddress")
+    @JvmStatic
+    fun EditText.searchAddress(viewModel: SafeAreaViewModel){
+        this.setOnEditorActionListener(EditorInfo.IME_ACTION_DONE){
+            viewModel.fetchCoord(this.text.toString())
+        }
+    }
+
 }

@@ -18,3 +18,7 @@ fun LifecycleOwner.repeatOnStarted(block: suspend CoroutineScope.() -> Unit) {
         lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED, block)
     }
 }
+
+fun Fragment.repeat(block: suspend CoroutineScope.() -> Unit){
+    viewLifecycleOwner.repeatOnStarted(block)
+}

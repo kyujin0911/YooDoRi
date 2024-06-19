@@ -133,6 +133,10 @@ dependencies {
 
     implementation ("com.github.prolificinteractive:material-calendarview:2.0.1")
     implementation ("com.jakewharton.threetenabp:threetenabp:1.2.1")
+
+
+    implementation ("com.github.hongbeomi:DividerSeekBar:v1.0.3")
+
 }
 kapt {
     correctErrorTypes = true

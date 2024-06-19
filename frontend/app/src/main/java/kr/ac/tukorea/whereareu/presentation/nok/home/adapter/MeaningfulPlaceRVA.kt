@@ -30,12 +30,10 @@ class MeaningfulPlaceRVA :
         }
 
     }) {
-    private var policeStationRVAClickListener: PoliceStationRVA.PoliceStationRVAClickListener? = null
     private var meaningfulPlaceRVAClickListener: MeaningfulPlaceRVAClickListener? = null
 
     //RVA 클릭 리스너 초기화
-    fun setRVAClickListener(outerListener: MeaningfulPlaceRVAClickListener, innerListener: PoliceStationRVA.PoliceStationRVAClickListener){
-        policeStationRVAClickListener = innerListener
+    fun setRVAClickListener(outerListener: MeaningfulPlaceRVAClickListener){
         meaningfulPlaceRVAClickListener = outerListener
     }
 
@@ -45,27 +43,14 @@ class MeaningfulPlaceRVA :
             with(binding) {
                 model = meaningfulPlace
 
-                moreViewBtn.setOnClickListener {
-                    meaningfulPlace.isExpanded = meaningfulPlace.isExpanded.not()
-                    notifyItemChanged(bindingAdapterPosition)
-                    Log.d("isExpanded", meaningfulPlace.isExpanded.toString())
-                }
-
                 mapViewBtn.setOnClickListener {
                     meaningfulPlaceRVAClickListener?.onClickMapView(meaningfulPlace.latLng)
                 }
 
-                val policeStationRVA = PoliceStationRVA()
-                policeStationRVA.setPoliceStationRVAClickListener(policeStationRVAClickListener!!)
-                policeRv.adapter = policeStationRVA
-                policeStationRVA.submitList(meaningfulPlace.policeStationInfo)
-
-                val timeInfoRVA = TimeInfoRVA()
-                timeInfoRv.adapter = timeInfoRVA
-                val timeInfo = meaningfulPlace.timeInfo.map {info ->
-                    TimeInfo(convertDayOfWeekInKorean(info.dayOfTheWeek), convertTimeInKorean(info.time))
+                infoViewBtn.setOnClickListener {
+                    meaningfulPlaceRVAClickListener?.onClickInfoView(meaningfulPlace)
                 }
-                timeInfoRVA.submitList(timeInfo)
+
             }
         }
     }
@@ -102,13 +87,13 @@ class MeaningfulPlaceRVA :
 
     private fun convertDayOfWeekInKorean(day: String): String {
         return when (day) {
-            "Monday" -> "월요일"
-            "Tuesday" -> "화요일"
-            "Wednesday" -> "수요일"
-            "Thursday" -> "목요일"
-            "Friday" -> "금요일"
-            "Saturday" -> "토요일"
-            "Sunday" -> "일요일"
+            "Monday" -> "월"
+            "Tuesday" -> "화"
+            "Wednesday" -> "수"
+            "Thursday" -> "목"
+            "Friday" -> "금"
+            "Saturday" -> "토"
+            "Sunday" -> "일"
             else -> "알 수 없음"
         }
     }
@@ -119,5 +104,6 @@ class MeaningfulPlaceRVA :
 
     interface MeaningfulPlaceRVAClickListener{
         fun onClickMapView(latLng: LatLng)
+        fun onClickInfoView(meaningfulPlace: MeaningfulPlaceInfo)
     }
 }

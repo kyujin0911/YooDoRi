@@ -12,12 +12,12 @@
         android:title="의미장소" />
 
     <item
-        android:id="@+id/nokHomeFragment"
+        android:id="@+id/homeTab"
         android:icon="@drawable/ic_home"
         android:title="홈"/>
 
     <item
-        android:id="@+id/safeAreaFragment"
+        android:id="@+id/safeAreaTab"
         android:icon="@drawable/ic_safe_zone"
         android:title="안심구역" />
 
