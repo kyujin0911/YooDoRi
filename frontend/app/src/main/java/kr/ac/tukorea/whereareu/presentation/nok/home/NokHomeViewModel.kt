@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kr.ac.tukorea.whereareu.data.model.DementiaKeyRequest
+import kr.ac.tukorea.whereareu.data.model.kakao.address.AddressResponse
 import kr.ac.tukorea.whereareu.data.model.nok.home.LocationInfoResponse
 import kr.ac.tukorea.whereareu.data.model.nok.home.PredictLocationInfo
 import kr.ac.tukorea.whereareu.data.repository.kakao.KakaoRepositoryImpl
@@ -82,6 +83,7 @@ class NokHomeViewModel @Inject constructor(
 
         data class StopPredict(val isPredicted: Boolean) : PredictEvent()
     }
+    private val userMeaningfulPlace = mutableListOf<MeaningfulPlaceInfo>()
 
     sealed interface NavigateEvent{
         data object Home: NavigateEvent

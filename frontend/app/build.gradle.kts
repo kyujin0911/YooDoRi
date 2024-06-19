@@ -10,6 +10,9 @@ plugins {
     id("dagger.hilt.android.plugin")
     id("com.google.dagger.hilt.android")
     id("androidx.navigation.safeargs.kotlin")
+
+    // Firebase추가를 위함
+    id("com.google.gms.google-services")
 }
 
 val properties = Properties().apply{
@@ -117,6 +120,12 @@ dependencies {
 
     //로딩화면
     implementation ("com.airbnb.android:lottie:5.0.2")
+
+    // Firebase 추가
+    implementation(platform("com.google.firebase:firebase-bom:33.0.0"))
+    implementation("com.google.firebase:firebase-messaging-ktx")
+    // 클라우드 메시징을 위해 추가
+    implementation("com.google.firebase:firebase-analytics")
 
     //Glide
     implementation ("com.github.bumptech.glide:glide:4.14.2")

@@ -1,4 +1,8 @@
+<<<<<<<< HEAD:frontend/app/src/main/java/kr/ac/tukorea/whereareu/presentation/nok/setting/SettingUpdateRateFragment.kt
 package kr.ac.tukorea.whereareu.presentation.nok.setting
+========
+package kr.ac.tukorea.whereareu.presentation.nok.setting.updatetime
+>>>>>>>> 38-FCM-연결:frontend/app/src/main/java/kr/ac/tukorea/whereareu/presentation/nok/setting/updatetime/SettingUpdateRateFragment.kt
 
 import android.content.Context.MODE_PRIVATE
 import androidx.fragment.app.activityViewModels

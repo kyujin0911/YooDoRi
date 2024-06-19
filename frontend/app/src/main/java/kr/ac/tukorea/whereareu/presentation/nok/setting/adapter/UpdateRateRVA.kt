@@ -1,4 +1,8 @@
+<<<<<<<< HEAD:frontend/app/src/main/java/kr/ac/tukorea/whereareu/presentation/nok/setting/adapter/UpdateRateRVA.kt
 package kr.ac.tukorea.whereareu.presentation.nok.setting.adapter
+========
+package kr.ac.tukorea.whereareu.presentation.nok.setting.updatetime
+>>>>>>>> 38-FCM-연결:frontend/app/src/main/java/kr/ac/tukorea/whereareu/presentation/nok/setting/updatetime/UpdateRateRVA.kt
 
 import android.view.LayoutInflater
 import android.view.View

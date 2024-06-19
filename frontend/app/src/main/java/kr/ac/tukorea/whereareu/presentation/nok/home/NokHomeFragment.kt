@@ -16,6 +16,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kr.ac.tukorea.whereareu.R
 import kr.ac.tukorea.whereareu.domain.home.InnerItemClickEvent
 import kr.ac.tukorea.whereareu.domain.home.PoliceStationInfo
+import kr.ac.tukorea.whereareu.firebase.FCMService
 import kr.ac.tukorea.whereareu.presentation.base.BaseFragment
 import kr.ac.tukorea.whereareu.presentation.nok.home.adapter.PoliceStationRVA
 import kr.ac.tukorea.whereareu.presentation.nok.home.adapter.MeaningfulPlaceRVA
@@ -33,8 +34,8 @@ class NokHomeFragment : BaseFragment<kr.ac.tukorea.whereareu.databinding.Fragmen
     }
     override fun initObserver() {
         repeatOnStarted {
-            viewModel.predictEvent.collect{ predictEvent ->
-                handlePredictEvent(predictEvent)
+            viewModel.predictEvent.collect { predictEvent ->
+//                handlePredictEvent(predictEvent)
             }
         }
     }
@@ -55,6 +56,8 @@ class NokHomeFragment : BaseFragment<kr.ac.tukorea.whereareu.databinding.Fragmen
     }
 
     override fun initView() {
+        FCMService().getFirebaseToken()
+
         binding.view = this
         binding.viewModel = viewModel
         checkLocationPermission()
@@ -64,11 +67,12 @@ class NokHomeFragment : BaseFragment<kr.ac.tukorea.whereareu.databinding.Fragmen
         binding.rv.apply {
             adapter = meaningfulPlaceRVA
             addItemDecoration(
-            DividerItemDecoration(
-                requireContext(),
-                LinearLayoutManager.VERTICAL
+                DividerItemDecoration(
+                    requireContext(),
+                    LinearLayoutManager.VERTICAL
+                )
             )
-        )}
+        }
         meaningfulPlaceRVA.setRVAClickListener(this, this)
     }
 
@@ -89,7 +93,7 @@ class NokHomeFragment : BaseFragment<kr.ac.tukorea.whereareu.databinding.Fragmen
         })*//*
 
         // half expanded state일 때 접기 제어
-        behavior.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback(){
+        behavior.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
             var isHalfExpanded = false
             override fun onStateChanged(bottomSheet: View, newState: Int) {
                 *//*when(newState){
@@ -150,7 +154,8 @@ class NokHomeFragment : BaseFragment<kr.ac.tukorea.whereareu.databinding.Fragmen
     }
 
     override fun onClickCopyPhoneNumber(phoneNumber: String) {
-        val clipboardManager = requireContext().getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
+        val clipboardManager =
+            requireContext().getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
         clipboardManager.setPrimaryClip(ClipData.newPlainText("", phoneNumber))
         if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2) {
             requireActivity().showToastShort(requireContext(), "전화번호가 복사되었습니다.")
@@ -158,7 +163,8 @@ class NokHomeFragment : BaseFragment<kr.ac.tukorea.whereareu.databinding.Fragmen
     }
 
     override fun onClickCopyAddress(address: String) {
-        val clipboardManager = requireContext().getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
+        val clipboardManager =
+            requireContext().getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
         clipboardManager.setPrimaryClip(ClipData.newPlainText("", address))
         if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2) {
             requireActivity().showToastShort(requireContext(), "주소가 복사되었습니다.")
