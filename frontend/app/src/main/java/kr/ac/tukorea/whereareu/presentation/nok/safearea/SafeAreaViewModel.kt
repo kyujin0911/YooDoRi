@@ -1,24 +1,21 @@
 package kr.ac.tukorea.whereareu.presentation.nok.safearea
 
 import android.util.Log
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.naver.maps.geometry.LatLng
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 import kr.ac.tukorea.whereareu.data.model.nok.safearea.GetCoordRequest
 import kr.ac.tukorea.whereareu.data.model.nok.safearea.RegisterSafeAreaGroupRequest
 import kr.ac.tukorea.whereareu.data.model.nok.safearea.RegisterSafeAreaRequest
 import kr.ac.tukorea.whereareu.data.model.nok.safearea.SafeAreaDto
 import kr.ac.tukorea.whereareu.data.model.nok.safearea.SafeAreaGroup
-import kr.ac.tukorea.whereareu.data.repository.kakao.KakaoRepositoryImpl
 import kr.ac.tukorea.whereareu.data.repository.nok.safearea.SafeAreaRepositoryImpl
 import kr.ac.tukorea.whereareu.util.network.onException
 import kr.ac.tukorea.whereareu.util.network.onSuccess
@@ -55,13 +52,15 @@ class SafeAreaViewModel@Inject constructor(
     private val _currentGroup = MutableStateFlow("기본 그룹")
     val currentGroup = _currentGroup.asStateFlow()
 
+    private var isSafeAreaCreated = false
+
 
     sealed class SafeAreaEvent{
         data class FetchSafeArea(val groupList: List<SafeAreaGroup>): SafeAreaEvent()
 
-        data class FetchSafeAreaGroup(val firstLatLng: LatLng, val safeAreas: List<SafeAreaDto>): SafeAreaEvent()
+        data class FetchSafeAreaGroup(val latLng: LatLng, val isSafeAreaCreated: Boolean, val safeAreas: List<SafeAreaDto>): SafeAreaEvent()
 
-        data class MapView(val behavior: Int, val coord: LatLng) : SafeAreaEvent()
+        data class MapView(val behavior: Int = BottomSheetBehavior.STATE_COLLAPSED, val coord: LatLng) : SafeAreaEvent()
 
         data class RadiusChange(val radius: String): SafeAreaEvent()
 
@@ -128,8 +127,10 @@ class SafeAreaViewModel@Inject constructor(
             )).onSuccess {
                 Log.d("registerSafeArea", it.toString())
                 eventSafeArea(SafeAreaEvent.SuccessRegisterSafeArea)
+                eventSafeArea(SafeAreaEvent.MapView(BottomSheetBehavior.STATE_HALF_EXPANDED, _settingSafeAreaLatLng.value))
                 eventSafeArea(SafeAreaEvent.SettingSafeArea(false))
                 isSettingSafeArea.value = false
+                isSafeAreaCreated = true
             }
         }
     }
@@ -213,8 +214,9 @@ class SafeAreaViewModel@Inject constructor(
                 val firstLatLng = with(it.safeAreas.first()){
                     LatLng(latitude, longitude)
                 }
-                eventSafeArea(SafeAreaEvent.FetchSafeAreaGroup(firstLatLng, it.safeAreas))
+                eventSafeArea(SafeAreaEvent.FetchSafeAreaGroup(firstLatLng, isSafeAreaCreated, it.safeAreas))
                 Log.d("fetchSafeAreaGroup", it.toString())
+                isSafeAreaCreated = false
             }
         }
     }

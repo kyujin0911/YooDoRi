@@ -7,8 +7,6 @@ import android.content.IntentFilter
 import android.graphics.PointF
 import android.util.Log
 import android.view.View
-import android.widget.Toast
-import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
@@ -281,7 +279,9 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
             }
 
             is SafeAreaViewModel.SafeAreaEvent.FetchSafeAreaGroup -> {
-                naverMap?.moveCamera(CameraUpdate.scrollTo(event.firstLatLng))
+                if (!event.isSafeAreaCreated) {
+                    naverMap?.moveCamera(CameraUpdate.scrollTo(event.latLng))
+                }
 
                 event.safeAreas.forEach {safeArea ->
                     val latLng = LatLng(safeArea.latitude, safeArea.longitude)
@@ -811,6 +811,8 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
         } else {
             navController.navigate(R.id.action_safeAreaDetailFragment_to_settingSafeAreaFragment)
         }*/
+        //binding.layout.translationY = 0f
+        //behavior.state = BottomSheetBehavior.STATE_HALF_EXPANDED
         safeAreaViewModel.setIsSettingSafeAreaStatus(true)
     }
 
