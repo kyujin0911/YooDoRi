@@ -34,20 +34,6 @@ class SafeAreaFragment : BaseFragment<FragmentSafeAreaBinding>(R.layout.fragment
         initSafeAreaRVA()
         showCreateSafeAreaGroupDialog()
         setSafeArea()
-        /*viewModel.registerSafeArea(
-            RegisterSafeAreaRequest(
-                "253050",
-                "테스트 그룹",
-                "테스트 지역",
-                37.4016759,
-                126.9341057,
-                100
-            )
-        )*/
-        /*binding.tv.setOnClickListener {
-            navigator.navigate(R.id.safeAreaDetailFragment)
-        }*/
-
     }
 
     override fun onResume() {
@@ -104,8 +90,9 @@ class SafeAreaFragment : BaseFragment<FragmentSafeAreaBinding>(R.layout.fragment
         viewModel.eventSafeArea(SafeAreaViewModel.SafeAreaEvent.MapView(BottomSheetBehavior.STATE_COLLAPSED, latLng))
     }
 
-    override fun onClickInfoView(groupKey: String) {
-        viewModel.setCurrentGroup(groupKey)
+    override fun onClickInfoView(groupKey: String, groupName: String) {
+        viewModel.setCurrentGroup(groupName)
+        viewModel.setSelectedSafeAreaGroup(groupName)
         val action = SafeAreaFragmentDirections.actionSafeAreaFragmentToSafeAreaDetailFragment(groupKey)
         navigator.navigate(action)
     }

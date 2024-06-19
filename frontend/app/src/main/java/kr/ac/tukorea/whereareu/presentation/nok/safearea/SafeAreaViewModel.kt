@@ -99,9 +99,11 @@ class SafeAreaViewModel@Inject constructor(
         _settingSafeAreaLatLng.value = coord
     }
 
-    fun setCurrentGroup(groupKey: String){
+    fun setCurrentGroup(groupName: String){
         //getSafeAreaName(groupKey)
-        _currentGroup.value = getSafeAreaName(groupKey)
+        _currentGroup.value = groupName
+        //setSelectedSafeAreaGroup(groupName)
+        eventSafeArea(SafeAreaEvent.ChangeSafeAreaGroup(groupName))
     }
 
     fun eventSafeArea(event: SafeAreaEvent){
@@ -118,7 +120,7 @@ class SafeAreaViewModel@Inject constructor(
             }
             repository.registerSafeArea(RegisterSafeAreaRequest(
                 _dementiaKey.value,
-                _selectedSafeAreaGroup.value.groupKey,
+                getCurrentGroupKey(),
                 settingSafeAreaName.value,
                 _settingSafeAreaLatLng.value.latitude,
                 _settingSafeAreaLatLng.value.longitude,
@@ -205,6 +207,9 @@ class SafeAreaViewModel@Inject constructor(
     fun fetchSafeAreaGroup(groupKey: String){
         viewModelScope.launch {
             repository.fetchSafeAreaGroup(_dementiaKey.value, groupKey).onSuccess {
+                if (it.safeAreas.isEmpty()){
+                    return@launch
+                }
                 val firstLatLng = with(it.safeAreas.first()){
                     LatLng(latitude, longitude)
                 }
@@ -224,8 +229,8 @@ class SafeAreaViewModel@Inject constructor(
         }
     }
 
-    fun createSafeAreaGroup(groupName: String){
-        eventSafeArea(SafeAreaEvent.CreateSafeAreaGroup(groupName))
+    fun getCurrentGroupKey(): String{
+        return _safeAreaGroupList.value.find { it.groupName == _currentGroup.value }?.groupKey ?: ""
     }
 
     fun getSafeAreaGroupList(): List<SafeAreaGroup>{

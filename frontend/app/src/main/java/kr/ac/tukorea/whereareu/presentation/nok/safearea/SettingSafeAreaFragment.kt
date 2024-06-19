@@ -4,6 +4,7 @@ import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import kr.ac.tukorea.whereareu.R
 import kr.ac.tukorea.whereareu.databinding.FragmentSettingSafeAreaBinding
 import kr.ac.tukorea.whereareu.presentation.base.BaseFragment
@@ -13,6 +14,10 @@ import kr.ac.tukorea.whereareu.util.extension.showToast
 class SettingSafeAreaFragment :
     BaseFragment<FragmentSettingSafeAreaBinding>(R.layout.fragment_setting_safe_area) {
     private val viewModel: SafeAreaViewModel by activityViewModels()
+    private val navigator by lazy {
+        findNavController()
+    }
+    private val args: SettingSafeAreaFragmentArgs by navArgs()
     override fun initObserver() {
         repeatOnStarted {
             viewModel.safeAreaEvent.collect { event ->
@@ -29,6 +34,12 @@ class SettingSafeAreaFragment :
 
             is SafeAreaViewModel.SafeAreaEvent.FailRegisterSafeArea -> {
                 requireContext().showToast(requireContext(), event.message)
+            }
+
+            is SafeAreaViewModel.SafeAreaEvent.SuccessRegisterSafeArea -> {
+                val currentKey = viewModel.getCurrentGroupKey()
+                val action = SettingSafeAreaFragmentDirections.actionSettingSafeAreaFragmentToSafeAreaDetailFragment(currentKey)
+                navigator.navigate(action)
             }
 
             else -> {}

@@ -7,6 +7,8 @@ import android.content.IntentFilter
 import android.graphics.PointF
 import android.util.Log
 import android.view.View
+import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
@@ -80,7 +82,6 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
     private val tag = "NokMainActivity:"
     private val isFirstNavigationEvent = mutableListOf(true, true, true)
     private var isRequireStopHomeFragmentJob = true
-
     private fun getUpdateLocationJob(duration: Long): Job {
         return lifecycleScope.launch {
             while (true) {
@@ -175,6 +176,12 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                 handleMeaningfulEvent(event)
             }
         }
+
+        repeatOnStarted {
+            safeAreaViewModel.currentGroup.collect{
+                Log.d("currentGroup", it.toString())
+            }
+        }
     }
 
     private fun handleSafeAreaEvent(event: SafeAreaViewModel.SafeAreaEvent) {
@@ -223,11 +230,14 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                 if (event.isSettingSafeArea) {
                     behavior.isDraggable = false
                     if(navController.currentDestination?.id == R.id.safeAreaFragment){
+                        safeAreaViewModel.setCurrentGroup("기본 그룹")
                         navController.navigate(R.id.action_safeAreaFragment_to_settingSafeAreaFragment)
                     } else {
-                        val action = SafeAreaDetailFragmentDirections.actionSafeAreaDetailFragmentToSettingSafeAreaFragment()
-                        navController.navigate(R.id.action_safeAreaDetailFragment_to_settingSafeAreaFragment)
+                        val action = SafeAreaDetailFragmentDirections.actionSafeAreaDetailFragmentToSettingSafeAreaFragment(binding.groupTv.text.toString())
+                        navController.navigate(action)
                     }
+
+                    naverMap?.moveCamera(CameraUpdate.zoomTo(14.0))
 
                     with(safeAreMetaData) {
                         binding.bottomSheetTopIv.isVisible = false
@@ -242,9 +252,8 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                         isSettingSafeArea = false
                         settingMarker.isVisible = false
                         settingCircleOverlay.isVisible = false
-                        safeAreaViewModel.setSelectedSafeAreaGroup("기본 그룹")
                     }
-                    navController.popBackStack()
+                    //navController.popBackStack()
                 }
             }
 
@@ -892,7 +901,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
 
         binding.bottomNav.setupWithNavController(navController)
         navController.addOnDestinationChangedListener { _, destination, _ ->
-            Log.d("destination", destination.toString())
+            //Log.d("backEntry", navController.currentBackStackEntry.)
 
             if (navController.currentDestination?.id !in listOf(
                     R.id.nokHomeFragment,
@@ -913,6 +922,19 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
             ) {
                 isFirstNavigationEvent[SAFE_AREA] = true
                 safeAreaViewModel.setIsSafeAreaGroupChanged(true)
+            }
+
+            if (destination.id != R.id.safeAreaDetailFragment){
+                with(safeAreMetaData){
+                    markers.forEach {
+                        it.map = null
+                    }
+                    circleOverlays.forEach {
+                        it.map = null
+                    }
+                    markers.clear()
+                    circleOverlays.clear()
+                }
             }
 
             if (destination.id != R.id.locationHistoryFragment) {

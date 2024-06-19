@@ -1,6 +1,8 @@
 package kr.ac.tukorea.whereareu.presentation.nok.safearea
 
 import android.util.Log
+import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.NavArgs
 import androidx.navigation.NavController
@@ -52,9 +54,16 @@ class SafeAreaDetailFragment :
         viewModel.fetchSafeAreaGroup(args.groupKey)
         binding.backBtn.setOnClickListener {
             viewModel.eventSafeArea(SafeAreaViewModel.SafeAreaEvent.ExitDetailFragment)
-            navigator.popBackStack()
+            navigator.popBackStack(R.id.safeAreaFragment, false)
         }
-
+        requireActivity().onBackPressedDispatcher.addCallback(
+            viewLifecycleOwner,
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    findNavController().popBackStack(R.id.safeAreaFragment, false)
+                }
+            }
+        )
     }
 
     private fun initRVA() {

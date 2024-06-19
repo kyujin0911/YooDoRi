@@ -126,6 +126,9 @@
                 android:name="groupName"
                 app:argType="string"
                 android:defaultValue="기본 그룹" />
+            <action
+                android:id="@+id/action_settingSafeAreaFragment_to_safeAreaDetailFragment"
+                app:destination="@id/safeAreaDetailFragment" />
         </fragment>
     </navigation>
 </navigation>
