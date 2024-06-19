@@ -59,7 +59,7 @@ class SafeAreaViewModel@Inject constructor(
     sealed class SafeAreaEvent{
         data class FetchSafeArea(val groupList: List<SafeAreaGroup>): SafeAreaEvent()
 
-        data class FetchSafeAreaGroup(val safeAreas: List<SafeAreaDto>): SafeAreaEvent()
+        data class FetchSafeAreaGroup(val firstLatLng: LatLng, val safeAreas: List<SafeAreaDto>): SafeAreaEvent()
 
         data class MapView(val behavior: Int, val coord: LatLng) : SafeAreaEvent()
 
@@ -204,7 +204,10 @@ class SafeAreaViewModel@Inject constructor(
     fun fetchSafeAreaGroup(groupKey: String){
         viewModelScope.launch {
             repository.fetchSafeAreaGroup(_dementiaKey.value, groupKey).onSuccess {
-                eventSafeArea(SafeAreaEvent.FetchSafeAreaGroup(it.safeAreas))
+                val firstLatLng = with(it.safeAreas.first()){
+                    LatLng(latitude, longitude)
+                }
+                eventSafeArea(SafeAreaEvent.FetchSafeAreaGroup(firstLatLng, it.safeAreas))
                 Log.d("fetchSafeAreaGroup", it.toString())
             }
         }

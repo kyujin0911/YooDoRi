@@ -272,6 +272,8 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
             }
 
             is SafeAreaViewModel.SafeAreaEvent.FetchSafeAreaGroup -> {
+                naverMap?.moveCamera(CameraUpdate.scrollTo(event.firstLatLng))
+
                 event.safeAreas.forEach {safeArea ->
                     val latLng = LatLng(safeArea.latitude, safeArea.longitude)
                     safeAreMetaData.markers.add(Marker().apply {

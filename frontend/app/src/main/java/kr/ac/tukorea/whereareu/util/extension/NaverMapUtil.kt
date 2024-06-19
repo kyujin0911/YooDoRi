@@ -22,13 +22,23 @@ fun Marker.setMarker(
     if (naverMap == null) {
         return
     }
+    val zIndex = when(markerIconColor){
+        MarkerIcons.YELLOW -> 10
+        MarkerIcons.PINK -> 8
+        MarkerIcons.GREEN -> 20
+        MarkerIcons.BLUE -> 5
+        MarkerIcons.RED -> 15
+        else -> 0
+    }
     with(this) {
         position = latLng
         icon = markerIconColor
         captionText = text
         captionRequestedWidth = captionWidth
         map = naverMap
+        this.zIndex = zIndex
     }
+
 }
 
 fun Marker.setMarkerWithInfoWindow(
