@@ -158,9 +158,6 @@ class FCMService : FirebaseMessagingService() {
         }
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP) // Activity Stack 을 경로만 남김(A-B-C-D-B => A-B)
 
-        //23.05.22 Android 최신버전 대응 (FLAG_MUTABLE, FLAG_IMMUTABLE)
-        //PendingIntent.FLAG_MUTABLE은 PendingIntent의 내용을 변경할 수 있도록 허용, PendingIntent.FLAG_IMMUTABLE은 PendingIntent의 내용을 변경할 수 없음
-//        val pendingIntent = PendingIntent.getActivity(this, uniId, intent, PendingIntent.FLAG_ONE_SHOT)
         val pendingIntent = PendingIntent.getActivity(this, uniId, intent, PendingIntent.FLAG_ONE_SHOT or PendingIntent.FLAG_MUTABLE)
 
         val safeAreaName = remoteMessage.data["safeAreaName"] ?: "안심구역1"
@@ -173,7 +170,6 @@ class FCMService : FirebaseMessagingService() {
         val notificationBuilder = NotificationCompat.Builder(this, channelId)
             .setPriority(NotificationCompat.PRIORITY_HIGH) // 중요도 (HIGH: 상단바 표시 가능)
             .setSmallIcon(R.drawable.ic_whereareu_logo) // 아이콘 설정
-//            .setContentTitle(remoteMessage.notification?.title.toString()?: "어디U")
             .setContentTitle(remoteMessage.data["title"] ?: "어디U")
             .setContentText(contentText)
             .setGroupSummary(true)
