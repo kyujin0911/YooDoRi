@@ -80,7 +80,6 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
     private val tag = "NokMainActivity:"
     private val isFirstNavigationEvent = mutableListOf(true, true, true)
     private var isRequireStopHomeFragmentJob = true
-
     private fun getUpdateLocationJob(duration: Long): Job {
         return lifecycleScope.launch {
             while (true) {
@@ -175,6 +174,12 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                 handleMeaningfulEvent(event)
             }
         }
+
+        repeatOnStarted {
+            safeAreaViewModel.currentGroup.collect{
+                Log.d("currentGroup", it.toString())
+            }
+        }
     }
 
     private fun handleSafeAreaEvent(event: SafeAreaViewModel.SafeAreaEvent) {
@@ -223,11 +228,14 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                 if (event.isSettingSafeArea) {
                     behavior.isDraggable = false
                     if(navController.currentDestination?.id == R.id.safeAreaFragment){
+                        safeAreaViewModel.setCurrentGroup("기본 그룹")
                         navController.navigate(R.id.action_safeAreaFragment_to_settingSafeAreaFragment)
                     } else {
-                        val action = SafeAreaDetailFragmentDirections.actionSafeAreaDetailFragmentToSettingSafeAreaFragment()
-                        navController.navigate(R.id.action_safeAreaDetailFragment_to_settingSafeAreaFragment)
+                        val action = SafeAreaDetailFragmentDirections.actionSafeAreaDetailFragmentToSettingSafeAreaFragment(binding.groupTv.text.toString())
+                        navController.navigate(action)
                     }
+
+                    naverMap?.moveCamera(CameraUpdate.zoomTo(14.0))
 
                     with(safeAreMetaData) {
                         binding.bottomSheetTopIv.isVisible = false
@@ -242,18 +250,17 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                         isSettingSafeArea = false
                         settingMarker.isVisible = false
                         settingCircleOverlay.isVisible = false
-                        safeAreaViewModel.setSelectedSafeAreaGroup("기본 그룹")
                     }
-                    navController.popBackStack()
+                    //navController.popBackStack()
                 }
             }
 
             is SafeAreaViewModel.SafeAreaEvent.RadiusChange -> {
                 val zoom = when (event.radius) {
                     "0.5" -> 14.0
-                    "1" -> 13.5
-                    "1.5" -> 13.0
-                    "2" -> 12.5
+                    "1" -> 13.3
+                    "1.5" -> 12.8
+                    "2" -> 12.4
                     "2.5" -> 12.0
                     "3" -> 11.5
                     else -> 14.0
@@ -272,7 +279,9 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
             }
 
             is SafeAreaViewModel.SafeAreaEvent.FetchSafeAreaGroup -> {
-                naverMap?.moveCamera(CameraUpdate.scrollTo(event.firstLatLng))
+                if (!event.isSafeAreaCreated) {
+                    naverMap?.moveCamera(CameraUpdate.scrollTo(event.latLng))
+                }
 
                 event.safeAreas.forEach {safeArea ->
                     val latLng = LatLng(safeArea.latitude, safeArea.longitude)
@@ -802,6 +811,8 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
         } else {
             navController.navigate(R.id.action_safeAreaDetailFragment_to_settingSafeAreaFragment)
         }*/
+        //binding.layout.translationY = 0f
+        //behavior.state = BottomSheetBehavior.STATE_HALF_EXPANDED
         safeAreaViewModel.setIsSettingSafeAreaStatus(true)
     }
 
@@ -847,39 +858,34 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
         behavior.setPeekHeight(300, true)
         behavior.addBottomSheetCallback(object : BottomSheetCallback() {
             override fun onStateChanged(bottomSheet: View, newState: Int) {
+                if (navController.currentDestination?.id == R.id.safeAreaDetailFragment){
+                    if(newState == BottomSheetBehavior.STATE_COLLAPSED){
+                        behavior.state = BottomSheetBehavior.STATE_HALF_EXPANDED
+                    }
+                }
             }
 
             override fun onSlide(bottomSheet: View, slideOffset: Float) {
                 //Log.d("slide offset", slideOffset.toString())
+                /*if(navController.currentDestination?.id == R.id.safeAreaDetailFragment) {
+                    if (slideOffset < 0.3f) {
+                        behavior.state = BottomSheetBehavior.STATE_HALF_EXPANDED
+                    }
+                }*/
 
                 if (slideOffset >= 0.5f) {
                     binding.navermapLogo.isVisible = false
+                    binding.setSafeAreaTv.isVisible = false
                 } else {
                     binding.navermapLogo.isVisible = true
+                    binding.setSafeAreaTv.isVisible = true
                 }
 
-                if (navController.currentDestination?.id in listOf(
-                        R.id.safeAreaDetailFragment,
-                    )
-                ) {
-                    if (slideOffset >= 0.5f) {
-                        binding.setSafeAreaTv.isVisible = false
-                    } else {
-                        binding.setSafeAreaTv.isVisible = true
-                    }
-
-                    /*if (slideOffset <= 0.2f) {
-                        Log.d("뭐ㅓㄴ데", "뭔데")
-                        //behavior.isDraggable = false
-                    } else {
-                        Log.d("뭐ㅓㄴ데", "뭐냐고")
-                        //behavior.isDraggable = true
-                    }*/
-                } else {
+                //} else {
                     if (slideOffset <= 0.3f) {
                         binding.layout.translationY = -slideOffset * bottomSheet.height * 0.5f
                     }
-                }
+               // }
             }
         })
     }
@@ -892,7 +898,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
 
         binding.bottomNav.setupWithNavController(navController)
         navController.addOnDestinationChangedListener { _, destination, _ ->
-            Log.d("destination", destination.toString())
+            //Log.d("backEntry", navController.currentBackStackEntry.)
 
             if (navController.currentDestination?.id !in listOf(
                     R.id.nokHomeFragment,
@@ -913,6 +919,19 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
             ) {
                 isFirstNavigationEvent[SAFE_AREA] = true
                 safeAreaViewModel.setIsSafeAreaGroupChanged(true)
+            }
+
+            if (destination.id != R.id.safeAreaDetailFragment){
+                with(safeAreMetaData){
+                    markers.forEach {
+                        it.map = null
+                    }
+                    circleOverlays.forEach {
+                        it.map = null
+                    }
+                    markers.clear()
+                    circleOverlays.clear()
+                }
             }
 
             if (destination.id != R.id.locationHistoryFragment) {
@@ -936,10 +955,6 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                 behavior.isDraggable = true
             }
 
-            if (destination.id == R.id.safeAreaFragment) {
-                behavior.setPeekHeight(300, true)
-            }
-
             when (destination.id) {
                 R.id.nokHomeFragment, R.id.meaningfulPlaceDetailFragment -> {
                     isRequireStopHomeFragmentJob = true
@@ -956,12 +971,13 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                 }
                 R.id.safeAreaDetailFragment -> {
                     homeViewModel.eventNavigate(NokHomeViewModel.NavigateEvent.SafeAreaDetail)
-                    behavior.halfExpandedRatio = 0.4f
+                    //behavior.halfExpandedRatio = 0.4f
                 }
 
                 R.id.settingSafeAreaFragment -> {
                     homeViewModel.eventNavigate(NokHomeViewModel.NavigateEvent.SafeAreaSetting)
-                    behavior.halfExpandedRatio = 0.2f
+                    behavior.state = BottomSheetBehavior.STATE_HALF_EXPANDED
+                    behavior.halfExpandedRatio = 0.25f
                 }
 
                 R.id.meaningfulPlaceFragment, R.id.meaningfulPlaceDetailForPageFragment -> {

@@ -29,7 +29,7 @@ class SelectGroupDialogFragment: BaseDialogFragment<DialogSelectGroupBinding>(R.
         //binding.radioGroup.check(defaultGroupId)
         binding.doneBtn.setOnClickListener {
             val checkedButton = view?.findViewById<RadioButton>(binding.radioGroup.checkedRadioButtonId)!!
-            viewModel.setSelectedSafeAreaGroup(checkedButton.text.toString())
+            viewModel.setCurrentGroup(checkedButton.text.toString())
             dismiss()
         }
 
