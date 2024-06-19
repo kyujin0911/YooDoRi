@@ -45,6 +45,7 @@ class SafeAreaDetailFragment: BaseFragment<FragmentSafeAreaDetailBinding>(R.layo
         initRVA()
         viewModel.fetchSafeAreaGroup(args.groupKey)
         binding.backBtn.setOnClickListener {
+            viewModel.eventSafeArea(SafeAreaViewModel.SafeAreaEvent.ExitDetailFragment)
             navigator.popBackStack()
         }
 

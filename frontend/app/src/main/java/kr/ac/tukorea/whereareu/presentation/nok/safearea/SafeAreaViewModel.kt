@@ -71,8 +71,9 @@ class SafeAreaViewModel@Inject constructor(
 
         data class CreateSafeAreaGroup(val groupName: String): SafeAreaEvent()
         data object SuccessRegisterSafeArea: SafeAreaEvent()
-        data class FailRegisterSafeArea(val message: String): SafeAreaEvent()
 
+        data object ExitDetailFragment: SafeAreaEvent()
+        data class FailRegisterSafeArea(val message: String): SafeAreaEvent()
         data class FetchCoord(val coord: LatLng): SafeAreaEvent()
     }
 

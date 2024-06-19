@@ -67,6 +67,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
     private val locationHistoryViewModel: LocationHistoryViewModel by viewModels()
     private val meaningfulViewModel: MeaningfulPlaceViewModel by viewModels()
     private val safeAreaViewModel: SafeAreaViewModel by viewModels()
+
     private var updateLocationJob: Job? = null
     private var countDownJob: Job? = null
     private var naverMap: NaverMap? = null
@@ -295,6 +296,19 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                 }
             }
 
+            is SafeAreaViewModel.SafeAreaEvent.ExitDetailFragment -> {
+                with(safeAreMetaData){
+                    markers.forEach {
+                        it.map = null
+                    }
+                    circleOverlays.forEach {
+                        it.map = null
+                    }
+                    markers.clear()
+                    circleOverlays.clear()
+                }
+            }
+
             else -> {}
         }
     }
@@ -354,7 +368,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                     settingMarker.apply {
                         setMarker(
                             naverMap?.cameraPosition?.target!!,
-                            MarkerIcons.YELLOW,
+                            MarkerIcons.PINK,
                             "",
                             naverMap
                         )
@@ -367,11 +381,11 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                         color =
                             ContextCompat.getColor(
                                 this@NokMainActivity,
-                                R.color.transparent_yellow
+                                R.color.purple
                             )
                         outlineWidth = 5
                         outlineColor =
-                            ContextCompat.getColor(this@NokMainActivity, R.color.deep_yellow)
+                            ContextCompat.getColor(this@NokMainActivity, R.color.deep_purple)
                         map = naverMap
                         isVisible = true
 
@@ -907,7 +921,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
             }
 
             if (destination.id !in listOf(
-                R.id.meaningfulPlaceFragment, R.id.meaningfulPlaceDetailFragment
+                R.id.meaningfulPlaceFragment, R.id.meaningfulPlaceDetailForPageFragment
             )){
                 removeMeaningfulPlaceMarker()
             }
