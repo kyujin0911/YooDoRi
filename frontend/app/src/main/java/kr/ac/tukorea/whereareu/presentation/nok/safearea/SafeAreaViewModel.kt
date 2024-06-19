@@ -36,9 +36,6 @@ class SafeAreaViewModel@Inject constructor(
 
     val isSettingSafeArea = MutableStateFlow(false)
 
-    private val _safeAreaRadius = MutableSharedFlow<Double>()
-    val safeAreaRadius = _safeAreaRadius.asSharedFlow()
-
     private val _safeAreaGroupList = MutableStateFlow<List<SafeAreaGroup>>(emptyList())
 
     private val _isSafeAreaGroupChanged = MutableStateFlow(true)
@@ -55,11 +52,14 @@ class SafeAreaViewModel@Inject constructor(
     private val _settingSafeAreaLatLng = MutableStateFlow(LatLng(0.0,0.0))
     val settingSafeAreaLatLng = _settingSafeAreaLatLng.asStateFlow()
 
+    private val _currentGroup = MutableStateFlow("기본 그룹")
+    val currentGroup = _currentGroup.asStateFlow()
+
 
     sealed class SafeAreaEvent{
         data class FetchSafeArea(val groupList: List<SafeAreaGroup>): SafeAreaEvent()
 
-        data class FetchSafeAreaGroup(val safeAreas: List<SafeAreaDto>): SafeAreaEvent()
+        data class FetchSafeAreaGroup(val firstLatLng: LatLng, val safeAreas: List<SafeAreaDto>): SafeAreaEvent()
 
         data class MapView(val behavior: Int, val coord: LatLng) : SafeAreaEvent()
 
@@ -71,8 +71,9 @@ class SafeAreaViewModel@Inject constructor(
 
         data class CreateSafeAreaGroup(val groupName: String): SafeAreaEvent()
         data object SuccessRegisterSafeArea: SafeAreaEvent()
-        data class FailRegisterSafeArea(val message: String): SafeAreaEvent()
 
+        data object ExitDetailFragment: SafeAreaEvent()
+        data class FailRegisterSafeArea(val message: String): SafeAreaEvent()
         data class FetchCoord(val coord: LatLng): SafeAreaEvent()
     }
 
@@ -96,6 +97,11 @@ class SafeAreaViewModel@Inject constructor(
 
     fun setSettingSafeAreaLatLng(coord: LatLng){
         _settingSafeAreaLatLng.value = coord
+    }
+
+    fun setCurrentGroup(groupKey: String){
+        //getSafeAreaName(groupKey)
+        _currentGroup.value = getSafeAreaName(groupKey)
     }
 
     fun eventSafeArea(event: SafeAreaEvent){
@@ -131,6 +137,7 @@ class SafeAreaViewModel@Inject constructor(
             repository.registerSafeAreaGroup(RegisterSafeAreaGroupRequest(_dementiaKey.value, groupName)).onSuccess {
                 _isSafeAreaGroupChanged.value = true
                 eventSafeArea(SafeAreaEvent.CreateSafeAreaGroup(groupName))
+                fetchSafeAreaAll()
                 Log.d("registerSafeAreaGroup", it.toString())
             }.onException {
                 Log.d("registerSafeAreaGroup", it.toString())
@@ -198,7 +205,10 @@ class SafeAreaViewModel@Inject constructor(
     fun fetchSafeAreaGroup(groupKey: String){
         viewModelScope.launch {
             repository.fetchSafeAreaGroup(_dementiaKey.value, groupKey).onSuccess {
-                eventSafeArea(SafeAreaEvent.FetchSafeAreaGroup(it.safeAreas))
+                val firstLatLng = with(it.safeAreas.first()){
+                    LatLng(latitude, longitude)
+                }
+                eventSafeArea(SafeAreaEvent.FetchSafeAreaGroup(firstLatLng, it.safeAreas))
                 Log.d("fetchSafeAreaGroup", it.toString())
             }
         }
@@ -220,6 +230,12 @@ class SafeAreaViewModel@Inject constructor(
 
     fun getSafeAreaGroupList(): List<SafeAreaGroup>{
         return _safeAreaGroupList.value
+    }
+
+    private fun getSafeAreaName(groupKey: String): String{
+        val groupName = _safeAreaGroupList.value.find { it.groupKey == groupKey }?.groupName
+        Log.d("groupName", groupName.toString())
+        return groupName ?: ""
     }
 
     fun setSelectedSafeAreaGroup(groupName: String){

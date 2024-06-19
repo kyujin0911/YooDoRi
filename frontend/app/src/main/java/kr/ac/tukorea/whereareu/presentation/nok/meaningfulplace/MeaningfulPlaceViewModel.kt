@@ -38,11 +38,6 @@ class MeaningfulPlaceViewModel @Inject constructor(
     private val _meaningfulEvent = MutableSharedFlow<MeaningfulEvent>()
     val meaningEvent = _meaningfulEvent.asSharedFlow()
 
-//    private val _navigateEvent = MutableSharedFlow<NavigateEvent>()
-//    val navigateEvent = _navigateEvent.asSharedFlow()
-
-//    val navigateEventToString = MutableStateFlow(NavigateEvent.Home.toString())
-
     private val _tempMeaningfulPlace = MutableStateFlow<List<MeaningfulPlaceInfo>>(emptyList())
 
     val tempPredictLocation = MutableStateFlow<PredictLocation>(PredictLocation())
@@ -55,6 +50,7 @@ class MeaningfulPlaceViewModel @Inject constructor(
         data class StartMeaningful(val isMeaningful: Boolean) : MeaningfulEvent()
 
         data class MeaningfulPlaceForPage(
+            val firstLatLng: LatLng,
             val meaningfulPlaceForListForPage: List<MeaningfulPlaceInfo>
         ): MeaningfulEvent()
 
@@ -122,8 +118,8 @@ class MeaningfulPlaceViewModel @Inject constructor(
                 eventMeaningful(MeaningfulEvent.SearchNearbyPoliceStationForPage(policeStationInfo))
                 meaningfulPlace.toModel(policeStationInfo)
             }
-
-            eventMeaningful(MeaningfulEvent.MeaningfulPlaceForPage(meaningfulPlaceInfo))
+            val firstLatLng = meaningfulPlaceInfo.first().latLng
+            eventMeaningful(MeaningfulEvent.MeaningfulPlaceForPage(firstLatLng, meaningfulPlaceInfo))
             _tempMeaningfulPlace.value = meaningfulPlaceInfo
             _meaningfulPlace.emit(meaningfulPlaceInfo)
         }.onException {
