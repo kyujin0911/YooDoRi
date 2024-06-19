@@ -12,6 +12,7 @@ class nok_info(Base):
     nok_phonenumber = Column(String)
     update_rate = Column(String)
     dementia_info_key = Column(String)
+    fcm_token = Column(String)
 
 class dementia_info(Base):
     __tablename__ = 'dementia_info'
