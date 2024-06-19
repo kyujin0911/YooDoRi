@@ -258,9 +258,9 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
             is SafeAreaViewModel.SafeAreaEvent.RadiusChange -> {
                 val zoom = when (event.radius) {
                     "0.5" -> 14.0
-                    "1" -> 13.5
-                    "1.5" -> 13.0
-                    "2" -> 12.5
+                    "1" -> 13.3
+                    "1.5" -> 12.8
+                    "2" -> 12.4
                     "2.5" -> 12.0
                     "3" -> 11.5
                     else -> 14.0
@@ -858,39 +858,34 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
         behavior.setPeekHeight(300, true)
         behavior.addBottomSheetCallback(object : BottomSheetCallback() {
             override fun onStateChanged(bottomSheet: View, newState: Int) {
+                if (navController.currentDestination?.id == R.id.safeAreaDetailFragment){
+                    if(newState == BottomSheetBehavior.STATE_COLLAPSED){
+                        behavior.state = BottomSheetBehavior.STATE_HALF_EXPANDED
+                    }
+                }
             }
 
             override fun onSlide(bottomSheet: View, slideOffset: Float) {
                 //Log.d("slide offset", slideOffset.toString())
+                /*if(navController.currentDestination?.id == R.id.safeAreaDetailFragment) {
+                    if (slideOffset < 0.3f) {
+                        behavior.state = BottomSheetBehavior.STATE_HALF_EXPANDED
+                    }
+                }*/
 
                 if (slideOffset >= 0.5f) {
                     binding.navermapLogo.isVisible = false
+                    binding.setSafeAreaTv.isVisible = false
                 } else {
                     binding.navermapLogo.isVisible = true
+                    binding.setSafeAreaTv.isVisible = true
                 }
 
-                if (navController.currentDestination?.id in listOf(
-                        R.id.safeAreaDetailFragment,
-                    )
-                ) {
-                    if (slideOffset >= 0.5f) {
-                        binding.setSafeAreaTv.isVisible = false
-                    } else {
-                        binding.setSafeAreaTv.isVisible = true
-                    }
-
-                    /*if (slideOffset <= 0.2f) {
-                        Log.d("뭐ㅓㄴ데", "뭔데")
-                        //behavior.isDraggable = false
-                    } else {
-                        Log.d("뭐ㅓㄴ데", "뭐냐고")
-                        //behavior.isDraggable = true
-                    }*/
-                } else {
+                //} else {
                     if (slideOffset <= 0.3f) {
                         binding.layout.translationY = -slideOffset * bottomSheet.height * 0.5f
                     }
-                }
+               // }
             }
         })
     }
@@ -960,10 +955,6 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                 behavior.isDraggable = true
             }
 
-            if (destination.id == R.id.safeAreaFragment) {
-                behavior.setPeekHeight(300, true)
-            }
-
             when (destination.id) {
                 R.id.nokHomeFragment, R.id.meaningfulPlaceDetailFragment -> {
                     isRequireStopHomeFragmentJob = true
@@ -980,12 +971,13 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                 }
                 R.id.safeAreaDetailFragment -> {
                     homeViewModel.eventNavigate(NokHomeViewModel.NavigateEvent.SafeAreaDetail)
-                    behavior.halfExpandedRatio = 0.4f
+                    //behavior.halfExpandedRatio = 0.4f
                 }
 
                 R.id.settingSafeAreaFragment -> {
                     homeViewModel.eventNavigate(NokHomeViewModel.NavigateEvent.SafeAreaSetting)
-                    behavior.halfExpandedRatio = 0.2f
+                    behavior.state = BottomSheetBehavior.STATE_HALF_EXPANDED
+                    behavior.halfExpandedRatio = 0.25f
                 }
 
                 R.id.meaningfulPlaceFragment, R.id.meaningfulPlaceDetailForPageFragment -> {
