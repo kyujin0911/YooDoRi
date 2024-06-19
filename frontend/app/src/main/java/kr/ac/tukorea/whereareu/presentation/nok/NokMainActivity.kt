@@ -845,7 +845,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
         behavior.state = BottomSheetBehavior.STATE_COLLAPSED
         behavior.isFitToContents = false
         behavior.halfExpandedRatio = 0.3f
-        behavior.setPeekHeight(200, true)
+        behavior.setPeekHeight(300, true)
         behavior.addBottomSheetCallback(object : BottomSheetCallback() {
             override fun onStateChanged(bottomSheet: View, newState: Int) {
             }
@@ -956,7 +956,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                 }
                 R.id.safeAreaDetailFragment -> {
                     homeViewModel.eventNavigate(NokHomeViewModel.NavigateEvent.SafeAreaDetail)
-                    behavior.halfExpandedRatio = 0.3f
+                    behavior.halfExpandedRatio = 0.4f
                 }
 
                 R.id.settingSafeAreaFragment -> {

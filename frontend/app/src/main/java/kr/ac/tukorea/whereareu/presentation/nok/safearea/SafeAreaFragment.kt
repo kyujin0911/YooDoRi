@@ -105,6 +105,7 @@ class SafeAreaFragment : BaseFragment<FragmentSafeAreaBinding>(R.layout.fragment
     }
 
     override fun onClickInfoView(groupKey: String) {
+        viewModel.setCurrentGroup(groupKey)
         val action = SafeAreaFragmentDirections.actionSafeAreaFragmentToSafeAreaDetailFragment(groupKey)
         navigator.navigate(action)
     }

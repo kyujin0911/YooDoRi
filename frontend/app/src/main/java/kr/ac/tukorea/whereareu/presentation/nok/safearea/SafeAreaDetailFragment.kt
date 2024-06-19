@@ -42,6 +42,7 @@ class SafeAreaDetailFragment: BaseFragment<FragmentSafeAreaDetailBinding>(R.layo
     }
 
     override fun initView() {
+        binding.viewModel = viewModel
         initRVA()
         viewModel.fetchSafeAreaGroup(args.groupKey)
         binding.backBtn.setOnClickListener {

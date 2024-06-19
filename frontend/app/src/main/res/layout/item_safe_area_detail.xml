@@ -18,7 +18,6 @@
             android:id="@+id/area_name_tv"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="12dp"
             android:layout_marginTop="4dp"
             android:gravity="start"
             android:text="@{model.areaName}"
