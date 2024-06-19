@@ -123,6 +123,7 @@ dependencies {
 
     // Firebase 추가
     implementation(platform("com.google.firebase:firebase-bom:33.0.0"))
+    implementation("com.google.firebase:firebase-analytics-ktx")
     implementation("com.google.firebase:firebase-messaging-ktx")
     // 클라우드 메시징을 위해 추가
     implementation("com.google.firebase:firebase-analytics")

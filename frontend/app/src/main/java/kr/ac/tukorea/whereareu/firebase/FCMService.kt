@@ -28,10 +28,6 @@ import kr.ac.tukorea.whereareu.presentation.nok.NokMainActivity
 
 
 class FCMService : FirebaseMessagingService() {
-//    푸시 알림으로 보낼 수 있는 메세지는 2가지
-//    1. Notification: 앱이 실행중(포그라운드)일 떄만 푸시 알림이 옴
-//    2. Data: 실행중이거나 백그라운드(앱이 실행중이지 않을때) 알림이 옴
-
     private val TAG = "FirebaseService"
 
     //channel 설정
@@ -39,8 +35,6 @@ class FCMService : FirebaseMessagingService() {
     private val channelName = "어디U Cnannel"
     private val channelDescription = "어디U를 위한 채널"
 
-    // 싱글톤
-    // 잠금화면 알림 표시
     object PushUtils {
         private var mWakeLock: PowerManager.WakeLock? = null
 
@@ -69,7 +63,6 @@ class FCMService : FirebaseMessagingService() {
     override fun onNewToken(token: String) {
         Log.d(TAG, "new Token: $token")
 
-        // 토큰 값을 따로 저장
         val pref = this.getSharedPreferences("FCMtoken", Context.MODE_PRIVATE)
         val editor = pref.edit()
         editor.putString("FCMtoken", token).apply()
@@ -83,12 +76,6 @@ class FCMService : FirebaseMessagingService() {
         PushUtils.acquireWakeLock(this)
 
         Log.d(TAG, "From: " + remoteMessage!!.from)
-
-        // Notification 메시지를 수신할 경우
-        // remoteMessage.notification?.body!! 여기에 내용이 저장되있음
-        // Log.d(TAG, "Notification Message Body: " + remoteMessage.notification?.body!!)
-
-        //받은 remoteMessage의 값 출력해보기. 데이터메세지 / 알림메세지
         Log.d(TAG, "Message data : ${remoteMessage.data}")
         Log.d(TAG, "Message noti : ${remoteMessage.notification}")
 
@@ -151,8 +138,7 @@ class FCMService : FirebaseMessagingService() {
                 .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
                 .build()
 
-//            val channel = NotificationChannel(channelId, channelName, importance).apply {
-            val channel = NotificationChannel(channelId, channelName, NotificationManager.IMPORTANCE_HIGH).apply {
+            val channel = NotificationChannel(channelId, channelName, importance).apply {
                 description = channelDescription
                 lockscreenVisibility = Notification.VISIBILITY_PUBLIC
                 setSound(soundUri, audioAttributes)
