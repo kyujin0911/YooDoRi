@@ -338,11 +338,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
             }
 
             NokHomeViewModel.NavigateEvent.MeaningfulPlace -> {
-                //clearSettingFragmentUI()
-//                stopHomeFragmentJob()
-                // 이걸 지워야 상세보기 시 마커가 사라지지 않음
-                stopGetDementiaLocation()
-                clearLocationFragmentUI()
+                setBottomSheetBehaviorForFirstNavigationEvent(MEANINGFUL_PLACE)
             }
 
             NokHomeViewModel.NavigateEvent.SafeArea -> {
@@ -926,6 +922,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
             if (destination.id !in listOf(
                 R.id.meaningfulPlaceFragment, R.id.meaningfulPlaceDetailForPageFragment
             )){
+                isFirstNavigationEvent[MEANINGFUL_PLACE] = true
                 removeMeaningfulPlaceMarker()
             }
 
