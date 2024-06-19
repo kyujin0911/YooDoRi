@@ -705,4 +705,5 @@
             app:menu="@menu/nok_main_menu" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
+
 </layout>

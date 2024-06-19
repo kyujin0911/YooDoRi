@@ -10,6 +10,7 @@ import kr.ac.tukorea.whereareu.data.api.NaverService
 import kr.ac.tukorea.whereareu.data.api.SettingService
 import kr.ac.tukorea.whereareu.data.api.dementia.DementiaHomeService
 import kr.ac.tukorea.whereareu.data.api.nok.LocationHistoryService
+import kr.ac.tukorea.whereareu.data.api.nok.MeaningfulPlaceService
 import kr.ac.tukorea.whereareu.data.api.nok.NokHomeService
 import kr.ac.tukorea.whereareu.data.api.nok.SafeAreaService
 import retrofit2.Retrofit
@@ -67,6 +68,12 @@ object ServiceModule {
     @Provides
     @Singleton
     fun provideSafeAreaAPI(@NetworkModule.BaseRetrofit retrofit: Retrofit): SafeAreaService {
+        return retrofit.buildService()
+    }
+
+    @Provides
+    @Singleton
+    fun provideNokMeaningfulPlaceApi(@NetworkModule.BaseRetrofit retrofit: Retrofit): MeaningfulPlaceService {
         return retrofit.buildService()
     }
 }

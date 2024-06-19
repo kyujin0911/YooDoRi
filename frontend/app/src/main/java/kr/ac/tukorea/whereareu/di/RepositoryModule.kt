@@ -12,6 +12,7 @@ import kr.ac.tukorea.whereareu.data.api.NaverService
 import kr.ac.tukorea.whereareu.data.api.nok.NokHomeService
 import kr.ac.tukorea.whereareu.data.api.SettingService
 import kr.ac.tukorea.whereareu.data.api.nok.LocationHistoryService
+import kr.ac.tukorea.whereareu.data.api.nok.MeaningfulPlaceService
 import kr.ac.tukorea.whereareu.data.api.nok.SafeAreaService
 import kr.ac.tukorea.whereareu.data.repository.dementia.home.DementiaHomeRepository
 import kr.ac.tukorea.whereareu.data.repository.dementia.home.DementiaHomeRepositoryImpl
@@ -25,6 +26,8 @@ import kr.ac.tukorea.whereareu.data.repository.nok.history.LocationHistoryReposi
 import kr.ac.tukorea.whereareu.data.repository.nok.history.LocationHistoryRepositoryImpl
 import kr.ac.tukorea.whereareu.data.repository.nok.home.NokHomeRepository
 import kr.ac.tukorea.whereareu.data.repository.nok.home.NokHomeRepositoryImpl
+import kr.ac.tukorea.whereareu.data.repository.nok.meaningfulplace.MeaningfulPlaceRepository
+import kr.ac.tukorea.whereareu.data.repository.nok.meaningfulplace.MeaningfulPlaceRepositoryImpl
 import kr.ac.tukorea.whereareu.data.repository.nok.safearea.SafeAreaRepository
 import kr.ac.tukorea.whereareu.data.repository.nok.safearea.SafeAreaRepositoryImpl
 import kr.ac.tukorea.whereareu.data.repository.setting.SettingRepository
@@ -82,4 +85,10 @@ object RepositoryModule {
         safeAreaService: SafeAreaService
     ): SafeAreaRepository = SafeAreaRepositoryImpl(safeAreaService)
 
+
+    @ViewModelScoped
+    @Provides
+    fun providesMeaningfulPlaceRepository(
+        meaningfulPlaceService: MeaningfulPlaceService
+    ): MeaningfulPlaceRepository = MeaningfulPlaceRepositoryImpl(meaningfulPlaceService)
 }

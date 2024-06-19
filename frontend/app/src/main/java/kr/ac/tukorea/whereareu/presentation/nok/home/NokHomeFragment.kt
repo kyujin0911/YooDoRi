@@ -13,6 +13,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kr.ac.tukorea.whereareu.R
 import kr.ac.tukorea.whereareu.databinding.FragmentHomeBinding
 import kr.ac.tukorea.whereareu.domain.home.MeaningfulPlaceInfo
+import kr.ac.tukorea.whereareu.firebase.FCMService
 import kr.ac.tukorea.whereareu.presentation.base.BaseFragment
 import kr.ac.tukorea.whereareu.presentation.login.nok.NokIdentityFragmentDirections
 import kr.ac.tukorea.whereareu.presentation.nok.home.adapter.MeaningfulPlaceRVA
@@ -39,8 +40,8 @@ class NokHomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home
     }
     override fun initObserver() {
         repeatOnStarted {
-            viewModel.predictEvent.collect{ predictEvent ->
-                handlePredictEvent(predictEvent)
+            viewModel.predictEvent.collect { predictEvent ->
+//                handlePredictEvent(predictEvent)
             }
         }
 
@@ -88,6 +89,8 @@ class NokHomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home
     }
 
     override fun initView() {
+        FCMService().getFirebaseToken()
+
         binding.view = this
         binding.viewModel = viewModel
         checkLocationPermission()
