@@ -123,19 +123,6 @@ class MeaningfulPlaceDetailForPageFragment :
         }
     }
 
-    private fun convertDayOfWeekInKorean(day: String): String {
-        return when (day) {
-            "Monday" -> "월"
-            "Tuesday" -> "화"
-            "Wednesday" -> "수"
-            "Thursday" -> "목"
-            "Friday" -> "금"
-            "Saturday" -> "토"
-            "Sunday" -> "일"
-            else -> "알 수 없음"
-        }
-    }
-
     private fun convertTimeInKorean(time: String): String {
         return "${time.substring(0 until 2)}시~${time.substring(2 until 4)}시"
     }
@@ -145,7 +132,6 @@ class MeaningfulPlaceDetailForPageFragment :
 
         val dayOfWeeks = timeInfoMap.keys
         dayOfWeeks.forEach { dayOfWeek ->
-            //val korean = convertDayOfWeekInKorean(dayOfWeek)
             val timeList = timeInfoMap[dayOfWeek]?.map { timeInfo ->
                 "${timeInfo.time.substring(0 until 2)}시 - ${
                     timeInfo.time.substring(2 until 4)
