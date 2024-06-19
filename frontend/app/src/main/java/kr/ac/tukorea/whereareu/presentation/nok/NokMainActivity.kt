@@ -695,6 +695,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
             }
 
             is MeaningfulPlaceViewModel.MeaningfulEvent.MeaningfulPlaceForPage -> {
+                naverMap?.moveCamera(CameraUpdate.scrollTo(event.firstLatLng))
                 event.meaningfulPlaceForListForPage.forEach { meaningfulPlace ->
                     meaningulPlaceMarkers.add(
                         Marker().apply {
