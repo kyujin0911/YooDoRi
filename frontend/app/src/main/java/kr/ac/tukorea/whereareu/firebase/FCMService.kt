@@ -18,9 +18,16 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
+import dagger.hilt.android.EntryPointAccessors
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kr.ac.tukorea.whereareu.R
+import kr.ac.tukorea.whereareu.di.FCMServiceEntryPoint
 import kr.ac.tukorea.whereareu.presentation.nok.NokMainActivity
-import kr.ac.tukorea.whereareu.presentation.nok.home.NokHomeViewModel
+import kr.ac.tukorea.whereareu.util.network.onError
+import kr.ac.tukorea.whereareu.util.network.onException
+import kr.ac.tukorea.whereareu.util.network.onSuccess
 
 class FCMService : FirebaseMessagingService() {
     private val TAG = "FirebaseService"
@@ -28,6 +35,7 @@ class FCMService : FirebaseMessagingService() {
     private val channelName = "어디U Channel"
     private val channelDescription = "어디U를 위한 채널"
 
+    private val serviceScope = CoroutineScope(Dispatchers.IO)
 
     object PushUtils {
         private var mWakeLock: PowerManager.WakeLock? = null
@@ -63,6 +71,7 @@ class FCMService : FirebaseMessagingService() {
         val pref = this.getSharedPreferences("FCMtoken", Context.MODE_PRIVATE)
         val editor = pref.edit()
         editor.putString("FCMtoken", token).apply()
+        editor.commit()
         Log.i(TAG, "토큰 저장")
     }
 
@@ -75,7 +84,6 @@ class FCMService : FirebaseMessagingService() {
 
         if (remoteMessage.notification != null) {
             showNotification(remoteMessage.notification!!, remoteMessage.data)
-
         } else if (remoteMessage.data.isNotEmpty()) {
             sendNotification(remoteMessage)
             Log.d(TAG, "title: ${remoteMessage.data["title"].toString()}")
@@ -84,10 +92,28 @@ class FCMService : FirebaseMessagingService() {
             Log.e(TAG, "data가 비어있습니다. 메시지를 수신하지 못했습니다.")
         }
 
-        val intent = Intent("FCM_SERVICE")
-        intent.putExtra("title", remoteMessage.data["title"])
-        intent.putExtra("body", remoteMessage.data["body"])
-        LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
+        // EntryPoint를 사용하여 NokHomeRepositoryImpl을 가져옴
+        val hiltEntryPoint = EntryPointAccessors.fromApplication(applicationContext, FCMServiceEntryPoint::class.java)
+        val repository = hiltEntryPoint.nokHomeRepository()
+
+        // 코루틴을 사용하여 비동기 작업 수행
+        val spf = getSharedPreferences("OtherUser", MODE_PRIVATE)
+        val key = spf.getString("key", "")
+        serviceScope.launch {
+            repository.getDementiaLocationInfo(key!!).onSuccess {
+                // 성공적으로 위치 정보를 가져왔을 때의 처리
+                Log.d(TAG, "Location info: $it")
+
+                val intent = Intent("UPDATE_LOCATION").apply{
+                    putExtra("locationInfo",it.toString())
+                }
+                LocalBroadcastManager.getInstance(applicationContext).sendBroadcast(intent)
+            }.onError {
+                Log.e(TAG, "Error fetching location info")
+            }.onException {
+                Log.e(TAG, "Exception fetching location info")
+            }
+        }
     }
 
     private fun createNotificationChannel() {
