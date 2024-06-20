@@ -2,6 +2,7 @@ package kr.ac.tukorea.whereareu.presentation.base
 
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -59,6 +60,7 @@ abstract class BaseFragment<V : ViewDataBinding>(@LayoutRes val layoutResource: 
 
     override fun onDestroyView() {
         super.onDestroyView()
+        Log.d("fragment onDestroyView", "onDestroyView")
         _binding = null
     }
 }

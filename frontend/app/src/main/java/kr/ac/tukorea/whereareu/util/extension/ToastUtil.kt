@@ -27,6 +27,10 @@ fun Activity.showToastOnView(context: Context, text: String, y: Int) {
     }
 }
 
+fun Context.showToast(context: Context, text: String){
+    Toast.makeText(context, text, Toast.LENGTH_SHORT).show()
+}
+
 fun Activity.showToastShort(context: Context, text: String){
     //Toast.makeText(context, text, Toast.LENGTH_SHORT).show()
     val binding = ToastLayoutBinding.inflate(layoutInflater)

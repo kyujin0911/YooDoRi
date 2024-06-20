@@ -15,7 +15,7 @@ from .util import JWTService
 from .config import Config
 from .schedularFunc import SchedulerFunc
 from .fcm_notification import send_push_notification
-from .LocationPredict import ForecastLSTMClassification, Preprocessing
+#from .LocationPredict import ForecastLSTMClassification, Preprocessing
 
 import asyncio
 import datetime
@@ -868,15 +868,11 @@ async def predict_location(user_info : int = Depends(APIKeyHeader(name = "Author
         session.close()
 
 
-@router.post("/test/fcm", responses = {200 : {"model" : CommonResponse, "description" : "FCM 전송 성공" }}, description="FCM 테스트")
-async def send_fcm(title: str, body: str, token: str):
+@router.post("/test/fcm", description="FCM 테스트")
+async def send_fcm(title: str, body: str, token: str, data : str):
 
-    send_push_notification(token, body, title)
-
-    return {
-        'status': 'success',
-        'message': 'FCM sent'
-    }
+    return send_push_notification(token, body, title, data)
+    
 
 
 '''#스케줄러 비활성화

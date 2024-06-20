@@ -1,0 +1,106 @@
+{
+  "status": "success",
+  "message": "Safe area information sent",
+  "result": {
+    "safeAreaList": [
+      {
+        "groupName": "notGrouped",
+        "safeAreas": [
+          {
+            "areaName": "2",
+            "latitude": 37.123456,
+            "longitude": 127.123456,
+            "radius": 100
+          },
+          {
+            "areaName": "집",
+            "latitude": 37.123456,
+            "longitude": 127.123456,
+            "radius": 100
+          },
+          {
+            "areaName": "2",
+            "latitude": 37.123456,
+            "longitude": 127.123456,
+            "radius": 100
+          }
+        ]
+      },
+      {
+        "groupName": "안심구역 그룹 1",
+        "safeAreas": [
+          {
+            "areaName": "집",
+            "latitude": 37.123456,
+            "longitude": 127.123456,
+            "radius": 100
+          },
+          {
+            "areaName": "놀이터",
+            "latitude": 37.123456,
+            "longitude": 127.123456,
+            "radius": 100
+          }
+        ]
+      },
+      {
+        "groupName": "안심구역 그룹 2",
+        "safeAreas": [
+          {
+            "areaName": "앞마당",
+            "latitude": 37.123456,
+            "longitude": 127.123456,
+            "radius": 100
+          }
+        ]
+      },
+      {
+        "groupName": "테스트 그룹",
+        "safeAreas": [
+          {
+            "areaName": "테스트 지역",
+            "latitude": 37.4016759,
+            "longitude": 126.9341057,
+            "radius": 100
+          },
+          {
+            "areaName": "테스트 지역",
+            "latitude": 37.4016759,
+            "longitude": 126.9341057,
+            "radius": 100
+          },
+          {
+            "areaName": "테스트 지역",
+            "latitude": 37.4016759,
+            "longitude": 126.9341057,
+            "radius": 100
+          },
+          {
+            "areaName": "테스트 지역",
+            "latitude": 37.4016759,
+            "longitude": 126.9341057,
+            "radius": 100
+          },
+          {
+            "areaName": "테스트 지역",
+            "latitude": 37.4016759,
+            "longitude": 126.9341057,
+            "radius": 100
+          },
+          {
+            "areaName": "테스트 지역",
+            "latitude": 37.4016759,
+            "longitude": 126.9341057,
+            "radius": 100
+          },
+          {
+            "areaName": "테스트 지역",
+            "latitude": 37.4016759,
+            "longitude": 126.9341057,
+            "radius": 100
+          }
+        ]
+      }
+    ]
+  }
+}

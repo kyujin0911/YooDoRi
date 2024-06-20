@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="16dp">
+
+        <TextView
+            android:id="@+id/cancel_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="취소"
+            android:textAppearance="@style/TextAppearance.App.16sp.Bold"
+            android:textColor="@color/blue"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/save_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="저장"
+            android:textAppearance="@style/TextAppearance.App.16sp.Bold"
+            android:textColor="@color/blue"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/safe_area_radius_title_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="안심구역 반경"
+            android:layout_marginTop="16dp"
+            app:layout_constraintStart_toStartOf="parent"
+            android:textAppearance="@style/TextAppearance.App.16sp.ExtraBold"
+            app:layout_constraintTop_toBottomOf="@id/cancel_btn"/>
+
+        <TextView
+            android:id="@+id/safe_area_radius_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="@style/TextAppearance.App.16sp.SemiBold"
+            app:layout_constraintStart_toEndOf="@id/safe_area_radius_title_tv"
+            android:layout_marginStart="8dp"
+            android:text="0.5km"
+            tools:text="3km"
+            app:layout_constraintBaseline_toBaselineOf="@id/safe_area_radius_title_tv"/>
+
+        <SeekBar
+            android:id="@+id/seek_bar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:layout_marginHorizontal="4dp"
+            android:max="5"
+            android:progressDrawable="@drawable/seekbar"
+            android:splitTrack="false"
+            android:thumb="@drawable/seekbar_thumb"
+            app:layout_constraintTop_toBottomOf="@id/safe_area_radius_title_tv" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

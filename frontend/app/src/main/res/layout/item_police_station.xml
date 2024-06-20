@@ -13,7 +13,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingVertical="12dp">
+        android:layout_marginVertical="8dp">
 
         <TextView
             android:id="@+id/name_tv"
@@ -29,7 +29,7 @@
             android:id="@+id/phone_number_title_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="12dp"
             android:text="전화번호"
             android:textAppearance="@style/TextAppearance.App.14sp.Regular"
             app:layout_constraintTop_toBottomOf="@id/road_address_tv"
@@ -43,7 +43,7 @@
             android:layout_marginStart="8dp"
             android:text="@{model.policePhoneNumber}"
             android:textAppearance="@style/TextAppearance.App.14sp.Regular"
-            app:layout_constraintTop_toBottomOf="@id/road_address_tv"
+            app:layout_constraintBaseline_toBaselineOf="@id/phone_number_title_tv"
             app:layout_constraintStart_toEndOf="@id/phone_number_title_tv"
             tools:text="010-0000-0000" />
 
@@ -63,7 +63,7 @@
             android:id="@+id/road_address_title_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="12dp"
             android:text="주소"
             android:textAppearance="@style/TextAppearance.App.14sp.Regular"
             app:layout_constraintTop_toBottomOf="@id/name_tv"
@@ -90,7 +90,7 @@
             android:maxLines="1"
             android:ellipsize="end"
             android:textAppearance="@style/TextAppearance.App.14sp.Regular"
-            app:layout_constraintTop_toBottomOf="@id/name_tv"
+            app:layout_constraintBaseline_toBaselineOf="@id/road_address_title_tv"
             app:layout_constraintStart_toEndOf="@id/road_address_title_tv"
             tools:text="경기도 무슨시 무슨동" />
 
@@ -111,6 +111,7 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center"
+            android:layout_marginTop="20dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/phone_number_tv">
             <TextView
@@ -129,6 +130,16 @@
                 android:scaleX="-1"
                 app:tint="@color/gray60"/>
         </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/gray20"
+            android:layout_marginTop="16dp"
+            app:layout_constraintTop_toBottomOf="@id/map_view_btn"
+            app:layout_constraintBottom_toBottomOf="parent"
+            />
+
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

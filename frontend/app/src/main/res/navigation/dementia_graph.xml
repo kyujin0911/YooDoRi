@@ -31,11 +31,11 @@
         android:label="LocationHistoryFragment" />
     <fragment
         android:id="@+id/safeAreaFragment2"
-        android:name="kr.ac.tukorea.whereareu.presentation.SafeAreaFragment"
+        android:name="kr.ac.tukorea.whereareu.presentation.nok.safearea.SafeAreaFragment"
         android:label="SafeAreaFragment" />
     <fragment
         android:id="@+id/meaningfulPlaceFragment2"
-        android:name="kr.ac.tukorea.whereareu.presentation.MeaningfulPlaceFragment"
+        android:name="kr.ac.tukorea.whereareu.presentation.nok.meaningfulplace.MeaningfulPlaceFragment"
         android:label="MeaningfulPlaceFragment" />
     <fragment
         android:id="@+id/dementiaHomeFragment"

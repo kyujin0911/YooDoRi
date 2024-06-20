@@ -5,6 +5,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import com.prolificinteractive.materialcalendarview.CalendarDay
 import com.prolificinteractive.materialcalendarview.format.ArrayWeekDayFormatter
+import kotlinx.coroutines.flow.collect
 import kr.ac.tukorea.whereareu.R
 import kr.ac.tukorea.whereareu.databinding.DialogCalendarBinding
 import kr.ac.tukorea.whereareu.presentation.base.BaseDialogFragment
@@ -13,6 +14,7 @@ import kr.ac.tukorea.whereareu.util.calendar.SaturdayDecorator
 import kr.ac.tukorea.whereareu.util.calendar.SelectedMonthDecorator
 import kr.ac.tukorea.whereareu.util.calendar.SundayDecorator
 import kr.ac.tukorea.whereareu.util.calendar.TodayDecorator
+import kr.ac.tukorea.whereareu.util.extension.repeatOnStarted
 import java.time.LocalDate
 
 class CalendarDialogFragment: BaseDialogFragment<DialogCalendarBinding>(R.layout.dialog_calendar) {
@@ -24,7 +26,11 @@ class CalendarDialogFragment: BaseDialogFragment<DialogCalendarBinding>(R.layout
         this.onCalendarClickListener = listener
     }
     override fun initObserver() {
+        repeatOnStarted {
+            viewModel.selectedDates.collect{
 
+            }
+        }
     }
 
     override fun initView() {
