@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools">
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:bind="http://schemas.android.com/apk/res-auto">
 
     <data>
         <variable
             name="model"
-            type="kr.ac.tukorea.whereareu.data.model.nok.home.TimeInfo" />
+            type="kr.ac.tukorea.whereareu.domain.home.GroupedTimeInfo" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -16,11 +17,14 @@
 
         <TextView
             android:id="@+id/day_of_the_week_tv"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
             android:text="@{model.dayOfTheWeek}"
-            tools:text="요일"
+            android:gravity="center"
+            tools:text="화"
+            bind:dayOfWeek="@{model.dayOfTheWeek}"
             android:textAppearance="@style/TextAppearance.App.12sp.SemiBold"
+            android:textColor="@color/white"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"/>
 
@@ -29,7 +33,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:text="@{model.time}"
             tools:text="시간"
             android:layout_marginStart="6dp"
             android:textAppearance="@style/TextAppearance.App.12sp.regular"

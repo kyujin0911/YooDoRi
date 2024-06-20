@@ -1,40 +1,54 @@
 package kr.ac.tukorea.whereareu.presentation.nok.home
 
-import android.content.ClipData
-import android.content.ClipboardManager
-import android.content.Context.CLIPBOARD_SERVICE
 import android.content.pm.PackageManager
-import android.os.Build
+import android.os.Bundle
 import android.util.Log
+import android.view.View
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.activityViewModels
-import androidx.recyclerview.widget.DividerItemDecoration
-import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.navigation.NavController
+import androidx.navigation.fragment.findNavController
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.naver.maps.geometry.LatLng
 import dagger.hilt.android.AndroidEntryPoint
 import kr.ac.tukorea.whereareu.R
-import kr.ac.tukorea.whereareu.domain.home.InnerItemClickEvent
-import kr.ac.tukorea.whereareu.domain.home.PoliceStationInfo
+import kr.ac.tukorea.whereareu.databinding.FragmentHomeBinding
+import kr.ac.tukorea.whereareu.domain.home.MeaningfulPlaceInfo
+import kr.ac.tukorea.whereareu.firebase.FCMService
 import kr.ac.tukorea.whereareu.presentation.base.BaseFragment
-import kr.ac.tukorea.whereareu.presentation.nok.home.adapter.PoliceStationRVA
+import kr.ac.tukorea.whereareu.presentation.login.nok.NokIdentityFragmentDirections
 import kr.ac.tukorea.whereareu.presentation.nok.home.adapter.MeaningfulPlaceRVA
 import kr.ac.tukorea.whereareu.util.extension.repeatOnStarted
-import kr.ac.tukorea.whereareu.util.extension.showToastShort
 
 
 @AndroidEntryPoint
-class NokHomeFragment : BaseFragment<kr.ac.tukorea.whereareu.databinding.FragmentHomeBinding>(R.layout.fragment_home),
-    MeaningfulPlaceRVA.MeaningfulPlaceRVAClickListener, PoliceStationRVA.PoliceStationRVAClickListener {
+class NokHomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home),
+    MeaningfulPlaceRVA.MeaningfulPlaceRVAClickListener {
     private val viewModel: NokHomeViewModel by activityViewModels()
+
     private val LOCATION_PERMISSION_REQUEST_CODE = 1001
     private val meaningfulPlaceRVA by lazy {
         MeaningfulPlaceRVA()
     }
+    private val navigator: NavController by lazy {
+        findNavController()
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        initObserver()
+        initView()
+    }
     override fun initObserver() {
         repeatOnStarted {
-            viewModel.predictEvent.collect{ predictEvent ->
-                handlePredictEvent(predictEvent)
+            viewModel.predictEvent.collect { predictEvent ->
+//                handlePredictEvent(predictEvent)
+            }
+        }
+
+        repeatOnStarted {
+            viewModel.meaningfulPlace.collect{
+                meaningfulPlaceRVA.submitList(it)
             }
         }
     }
@@ -45,71 +59,56 @@ class NokHomeFragment : BaseFragment<kr.ac.tukorea.whereareu.databinding.Fragmen
                 initMeaningfulListRVA()
             }
 
-            is NokHomeViewModel.PredictEvent.MeaningFulPlace -> {
-                Log.d("뭐고", event.meaningfulPlaceForList.toString())
-                meaningfulPlaceRVA.submitList(event.meaningfulPlaceForList)
-            }
+            /*is NokHomeViewModel.PredictEvent.MeaningFulPlace -> {
+                if(meaningfulPlaceRVA.currentList.isEmpty()) {
+                    Log.d("ds", "isEmpty")
+                    meaningfulPlaceRVA.submitList(event.meaningfulPlaceForList)
+                }
+                else{
+                    Log.d("ds", "isNotEmpty")
+                }
+            }*/
+            is NokHomeViewModel.PredictEvent.PredictLocation -> {
+                with(event.predictLocation){
+                    val address = meaningfulPlaceInfo.address
+                    meaningfulPlaceInfo.latLng
+                    binding.addressTv.text = address
+                    val meaningfulPlaceInfo = MeaningfulPlaceInfo(address, emptyList(), meaningfulPlaceInfo.latLng, false, policeStationInfo)
 
+                    binding.mapViewBtn.setOnClickListener {
+                        viewModel.eventPredict(NokHomeViewModel.PredictEvent.MapView(BottomSheetBehavior.STATE_COLLAPSED, meaningfulPlaceInfo.latLng))
+                    }
+
+                    binding.infoViewBtn.setOnClickListener {
+                        val action = NokHomeFragmentDirections.actionNokHomeFragmentToMeaningfulPlaceDetailFragment(meaningfulPlaceInfo)
+                        navigator.navigate(action)
+                    }
+                }
+            }
             else -> {}
         }
     }
 
     override fun initView() {
+        FCMService().getFirebaseToken()
+
         binding.view = this
         binding.viewModel = viewModel
+        viewModel.fetchSafeAreaAll()
         checkLocationPermission()
     }
 
     private fun initMeaningfulListRVA(){
-        binding.rv.apply {
-            adapter = meaningfulPlaceRVA
-            addItemDecoration(
-            DividerItemDecoration(
-                requireContext(),
-                LinearLayoutManager.VERTICAL
-            )
-        )}
-        meaningfulPlaceRVA.setRVAClickListener(this, this)
+        binding.rv.adapter = meaningfulPlaceRVA
+        meaningfulPlaceRVA.setRVAClickListener(this)
     }
 
-    /*private fun initBottomSheet(){
-        behavior = BottomSheetBehavior.from(binding.bottomSheet)
-        behavior.state = BottomSheetBehavior.STATE_COLLAPSED
-        behavior.peekHeight = 20
-        behavior.isFitToContents = false
-        behavior.halfExpandedRatio = 0.3f
-
-        //bottom sheet predict layout과 높이 맞추기
-        *//*val viewTreeObserver: ViewTreeObserver = binding.predictLayout.viewTreeObserver
-        viewTreeObserver.addOnGlobalLayoutListener(object : OnGlobalLayoutListener {
-            override fun onGlobalLayout() {
-                behavior.expandedOffset = binding.predictLayout.height + 35
-                binding.predictLayout.viewTreeObserver.removeOnGlobalLayoutListener(this)
-            }
-        })*//*
-
-        // half expanded state일 때 접기 제어
-        behavior.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback(){
-            var isHalfExpanded = false
-            override fun onStateChanged(bottomSheet: View, newState: Int) {
-                *//*when(newState){
-                    BottomSheetBehavior.STATE_HALF_EXPANDED -> {
-                        isHalfExpanded = true
-                    }
-                    BottomSheetBehavior.STATE_COLLAPSED and BottomSheetBehavior.STATE_HALF_EXPANDED-> {
-                        isHalfExpanded = false
-                    }
-                }*//*
-            }
-
-            override fun onSlide(bottomSheet: View, slideOffset: Float) {
-                *//*if(isHalfExpanded && slideOffset < 0.351f){
-                    behavior.state = BottomSheetBehavior.STATE_COLLAPSED
-                }*//*
-            }
-
-        })
-    }*/
+    override fun onResume() {
+        super.onResume()
+        viewModel.eventMeaningfulPlace()
+        viewModel.eventPredictLocation()
+        initMeaningfulListRVA()
+    }
 
     private fun checkLocationPermission() {
         if (ActivityCompat.checkSelfPermission(
@@ -145,27 +144,14 @@ class NokHomeFragment : BaseFragment<kr.ac.tukorea.whereareu.databinding.Fragmen
 
 
     // inner RVA 클릭 이벤트
-    override fun onClickMoreView(policeStationInfo: PoliceStationInfo) {
-        viewModel.eventInnerItemClick(InnerItemClickEvent(BottomSheetBehavior.STATE_COLLAPSED, policeStationInfo.latLng))
-    }
-
-    override fun onClickCopyPhoneNumber(phoneNumber: String) {
-        val clipboardManager = requireContext().getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
-        clipboardManager.setPrimaryClip(ClipData.newPlainText("", phoneNumber))
-        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2) {
-            requireActivity().showToastShort(requireContext(), "전화번호가 복사되었습니다.")
-        }
-    }
-
-    override fun onClickCopyAddress(address: String) {
-        val clipboardManager = requireContext().getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
-        clipboardManager.setPrimaryClip(ClipData.newPlainText("", address))
-        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2) {
-            requireActivity().showToastShort(requireContext(), "주소가 복사되었습니다.")
-        }
-    }
-
     override fun onClickMapView(latLng: LatLng) {
-        viewModel.eventInnerItemClick(InnerItemClickEvent(BottomSheetBehavior.STATE_COLLAPSED, latLng))
+        viewModel.eventPredict(NokHomeViewModel.PredictEvent.MapView(BottomSheetBehavior.STATE_COLLAPSED, latLng))
+    }
+
+    override fun onClickInfoView(meaningfulPlace: MeaningfulPlaceInfo) {
+        val action = NokHomeFragmentDirections.actionNokHomeFragmentToMeaningfulPlaceDetailFragment(
+            meaningfulPlace
+        )
+        navigator.navigate(action)
     }
 }

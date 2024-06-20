@@ -27,12 +27,6 @@ class LocationHistoryViewModel @Inject constructor(
     private val _locationHistoryEvent = MutableSharedFlow<LocationHistoryEvent>()
     val locationHistoryEvent = _locationHistoryEvent.asSharedFlow()
 
-    private val _progress = MutableStateFlow(0)
-    val progress = _progress.asStateFlow()
-
-    private val _progress2 = MutableStateFlow(0)
-    val progress2 = _progress2.asStateFlow()
-
     private val _maxProgress = MutableStateFlow(0)
     val maxProgress = _maxProgress.asStateFlow()
 
@@ -66,12 +60,10 @@ class LocationHistoryViewModel @Inject constructor(
 
     fun setProgress(progress: Int) {
         eventLocationHistory(LocationHistoryEvent.OnProgressChanged(progress))
-        //_progress.value = progress
     }
 
     fun setProgress2(progress: Int){
         eventLocationHistory(LocationHistoryEvent.OnProgress2Changed(progress))
-        //_progress2.value = progress
     }
 
     fun setMaxProgress(maxProgress: Int) {
@@ -103,7 +95,7 @@ class LocationHistoryViewModel @Inject constructor(
         viewModelScope.launch {
             val list = listOf( async { fetchLocationHistory(date1) },
             async { fetchLocationHistory(date2) }).awaitAll()
-            if (list.isNotEmpty()){
+            if (list[0].isNotEmpty() && list[1].isNotEmpty()){
                 eventLocationHistory(LocationHistoryEvent.FetchSuccessMultiple(list))
                 _maxProgress.value = list[0].indices.last
                 _maxProgress2.value = list[1].indices.last

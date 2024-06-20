@@ -5,6 +5,7 @@ import android.content.Context
 import android.os.Build
 import android.view.WindowManager
 import androidx.core.view.WindowCompat
+import androidx.fragment.app.Fragment
 
 fun Activity.setStatusBarTransparent() {
     window.apply {
@@ -15,6 +16,18 @@ fun Activity.setStatusBarTransparent() {
     }
     if(Build.VERSION.SDK_INT >= 30) {	// API 30 에 적용
         WindowCompat.setDecorFitsSystemWindows(window, false)
+    }
+}
+
+fun Fragment.setStatusBarTransparent() {
+    requireActivity().window.apply {
+        setFlags(
+            WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
+            WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
+        )
+    }
+    if(Build.VERSION.SDK_INT >= 30) {	// API 30 에 적용
+        WindowCompat.setDecorFitsSystemWindows(requireActivity().window, false)
     }
 }
 

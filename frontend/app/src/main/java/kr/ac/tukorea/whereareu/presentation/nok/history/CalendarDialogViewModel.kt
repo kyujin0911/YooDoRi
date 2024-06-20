@@ -1,8 +1,12 @@
 package kr.ac.tukorea.whereareu.presentation.nok.history
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 import org.threeten.bp.LocalDate
 
 class CalendarDialogViewModel: ViewModel() {
@@ -12,14 +16,16 @@ class CalendarDialogViewModel: ViewModel() {
     val selectedDate = MutableStateFlow(LocalDate.MIN)
     val selectedDate2 = MutableStateFlow(LocalDate.MIN)
 
-    val selectedDates = MutableStateFlow(listOf<LocalDate>())
+    val selectedDates = MutableSharedFlow<List<LocalDate>>()
 
     fun setIsMultipleSelected(isMultipleSelected: Boolean){
         _isMultipleSelected.value = isMultipleSelected
     }
 
     fun setSelectedDates(dates: List<LocalDate>){
-        selectedDates.value = dates
+        viewModelScope.launch {
+            selectedDates.emit(dates)
+        }
     }
 
 
@@ -29,5 +35,10 @@ class CalendarDialogViewModel: ViewModel() {
 
     fun setSelectedDate2(date: LocalDate){
         selectedDate2.value = date
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        Log.d("dialog viewmodel", "mvlak")
     }
 }

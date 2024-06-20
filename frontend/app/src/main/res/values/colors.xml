@@ -3,6 +3,7 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="yellow">#FFFFC952</color>
+    <color name="transparent_yellow">#4DFFC952</color>
     <color name="deep_yellow">#FF9800</color>
     <color name="orange">#FFFE5E00</color>
     <color name="green">#FF30DF61</color>
@@ -18,4 +19,5 @@
     <color name="marker_blue">#4DB0FE</color>
     <color name="marker_yellow">#FEC701</color>
     <color name="marker_green">#08D976</color>
+    <color name="gray_bg">#F2F5FA</color>
 </resources>

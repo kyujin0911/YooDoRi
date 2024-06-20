@@ -9,6 +9,7 @@ import com.naver.maps.map.overlay.InfoWindow
 import com.naver.maps.map.overlay.Marker
 import com.naver.maps.map.overlay.OverlayImage
 import com.naver.maps.map.overlay.PathOverlay
+import com.naver.maps.map.util.MarkerIcons
 import kr.ac.tukorea.whereareu.R
 
 fun Marker.setMarker(
@@ -21,13 +22,23 @@ fun Marker.setMarker(
     if (naverMap == null) {
         return
     }
+    val zIndex = when(markerIconColor){
+        MarkerIcons.YELLOW -> 10
+        MarkerIcons.PINK -> 12
+        MarkerIcons.GREEN -> 20
+        MarkerIcons.BLUE -> 5
+        MarkerIcons.RED -> 15
+        else -> 0
+    }
     with(this) {
         position = latLng
         icon = markerIconColor
         captionText = text
         captionRequestedWidth = captionWidth
         map = naverMap
+        this.zIndex = zIndex
     }
+
 }
 
 fun Marker.setMarkerWithInfoWindow(
@@ -40,6 +51,14 @@ fun Marker.setMarkerWithInfoWindow(
     captionWidth: Int = 400
 ) {
     this.setMarker(latLng, markerIconColor, markerText, naverMap, captionWidth)
+    val zIndex = when(markerIconColor){
+        MarkerIcons.YELLOW -> 10
+        MarkerIcons.GREEN -> 20
+        MarkerIcons.BLUE -> 5
+        MarkerIcons.RED -> 15
+        else -> 0
+    }
+    this.zIndex = zIndex
     InfoWindow().apply {
         setAdapter(context, infoText)
         open(this@setMarkerWithInfoWindow)

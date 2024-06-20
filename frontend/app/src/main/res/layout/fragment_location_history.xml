@@ -21,14 +21,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:visibility="@{viewModel.isMultipleSelected ? View.VISIBLE : View.GONE}"
-            app:constraint_referenced_ids="seek_bar2, next2, previous2, movement_detail_tv2, compare_date_tv, date_info_tv, date_info_tv2"/>
+            app:constraint_referenced_ids="seek_bar2, next2, previous2, movement_detail_tv2, date_info_tv, date_info_tv2"/>
 
         <androidx.constraintlayout.widget.Group
             android:id="@+id/single_group"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:visibility="@{viewModel.isMultipleSelected ? View.GONE : View.VISIBLE}"
-            app:constraint_referenced_ids="date_tv, timeInfo_title_tv, movement_title_tv, rv"/>
+            app:constraint_referenced_ids="timeInfo_title_tv, movement_title_tv, rv"/>
 
         <LinearLayout
             android:id="@+id/calendar_btn"
@@ -63,20 +63,7 @@
             android:layout_height="0dp"
             android:gravity="center"
             android:layout_marginStart="16dp"
-            android:text="2024년 3월 24일, 화요일"
-            android:padding="8dp"
-            android:textAppearance="@style/TextAppearance.App.24sp.Bold"
-            app:layout_constraintStart_toEndOf="@id/calendar_btn"
-            app:layout_constraintTop_toTopOf="@id/calendar_btn"
-            app:layout_constraintBottom_toBottomOf="@id/calendar_btn"/>
-
-        <TextView
-            android:id="@+id/compare_date_tv"
-            android:layout_width="wrap_content"
-            android:layout_height="0dp"
-            android:gravity="center"
-            android:layout_marginStart="16dp"
-            android:text="위치 기록 비교"
+            android:text="날짜를 선택해주세요."
             android:padding="8dp"
             android:textAppearance="@style/TextAppearance.App.24sp.Bold"
             app:layout_constraintStart_toEndOf="@id/calendar_btn"
@@ -110,9 +97,9 @@
             android:layout_marginTop="8dp"
             android:layout_marginHorizontal="4dp"
             android:max="@{viewModel.maxProgress2}"
-            android:progressDrawable="@drawable/seekbar"
+            android:progressDrawable="@drawable/seekbar_purple"
             android:splitTrack="false"
-            android:thumb="@drawable/seekbar_thumb"
+            android:thumb="@drawable/seekbar_thumb_purple"
             app:layout_constraintTop_toBottomOf="@id/next2" />
 
 
@@ -231,11 +218,11 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:nestedScrollingEnabled="false"
-            android:orientation="horizontal"
             android:layout_marginTop="16dp"
             android:layout_marginStart="8dp"
             android:overScrollMode="never"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            android:orientation="horizontal"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/seek_bar2"
             app:layout_constraintStart_toEndOf="@id/movement_title_tv"
