@@ -13,6 +13,8 @@ plugins {
 
     // Firebase추가를 위함
     id("com.google.gms.google-services")
+
+    id ("kotlin-parcelize")
 }
 
 val properties = Properties().apply{
