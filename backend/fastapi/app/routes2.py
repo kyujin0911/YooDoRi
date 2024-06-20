@@ -51,7 +51,7 @@ client = OpenAI(
 @router.post("/test/fcm", description="FCM 테스트")
 async def send_fcm(request: FCMRequest):
     
-    send_push_notification(request.token, request.title, request.body, request.data)
+    await send_push_notification(request.token, request.title, request.body, request.data)
 
     return {"status": "success", "message": "FCM sent"}
 
@@ -1070,6 +1070,37 @@ async def get_safe_area_group_info(dementiaKey: str, groupKey: str):
             }
 
             return response
+    finally:
+        session.close()
+
+@router.get("/safeArea/info/all", responses = {200 : {"model" : GetSafeAreaAllResponse, "description" : "전체 안전 지역 정보 전송 성공" }, 404: {"model": ErrorResponse, "description": "안전 지역 정보 없음"}}, description="보호 대상자의 전체 안전 지역 정보 전달(쿼리 스트링)")
+async def get_safe_area_all_info(dementiaKey: str):
+    try:
+        safe_area_list = session.query(models.safe_area_info).filter_by(dementia_key = dementiaKey).all()
+
+        areas = []
+
+        for area in safe_area_list:
+            new_area = {
+                'areaName' : area.area_name,
+                'latitude' : area.latitude,
+                'longitude' : area.longitude,
+                'radius' : area.radius
+            }
+            areas.append(new_area)
+
+        result = {
+            'safeAreas': areas
+        }
+
+        response = {
+            'status': 'success',
+            'message': 'Safe area information sent',
+            'result': result
+        }
+
+        return response
+    
     finally:
         session.close()
 
