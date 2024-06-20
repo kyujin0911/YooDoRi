@@ -74,8 +74,8 @@ class SettingSafeAreaFragment :
 
     private fun cancelSettingSafeArea() {
         binding.cancelBtn.setOnClickListener {
-            navigator.popBackStack()
             viewModel.setIsSettingSafeAreaStatus(false)
+            navigator.popBackStack()
         }
     }
 }

@@ -14,17 +14,20 @@ import android.os.Build
 import android.os.PowerManager
 import android.util.Log
 import androidx.core.app.NotificationCompat
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import kr.ac.tukorea.whereareu.R
 import kr.ac.tukorea.whereareu.presentation.nok.NokMainActivity
+import kr.ac.tukorea.whereareu.presentation.nok.home.NokHomeViewModel
 
 class FCMService : FirebaseMessagingService() {
     private val TAG = "FirebaseService"
     private val channelId: String = "WhereAreU"
     private val channelName = "어디U Channel"
     private val channelDescription = "어디U를 위한 채널"
+
 
     object PushUtils {
         private var mWakeLock: PowerManager.WakeLock? = null
@@ -72,6 +75,7 @@ class FCMService : FirebaseMessagingService() {
 
         if (remoteMessage.notification != null) {
             showNotification(remoteMessage.notification!!, remoteMessage.data)
+
         } else if (remoteMessage.data.isNotEmpty()) {
             sendNotification(remoteMessage)
             Log.d(TAG, "title: ${remoteMessage.data["title"].toString()}")
@@ -79,6 +83,11 @@ class FCMService : FirebaseMessagingService() {
         } else {
             Log.e(TAG, "data가 비어있습니다. 메시지를 수신하지 못했습니다.")
         }
+
+        val intent = Intent("FCM_SERVICE")
+        intent.putExtra("title", remoteMessage.data["title"])
+        intent.putExtra("body", remoteMessage.data["body"])
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
     }
 
     private fun createNotificationChannel() {
