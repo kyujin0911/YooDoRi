@@ -2,6 +2,7 @@ package kr.ac.tukorea.whereareu.presentation.nok.safearea
 
 import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
+import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -77,5 +78,14 @@ class SettingSafeAreaFragment :
             viewModel.setIsSettingSafeAreaStatus(false)
             navigator.popBackStack()
         }
+        requireActivity().onBackPressedDispatcher.addCallback(
+            viewLifecycleOwner,
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    viewModel.setIsSettingSafeAreaStatus(false)
+                    navigator.popBackStack()
+                }
+            }
+        )
     }
 }

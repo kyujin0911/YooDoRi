@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.graphics.PointF
+import android.os.Bundle
 import android.util.Log
 import android.view.View
 import androidx.activity.viewModels
@@ -36,6 +37,7 @@ import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kr.ac.tukorea.whereareu.R
+import kr.ac.tukorea.whereareu.data.model.nok.home.LocationInfoResponse
 import kr.ac.tukorea.whereareu.databinding.ActivityNokMainBinding
 import kr.ac.tukorea.whereareu.databinding.IconLocationOverlayLayoutBinding
 import kr.ac.tukorea.whereareu.domain.history.LocationHistory
@@ -1067,5 +1069,25 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
         meaningulPlaceMarkers.forEach { marker ->
             marker.map = null
         }
+    }
+
+    private val locationUpdateReceiver: BroadcastReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            updateMapWithLocation()
+        }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        LocalBroadcastManager.getInstance(this).registerReceiver(locationUpdateReceiver, IntentFilter("UPDATE_LOCATION"))
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(locationUpdateReceiver)
+    }
+
+    private fun updateMapWithLocation() {
+        homeViewModel.getDementiaLocation()
     }
 }
