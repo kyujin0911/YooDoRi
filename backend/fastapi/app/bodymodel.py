@@ -54,7 +54,6 @@ class dementiaResult(BaseModel):
 class ReceiveDementiaInfoRequest(BaseModel):
     name : str = Field(examples=["성춘향"])
     phoneNumber : str = Field(examples=["010-1234-5678"])
-    fcmToken : str = Field(examples=["ksjdnfjkdasnfljsknafljansdfjlsakn"])
 
 class ReceiveDementiaInfoResponse(BaseModel):
     status: str = Field("success")
@@ -320,3 +319,14 @@ class RegisterSafeAreaGroupResponse(BaseModel):
     status: str = Field("success")
     message: str = Field("메~시~지~")
     result: groupKey
+
+class safeArea(BaseModel):
+    areaName : str = Field(examples=["집"])
+    latitude : float = Field(examples=["37.123456"])
+    longitude : float = Field(examples=["127.123456"])
+    radius : float = Field(examples=["0.5"], description="킬로미터 단위")
+
+class GetSafeAreaAllResponse(BaseModel):
+    status: str = Field("success")
+    message: str = Field("메~시~지~")
+    result: List[safeArea]
