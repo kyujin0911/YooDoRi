@@ -19,14 +19,19 @@ import kotlinx.coroutines.launch
 import kr.ac.tukorea.whereareu.data.model.DementiaKeyRequest
 import kr.ac.tukorea.whereareu.data.model.kakao.address.AddressResponse
 import kr.ac.tukorea.whereareu.data.model.nok.home.LocationInfoResponse
+import kr.ac.tukorea.whereareu.data.model.nok.home.SafeArea
+import kr.ac.tukorea.whereareu.data.model.nok.safearea.SafeAreaGroup
 import kr.ac.tukorea.whereareu.data.repository.kakao.KakaoRepositoryImpl
 import kr.ac.tukorea.whereareu.data.repository.naver.NaverRepositoryImpl
 import kr.ac.tukorea.whereareu.data.repository.nok.home.NokHomeRepositoryImpl
+import kr.ac.tukorea.whereareu.data.repository.nok.safearea.SafeAreaRepository
+import kr.ac.tukorea.whereareu.data.repository.nok.safearea.SafeAreaRepositoryImpl
 import kr.ac.tukorea.whereareu.domain.home.LastLocation
 import kr.ac.tukorea.whereareu.domain.home.MeaningfulPlaceInfo
 import kr.ac.tukorea.whereareu.domain.home.DementiaStatusInfo
 import kr.ac.tukorea.whereareu.domain.home.PoliceStationInfo
 import kr.ac.tukorea.whereareu.domain.home.PredictLocation
+import kr.ac.tukorea.whereareu.presentation.nok.safearea.SafeAreaViewModel
 import kr.ac.tukorea.whereareu.util.network.onError
 import kr.ac.tukorea.whereareu.util.network.onException
 import kr.ac.tukorea.whereareu.util.network.onFail
@@ -37,6 +42,7 @@ import kotlin.system.measureTimeMillis
 @HiltViewModel
 class NokHomeViewModel @Inject constructor(
     private val nokHomeRepository: NokHomeRepositoryImpl,
+    private val safeAreaRepository: SafeAreaRepositoryImpl,
     private val naverRepository: NaverRepositoryImpl,
     private val kakaoRepository: KakaoRepositoryImpl,
 ) : ViewModel() {
@@ -98,6 +104,8 @@ class NokHomeViewModel @Inject constructor(
         data class MapView(val behavior: Int, val coord: LatLng) : PredictEvent()
 
         data class StopPredict(val isPredicted: Boolean) : PredictEvent()
+
+        data class FetchSafeArea(val groupList: List<SafeArea>): PredictEvent()
     }
     private val userMeaningfulPlace = mutableListOf<MeaningfulPlaceInfo>()
 
@@ -308,6 +316,61 @@ class NokHomeViewModel @Inject constructor(
             }
         }.onException {
             Log.d("predict exception", it.toString())
+        }
+    }
+
+    fun fetchSafeAreaAll() {
+        viewModelScope.launch {
+            safeAreaRepository.fetchSafeAreaInfoAll(_dementiaKey.value).onSuccess {response ->
+                if(response.safeAreas.isEmpty()){
+                    return@launch
+                }
+                eventPredict(PredictEvent.FetchSafeArea(response.safeAreas))
+
+                //val safeAreaList = mutableListOf<SafeArea>()
+                //val groupNameList = response.safeAreaList.map { it.groupName}.filterNot { it == "notGrouped" }
+
+                /*response.safeAreaList.forEach { _safeAreaList ->
+                    val temp = if (_safeAreaList.groupName == "notGrouped") {
+                        _safeAreaList.safeAreas.map { safeArea ->
+                            SafeArea(
+                                "",
+                                _safeAreaList.groupKey,
+                                safeArea.areaKey,
+                                safeArea.areaName,
+                                safeArea.latitude,
+                                safeArea.longitude,
+                                safeArea.radius,
+                                SafeAreaRVA.SAFE_AREA
+                            )
+                        }
+                    } else {
+                        _safeAreaList.safeAreas.map {
+                            SafeArea(
+                                _safeAreaList.groupName,
+                                _safeAreaList.groupKey,
+                                "",
+                                "",
+                                0.0,
+                                0.0,
+                                0,
+                                SafeAreaRVA.SAFE_AREA_GROUP
+                            )
+                        }
+                    }
+                    safeAreaList.addAll(temp)
+                }
+                safeAreaList.sortWith(
+                    compareBy(
+                        {it.viewType},
+                        {it.groupName},
+                        {it.areaName}
+                    )
+                )*/
+                //savedStateHandle["safeAreaGroupList"] = groupList
+                //Log.d("safeArea List", safeAreaList.toString())
+                Log.d("fetchSafeArea", response.toString())
+            }
         }
     }
 }

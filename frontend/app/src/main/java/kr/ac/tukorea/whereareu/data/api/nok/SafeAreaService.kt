@@ -1,6 +1,7 @@
 package kr.ac.tukorea.whereareu.data.api.nok
 
 import kr.ac.tukorea.whereareu.data.model.ResponseBody
+import kr.ac.tukorea.whereareu.data.model.nok.home.SafeAreaInfoResponse
 import kr.ac.tukorea.whereareu.data.model.nok.safearea.GetCoordRequest
 import kr.ac.tukorea.whereareu.data.model.nok.safearea.response.GetSafeAreaGroupResponse
 import kr.ac.tukorea.whereareu.data.model.nok.safearea.response.GetSafeAreaResponse
@@ -30,4 +31,7 @@ interface SafeAreaService {
 
     @POST("address/conversion")
     suspend fun getCoord(@Body request: GetCoordRequest): Response<ResponseBody<GetCoordResponse>>
+
+    @GET("safeArea/info/all")
+    suspend fun getSafeAreaInfoAll(@Query("dementiaKey") dementiaKey: String): Response<ResponseBody<SafeAreaInfoResponse>>
 }

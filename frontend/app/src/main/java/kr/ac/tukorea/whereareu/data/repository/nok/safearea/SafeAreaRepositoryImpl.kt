@@ -2,6 +2,7 @@ package kr.ac.tukorea.whereareu.data.repository.nok.safearea
 
 import kr.ac.tukorea.whereareu.data.api.nok.SafeAreaService
 import kr.ac.tukorea.whereareu.data.model.ResponseBody
+import kr.ac.tukorea.whereareu.data.model.nok.home.SafeAreaInfoResponse
 import kr.ac.tukorea.whereareu.data.model.nok.safearea.GetCoordRequest
 import kr.ac.tukorea.whereareu.data.model.nok.safearea.response.GetSafeAreaGroupResponse
 import kr.ac.tukorea.whereareu.data.model.nok.safearea.response.GetSafeAreaResponse
@@ -27,6 +28,10 @@ class SafeAreaRepositoryImpl @Inject constructor(
 
     override suspend fun fetchSafeAreaAll(dementiaKey: String): NetworkResult<GetSafeAreaResponse> {
         return handleApi({api.getSafeAreaAll(dementiaKey)}) { response: ResponseBody<GetSafeAreaResponse> -> response.result}
+    }
+
+    override suspend fun fetchSafeAreaInfoAll(dementiaKey: String): NetworkResult<SafeAreaInfoResponse> {
+        return handleApi({api.getSafeAreaInfoAll(dementiaKey)}) { response: ResponseBody<SafeAreaInfoResponse> -> response.result}
     }
 
     override suspend fun fetchSafeAreaGroup(

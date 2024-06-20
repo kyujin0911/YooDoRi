@@ -24,12 +24,15 @@ import com.naver.maps.map.CameraAnimation
 import com.naver.maps.map.CameraUpdate
 import com.naver.maps.map.MapFragment
 import com.naver.maps.map.NaverMap
+import com.naver.maps.map.NaverMapOptions
 import com.naver.maps.map.OnMapReadyCallback
 import com.naver.maps.map.overlay.CircleOverlay
 import com.naver.maps.map.overlay.Marker
 import com.naver.maps.map.overlay.OverlayImage
 import com.naver.maps.map.overlay.PathOverlay
+import com.naver.maps.map.util.FusedLocationSource
 import com.naver.maps.map.util.MarkerIcons
+import com.naver.maps.map.widget.LocationButtonView
 import com.naver.maps.map.widget.ZoomControlView
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Job
@@ -82,6 +85,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
     private val tag = "NokMainActivity:"
     private val isFirstNavigationEvent = mutableListOf(true, true, true)
     private var isRequireStopHomeFragmentJob = true
+    private lateinit var locationSource: FusedLocationSource
     private fun getUpdateLocationJob(duration: Long): Job {
         return lifecycleScope.launch {
             while (true) {
@@ -240,6 +244,7 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                     naverMap?.moveCamera(CameraUpdate.zoomTo(14.0))
 
                     with(safeAreMetaData) {
+                        naverMap?.locationSource = locationSource
                         binding.bottomSheetTopIv.isVisible = false
                         isSettingSafeArea = true
                         settingMarker.isVisible = true
@@ -692,6 +697,38 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                 behavior.state = event.behavior
                 naverMap?.moveCamera(CameraUpdate.scrollTo(event.coord))
             }
+
+            is NokHomeViewModel.PredictEvent.FetchSafeArea -> {
+                event.groupList.forEach {
+                    val latLng = LatLng(it.latitude, it.longitude)
+                    predictMetaData.safeMarkers.add(
+                        Marker().apply {
+                            setMarker(
+                                latLng,
+                                MarkerIcons.YELLOW,
+                                it.areaName,
+                                naverMap
+                            )
+                        }
+                    )
+                    predictMetaData.safeCircleOverlays.add(
+                        CircleOverlay().apply {
+                            radius = it.radius.times(1000)
+                            center = latLng
+                            outlineWidth = 5
+                            outlineColor = ContextCompat.getColor(
+                                this@NokMainActivity,
+                                R.color.deep_yellow
+                            )
+                            color = ContextCompat.getColor(
+                                this@NokMainActivity,
+                                R.color.transparent_yellow
+                            )
+                            map = naverMap
+                        }
+                    )
+                }
+            }
         }
     }
 
@@ -823,6 +860,8 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
         binding.viewModel = homeViewModel
         binding.safeAreaVm = safeAreaViewModel
         homeViewModel.fetchUserInfo()
+        locationSource =
+            FusedLocationSource(this, LOCATION_PERMISSION_REQUEST_CODE)
         initBottomSheet()
         initMap()
         initNavigator()
@@ -841,13 +880,15 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
     private fun initMap() {
         val fm = supportFragmentManager
         val mapFragment = fm.findFragmentById(R.id.map_fragment) as MapFragment?
-            ?: MapFragment.newInstance().also {
+            ?: MapFragment.newInstance(NaverMapOptions().locationButtonEnabled(false)).also {
                 fm.beginTransaction().add(R.id.map_fragment, it).commit()
             }
         mapFragment.getMapAsync { map ->
             map.uiSettings.isZoomControlEnabled = false
+            //val locationButton: LocationButtonView = findViewById(R.id.navermap_location_button)
             val zoomControlView: ZoomControlView = findViewById(R.id.zoom)
             zoomControlView.map = map
+            //locationButton.map = map
             naverMap = map
         }
     }
@@ -919,6 +960,17 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                     isRequireStopHomeFragmentJob = false
                     stopHomeFragmentJob()
                 }
+            }
+
+            if (destination.id != R.id.nokHomeFragment){
+                predictMetaData.safeMarkers.forEach {
+                    it.map = null
+                }
+                predictMetaData.safeCircleOverlays.forEach {
+                    it.map = null
+                }
+                predictMetaData.safeMarkers.clear()
+                predictMetaData.safeCircleOverlays.clear()
             }
 
             if (destination.id !in listOf(
@@ -1063,6 +1115,9 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
         const val MEANINGFUL_PLACE = 0
         const val HOME = 1
         const val SAFE_AREA = 2
+
+        private const val LOCATION_PERMISSION_REQUEST_CODE = 1000
+
     }
 
     private fun removeMeaningfulPlaceMarker() {

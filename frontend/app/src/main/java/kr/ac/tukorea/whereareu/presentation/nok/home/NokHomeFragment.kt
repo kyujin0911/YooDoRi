@@ -2,6 +2,7 @@ package kr.ac.tukorea.whereareu.presentation.nok.home
 
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.activityViewModels
@@ -93,6 +94,7 @@ class NokHomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home
 
         binding.view = this
         binding.viewModel = viewModel
+        viewModel.fetchSafeAreaAll()
         checkLocationPermission()
     }
 
