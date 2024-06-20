@@ -1,9 +1,11 @@
 package kr.ac.tukorea.whereareu.presentation.nok
 
+import android.Manifest
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.content.pm.PackageManager
 import android.graphics.PointF
 import android.os.Bundle
 import android.util.Log
@@ -17,6 +19,8 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetBehavior.BottomSheetCallback
 import com.naver.maps.geometry.LatLng
@@ -61,6 +65,8 @@ import kr.ac.tukorea.whereareu.util.extension.setInfoWindowText
 import kr.ac.tukorea.whereareu.util.extension.setMarker
 import kr.ac.tukorea.whereareu.util.extension.setMarkerWithInfoWindow
 import kr.ac.tukorea.whereareu.util.extension.setPath
+import kr.ac.tukorea.whereareu.util.location.DefaultLocationClient
+import kr.ac.tukorea.whereareu.util.location.LocationClient
 import kotlin.math.roundToInt
 
 
@@ -85,7 +91,9 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
     private val tag = "NokMainActivity:"
     private val isFirstNavigationEvent = mutableListOf(true, true, true)
     private var isRequireStopHomeFragmentJob = true
-    private lateinit var locationSource: FusedLocationSource
+    //private lateinit var locationSource: FusedLocationSource
+    private lateinit var locationClient: LocationClient
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
     private fun getUpdateLocationJob(duration: Long): Job {
         return lifecycleScope.launch {
             while (true) {
@@ -244,7 +252,10 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
                     naverMap?.moveCamera(CameraUpdate.zoomTo(14.0))
 
                     with(safeAreMetaData) {
-                        naverMap?.locationSource = locationSource
+                        //getLastKnownLocation()
+                        binding.currentLocationIv.setOnClickListener {
+                            getLastKnownLocation()
+                        }
                         binding.bottomSheetTopIv.isVisible = false
                         isSettingSafeArea = true
                         settingMarker.isVisible = true
@@ -329,6 +340,25 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
 
             else -> {}
         }
+    }
+
+    private fun getLastKnownLocation() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return
+        }
+        fusedLocationClient.lastLocation
+            .addOnSuccessListener { location ->
+                if (location != null) {
+                    val latLng = LatLng(location.latitude, location.longitude)
+                    naverMap?.moveCamera(CameraUpdate.scrollTo(latLng))
+                    //locationTextView.text = "Latitude: $latitude, Longitude: $longitude"
+                } else {
+                    //locationTextView.text = "Location not available"
+                }
+            }
+            .addOnFailureListener { exception ->
+                Log.d("getLastKnownLocation", exception.message.toString())
+            }
     }
 
     private fun handleNavigationEvent(event: NokHomeViewModel.NavigateEvent) {
@@ -860,8 +890,9 @@ class NokMainActivity : BaseActivity<ActivityNokMainBinding>(R.layout.activity_n
         binding.viewModel = homeViewModel
         binding.safeAreaVm = safeAreaViewModel
         homeViewModel.fetchUserInfo()
-        locationSource =
-            FusedLocationSource(this, LOCATION_PERMISSION_REQUEST_CODE)
+        //locationSource =
+            //FusedLocationSource(this, LOCATION_PERMISSION_REQUEST_CODE)
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         initBottomSheet()
         initMap()
         initNavigator()
